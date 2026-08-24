@@ -43,6 +43,9 @@ const AuthContext =
 
 const TIEMPO_INACTIVIDAD_MS =  2 * 60 * 1000
 
+// Deshabilitado temporalmente
+const CIERRE_POR_INACTIVIDAD = false
+
 export function AuthProvider({
   children,
 }: AuthProviderProps) {
@@ -115,7 +118,7 @@ export function AuthProvider({
  * dos minutos.
  */
 useEffect(() => {
-  if (!sesion) {
+  if (!CIERRE_POR_INACTIVIDAD || !sesion) {
     return
   }
 

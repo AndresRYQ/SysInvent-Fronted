@@ -1,7 +1,17 @@
-import {  BrowserRouter,  Navigate,  Route,  Routes,} from 'react-router-dom'
-import {  AuthProvider,  useAuth,} from '../hooks/useAuth'
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from 'react-router-dom'
+
+import {
+  AuthProvider,
+  useAuth,
+} from '../hooks/useAuth'
 import { AccessDeniedPage } from '../pages/AccessDeniedPage'
 import { LoginPage } from '../pages/auth/LoginPage'
+import { CategoriasPage } from '../pages/categorias/CategoriasPage'
 import { ProtectedRoute } from './ProtectedRoute'
 import { RoleRoute } from './RoleRoute'
 
@@ -55,7 +65,21 @@ function DashboardTemporal() {
           }}
         >
           <a
-            href="/usuarios"
+            href="/categorias"
+            style={{
+              padding: '12px 18px',
+              borderRadius: '9px',
+              color: '#1f2937',
+              background: '#dff3e2',
+              textDecoration: 'none',
+              fontWeight: 700,
+            }}
+          >
+            Probar algo
+          </a>
+
+          <a
+            href="/categorias"
             style={{
               padding: '12px 18px',
               borderRadius: '9px',
@@ -64,7 +88,7 @@ function DashboardTemporal() {
               textDecoration: 'none',
             }}
           >
-            Probar módulo Usuarios
+            Probar módulo Categorías
           </a>
 
           <button
@@ -81,55 +105,6 @@ function DashboardTemporal() {
             Cerrar sesión
           </button>
         </div>
-      </section>
-    </main>
-  )
-}
-
-function ModuloUsuariosTemporal() {
-  return (
-    <main
-      style={{
-        minHeight: '100vh',
-        padding: '48px 24px',
-        background: '#f4f7f4',
-      }}
-    >
-      <section
-        style={{
-          maxWidth: '760px',
-          margin: '0 auto',
-          padding: '32px',
-          borderRadius: '18px',
-          background: '#ffffff',
-        }}
-      >
-        <p
-          style={{
-            color: '#338f3c',
-            fontWeight: 700,
-          }}
-        >
-          MÓDULO PROTEGIDO
-        </p>
-
-        <h1>Gestión de usuarios</h1>
-
-        <p>
-          Solo el rol Administrador
-          puede ingresar a esta ruta.
-        </p>
-
-        <a
-          href="/dashboard"
-          style={{
-            display: 'inline-block',
-            marginTop: '24px',
-            color: '#287f32',
-          }}
-        >
-          Regresar al dashboard
-        </a>
       </section>
     </main>
   )
@@ -156,7 +131,6 @@ export function AppRouter() {
           />
 
           <Route element={<ProtectedRoute />}>
-            {/* Accesible para cualquier rol */}
             <Route
               path="/dashboard"
               element={<DashboardTemporal />}
@@ -167,7 +141,6 @@ export function AppRouter() {
               element={<AccessDeniedPage />}
             />
 
-            {/* Solo Administrador */}
             <Route
               element={
                 <RoleRoute
@@ -178,10 +151,8 @@ export function AppRouter() {
               }
             >
               <Route
-                path="/usuarios"
-                element={
-                  <ModuloUsuariosTemporal />
-                }
+                path="/categorias"
+                element={<CategoriasPage />}
               />
             </Route>
           </Route>
