@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 
+import { CategoriaDeleteModal } from '../../components/categorias/CategoriaDeleteModal'
+import { CategoriaFormModal } from '../../components/categorias/CategoriaFormModal'
 import {
   FiltrosCategorias,
   type FiltrosCategoriasValores,
@@ -140,7 +142,15 @@ function filtrarCategorias(
   })
 }
 
+function crearFechaActual() {
+  return new Intl.DateTimeFormat('es-PE').format(
+    new Date(),
+  )
+}
+
 export function CategoriasPage() {
+  const [categorias, setCategorias] =
+    useState<Categoria[]>(CATEGORIAS_MOCK)
   const [filtros, setFiltros] =
     useState<FiltrosCategoriasValores>(
       FILTROS_INICIALES,
@@ -151,14 +161,22 @@ export function CategoriasPage() {
     )
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
+  const [modalFormOpen, setModalFormOpen] =
+    useState(false)
+  const [categoriaEnEdicion, setCategoriaEnEdicion] =
+    useState<Categoria | null>(null)
+  const [modalDeleteOpen, setModalDeleteOpen] =
+    useState(false)
+  const [categoriaAEliminar, setCategoriaAEliminar] =
+    useState<Categoria | null>(null)
 
   const categoriasFiltradas = useMemo(
     () =>
       filtrarCategorias(
-        CATEGORIAS_MOCK,
+        categorias,
         filtrosAplicados,
       ),
-    [filtrosAplicados],
+    [categorias, filtrosAplicados],
   )
 
   const totalItems = categoriasFiltradas.length
@@ -189,60 +207,126 @@ export function CategoriasPage() {
   }, [page, pageSize, totalItems])
 
   return (
-    <main className="categories-page app-shell">
-      <div className="container-xl px-0">
-        <div className="categories-panel">
-          <FiltrosCategorias
-            valores={filtros}
-            onChange={(campo, valor) =>
-              setFiltros((actual) => ({
-                ...actual,
-                [campo]: valor,
-              }))
-            }
-            onBuscar={() => {
-              setFiltrosAplicados(filtros)
-              setPage(1)
-            }}
-            onLimpiar={() => {
-              setFiltros(FILTROS_INICIALES)
-              setFiltrosAplicados(FILTROS_INICIALES)
-              setPage(1)
-            }}
-          />
-        </div>
+    <>
+      <main className="categories-page app-shell">
+        <div className="container-xl px-0">
+          <div className="categories-panel">
+            <FiltrosCategorias
+              valores={filtros}
+              onChange={(campo, valor) =>
+                setFiltros((actual) => ({
+                  ...actual,
+                  [campo]: valor,
+                }))
+              }
+              onBuscar={() => {
+                setFiltrosAplicados(filtros)
+                setPage(1)
+              }}
+              onLimpiar={() => {
+                setFiltros(FILTROS_INICIALES)
+                setFiltrosAplicados(FILTROS_INICIALES)
+                setPage(1)
+              }}
+            />
+          </div>
 
-        <div className="categories-panel">
-          <TablaCategorias
-            categorias={categoriasPaginadas}
-            totalItems={totalItems}
-            page={page}
-            pageSize={pageSize}
-            onAgregar={() => {
-              window.alert(
-                'Accion Agregar categoria lista para conectar con formulario o modal.',
-              )
-            }}
-            onEditar={(categoria) => {
-              window.alert(
-                `Editar categoria: ${categoria.nombre}`,
-              )
-            }}
-            onEliminar={(categoria) => {
-              window.alert(
-                `Eliminar categoria: ${categoria.nombre}`,
-              )
-            }}
-            onPageChange={(nextPage) =>
-              setPage(nextPage)
-            }
-            onPageSizeChange={(nextPageSize) => {
-              setPageSize(nextPageSize)
-              setPage(1)
-            }}
-          />
+          <div className="categories-panel">
+            <TablaCategorias
+              categorias={categoriasPaginadas}
+              totalItems={totalItems}
+              page={page}
+              pageSize={pageSize}
+              onAgregar={() => {
+                setCategoriaEnEdicion(null)
+                setModalFormOpen(true)
+              }}
+              onEditar={(categoria) => {
+                setCategoriaEnEdicion(categoria)
+                setModalFormOpen(true)
+              }}
+              onEliminar={(categoria) => {
+                setCategoriaAEliminar(categoria)
+                setModalDeleteOpen(true)
+              }}
+              onPageChange={(nextPage) =>
+                setPage(nextPage)
+              }
+              onPageSizeChange={(nextPageSize) => {
+                setPageSize(nextPageSize)
+                setPage(1)
+              }}
+            />
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+
+      <CategoriaFormModal
+        abierto={modalFormOpen}
+        categoria={categoriaEnEdicion}
+        onClose={() => {
+          setModalFormOpen(false)
+          setCategoriaEnEdicion(null)
+        }}
+        onSubmit={(payload) => {
+          if (categoriaEnEdicion) {
+            setCategorias((actual) =>
+              actual.map((categoria) =>
+                categoria.id ===
+                categoriaEnEdicion.id
+                  ? {
+                      ...categoria,
+                      ...payload,
+                    }
+                  : categoria,
+              ),
+            )
+          } else {
+            setCategorias((actual) => {
+              const nextId = String(
+                actual.length + 1,
+              ).padStart(3, '0')
+
+              return [
+                {
+                  id: `CAT-${nextId}`,
+                  fechaRegistro:
+                    crearFechaActual(),
+                  estado: true,
+                  ...payload,
+                },
+                ...actual,
+              ]
+            })
+          }
+
+          setModalFormOpen(false)
+          setCategoriaEnEdicion(null)
+        }}
+      />
+
+      <CategoriaDeleteModal
+        abierto={modalDeleteOpen}
+        categoria={categoriaAEliminar}
+        onClose={() => {
+          setModalDeleteOpen(false)
+          setCategoriaAEliminar(null)
+        }}
+        onConfirm={() => {
+          if (categoriaAEliminar) {
+            setCategorias((actual) =>
+              actual.filter(
+                (categoria) =>
+                  categoria.id !==
+                  categoriaAEliminar.id,
+              ),
+            )
+          }
+
+          setModalDeleteOpen(false)
+          setCategoriaAEliminar(null)
+        }}
+      />
+    </>
   )
 }

@@ -64,6 +64,11 @@
   transform: translateY(-1px);
 }
 
+.categories-control--textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
 .categories-btn-primary,
 .categories-btn-secondary {
   display: inline-flex !important;
@@ -97,6 +102,20 @@
   color: #1f2937 !important;
   border: 1px solid rgb(17 24 39 / 10%) !important;
   background: #fff !important;
+}
+
+.categories-btn-danger {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 0 18px;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: #b42318 !important;
+  color: #fff !important;
+  font-weight: 800 !important;
 }
 
 .categories-btn-primary:hover,
@@ -270,6 +289,100 @@
   background: #fef3f2 !important;
 }
 
+.categories-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgb(15 23 42 / 45%);
+  backdrop-filter: blur(6px);
+}
+
+.categories-modal-card {
+  width: min(100%, 640px);
+  border: 1px solid var(--brand-border);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgb(15 23 42 / 20%);
+  animation: categories-fade-up 180ms ease;
+}
+
+.categories-modal-card--sm {
+  width: min(100%, 460px);
+  padding: 28px;
+}
+
+.categories-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 24px 0;
+}
+
+.categories-modal-title {
+  margin: 0;
+  color: #13342b;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.categories-modal-copy {
+  margin: 8px 0 0;
+  color: #667085;
+}
+
+.categories-modal-close {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgb(17 24 39 / 10%) !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  color: #344054 !important;
+}
+
+.categories-modal-body {
+  padding: 24px;
+}
+
+.categories-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 0 24px 24px;
+}
+
+.categories-modal-footer--center {
+  justify-content: center;
+  padding: 24px 0 0;
+}
+
+.categories-delete-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  border-radius: 18px;
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.categories-delete-name {
+  margin: 10px 0 0;
+  color: #13342b;
+  font-weight: 800;
+  text-align: center;
+}
+
 .categories-empty-state {
   display: flex;
   flex-direction: column;
@@ -380,5 +493,21 @@
   .categories-pagination__content {
     justify-content: space-between;
     flex-wrap: wrap;
+  }
+
+  .categories-modal-backdrop {
+    padding: 16px;
+  }
+
+  .categories-modal-header,
+  .categories-modal-body,
+  .categories-modal-footer {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .categories-modal-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
   }
 }
