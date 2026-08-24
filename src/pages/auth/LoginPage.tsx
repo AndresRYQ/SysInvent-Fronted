@@ -76,9 +76,24 @@ export function LoginPage() {
   ] = useState(0)
 
   useEffect(() => {
-    document.title =
-      'Iniciar sesión | AGRIHUSAC'
-  }, [])
+  document.title =
+    'Iniciar sesión | AGRIHUSAC'
+
+  const motivoCierre =
+    sessionStorage.getItem(
+      'agrihusac_motivo_cierre',
+    )
+
+  if (motivoCierre === 'inactividad') {
+    setMensajeError(
+      'Tu sesión se cerró por inactividad. Inicia sesión nuevamente.',
+    )
+  }
+
+  sessionStorage.removeItem(
+    'agrihusac_motivo_cierre',
+  )
+}, [])
 
   /*
    * Actualiza el contador del bloqueo
