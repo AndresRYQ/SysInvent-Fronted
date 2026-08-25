@@ -1,6 +1,34 @@
+.categories-page-shell {
+  position: relative;
+  min-height: 100vh;
+  padding: 18px 24px 42px;
+}
+
 .categories-page {
   min-height: 100vh;
   padding: 40px 20px 56px;
+}
+
+.categories-page-body {
+  position: relative;
+  z-index: 1;
+  margin-top: 24px;
+}
+
+.categories-summary-wrapper {
+  position: relative;
+  z-index: 1;
+  margin-top: 22px;
+}
+
+.categories-summary-card {
+  max-width: 920px;
+  padding: 28px 30px;
+  border: 1px solid rgb(255 255 255 / 70%);
+  border-radius: 22px;
+  background: rgb(255 255 255 / 77%);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(12px);
 }
 
 .categories-panel {

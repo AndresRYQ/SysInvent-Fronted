@@ -7,7 +7,9 @@ import {
   type FiltrosCategoriasValores,
 } from '../../components/categorias/FiltrosCategorias'
 import { TablaCategorias } from '../../components/categorias/TablaCategorias'
+import { useAuth } from '../../hooks/useAuth'
 import type { Categoria } from '../../types/categoria'
+import '../../styles/DashboardPage.css'
 import './CategoriasPage.css'
 
 const FILTROS_INICIALES: FiltrosCategoriasValores = {
@@ -149,6 +151,17 @@ function crearFechaActual() {
 }
 
 export function CategoriasPage() {
+  const { sesion, logout } = useAuth()
+  const nombreCompleto = sesion?.nombreCompleto ?? 'Usuario sin sesión'
+  const nombreUsuario = sesion?.usuario ?? 'usuario'
+  const rolUsuario = sesion?.rol ?? 'Sin rol'
+  const inicialesUsuario = nombreCompleto
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((parte) => parte[0]?.toUpperCase() ?? '')
+    .join('') || 'US'
+
   const [categorias, setCategorias] =
     useState<Categoria[]>(CATEGORIAS_MOCK)
   const [filtros, setFiltros] =
@@ -208,8 +221,64 @@ export function CategoriasPage() {
 
   return (
     <>
-      <main className="categories-page app-shell">
-        <div className="container-xl px-0">
+      <main className="dashboard-shell categories-page-shell">
+        <nav className="topbar" aria-label="Navegacion principal">
+          <a className="brand" href="/dashboard">
+            <span className="brand-mark">🌿</span>
+            <span className="brand-name">AGRIHUASA</span>
+            <span className="brand-system">FFPMS</span>
+          </a>
+
+          <div className="nav-links">
+            <a className="nav-link" href="/dashboard">
+              Inicio
+            </a>
+            <a className="nav-link is-active" href="/categorias">
+              Categorías
+            </a>
+            <a className="nav-link" href="/dashboard">
+              Reportes
+            </a>
+          </div>
+
+          <div className="topbar-actions">
+            <button
+              className="notification-button"
+              type="button"
+              aria-label="Notificaciones"
+            >
+              🔔
+              <span>3</span>
+            </button>
+
+            <button
+              className="user-menu"
+              type="button"
+              onClick={logout}
+            >
+              <span className="avatar">{inicialesUsuario}</span>
+              <span>
+                <strong>{nombreCompleto}</strong>
+                <small>{rolUsuario}</small>
+              </span>
+            </button>
+          </div>
+        </nav>
+
+        <section className="categories-summary-wrapper">
+          <div className="categories-summary-card">
+            <span className="categories-kicker">Sesión activa</span>
+            <h1 className="categories-section-title">
+              Módulo de categorías
+            </h1>
+            <p className="categories-section-copy">
+              Usuario activo: <strong>{nombreCompleto}</strong> ·{' '}
+              {nombreUsuario} · {rolUsuario}
+            </p>
+          </div>
+        </section>
+
+        <div className="container-xl px-0 categories-page-body">
           <div className="categories-panel">
             <FiltrosCategorias
               valores={filtros}

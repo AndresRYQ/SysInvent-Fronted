@@ -1,10 +1,12 @@
+import { useState, type ReactNode } from 'react'
+import { useNavigate } from 'react-router-dom'
+
 import AnimatedContent from '../components/ui/AnimatedContent'
 import CountUp from '../components/ui/CountUp'
 import SpotlightCard from '../components/ui/SpotlightCard'
 import { useAuth } from '../hooks/useAuth'
 import '../styles/react-bits.css'
 import '../styles/DashboardPage.css'
-import { useState, type ReactNode } from 'react'
 
 type IconName =
   | 'leaf'
@@ -510,6 +512,7 @@ function Icon({ name }: { name: IconName }) {
 }
 
 function DashboardPage() {
+  const navigate = useNavigate()
   const { sesion, logout } = useAuth()
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const nombreUsuario = sesion?.nombreCompleto ?? 'Frank Arone'
@@ -520,6 +523,12 @@ function DashboardPage() {
     selectedCategory === 'Todos'
       ? modules
       : modules.filter((module) => module.category === selectedCategory)
+
+  const manejarAbrirModulo = (moduleTitle: string) => {
+    if (moduleTitle === 'Categorías') {
+      navigate('/categorias')
+    }
+  }
 
   return (
     <main className="dashboard-shell">
@@ -637,7 +646,11 @@ function DashboardPage() {
                 <h2>{module.title}</h2>
                 <p>{module.description}</p>
               </div>
-              <button className={`module-action tone-${module.tone}`} type="button">
+              <button
+                className={`module-action tone-${module.tone}`}
+                type="button"
+                onClick={() => manejarAbrirModulo(module.title)}
+              >
                 Abrir modulo
                 <span aria-hidden="true">→</span>
               </button>
