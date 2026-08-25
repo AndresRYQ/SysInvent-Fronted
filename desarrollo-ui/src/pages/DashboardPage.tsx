@@ -3,6 +3,7 @@ import CountUp from '../components/ui/CountUp'
 import SpotlightCard from '../components/ui/SpotlightCard'
 import '../styles/react-bits.css'
 import '../styles/DashboardPage.css'
+import { useState, type ReactNode } from 'react'
 
 type IconName =
   | 'leaf'
@@ -41,6 +42,7 @@ type Module = {
   description: string
   icon: IconName
   tone: string
+  category: string
 }
 
 const navItems: NavItem[] = [
@@ -96,54 +98,295 @@ const metrics: Metric[] = [
   },
 ]
 
+const categories = [
+  'Todos',
+  'Operaciones',
+  'Inventario',
+  'Reportes',
+  'Maestros',
+  'Seguridad',
+]
+
 const modules: Module[] = [
   {
-    title: 'Pallet - QR',
-    description: 'Generar y escanear codigos QR de pallets.',
-    icon: 'qr',
-    tone: 'green',
-  },
-  {
-    title: 'Registro personal',
-    description: 'Gestionar informacion del personal.',
-    icon: 'users',
-    tone: 'blue',
-  },
-  {
-    title: 'Estado de orden',
-    description: 'Consultar estado de las ordenes.',
+    title: 'Registro de Guías',
+    description: 'Gestionar guías de recepción.',
     icon: 'clipboard',
-    tone: 'orange',
+    tone: 'green',
+    category: 'Operaciones',
   },
   {
-    title: 'Auditoria',
-    description: 'Revisar logs y auditorias del sistema.',
+    title: 'Registro de Plantillas',
+    description: 'Administrar plantillas de producción.',
+    icon: 'clipboard',
+    tone: 'green',
+    category: 'Operaciones',
+  },
+  {
+    title: 'Registro de Fucs',
+    description: 'Control de FUCs del proceso.',
+    icon: 'clipboard',
+    tone: 'green',
+    category: 'Operaciones',
+  },
+  {
+    title: 'Calidad en Recepción',
+    description: 'Control de calidad de ingreso.',
     icon: 'audit',
-    tone: 'violet',
+    tone: 'green',
+    category: 'Operaciones',
   },
   {
-    title: 'Orden de compra',
-    description: 'Generar y gestionar ordenes de compra.',
-    icon: 'cart',
-    tone: 'red',
+    title: 'Calidad en Proceso',
+    description: 'Seguimiento de calidad.',
+    icon: 'audit',
+    tone: 'green',
+    category: 'Operaciones',
   },
   {
-    title: 'Vale de consumo',
-    description: 'Crear y administrar vales de consumo.',
-    icon: 'order',
-    tone: 'amber',
-  },
-  {
-    title: 'Productos',
-    description: 'Gestionar productos del almacen.',
+    title: 'Control de Desverdizado',
+    description: 'Gestión del proceso de desverdizado.',
     icon: 'box',
     tone: 'green',
+    category: 'Operaciones',
   },
   {
-    title: 'Reportes y Kardex',
-    description: 'Ver reportes y kardex de productos.',
+    title: 'Control de Proceso',
+    description: 'Supervisión operacional.',
+    icon: 'chart',
+    tone: 'green',
+    category: 'Operaciones',
+  },
+  {
+    title: 'Túnel y Cámara de Frío',
+    description: 'Control de cámaras y túneles.',
+    icon: 'box',
+    tone: 'blue',
+    category: 'Operaciones',
+  },
+  {
+    title: 'Registro de Packing List',
+    description: 'Administración de packing list.',
+    icon: 'clipboard',
+    tone: 'blue',
+    category: 'Operaciones',
+  },
+  {
+    title: 'Mercado Local',
+    description: 'Gestión de ventas locales.',
     icon: 'chart',
     tone: 'blue',
+    category: 'Operaciones',
+  },
+
+  {
+    title: 'Req. de Mantenimiento',
+    description: 'Solicitudes de mantenimiento.',
+    icon: 'order',
+    tone: 'orange',
+    category: 'Inventario',
+  },
+  {
+    title: 'Req. de Materiales',
+    description: 'Requerimientos de materiales.',
+    icon: 'order',
+    tone: 'orange',
+    category: 'Inventario',
+  },
+  {
+    title: 'Req. de Personal',
+    description: 'Solicitudes de personal.',
+    icon: 'users',
+    tone: 'orange',
+    category: 'Inventario',
+  },
+
+  {
+    title: 'Compras Mantenimiento',
+    description: 'Gestión de compras de mantenimiento.',
+    icon: 'cart',
+    tone: 'red',
+    category: 'Inventario',
+  },
+  {
+    title: 'Compras Materiales',
+    description: 'Gestión de compras de materiales.',
+    icon: 'cart',
+    tone: 'red',
+    category: 'Inventario',
+  },
+
+  {
+    title: 'Personal',
+    description: 'Administración del personal.',
+    icon: 'users',
+    tone: 'blue',
+    category: 'Inventario',
+  },
+  {
+    title: 'Contabilidad',
+    description: 'Procesos contables.',
+    icon: 'chart',
+    tone: 'violet',
+    category: 'Inventario',
+  },
+
+  {
+    title: 'Ingresos de Almacén',
+    description: 'Registro de ingresos.',
+    icon: 'entry',
+    tone: 'green',
+    category: 'Inventario',
+  },
+  {
+    title: 'Vales de Consumo',
+    description: 'Administrar vales.',
+    icon: 'order',
+    tone: 'amber',
+    category: 'Inventario',
+  },
+  {
+    title: 'Control de Almacén',
+    description: 'Control de inventario.',
+    icon: 'box',
+    tone: 'green',
+    category: 'Inventario',
+  },
+  {
+    title: 'Registro de Ventas',
+    description: 'Registro de ventas.',
+    icon: 'cart',
+    tone: 'orange',
+    category: 'Inventario',
+  },
+
+  {
+    title: 'Reporte de Recepción',
+    description: 'Reportes de recepción.',
+    icon: 'report',
+    tone: 'blue',
+    category: 'Reportes',
+  },
+  {
+    title: 'Reporte de Fucs',
+    description: 'Reportería FUCs.',
+    icon: 'report',
+    tone: 'blue',
+    category: 'Reportes',
+  },
+  {
+    title: 'Reporte de Producción',
+    description: 'Indicadores de producción.',
+    icon: 'chart',
+    tone: 'blue',
+    category: 'Reportes',
+  },
+  {
+    title: 'Reporte de Trazabilidad',
+    description: 'Seguimiento de trazabilidad.',
+    icon: 'report',
+    tone: 'blue',
+    category: 'Reportes',
+  },
+  {
+    title: 'Reporte Stock Frío',
+    description: 'Stock en cámaras.',
+    icon: 'box',
+    tone: 'blue',
+    category: 'Reportes',
+  },
+  {
+    title: 'Reporte Stock Detallado',
+    description: 'Detalle de inventario.',
+    icon: 'box',
+    tone: 'blue',
+    category: 'Reportes',
+  },
+  {
+    title: 'Reporte de Calidad',
+    description: 'Control de calidad.',
+    icon: 'audit',
+    tone: 'blue',
+    category: 'Reportes',
+  },
+  {
+    title: 'Reporte Stock Pallets',
+    description: 'Stock de pallets.',
+    icon: 'qr',
+    tone: 'blue',
+    category: 'Reportes',
+  },
+  {
+    title: 'Reporte Kardex',
+    description: 'Movimientos de almacén.',
+    icon: 'chart',
+    tone: 'blue',
+    category: 'Reportes',
+  },
+
+  {
+    title: 'Especies',
+    description: 'Mantenimiento de especies.',
+    icon: 'box',
+    tone: 'green',
+    category: 'Maestros',
+  },
+  {
+    title: 'Categorías',
+    description: 'Gestión de categorías.',
+    icon: 'box',
+    tone: 'green',
+    category: 'Maestros'
+  },
+  {
+    title: 'Marcas de Caja',
+    description: 'Administración de marcas.',
+    icon: 'box',
+    tone: 'green',
+    category: 'Maestros',
+  },
+  {
+    title: 'Modelos de Caja',
+    description: 'Configuración de modelos.',
+    icon: 'box',
+    tone: 'green',
+    category: 'Maestros',
+  },
+  {
+    title: 'Cámaras de Frío',
+    description: 'Administración de cámaras.',
+    icon: 'box',
+    tone: 'green',
+    category: 'Maestros',
+  },
+  {
+    title: 'Acopiadores',
+    description: 'Gestión de acopiadores.',
+    icon: 'users',
+    tone: 'green',
+    category: 'Maestros',
+  },
+  {
+    title: 'Clientes',
+    description: 'Administración de clientes.',
+    icon: 'users',
+    tone: 'green',
+    category: 'Maestros',
+  },
+
+  {
+    title: 'Usuarios',
+    description: 'Administración de usuarios.',
+    icon: 'users',
+    tone: 'violet',
+    category: 'Seguridad',
+  },
+  {
+    title: 'Roles',
+    description: 'Gestión de roles.',
+    icon: 'users',
+    tone: 'violet',
+    category: 'Seguridad',
   },
 ]
 
@@ -156,7 +399,7 @@ function Icon({ name }: { name: IconName }) {
     strokeWidth: 2,
   }
 
-  const paths: Record<IconName, JSX.Element> = {
+  const paths: Record<IconName, ReactNode> = {
     leaf: (
       <>
         <path d="M20 4c-8.2.2-14.5 3.4-16 12.4 5.8 1.2 12.4-1.9 16-12.4Z" />
@@ -273,6 +516,12 @@ function Icon({ name }: { name: IconName }) {
 }
 
 function DashboardPage() {
+  const [selectedCategory, setSelectedCategory] = useState('Todos')
+  const filteredModules =selectedCategory === 'Todos'
+        ? modules
+        : modules.filter(
+        (module) =>
+        module.category === selectedCategory)  
   return (
     <main className="dashboard-shell">
       <nav className="topbar" aria-label="Navegacion principal">
@@ -365,8 +614,27 @@ function DashboardPage() {
         ))}
       </section>
 
+      <section className="categories-bar">
+        {categories.map((category) => (
+          <button
+            key={category}
+            type="button"
+            className={`category-chip ${
+              selectedCategory === category
+                ? 'active'
+                : ''
+            }`}
+            onClick={() =>
+              setSelectedCategory(category)
+            }
+          >
+            {category}
+          </button>
+        ))}
+      </section>
+
       <section className="modules-grid" aria-label="Modulos del sistema">
-        {modules.map((module, index) => (
+        {filteredModules.map((module, index) => (
           <AnimatedContent delay={140 + index * 70} key={module.title}>
             <SpotlightCard className="module-card" color={`var(--tone-${module.tone}-soft)`}>
               <div className={`module-icon tone-${module.tone}`}>
