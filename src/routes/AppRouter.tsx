@@ -10,6 +10,7 @@ import { AccessDeniedPage } from '../pages/AccessDeniedPage'
 import DashboardPage from '../pages/DashboardPage'
 import { LoginPage } from '../pages/auth/LoginPage'
 import { CategoriasPage } from '../pages/categorias/CategoriasPage'
+import { ValesConsumoPage } from '../pages/vales-consumo/ValesConsumoPage'
 import { ProtectedRoute } from './ProtectedRoute'
 import { RoleRoute } from './RoleRoute'
 
@@ -56,6 +57,10 @@ export function AppRouter() {
               <Route
                 path="/categorias"
                 element={<CategoriasPage />}
+              />
+              <Route
+                path="/vales-consumo"
+                element={<ValesConsumoPage />}
               />
             </Route>
           </Route>

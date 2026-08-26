@@ -236,6 +236,9 @@ export function CategoriasPage() {
             <a className="nav-link is-active" href="/categorias">
               Categorías
             </a>
+            <a className="nav-link" href="/vales-consumo">
+              Vales de consumo
+            </a>
             <a className="nav-link" href="/dashboard">
               Reportes
             </a>

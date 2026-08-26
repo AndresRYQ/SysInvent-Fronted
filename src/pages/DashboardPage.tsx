@@ -528,6 +528,10 @@ function DashboardPage() {
     if (moduleTitle === 'Categorías') {
       navigate('/categorias')
     }
+
+    if (moduleTitle === 'Vales de Consumo') {
+      navigate('/vales-consumo')
+    }
   }
 
   return (
