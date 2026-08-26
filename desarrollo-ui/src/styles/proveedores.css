@@ -10,6 +10,13 @@
 
 .ui-field--full {
   grid-column: 1 / -1;
+  padding: 10px 12px;
+  border: 1px solid var(--line, rgba(16, 24, 40, 0.12));
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+  color: var(--ink, #101828);
+  transition: border-color 0.2s, box-shadow 0.2s;
   
 }
 
