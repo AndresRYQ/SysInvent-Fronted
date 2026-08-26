@@ -30,12 +30,12 @@ export default function FormularioProveedor({ proveedor, onGuardar, onCancelar }
 
   const validar = (): boolean => {
     const e: Record<string, string> = {};
-    if (!form.nombre.trim()) e.nombre = 'El nombre es obligatorio';
-    if (!form.ruc.trim()) e.ruc = 'El RUC es obligatorio';
-    else if (form.ruc.length < 10) e.ruc = 'El RUC debe tener 13 dígitos';
-    if (!form.telefono.trim()) e.telefono = 'El teléfono es obligatorio';
-    if (!form.correo.trim()) e.correo = 'El correo es obligatorio';
-    else if (!/\S+@\S+\.\S+/.test(form.correo)) e.correo = 'Correo inválido';
+    if (!form.nombre.trim()) e.nombre = 'El nombre o razón social es obligatorio';
+    if (!form.ruc.trim()) e.ruc = 'El número de RUC es obligatorio';
+    else if (form.ruc.length !== 11) e.ruc = 'El RUC debe tener exactamente 11 dígitos';
+    if (!form.telefono.trim()) e.telefono = 'El número de teléfono es obligatorio';
+    if (!form.correo.trim()) e.correo = 'El correo electrónico es obligatorio';
+    else if (!/\S+@\S+\.\S+/.test(form.correo)) e.correo = 'Ingrese un correo electrónico válido';
     if (!form.direccion.trim()) e.direccion = 'La dirección es obligatoria';
     setErrores(e);
     return Object.keys(e).length === 0;
@@ -51,8 +51,8 @@ export default function FormularioProveedor({ proveedor, onGuardar, onCancelar }
       <div className="form-proveedor__grid">
         <Input
           id="nombre"
-          label="Nombre del Proveedor"
-          placeholder="Ej: Distribuidora Central S.A."
+          label="Razón Social / Nombre"
+          placeholder="Ej: Distribuidora Central S.A.C."
           value={form.nombre}
           onChange={(e) => actualizar('nombre', e.target.value)}
           error={errores.nombre}
@@ -60,8 +60,8 @@ export default function FormularioProveedor({ proveedor, onGuardar, onCancelar }
         <Input
           id="ruc"
           label="RUC"
-          placeholder="13 dígitos"
-          maxLength={13}
+          placeholder="Ej: 20512345678"
+          maxLength={11}
           value={form.ruc}
           onChange={(e) => actualizar('ruc', e.target.value)}
           error={errores.ruc}
@@ -69,7 +69,7 @@ export default function FormularioProveedor({ proveedor, onGuardar, onCancelar }
         <Input
           id="telefono"
           label="Teléfono"
-          placeholder="Ej: 02-2345678"
+          placeholder="Ej: 01-1234567"
           value={form.telefono}
           onChange={(e) => actualizar('telefono', e.target.value)}
           error={errores.telefono}
@@ -78,7 +78,7 @@ export default function FormularioProveedor({ proveedor, onGuardar, onCancelar }
           id="correo"
           label="Correo Electrónico"
           type="email"
-          placeholder="correo@empresa.com"
+          placeholder="correo@empresa.com.pe"
           value={form.correo}
           onChange={(e) => actualizar('correo', e.target.value)}
           error={errores.correo}
@@ -86,7 +86,7 @@ export default function FormularioProveedor({ proveedor, onGuardar, onCancelar }
         <Input
           id="direccion"
           label="Dirección"
-          placeholder="Av. Principal 123, Quito"
+          placeholder="Ej: Av. Principal 123, distrito, Lima"
           value={form.direccion}
           onChange={(e) => actualizar('direccion', e.target.value)}
           error={errores.direccion}
@@ -105,7 +105,7 @@ export default function FormularioProveedor({ proveedor, onGuardar, onCancelar }
       </div>
       <div className="form-proveedor__acciones">
         <Button type="button" variant="secondary" onClick={onCancelar}>Cancelar</Button>
-        <Button type="submit">{proveedor ? 'Actualizar' : 'Registrar'}</Button>
+        <Button type="submit">{proveedor ? 'Guardar Cambios' : 'Registrar Proveedor'}</Button>
       </div>
     </form>
   );

@@ -5,11 +5,11 @@ import '../../styles/proveedores.css';
 
 const proveedorEjemplo: Proveedor = {
   id: 1,
-  nombre: 'Distribuidora El Sol S.A.',
-  ruc: '1792345678001',
-  telefono: '02-2345678',
-  correo: 'info@elsol.com.ec',
-  direccion: 'Av. Principal 123, Quito',
+  nombre: 'Distribuidora El Sol S.A.C.',
+  ruc: '20512345678',
+  telefono: '01-2345678',
+  correo: 'info@elsol.com.pe',
+  direccion: 'Av. Principal 123, Lima',
   estado: 'Activo',
 };
 
@@ -25,7 +25,7 @@ export default function EditarProveedorPage() {
       <div className="proveedores-page__header">
         <div>
           <h2>Editar Proveedor</h2>
-          <p className="proveedores-page__subtitulo">Modificar datos del proveedor</p>
+          <p className="proveedores-page__subtitulo">Modificar la información del proveedor</p>
         </div>
       </div>
       <FormularioProveedor proveedor={proveedorEjemplo} onGuardar={handleGuardar} onCancelar={() => navigate('/proveedores')} />

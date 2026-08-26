@@ -1,5 +1,5 @@
 /* ============================================
-   UI Components - Estilos globales reutilizables
+   UI Components - Paleta del proyecto
    ============================================ */
 
 .ui-field {
@@ -10,40 +10,46 @@
 
 .ui-field--full {
   grid-column: 1 / -1;
+  
 }
 
 .ui-label {
   font-size: 13px;
   font-weight: 600;
-  color: var(--ink, #101828);
+  color: #303a33;
 }
 
 .ui-input,
 .ui-select {
   padding: 10px 12px;
-  border: 1px solid var(--line, rgba(16, 24, 40, 0.12));
-  border-radius: 8px;
+  border: 1px solid #cfd2cf;
+  border-radius: 12px;
   font-size: 14px;
-  background: #fff;
-  color: var(--ink, #101828);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #ffffff;
+  color: #4c514e;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.ui-input::placeholder {
+  color: #6f7370;
+  opacity: 1;
 }
 
 .ui-input:focus,
 .ui-select:focus {
   outline: none;
-  border-color: var(--green, #21a66b);
-  box-shadow: 0 0 0 3px rgba(33, 166, 107, 0.15);
+  border-color: #338f3c;
+  box-shadow: 0 0 0 4px rgb(51 143 60 / 11%);
 }
 
 .ui-input--error,
 .ui-select--error {
-  border-color: var(--red, #dc3545);
+  border-color: #b3261e;
 }
 
 .ui-error {
   font-size: 12px;
-  color: var(--red, #dc3545);
+  color: #b3261e;
 }
 
 /* ============================================
@@ -57,13 +63,13 @@
   gap: 6px;
   font-weight: 600;
   border: none;
-  border-radius: 8px;
+  border-radius: 11px;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
 .ui-btn:active {
-  transform: scale(0.97);
+  transform: translateY(0);
 }
 
 .ui-btn--md {
@@ -77,40 +83,49 @@
 }
 
 .ui-btn--primary {
-  background: var(--green, #21a66b);
-  color: #fff;
+  background: #338f3c;
+  color: #ffffff;
+  box-shadow: 0 7px 15px rgb(51 143 60 / 17%);
 }
 
 .ui-btn--primary:hover {
-  background: #1c925d;
+  background: #287f32;
+  box-shadow: 0 9px 20px rgb(51 143 60 / 25%);
+  transform: translateY(-1px);
+}
+
+.ui-btn--primary:focus-visible {
+  outline: 3px solid rgb(51 143 60 / 30%);
+  outline-offset: 3px;
 }
 
 .ui-btn--secondary {
-  background: var(--line, rgba(16, 24, 40, 0.08));
-  color: var(--ink, #101828);
+  background: #f0f7f0;
+  color: #303a33;
+  border: 1px solid #cfd2cf;
 }
 
 .ui-btn--secondary:hover {
-  background: rgba(16, 24, 40, 0.14);
+  background: #e4f0e4;
 }
 
 .ui-btn--danger {
   background: transparent;
-  color: var(--red, #dc3545);
-  border: 1px solid var(--red, #dc3545);
+  color: #b3261e;
+  border: 1px solid #b3261e;
 }
 
 .ui-btn--danger:hover {
-  background: rgba(220, 53, 69, 0.08);
+  background: rgb(179 38 30 / 8%);
 }
 
 .ui-btn--ghost {
   background: transparent;
-  color: var(--blue, #287be6);
+  color: #338f3c;
 }
 
 .ui-btn--ghost:hover {
-  background: rgba(40, 123, 230, 0.08);
+  background: #f0f7f0;
 }
 
 /* ============================================
@@ -121,6 +136,7 @@
   padding: 24px;
   max-width: 1280px;
   margin: 0 auto;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .proveedores-page__header {
@@ -134,13 +150,13 @@
   margin: 0;
   font-size: 22px;
   font-weight: 700;
-  color: var(--ink, #101828);
+  color: #ecf3ee;
 }
 
 .proveedores-page__subtitulo {
   margin: 4px 0 0;
   font-size: 14px;
-  color: var(--muted, #667085);
+  color: #6d716e;
 }
 
 /* ============================================
@@ -152,8 +168,8 @@
   gap: 16px;
   align-items: flex-end;
   padding: 16px 20px;
-  background: var(--panel, rgba(255, 255, 255, 0.82));
-  border: 1px solid var(--line, rgba(16, 24, 40, 0.08));
+  background: #ffffff;
+  border: 1px solid #cfd2cf;
   border-radius: 12px;
   margin-bottom: 20px;
 }
@@ -169,8 +185,8 @@
 
 .form-proveedor {
   padding: 24px;
-  background: var(--panel, rgba(255, 255, 255, 0.82));
-  border: 1px solid var(--line, rgba(16, 24, 40, 0.08));
+  background: #ffffff;
+  border: 1px solid #cfd2cf;
   border-radius: 12px;
 }
 
@@ -186,7 +202,7 @@
   gap: 12px;
   margin-top: 24px;
   padding-top: 16px;
-  border-top: 1px solid var(--line, rgba(16, 24, 40, 0.08));
+  border-top: 1px solid #cfd2cf;
 }
 
 /* ============================================
@@ -194,8 +210,8 @@
    ============================================ */
 
 .tabla-proveedores {
-  background: var(--panel, rgba(255, 255, 255, 0.82));
-  border: 1px solid var(--line, rgba(16, 24, 40, 0.08));
+  background: #ffffff;
+  border: 1px solid #cfd2cf;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -205,13 +221,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--line, rgba(16, 24, 40, 0.08));
+  border-bottom: 1px solid #cfd2cf;
 }
 
 .tabla-proveedores__header h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 700;
+  color: #303a33;
 }
 
 .tabla-proveedores__badge {
@@ -219,8 +236,8 @@
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 20px;
-  background: var(--tone-green-soft, rgba(33, 166, 107, 0.18));
-  color: var(--green, #21a66b);
+  background: rgb(51 143 60 / 14%);
+  color: #338f3c;
 }
 
 .tabla-proveedores__scroll {
@@ -234,7 +251,7 @@
 }
 
 .tabla-proveedores thead {
-  background: rgba(16, 24, 40, 0.03);
+  background: #f6f8f6;
 }
 
 .tabla-proveedores th {
@@ -244,18 +261,18 @@
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--muted, #667085);
-  border-bottom: 1px solid var(--line, rgba(16, 24, 40, 0.08));
+  color: #6d716e;
+  border-bottom: 1px solid #cfd2cf;
 }
 
 .tabla-proveedores td {
   padding: 12px 16px;
-  border-bottom: 1px solid var(--line, rgba(16, 24, 40, 0.06));
-  color: var(--ink, #101828);
+  border-bottom: 1px solid #e9ecec;
+  color: #303a33;
 }
 
 .tabla-proveedores tbody tr:hover {
-  background: rgba(33, 166, 107, 0.04);
+  background: rgb(51 143 60 / 4%);
 }
 
 .tabla-proveedores__nombre {
@@ -265,7 +282,7 @@
 .tabla-proveedores__vacio {
   text-align: center;
   padding: 40px 16px !important;
-  color: var(--muted, #667085);
+  color: #6d716e;
   font-style: italic;
 }
 
@@ -278,13 +295,13 @@
 }
 
 .tabla-proveedores__estado--activo {
-  background: rgba(33, 166, 107, 0.14);
-  color: var(--green, #21a66b);
+  background: rgb(51 143 60 / 14%);
+  color: #338f3c;
 }
 
 .tabla-proveedores__estado--inactivo {
-  background: rgba(220, 53, 69, 0.12);
-  color: var(--red, #dc3545);
+  background: rgb(179 38 30 / 12%);
+  color: #b3261e;
 }
 
 .tabla-proveedores__acciones {

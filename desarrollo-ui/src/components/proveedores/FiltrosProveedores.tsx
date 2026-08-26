@@ -13,8 +13,8 @@ export default function FiltrosProveedores({ busqueda, filtroEstado, onBusquedaC
     <div className="filtros-proveedores">
       <Input
         id="busqueda"
-        label="Buscar"
-        placeholder="Nombre, RUC o correo..."
+        label="Buscar proveedor"
+        placeholder="Buscar por nombre, RUC o correo..."
         value={busqueda}
         onChange={(e) => onBusquedaChange(e.target.value)}
       />
@@ -23,7 +23,7 @@ export default function FiltrosProveedores({ busqueda, filtroEstado, onBusquedaC
         label="Estado"
         value={filtroEstado}
         onChange={(e) => onEstadoChange(e.target.value)}
-        placeholder="Todos"
+        placeholder="Todos los estados"
         options={[
           { value: 'Activo', label: 'Activo' },
           { value: 'Inactivo', label: 'Inactivo' },

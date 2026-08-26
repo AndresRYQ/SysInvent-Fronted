@@ -14,8 +14,8 @@ export default function NuevoProveedorPage() {
     <div className="proveedores-page">
       <div className="proveedores-page__header">
         <div>
-          <h2>Registrar Proveedor</h2>
-          <p className="proveedores-page__subtitulo">Complete los datos del nuevo proveedor</p>
+          <h2>Nuevo Proveedor</h2>
+          <p className="proveedores-page__subtitulo">Ingrese los datos del nuevo proveedor</p>
         </div>
       </div>
       <FormularioProveedor onGuardar={handleGuardar} onCancelar={() => navigate('/proveedores')} />

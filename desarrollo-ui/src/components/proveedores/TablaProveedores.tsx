@@ -11,18 +11,18 @@ export default function TablaProveedores({ proveedores, onEditar, onEliminar }: 
   return (
     <div className="tabla-proveedores">
       <div className="tabla-proveedores__header">
-        <h3>Listado de Proveedores</h3>
-        <span className="tabla-proveedores__badge">{proveedores.length} registro(s)</span>
+        <h3>Proveedores Registrados</h3>
+        <span className="tabla-proveedores__badge">{proveedores.length} proveedor(es)</span>
       </div>
       <div className="tabla-proveedores__scroll">
         <table>
           <thead>
             <tr>
-              <th>#</th>
-              <th>Nombre</th>
+              <th>N°</th>
+              <th>Nombre / Razón Social</th>
               <th>RUC</th>
               <th>Teléfono</th>
-              <th>Correo</th>
+              <th>Correo Electrónico</th>
               <th>Dirección</th>
               <th>Estado</th>
               <th>Acciones</th>
@@ -32,7 +32,7 @@ export default function TablaProveedores({ proveedores, onEditar, onEliminar }: 
             {proveedores.length === 0 ? (
               <tr>
                 <td colSpan={8} className="tabla-proveedores__vacio">
-                  No hay proveedores registrados.
+                  No se encontraron proveedores.
                 </td>
               </tr>
             ) : (

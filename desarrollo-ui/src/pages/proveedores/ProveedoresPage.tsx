@@ -9,29 +9,29 @@ import '../../styles/proveedores.css';
 const datosIniciales: Proveedor[] = [
   {
     id: 1,
-    nombre: 'Distribuidora El Sol S.A.',
-    ruc: '1792345678001',
-    telefono: '02-2345678',
-    correo: 'info@elsol.com.ec',
-    direccion: 'Av. Principal 123, Quito',
+    nombre: 'Distribuidora El Sol S.A.C.',
+    ruc: '20512345678',
+    telefono: '01-2345678',
+    correo: 'info@elsol.com.pe',
+    direccion: 'Av. Principal 123, Lima',
     estado: 'Activo',
   },
   {
     id: 2,
-    nombre: 'Importaciones del Norte Cía. Ltda.',
-    ruc: '1804567890001',
-    telefono: '06-2876543',
-    correo: 'ventas@delnorte.com.ec',
-    direccion: 'Calle Comercio 456, Guayaquil',
+    nombre: 'Importaciones del Norte S.A.C.',
+    ruc: '20623456789',
+    telefono: '076-2876543',
+    correo: 'ventas@delnorte.com.pe',
+    direccion: 'Calle Comercio 456, Trujillo',
     estado: 'Activo',
   },
   {
     id: 3,
-    nombre: 'Mayorista La Estrella',
-    ruc: '0912345678001',
-    telefono: '04-2456789',
-    correo: 'contacto@laestrella.com.ec',
-    direccion: 'Av. Industrial 789, Cuenca',
+    nombre: 'Mayorista La Estrella E.I.R.L.',
+    ruc: '20434567890',
+    telefono: '054-2456789',
+    correo: 'contacto@laestrella.com.pe',
+    direccion: 'Av. Industrial 789, Arequipa',
     estado: 'Inactivo',
   },
 ];
@@ -57,7 +57,7 @@ export default function ProveedoresPage() {
   };
 
   const handleEliminar = (id: number) => {
-    if (confirm('¿Estás seguro de eliminar este proveedor?')) {
+    if (confirm('¿Está seguro de eliminar este proveedor? Esta acción no se puede deshacer.')) {
       setProveedores((prev) => prev.filter((p) => p.id !== id));
     }
   };
@@ -66,8 +66,8 @@ export default function ProveedoresPage() {
     <div className="proveedores-page">
       <div className="proveedores-page__header">
         <div>
-          <h2>Módulo de Proveedores</h2>
-          <p className="proveedores-page__subtitulo">Gestión y administración de proveedores del almacén</p>
+          <h2>Gestión de Proveedores</h2>
+          <p className="proveedores-page__subtitulo">Administración de proveedores del almacén</p>
         </div>
         <Button onClick={() => navigate('/proveedores/nuevo')}>
           + Nuevo Proveedor
