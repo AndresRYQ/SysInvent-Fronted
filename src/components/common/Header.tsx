@@ -18,6 +18,7 @@ type HeaderProps = {
   notifications?: number
   menuAbierto?: boolean
   onMenuClick?: () => void
+  ocultarToggle?: boolean
 }
 
 export function Header({
@@ -27,6 +28,7 @@ export function Header({
   notifications = 3,
   menuAbierto = false,
   onMenuClick,
+  ocultarToggle = false,
 }: HeaderProps) {
   const { sesion, logout } = useAuth()
   const { pathname } = useLocation()
@@ -50,7 +52,7 @@ export function Header({
 
   return (
     <nav className="topbar" aria-label="Navegacion principal">
-      {onMenuClick && (
+      {onMenuClick && !ocultarToggle && (
         <button
           className="menu-toggle"
           type="button"
