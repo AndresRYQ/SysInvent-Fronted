@@ -20,9 +20,19 @@ interface CentroCostoFormState {
   descripcion: string
 }
 
+interface CentroCostoFormErrores {
+  nombre: boolean
+  descripcion: boolean
+}
+
 const FORM_INICIAL: CentroCostoFormState = {
   nombre: '',
   descripcion: '',
+}
+
+const ERRORES_INICIALES: CentroCostoFormErrores = {
+  nombre: false,
+  descripcion: false,
 }
 
 export function CentroCostoFormModal({
@@ -33,6 +43,10 @@ export function CentroCostoFormModal({
 }: CentroCostoFormModalProps) {
   const [form, setForm] =
     useState<CentroCostoFormState>(FORM_INICIAL)
+  const [errores, setErrores] =
+    useState<CentroCostoFormErrores>(
+      ERRORES_INICIALES,
+    )
 
   useEffect(() => {
     if (!abierto) {
@@ -44,10 +58,12 @@ export function CentroCostoFormModal({
         nombre: centroCosto.nombre,
         descripcion: centroCosto.descripcion,
       })
+      setErrores(ERRORES_INICIALES)
       return
     }
 
     setForm(FORM_INICIAL)
+    setErrores(ERRORES_INICIALES)
   }, [abierto, centroCosto])
 
   if (!abierto) {
@@ -70,7 +86,7 @@ export function CentroCostoFormModal({
         }
       >
         <div className="maestro-modal-header">
-          <div>
+          <div className="maestro-modal-header__content">
             <h3
               id="centro-costo-form-title"
               className="maestro-modal-title"
@@ -79,10 +95,6 @@ export function CentroCostoFormModal({
                 ? 'Editar centro de costo'
                 : 'Registrar centro de costo'}
             </h3>
-
-            <p className="maestro-modal-copy">
-              Completa los datos del centro de costo.
-            </p>
           </div>
 
           <button
@@ -96,8 +108,25 @@ export function CentroCostoFormModal({
         </div>
 
         <form
+          noValidate
           onSubmit={(event) => {
             event.preventDefault()
+
+            const nuevosErrores = {
+              nombre:
+                form.nombre.trim().length === 0,
+              descripcion:
+                form.descripcion.trim().length === 0,
+            }
+
+            setErrores(nuevosErrores)
+
+            if (
+              nuevosErrores.nombre ||
+              nuevosErrores.descripcion
+            ) {
+              return
+            }
 
             onSubmit({
               nombre: form.nombre.trim(),
@@ -113,21 +142,55 @@ export function CentroCostoFormModal({
                 htmlFor="centroCostoNombreModal"
               >
                 Nombre de centro de costo
+                <span className="maestro-required" aria-hidden="true">
+                  *
+                </span>
               </label>
 
               <input
                 id="centroCostoNombreModal"
-                className="form-control maestro-control"
+                className={`form-control maestro-control${
+                  errores.nombre
+                    ? ' maestro-control--error'
+                    : ''
+                }`}
                 type="text"
                 value={form.nombre}
-                onChange={(event) =>
+                aria-invalid={errores.nombre}
+                aria-describedby={
+                  errores.nombre
+                    ? 'centroCostoNombreModalError'
+                    : undefined
+                }
+                onChange={(event) => {
+                  const value = event.target.value
+
                   setForm((actual) => ({
                     ...actual,
-                    nombre: event.target.value,
+                    nombre: value,
                   }))
-                }
+
+                  if (
+                    errores.nombre &&
+                    value.trim().length > 0
+                  ) {
+                    setErrores((actual) => ({
+                      ...actual,
+                      nombre: false,
+                    }))
+                  }
+                }}
                 required
               />
+
+              {errores.nombre && (
+                <div
+                  id="centroCostoNombreModalError"
+                  className="maestro-field-error"
+                >
+                  Campo requerido
+                </div>
+              )}
             </div>
 
             <div className="mb-3">
@@ -136,31 +199,65 @@ export function CentroCostoFormModal({
                 htmlFor="centroCostoDescripcionModal"
               >
                 Descripción
+                <span className="maestro-required" aria-hidden="true">
+                  *
+                </span>
               </label>
 
               <textarea
                 id="centroCostoDescripcionModal"
-                className="form-control maestro-control maestro-control--textarea"
+                className={`form-control maestro-control maestro-control--textarea${
+                  errores.descripcion
+                    ? ' maestro-control--error'
+                    : ''
+                }`}
                 value={form.descripcion}
-                onChange={(event) =>
+                aria-invalid={errores.descripcion}
+                aria-describedby={
+                  errores.descripcion
+                    ? 'centroCostoDescripcionModalError'
+                    : undefined
+                }
+                onChange={(event) => {
+                  const value = event.target.value
+
                   setForm((actual) => ({
                     ...actual,
-                    descripcion:
-                      event.target.value,
+                    descripcion: value,
                   }))
-                }
+
+                  if (
+                    errores.descripcion &&
+                    value.trim().length > 0
+                  ) {
+                    setErrores((actual) => ({
+                      ...actual,
+                      descripcion: false,
+                    }))
+                  }
+                }}
                 rows={4}
                 required
               />
+
+              {errores.descripcion && (
+                <div
+                  id="centroCostoDescripcionModalError"
+                  className="maestro-field-error"
+                >
+                  Campo requerido
+                </div>
+              )}
             </div>
           </div>
 
           <div className="maestro-modal-footer">
             <button
               type="button"
-              className="btn maestro-btn-secondary"
+              className="btn maestro-btn-danger"
               onClick={onClose}
             >
+              <X size={18} />
               Cancelar
             </button>
 
@@ -177,4 +274,3 @@ export function CentroCostoFormModal({
     </div>
   )
 }
-
