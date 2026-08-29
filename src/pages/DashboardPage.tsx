@@ -306,8 +306,8 @@ const modules: Module[] = [
     category: 'Reportes',
   },
   {
-    title: 'Especies',
-    description: 'Mantenimiento de especies.',
+    title: 'Centros de costo',
+    description: 'Mantenimiento de centros de costo.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -510,6 +510,10 @@ function DashboardPage() {
   const manejarAbrirModulo = (moduleTitle: string) => {
     if (moduleTitle === 'Categorías') {
       navigate('/categorias')
+    }
+
+    if (moduleTitle === 'Centros de costo') {
+      navigate('/centros-costo')
     }
 
     if (moduleTitle === 'Vales de Consumo') {

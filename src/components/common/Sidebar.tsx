@@ -3,6 +3,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardList,
+  Coins,
   LayoutDashboard,
 } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
@@ -10,6 +11,7 @@ import { Link, useLocation } from 'react-router-dom'
 const ENLACES = [
   { to: '/dashboard', label: 'Inicio', icon: LayoutDashboard },
   { to: '/categorias', label: 'Categorías', icon: Boxes },
+  { to: '/centros-costo', label: 'Centros de costo', icon: Coins },
   {
     to: '/vales-consumo',
     label: 'Vales de consumo',
