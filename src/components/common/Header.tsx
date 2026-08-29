@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Bell, Leaf } from 'lucide-react'
+import { Bell, Leaf, LogOut } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
 import { useAuth } from '../../hooks/useAuth'
@@ -77,12 +77,22 @@ export function Header({
           <span>{notifications}</span>
         </button>
 
-        <button className="user-menu" type="button" onClick={logout}>
+        <button className="user-menu" type="button">
           <span className="avatar">{iniciales}</span>
           <span>
             <strong>{nombreCompleto}</strong>
             <small>{rolUsuario}</small>
           </span>
+        </button>
+
+        <button
+          className="logout-button"
+          type="button"
+          onClick={logout}
+          aria-label="Cerrar sesión"
+          title="Cerrar sesión"
+        >
+          <LogOut size={18} />
         </button>
       </div>
     </nav>
