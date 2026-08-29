@@ -334,8 +334,8 @@ const modules: Module[] = [
     category: 'Maestros',
   },
   {
-    title: 'Cámaras de Frío',
-    description: 'Administración de cámaras.',
+    title: 'Unidades de medida',
+    description: 'Administración de unidades de medida.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -522,6 +522,10 @@ function DashboardPage() {
 
     if (moduleTitle === 'Tipos de comprobante') {
       navigate('/tipos-comprobante')
+    }
+
+    if (moduleTitle === 'Unidades de medida') {
+      navigate('/unidades-medida')
     }
 
     if (moduleTitle === 'Vales de Consumo') {

@@ -6,6 +6,7 @@ import {
   Coins,
   LayoutDashboard,
   ReceiptText,
+  Ruler,
   Tags,
 } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
@@ -19,6 +20,11 @@ const ENLACES = [
     to: '/tipos-comprobante',
     label: 'Tipos de comprobante',
     icon: ReceiptText,
+  },
+  {
+    to: '/unidades-medida',
+    label: 'Unidades de medida',
+    icon: Ruler,
   },
   {
     to: '/vales-consumo',

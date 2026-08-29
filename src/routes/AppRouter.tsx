@@ -14,6 +14,7 @@ import { CategoriasPage } from '../pages/categorias/CategoriasPage'
 import { CentrosCostoPage } from '../pages/centros-costos/CentrosCostoPage'
 import { TiposProductoPage } from '../pages/tipos-producto/TiposProductoPage'
 import { TiposComprobantePage } from '../pages/tipos-comprobante/TiposComprobantePage'
+import { UnidadesMedidaPage } from '../pages/unidades-medida/UnidadesMedidaPage'
 import { ValesConsumoPage } from '../pages/vales-consumo/ValesConsumoPage'
 import { ProtectedRoute } from './ProtectedRoute'
 import { RoleRoute } from './RoleRoute'
@@ -74,6 +75,10 @@ export function AppRouter() {
                 <Route
                   path="/tipos-comprobante"
                   element={<TiposComprobantePage />}
+                />
+                <Route
+                  path="/unidades-medida"
+                  element={<UnidadesMedidaPage />}
                 />
                 <Route
                   path="/vales-consumo"
