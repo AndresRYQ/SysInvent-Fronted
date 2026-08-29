@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import {
   ArrowLeft,
-  Bell,
   CalendarDays,
   ChevronDown,
   ClipboardList,
@@ -41,18 +40,11 @@ const PRODUCTOS_DISPONIBLES = [
 ]
 
 export function ValesConsumoPage() {
-  const { sesion, logout } = useAuth()
+  const { sesion } = useAuth()
   const [productos, setProductos] = useState(PRODUCTOS_INICIALES)
   const [productoSeleccionado, setProductoSeleccionado] = useState('')
   const [mensaje, setMensaje] = useState('')
   const nombreCompleto = sesion?.nombreCompleto ?? 'Usuario sin sesión'
-  const rolUsuario = sesion?.rol ?? 'Sin rol'
-  const iniciales = nombreCompleto
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((parte) => parte[0]?.toUpperCase() ?? '')
-    .join('') || 'US'
 
   const agregarProducto = () => {
     const producto = PRODUCTOS_DISPONIBLES.find(
@@ -92,29 +84,6 @@ export function ValesConsumoPage() {
 
   return (
     <main className="dashboard-shell voucher-shell">
-      <nav className="topbar" aria-label="Navegacion principal">
-        <a className="brand" href="/dashboard">
-          <span className="brand-mark"><Package size={21} /></span>
-          <span className="brand-name">AGRIHUASA</span>
-          <span className="brand-system">FFPMS</span>
-        </a>
-        <div className="nav-links">
-          <a className="nav-link" href="/dashboard">Inicio</a>
-          <a className="nav-link" href="/categorias">Categorías</a>
-          <a className="nav-link is-active" href="/vales-consumo">Vales de consumo</a>
-          <a className="nav-link" href="/dashboard">Reportes</a>
-        </div>
-        <div className="topbar-actions">
-          <button className="notification-button" type="button" aria-label="Notificaciones">
-            <Bell size={18} /><span>3</span>
-          </button>
-          <button className="user-menu" type="button" onClick={logout}>
-            <span className="avatar">{iniciales}</span>
-            <span><strong>{nombreCompleto}</strong><small>{rolUsuario}</small></span>
-          </button>
-        </div>
-      </nav>
-
       <section className="voucher-heading">
         <a className="back-link" href="/dashboard"><ArrowLeft size={16} /> Volver al inicio</a>
         <div className="heading-row">

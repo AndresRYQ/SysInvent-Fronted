@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom'
 
 import { AuthProvider } from '../hooks/useAuth'
+import { MainLayout } from '../layouts/MainLayout'
 import { AccessDeniedPage } from '../pages/AccessDeniedPage'
 import DashboardPage from '../pages/DashboardPage'
 import { LoginPage } from '../pages/auth/LoginPage'
@@ -35,33 +36,35 @@ export function AppRouter() {
           />
 
           <Route element={<ProtectedRoute />}>
-            <Route
-              path="/dashboard"
-              element={<DashboardPage />}
-            />
+            <Route element={<MainLayout />}>
+              <Route
+                path="/dashboard"
+                element={<DashboardPage />}
+              />
 
-            <Route
-              path="/sin-permiso"
-              element={<AccessDeniedPage />}
-            />
+              <Route
+                path="/sin-permiso"
+                element={<AccessDeniedPage />}
+              />
 
-            <Route
-              element={
-                <RoleRoute
-                  rolesPermitidos={[
-                    'Administrador',
-                  ]}
+              <Route
+                element={
+                  <RoleRoute
+                    rolesPermitidos={[
+                      'Administrador',
+                    ]}
+                  />
+                }
+              >
+                <Route
+                  path="/categorias"
+                  element={<CategoriasPage />}
                 />
-              }
-            >
-              <Route
-                path="/categorias"
-                element={<CategoriasPage />}
-              />
-              <Route
-                path="/vales-consumo"
-                element={<ValesConsumoPage />}
-              />
+                <Route
+                  path="/vales-consumo"
+                  element={<ValesConsumoPage />}
+                />
+              </Route>
             </Route>
           </Route>
 
