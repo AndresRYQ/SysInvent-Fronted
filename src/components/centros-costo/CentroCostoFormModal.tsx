@@ -1,54 +1,54 @@
 import { useEffect, useState } from 'react'
 import { Save, X } from 'lucide-react'
 
-import type { Categoria } from '../../types/categoria'
+import type { CentroCosto } from '../../types/centroCosto'
 
-interface CategoriaFormModalProps {
+interface CentroCostoFormModalProps {
   abierto: boolean
-  categoria: Categoria | null
+  centroCosto: CentroCosto | null
   onClose: () => void
   onSubmit: (
-    categoria: Pick<
-      Categoria,
+    centroCosto: Pick<
+      CentroCosto,
       'nombre' | 'descripcion'
     >,
   ) => void
 }
 
-interface CategoriaFormState {
+interface CentroCostoFormState {
   nombre: string
   descripcion: string
 }
 
-const FORM_INICIAL: CategoriaFormState = {
+const FORM_INICIAL: CentroCostoFormState = {
   nombre: '',
   descripcion: '',
 }
 
-export function CategoriaFormModal({
+export function CentroCostoFormModal({
   abierto,
-  categoria,
+  centroCosto,
   onClose,
   onSubmit,
-}: CategoriaFormModalProps) {
+}: CentroCostoFormModalProps) {
   const [form, setForm] =
-    useState<CategoriaFormState>(FORM_INICIAL)
+    useState<CentroCostoFormState>(FORM_INICIAL)
 
   useEffect(() => {
     if (!abierto) {
       return
     }
 
-    if (categoria) {
+    if (centroCosto) {
       setForm({
-        nombre: categoria.nombre,
-        descripcion: categoria.descripcion,
+        nombre: centroCosto.nombre,
+        descripcion: centroCosto.descripcion,
       })
       return
     }
 
     setForm(FORM_INICIAL)
-  }, [abierto, categoria])
+  }, [abierto, centroCosto])
 
   if (!abierto) {
     return null
@@ -64,7 +64,7 @@ export function CategoriaFormModal({
         className="maestro-modal-card"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="categoria-form-title"
+        aria-labelledby="centro-costo-form-title"
         onClick={(event) =>
           event.stopPropagation()
         }
@@ -72,16 +72,16 @@ export function CategoriaFormModal({
         <div className="maestro-modal-header">
           <div>
             <h3
-              id="categoria-form-title"
+              id="centro-costo-form-title"
               className="maestro-modal-title"
             >
-              {categoria
-                ? 'Editar categoría'
-                : 'Registrar categoría'}
+              {centroCosto
+                ? 'Editar centro de costo'
+                : 'Registrar centro de costo'}
             </h3>
 
             <p className="maestro-modal-copy">
-              Completa los datos de la categoría.
+              Completa los datos del centro de costo.
             </p>
           </div>
 
@@ -110,13 +110,13 @@ export function CategoriaFormModal({
             <div className="mb-3">
               <label
                 className="form-label maestro-label"
-                htmlFor="categoriaNombreModal"
+                htmlFor="centroCostoNombreModal"
               >
-                Nombre de categoría
+                Nombre de centro de costo
               </label>
 
               <input
-                id="categoriaNombreModal"
+                id="centroCostoNombreModal"
                 className="form-control maestro-control"
                 type="text"
                 value={form.nombre}
@@ -133,13 +133,13 @@ export function CategoriaFormModal({
             <div className="mb-3">
               <label
                 className="form-label maestro-label"
-                htmlFor="categoriaDescripcionModal"
+                htmlFor="centroCostoDescripcionModal"
               >
                 Descripción
               </label>
 
               <textarea
-                id="categoriaDescripcionModal"
+                id="centroCostoDescripcionModal"
                 className="form-control maestro-control maestro-control--textarea"
                 value={form.descripcion}
                 onChange={(event) =>

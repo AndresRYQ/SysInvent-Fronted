@@ -1,21 +1,21 @@
 import { AlertTriangle } from 'lucide-react'
 
-import type { Categoria } from '../../types/categoria'
+import type { Destino } from '../../types/destino'
 
-interface CategoriaDeleteModalProps {
+interface DestinoDeleteModalProps {
   abierto: boolean
-  categoria: Categoria | null
+  destino: Destino | null
   onClose: () => void
   onConfirm: () => void
 }
 
-export function CategoriaDeleteModal({
+export function DestinoDeleteModal({
   abierto,
-  categoria,
+  destino,
   onClose,
   onConfirm,
-}: CategoriaDeleteModalProps) {
-  if (!abierto || !categoria) {
+}: DestinoDeleteModalProps) {
+  if (!abierto || !destino) {
     return null
   }
 
@@ -29,19 +29,14 @@ export function CategoriaDeleteModal({
         className="maestro-modal-card maestro-modal-card--sm"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="categoria-delete-title"
-        onClick={(event) =>
-          event.stopPropagation()
-        }
+        aria-labelledby="destino-delete-title"
+        onClick={(event) => event.stopPropagation()}
       >
         <div className="maestro-delete-icon">
           <AlertTriangle size={24} />
         </div>
 
-        <h3
-          id="categoria-delete-title"
-          className="maestro-modal-title text-center"
-        >
+        <h3 id="destino-delete-title" className="maestro-modal-title text-center">
           Confirmar eliminación
         </h3>
 
@@ -49,9 +44,7 @@ export function CategoriaDeleteModal({
           ¿Seguro que quiere eliminar este registro?
         </p>
 
-        <p className="maestro-delete-name">
-          {categoria.nombre}
-        </p>
+        <p className="maestro-delete-name">{destino.nombre}</p>
 
         <div className="maestro-modal-footer maestro-modal-footer--center">
           <button
@@ -74,4 +67,3 @@ export function CategoriaDeleteModal({
     </div>
   )
 }
-

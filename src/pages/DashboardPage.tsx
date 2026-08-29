@@ -306,8 +306,8 @@ const modules: Module[] = [
     category: 'Reportes',
   },
   {
-    title: 'Especies',
-    description: 'Mantenimiento de especies.',
+    title: 'Centros de costo',
+    description: 'Mantenimiento de centros de costo.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -320,30 +320,30 @@ const modules: Module[] = [
     category: 'Maestros',
   },
   {
-    title: 'Marcas de Caja',
-    description: 'Administración de marcas.',
+    title: 'Tipos de producto',
+    description: 'Administración de tipos de producto.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
   },
   {
-    title: 'Modelos de Caja',
-    description: 'Configuración de modelos.',
+    title: 'Tipos de comprobante',
+    description: 'Administración de tipos de comprobante.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
   },
   {
-    title: 'Cámaras de Frío',
-    description: 'Administración de cámaras.',
+    title: 'Unidades de medida',
+    description: 'Administración de unidades de medida.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
   },
   {
-    title: 'Acopiadores',
-    description: 'Gestión de acopiadores.',
-    icon: 'users',
+    title: 'Destinos',
+    description: 'Administración de destinos.',
+    icon: 'box',
     tone: 'green',
     category: 'Maestros',
   },
@@ -510,6 +510,26 @@ function DashboardPage() {
   const manejarAbrirModulo = (moduleTitle: string) => {
     if (moduleTitle === 'Categorías') {
       navigate('/categorias')
+    }
+
+    if (moduleTitle === 'Centros de costo') {
+      navigate('/centros-costo')
+    }
+
+    if (moduleTitle === 'Tipos de producto') {
+      navigate('/tipos-producto')
+    }
+
+    if (moduleTitle === 'Tipos de comprobante') {
+      navigate('/tipos-comprobante')
+    }
+
+    if (moduleTitle === 'Unidades de medida') {
+      navigate('/unidades-medida')
+    }
+
+    if (moduleTitle === 'Destinos') {
+      navigate('/destinos')
     }
 
     if (moduleTitle === 'Vales de Consumo') {

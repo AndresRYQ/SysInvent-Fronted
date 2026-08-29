@@ -82,35 +82,35 @@ export function AuthProvider({
    * Finaliza la sesión cuando llega
    * su fecha de expiración.
    */
-  useEffect(() => {
-    if (!sesion) {
-      return
-    }
-
-    const fechaExpiracion = Date.parse(
-      sesion.fechaExpiracion,
-    )
-
-    const tiempoRestante =
-      fechaExpiracion - Date.now()
-
-    if (
-      Number.isNaN(fechaExpiracion) ||
-      tiempoRestante <= 0
-    ) {
-      logout()
-      return
-    }
-
-    const temporizador = window.setTimeout(
-      logout,
-      tiempoRestante,
-    )
-
-    return () => {
-      window.clearTimeout(temporizador)
-    }
-  }, [sesion, logout])
+  // useEffect(() => {
+  //   if (!sesion) {
+  //     return
+  //   }
+  //
+  //   const fechaExpiracion = Date.parse(
+  //     sesion.fechaExpiracion,
+  //   )
+  //
+  //   const tiempoRestante =
+  //     fechaExpiracion - Date.now()
+  //
+  //   if (
+  //     Number.isNaN(fechaExpiracion) ||
+  //     tiempoRestante <= 0
+  //   ) {
+  //     logout()
+  //     return
+  //   }
+  //
+  //   const temporizador = window.setTimeout(
+  //     logout,
+  //     tiempoRestante,
+  //   )
+  //
+  //   return () => {
+  //     window.clearTimeout(temporizador)
+  //   }
+  // }, [sesion, logout])
 
   /*
  * Cierra la sesión si el usuario no

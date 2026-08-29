@@ -1,54 +1,51 @@
 import { useEffect, useState } from 'react'
 import { Save, X } from 'lucide-react'
 
-import type { Categoria } from '../../types/categoria'
+import type { UnidadMedida } from '../../types/unidadMedida'
 
-interface CategoriaFormModalProps {
+interface UnidadMedidaFormModalProps {
   abierto: boolean
-  categoria: Categoria | null
+  unidadMedida: UnidadMedida | null
   onClose: () => void
   onSubmit: (
-    categoria: Pick<
-      Categoria,
-      'nombre' | 'descripcion'
-    >,
+    unidadMedida: Pick<UnidadMedida, 'nombre' | 'descripcion'>,
   ) => void
 }
 
-interface CategoriaFormState {
+interface UnidadMedidaFormState {
   nombre: string
   descripcion: string
 }
 
-const FORM_INICIAL: CategoriaFormState = {
+const FORM_INICIAL: UnidadMedidaFormState = {
   nombre: '',
   descripcion: '',
 }
 
-export function CategoriaFormModal({
+export function UnidadMedidaFormModal({
   abierto,
-  categoria,
+  unidadMedida,
   onClose,
   onSubmit,
-}: CategoriaFormModalProps) {
+}: UnidadMedidaFormModalProps) {
   const [form, setForm] =
-    useState<CategoriaFormState>(FORM_INICIAL)
+    useState<UnidadMedidaFormState>(FORM_INICIAL)
 
   useEffect(() => {
     if (!abierto) {
       return
     }
 
-    if (categoria) {
+    if (unidadMedida) {
       setForm({
-        nombre: categoria.nombre,
-        descripcion: categoria.descripcion,
+        nombre: unidadMedida.nombre,
+        descripcion: unidadMedida.descripcion,
       })
       return
     }
 
     setForm(FORM_INICIAL)
-  }, [abierto, categoria])
+  }, [abierto, unidadMedida])
 
   if (!abierto) {
     return null
@@ -64,7 +61,7 @@ export function CategoriaFormModal({
         className="maestro-modal-card"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="categoria-form-title"
+        aria-labelledby="unidad-medida-form-title"
         onClick={(event) =>
           event.stopPropagation()
         }
@@ -72,16 +69,16 @@ export function CategoriaFormModal({
         <div className="maestro-modal-header">
           <div>
             <h3
-              id="categoria-form-title"
+              id="unidad-medida-form-title"
               className="maestro-modal-title"
             >
-              {categoria
-                ? 'Editar categoría'
-                : 'Registrar categoría'}
+              {unidadMedida
+                ? 'Editar unidad de medida'
+                : 'Registrar unidad de medida'}
             </h3>
 
             <p className="maestro-modal-copy">
-              Completa los datos de la categoría.
+              Completa los datos de la unidad de medida.
             </p>
           </div>
 
@@ -101,8 +98,7 @@ export function CategoriaFormModal({
 
             onSubmit({
               nombre: form.nombre.trim(),
-              descripcion:
-                form.descripcion.trim(),
+              descripcion: form.descripcion.trim(),
             })
           }}
         >
@@ -110,13 +106,13 @@ export function CategoriaFormModal({
             <div className="mb-3">
               <label
                 className="form-label maestro-label"
-                htmlFor="categoriaNombreModal"
+                htmlFor="unidadMedidaNombreModal"
               >
-                Nombre de categoría
+                Nombre de unidad de medida
               </label>
 
               <input
-                id="categoriaNombreModal"
+                id="unidadMedidaNombreModal"
                 className="form-control maestro-control"
                 type="text"
                 value={form.nombre}
@@ -126,6 +122,7 @@ export function CategoriaFormModal({
                     nombre: event.target.value,
                   }))
                 }
+                placeholder="Ej. Unidad, Kilogramo, Litro, Metro"
                 required
               />
             </div>
@@ -133,20 +130,19 @@ export function CategoriaFormModal({
             <div className="mb-3">
               <label
                 className="form-label maestro-label"
-                htmlFor="categoriaDescripcionModal"
+                htmlFor="unidadMedidaDescripcionModal"
               >
                 Descripción
               </label>
 
               <textarea
-                id="categoriaDescripcionModal"
+                id="unidadMedidaDescripcionModal"
                 className="form-control maestro-control maestro-control--textarea"
                 value={form.descripcion}
                 onChange={(event) =>
                   setForm((actual) => ({
                     ...actual,
-                    descripcion:
-                      event.target.value,
+                    descripcion: event.target.value,
                   }))
                 }
                 rows={4}
@@ -177,4 +173,3 @@ export function CategoriaFormModal({
     </div>
   )
 }
-

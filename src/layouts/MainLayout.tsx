@@ -5,7 +5,7 @@ import { Header } from '../components/common/Header'
 import { Sidebar } from '../components/common/Sidebar'
 import '../styles/MainLayout.css'
 
-const SIN_MENU = ['/dashboard', '/sin-permiso']
+const SIN_MENU = ['/dashboard', '/sin-permiso', '/categorias']
 
 export function MainLayout() {
   const { pathname } = useLocation()

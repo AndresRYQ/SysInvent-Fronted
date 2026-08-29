@@ -1,21 +1,21 @@
 import { AlertTriangle } from 'lucide-react'
 
-import type { Categoria } from '../../types/categoria'
+import type { CentroCosto } from '../../types/centroCosto'
 
-interface CategoriaDeleteModalProps {
+interface CentroCostoDeleteModalProps {
   abierto: boolean
-  categoria: Categoria | null
+  centroCosto: CentroCosto | null
   onClose: () => void
   onConfirm: () => void
 }
 
-export function CategoriaDeleteModal({
+export function CentroCostoDeleteModal({
   abierto,
-  categoria,
+  centroCosto,
   onClose,
   onConfirm,
-}: CategoriaDeleteModalProps) {
-  if (!abierto || !categoria) {
+}: CentroCostoDeleteModalProps) {
+  if (!abierto || !centroCosto) {
     return null
   }
 
@@ -29,7 +29,7 @@ export function CategoriaDeleteModal({
         className="maestro-modal-card maestro-modal-card--sm"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="categoria-delete-title"
+        aria-labelledby="centro-costo-delete-title"
         onClick={(event) =>
           event.stopPropagation()
         }
@@ -39,7 +39,7 @@ export function CategoriaDeleteModal({
         </div>
 
         <h3
-          id="categoria-delete-title"
+          id="centro-costo-delete-title"
           className="maestro-modal-title text-center"
         >
           Confirmar eliminación
@@ -50,7 +50,7 @@ export function CategoriaDeleteModal({
         </p>
 
         <p className="maestro-delete-name">
-          {categoria.nombre}
+          {centroCosto.nombre}
         </p>
 
         <div className="maestro-modal-footer maestro-modal-footer--center">

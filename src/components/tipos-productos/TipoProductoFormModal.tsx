@@ -1,54 +1,54 @@
 import { useEffect, useState } from 'react'
 import { Save, X } from 'lucide-react'
 
-import type { Categoria } from '../../types/categoria'
+import type { TipoProducto } from '../../types/tipoProducto'
 
-interface CategoriaFormModalProps {
+interface TipoProductoFormModalProps {
   abierto: boolean
-  categoria: Categoria | null
+  tipoProducto: TipoProducto | null
   onClose: () => void
   onSubmit: (
-    categoria: Pick<
-      Categoria,
+    tipoProducto: Pick<
+      TipoProducto,
       'nombre' | 'descripcion'
     >,
   ) => void
 }
 
-interface CategoriaFormState {
+interface TipoProductoFormState {
   nombre: string
   descripcion: string
 }
 
-const FORM_INICIAL: CategoriaFormState = {
+const FORM_INICIAL: TipoProductoFormState = {
   nombre: '',
   descripcion: '',
 }
 
-export function CategoriaFormModal({
+export function TipoProductoFormModal({
   abierto,
-  categoria,
+  tipoProducto,
   onClose,
   onSubmit,
-}: CategoriaFormModalProps) {
+}: TipoProductoFormModalProps) {
   const [form, setForm] =
-    useState<CategoriaFormState>(FORM_INICIAL)
+    useState<TipoProductoFormState>(FORM_INICIAL)
 
   useEffect(() => {
     if (!abierto) {
       return
     }
 
-    if (categoria) {
+    if (tipoProducto) {
       setForm({
-        nombre: categoria.nombre,
-        descripcion: categoria.descripcion,
+        nombre: tipoProducto.nombre,
+        descripcion: tipoProducto.descripcion,
       })
       return
     }
 
     setForm(FORM_INICIAL)
-  }, [abierto, categoria])
+  }, [abierto, tipoProducto])
 
   if (!abierto) {
     return null
@@ -64,7 +64,7 @@ export function CategoriaFormModal({
         className="maestro-modal-card"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="categoria-form-title"
+        aria-labelledby="tipo-producto-form-title"
         onClick={(event) =>
           event.stopPropagation()
         }
@@ -72,16 +72,16 @@ export function CategoriaFormModal({
         <div className="maestro-modal-header">
           <div>
             <h3
-              id="categoria-form-title"
+              id="tipo-producto-form-title"
               className="maestro-modal-title"
             >
-              {categoria
-                ? 'Editar categoría'
-                : 'Registrar categoría'}
+              {tipoProducto
+                ? 'Editar tipo de producto'
+                : 'Registrar tipo de producto'}
             </h3>
 
             <p className="maestro-modal-copy">
-              Completa los datos de la categoría.
+              Completa los datos del tipo de producto.
             </p>
           </div>
 
@@ -110,13 +110,13 @@ export function CategoriaFormModal({
             <div className="mb-3">
               <label
                 className="form-label maestro-label"
-                htmlFor="categoriaNombreModal"
+                htmlFor="tipoProductoNombreModal"
               >
-                Nombre de categoría
+                Nombre de tipo de producto
               </label>
 
               <input
-                id="categoriaNombreModal"
+                id="tipoProductoNombreModal"
                 className="form-control maestro-control"
                 type="text"
                 value={form.nombre}
@@ -133,13 +133,13 @@ export function CategoriaFormModal({
             <div className="mb-3">
               <label
                 className="form-label maestro-label"
-                htmlFor="categoriaDescripcionModal"
+                htmlFor="tipoProductoDescripcionModal"
               >
                 Descripción
               </label>
 
               <textarea
-                id="categoriaDescripcionModal"
+                id="tipoProductoDescripcionModal"
                 className="form-control maestro-control maestro-control--textarea"
                 value={form.descripcion}
                 onChange={(event) =>
@@ -177,4 +177,3 @@ export function CategoriaFormModal({
     </div>
   )
 }
-

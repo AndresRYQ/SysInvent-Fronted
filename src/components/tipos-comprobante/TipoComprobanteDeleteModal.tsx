@@ -1,21 +1,21 @@
 import { AlertTriangle } from 'lucide-react'
 
-import type { Categoria } from '../../types/categoria'
+import type { TipoComprobante } from '../../types/tipoComprobante'
 
-interface CategoriaDeleteModalProps {
+interface TipoComprobanteDeleteModalProps {
   abierto: boolean
-  categoria: Categoria | null
+  tipoComprobante: TipoComprobante | null
   onClose: () => void
   onConfirm: () => void
 }
 
-export function CategoriaDeleteModal({
+export function TipoComprobanteDeleteModal({
   abierto,
-  categoria,
+  tipoComprobante,
   onClose,
   onConfirm,
-}: CategoriaDeleteModalProps) {
-  if (!abierto || !categoria) {
+}: TipoComprobanteDeleteModalProps) {
+  if (!abierto || !tipoComprobante) {
     return null
   }
 
@@ -29,7 +29,7 @@ export function CategoriaDeleteModal({
         className="maestro-modal-card maestro-modal-card--sm"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="categoria-delete-title"
+        aria-labelledby="tipo-comprobante-delete-title"
         onClick={(event) =>
           event.stopPropagation()
         }
@@ -39,7 +39,7 @@ export function CategoriaDeleteModal({
         </div>
 
         <h3
-          id="categoria-delete-title"
+          id="tipo-comprobante-delete-title"
           className="maestro-modal-title text-center"
         >
           Confirmar eliminación
@@ -50,7 +50,7 @@ export function CategoriaDeleteModal({
         </p>
 
         <p className="maestro-delete-name">
-          {categoria.nombre}
+          {tipoComprobante.nombre}
         </p>
 
         <div className="maestro-modal-footer maestro-modal-footer--center">
@@ -74,4 +74,3 @@ export function CategoriaDeleteModal({
     </div>
   )
 }
-
