@@ -320,8 +320,8 @@ const modules: Module[] = [
     category: 'Maestros',
   },
   {
-    title: 'Marcas de Caja',
-    description: 'Administración de marcas.',
+    title: 'Tipos de producto',
+    description: 'Administración de tipos de producto.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -514,6 +514,10 @@ function DashboardPage() {
 
     if (moduleTitle === 'Centros de costo') {
       navigate('/centros-costo')
+    }
+
+    if (moduleTitle === 'Tipos de producto') {
+      navigate('/tipos-producto')
     }
 
     if (moduleTitle === 'Vales de Consumo') {
