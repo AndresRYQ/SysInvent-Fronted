@@ -341,9 +341,9 @@ const modules: Module[] = [
     category: 'Maestros',
   },
   {
-    title: 'Acopiadores',
-    description: 'Gestión de acopiadores.',
-    icon: 'users',
+    title: 'Destinos',
+    description: 'Administración de destinos.',
+    icon: 'box',
     tone: 'green',
     category: 'Maestros',
   },
@@ -526,6 +526,10 @@ function DashboardPage() {
 
     if (moduleTitle === 'Unidades de medida') {
       navigate('/unidades-medida')
+    }
+
+    if (moduleTitle === 'Destinos') {
+      navigate('/destinos')
     }
 
     if (moduleTitle === 'Vales de Consumo') {

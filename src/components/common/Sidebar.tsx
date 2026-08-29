@@ -5,6 +5,7 @@ import {
   ClipboardList,
   Coins,
   LayoutDashboard,
+  MapPin,
   ReceiptText,
   Ruler,
   Tags,
@@ -25,6 +26,11 @@ const ENLACES = [
     to: '/unidades-medida',
     label: 'Unidades de medida',
     icon: Ruler,
+  },
+  {
+    to: '/destinos',
+    label: 'Destinos',
+    icon: MapPin,
   },
   {
     to: '/vales-consumo',
