@@ -43,7 +43,7 @@ export function TablePagination({
   totalItems,
   page,
   pageSize,
-  pageSizes = [10, 25, 100],
+  pageSizes = [10, 20, 50],
   onPageChange,
   onPageSizeChange,
 }: TablePaginationProps) {

@@ -40,16 +40,8 @@ export function TablaCategorias({
           <div>
             <span className="categories-kicker">
               <FolderKanban size={16} />
-              Registros
-            </span>
-
-            <h2 className="categories-section-title mb-1">
               Listado de categorías
-            </h2>
-
-            <p className="categories-section-copy mb-0">
-              Total encontrados: {totalItems}
-            </p>
+            </span>
           </div>
 
           <button
