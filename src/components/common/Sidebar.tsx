@@ -1,5 +1,7 @@
 import {
   Boxes,
+  ChevronLeft,
+  ChevronRight,
   ClipboardList,
   LayoutDashboard,
 } from 'lucide-react'
@@ -17,37 +19,49 @@ const ENLACES = [
 
 type SidebarProps = {
   abierto: boolean
+  onToggle: () => void
 }
 
-export function Sidebar({ abierto }: SidebarProps) {
+export function Sidebar({ abierto, onToggle }: SidebarProps) {
   const { pathname } = useLocation()
+
+  const activo = (to: string) =>
+    to === '/dashboard' ? pathname === to : pathname.startsWith(to)
 
   return (
     <aside
       className={`sidebar ${abierto ? 'sidebar--abierto' : ''}`}
       aria-hidden={!abierto}
     >
+      <button
+        type="button"
+        className="sidebar-toggle"
+        onClick={onToggle}
+        aria-label={abierto ? 'Contraer menú' : 'Expandir menú'}
+        title={abierto ? 'Contraer menú' : 'Expandir menú'}
+      >
+        {abierto ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+      </button>
+
       <div className="sidebar-inner">
-        <div className="sidebar-head">
+        <div className={`sidebar-head ${abierto ? '' : 'sidebar-head--cerrado'}`}>
           <span className="sidebar-title">Menú</span>
         </div>
 
         <nav className="sidebar-nav">
           {ENLACES.map((enlace) => {
             const Icon = enlace.icon
-            const activo =
-              enlace.to === '/dashboard'
-                ? pathname === '/dashboard'
-                : pathname.startsWith(enlace.to)
+            const esActivo = activo(enlace.to)
 
             return (
               <Link
                 key={enlace.to}
                 to={enlace.to}
-                className={`sidebar-link ${activo ? 'is-active' : ''}`}
+                className={`sidebar-link ${esActivo ? 'is-active' : ''}`}
+                title={!abierto ? enlace.label : undefined}
               >
                 <Icon size={18} />
-                <span>{enlace.label}</span>
+                {abierto && <span>{enlace.label}</span>}
               </Link>
             )
           })}

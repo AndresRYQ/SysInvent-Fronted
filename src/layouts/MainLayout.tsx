@@ -22,15 +22,16 @@ export function MainLayout() {
   return (
     <div className="app-layout">
       <header className="app-header">
-        <Header
-          menuAbierto={menuAbierto}
-          onMenuClick={() => setMenuAbierto((actual) => !actual)}
-          ocultarToggle={ocultarMenu}
-        />
+        <Header />
       </header>
 
       <div className="app-content-container">
-        {!ocultarMenu && <Sidebar abierto={menuAbierto} />}
+        {!ocultarMenu && (
+          <Sidebar
+            abierto={menuAbierto}
+            onToggle={() => setMenuAbierto((actual) => !actual)}
+          />
+        )}
 
         <main className="app-main">
           <Outlet />
