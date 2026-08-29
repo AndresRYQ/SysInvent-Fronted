@@ -56,12 +56,12 @@ export function CentroCostoFormModal({
 
   return (
     <div
-      className="centros-modal-backdrop"
+      className="maestro-modal-backdrop"
       role="presentation"
       onClick={onClose}
     >
       <div
-        className="centros-modal-card"
+        className="maestro-modal-card"
         role="dialog"
         aria-modal="true"
         aria-labelledby="centro-costo-form-title"
@@ -69,25 +69,25 @@ export function CentroCostoFormModal({
           event.stopPropagation()
         }
       >
-        <div className="centros-modal-header">
+        <div className="maestro-modal-header">
           <div>
             <h3
               id="centro-costo-form-title"
-              className="centros-modal-title"
+              className="maestro-modal-title"
             >
               {centroCosto
                 ? 'Editar centro de costo'
                 : 'Registrar centro de costo'}
             </h3>
 
-            <p className="centros-modal-copy">
+            <p className="maestro-modal-copy">
               Completa los datos del centro de costo.
             </p>
           </div>
 
           <button
             type="button"
-            className="btn centros-modal-close"
+            className="btn maestro-modal-close"
             onClick={onClose}
             aria-label="Cerrar modal"
           >
@@ -106,10 +106,10 @@ export function CentroCostoFormModal({
             })
           }}
         >
-          <div className="centros-modal-body">
+          <div className="maestro-modal-body">
             <div className="mb-3">
               <label
-                className="form-label centros-label"
+                className="form-label maestro-label"
                 htmlFor="centroCostoNombreModal"
               >
                 Nombre de centro de costo
@@ -117,7 +117,7 @@ export function CentroCostoFormModal({
 
               <input
                 id="centroCostoNombreModal"
-                className="form-control centros-control"
+                className="form-control maestro-control"
                 type="text"
                 value={form.nombre}
                 onChange={(event) =>
@@ -132,15 +132,15 @@ export function CentroCostoFormModal({
 
             <div className="mb-3">
               <label
-                className="form-label centros-label"
+                className="form-label maestro-label"
                 htmlFor="centroCostoDescripcionModal"
               >
-                Descripcion
+                Descripción
               </label>
 
               <textarea
                 id="centroCostoDescripcionModal"
-                className="form-control centros-control centros-control--textarea"
+                className="form-control maestro-control maestro-control--textarea"
                 value={form.descripcion}
                 onChange={(event) =>
                   setForm((actual) => ({
@@ -155,10 +155,10 @@ export function CentroCostoFormModal({
             </div>
           </div>
 
-          <div className="centros-modal-footer">
+          <div className="maestro-modal-footer">
             <button
               type="button"
-              className="btn centros-btn-secondary"
+              className="btn maestro-btn-secondary"
               onClick={onClose}
             >
               Cancelar
@@ -166,7 +166,7 @@ export function CentroCostoFormModal({
 
             <button
               type="submit"
-              className="btn centros-btn-primary"
+              className="btn maestro-btn-primary"
             >
               <Save size={18} />
               Guardar
@@ -177,3 +177,4 @@ export function CentroCostoFormModal({
     </div>
   )
 }
+

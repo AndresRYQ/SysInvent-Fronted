@@ -56,12 +56,12 @@ export function CategoriaFormModal({
 
   return (
     <div
-      className="categories-modal-backdrop"
+      className="maestro-modal-backdrop"
       role="presentation"
       onClick={onClose}
     >
       <div
-        className="categories-modal-card"
+        className="maestro-modal-card"
         role="dialog"
         aria-modal="true"
         aria-labelledby="categoria-form-title"
@@ -69,25 +69,25 @@ export function CategoriaFormModal({
           event.stopPropagation()
         }
       >
-        <div className="categories-modal-header">
+        <div className="maestro-modal-header">
           <div>
             <h3
               id="categoria-form-title"
-              className="categories-modal-title"
+              className="maestro-modal-title"
             >
               {categoria
-                ? 'Editar categoria'
-                : 'Registrar categoria'}
+                ? 'Editar categoría'
+                : 'Registrar categoría'}
             </h3>
 
-            <p className="categories-modal-copy">
-              Completa los datos de la categoria.
+            <p className="maestro-modal-copy">
+              Completa los datos de la categoría.
             </p>
           </div>
 
           <button
             type="button"
-            className="btn categories-modal-close"
+            className="btn maestro-modal-close"
             onClick={onClose}
             aria-label="Cerrar modal"
           >
@@ -106,18 +106,18 @@ export function CategoriaFormModal({
             })
           }}
         >
-          <div className="categories-modal-body">
+          <div className="maestro-modal-body">
             <div className="mb-3">
               <label
-                className="form-label categories-label"
+                className="form-label maestro-label"
                 htmlFor="categoriaNombreModal"
               >
-                Nombre de categoria
+                Nombre de categoría
               </label>
 
               <input
                 id="categoriaNombreModal"
-                className="form-control categories-control"
+                className="form-control maestro-control"
                 type="text"
                 value={form.nombre}
                 onChange={(event) =>
@@ -132,15 +132,15 @@ export function CategoriaFormModal({
 
             <div className="mb-3">
               <label
-                className="form-label categories-label"
+                className="form-label maestro-label"
                 htmlFor="categoriaDescripcionModal"
               >
-                Descripcion
+                Descripción
               </label>
 
               <textarea
                 id="categoriaDescripcionModal"
-                className="form-control categories-control categories-control--textarea"
+                className="form-control maestro-control maestro-control--textarea"
                 value={form.descripcion}
                 onChange={(event) =>
                   setForm((actual) => ({
@@ -155,10 +155,10 @@ export function CategoriaFormModal({
             </div>
           </div>
 
-          <div className="categories-modal-footer">
+          <div className="maestro-modal-footer">
             <button
               type="button"
-              className="btn categories-btn-secondary"
+              className="btn maestro-btn-secondary"
               onClick={onClose}
             >
               Cancelar
@@ -166,7 +166,7 @@ export function CategoriaFormModal({
 
             <button
               type="submit"
-              className="btn categories-btn-primary"
+              className="btn maestro-btn-primary"
             >
               <Save size={18} />
               Guardar
@@ -177,3 +177,4 @@ export function CategoriaFormModal({
     </div>
   )
 }
+

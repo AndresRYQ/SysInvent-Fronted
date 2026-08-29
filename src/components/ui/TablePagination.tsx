@@ -70,14 +70,14 @@ export function TablePagination({
   )
 
   return (
-    <div className="table-footer categories-pagination">
+    <div className="table-footer maestro-pagination">
       <div className="d-flex align-items-center gap-2">
-        <span className="categories-pagination__label">
+        <span className="maestro-pagination__label">
           Filas
         </span>
 
         <select
-          className="form-select categories-pagination__select"
+          className="form-select maestro-pagination__select"
           value={pageSize}
           onChange={(event) =>
             onPageSizeChange(
@@ -93,15 +93,15 @@ export function TablePagination({
         </select>
       </div>
 
-      <div className="categories-pagination__content">
-        <span className="categories-pagination__label">
+      <div className="maestro-pagination__content">
+        <span className="maestro-pagination__label">
           {startItem} - {endItem} de {totalItems}
         </span>
 
-        <div className="categories-pagination__nav">
+        <div className="maestro-pagination__nav">
           <button
             type="button"
-            className="categories-page-btn"
+            className="maestro-page-btn"
             onClick={() =>
               onPageChange(currentPage - 1)
             }
@@ -117,8 +117,8 @@ export function TablePagination({
               type="button"
               className={
                 pageNumber === currentPage
-                  ? 'categories-page-btn categories-page-btn--active'
-                  : 'categories-page-btn'
+                  ? 'maestro-page-btn maestro-page-btn--active'
+                  : 'maestro-page-btn'
               }
               onClick={() =>
                 onPageChange(pageNumber)
@@ -130,7 +130,7 @@ export function TablePagination({
 
           <button
             type="button"
-            className="categories-page-btn"
+            className="maestro-page-btn"
             onClick={() =>
               onPageChange(currentPage + 1)
             }
@@ -144,3 +144,4 @@ export function TablePagination({
     </div>
   )
 }
+

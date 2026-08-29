@@ -2,24 +2,24 @@
   --font-xs: 0.8rem;
 }
 
-.centros-page-shell {
+.maestro-page-shell {
   position: relative;
   min-height: 100vh;
   padding: 0px 24px 42px;
 }
 
-.centros-page {
+.maestro-page {
   min-height: 100vh;
   padding: 40px 20px 56px;
 }
 
-.centros-page-body {
+.maestro-page-body {
   position: relative;
   z-index: 1;
   margin-top: 15px;
 }
 
-.centros-topbar {
+.maestro-topbar {
   padding: 18px 22px;
   border: 1px solid rgb(255 255 255 / 72%);
   border-radius: 22px;
@@ -29,7 +29,7 @@
   backdrop-filter: blur(12px);
 }
 
-.centros-topbar__copy h1 {
+.maestro-topbar__copy h1 {
   margin: 0;
   color: #13342b;
   font-size: 1.45rem;
@@ -37,20 +37,20 @@
   line-height: 1.1;
 }
 
-.centros-topbar__copy p {
+.maestro-topbar__copy p {
   margin: 6px 0 0;
   color: #667085;
   font-size: 0.9rem;
   font-weight: 600;
 }
 
-.centros-summary-wrapper {
+.maestro-summary-wrapper {
   position: relative;
   z-index: 1;
   margin-top: 22px;
 }
 
-.centros-summary-card {
+.maestro-summary-card {
   max-width: 920px;
   padding: 28px 30px;
   border: 1px solid rgb(255 255 255 / 70%);
@@ -60,13 +60,13 @@
   backdrop-filter: blur(12px);
 }
 
-.centros-panel {
+.maestro-panel {
   margin-top: 15px;
-  animation: centros-fade-up 700ms ease both;
+  animation: maestro-fade-up 700ms ease both;
 }
 
-.centros-filter-card,
-.centros-table-card {
+.maestro-filter-card,
+.maestro-table-card {
   border: 1px solid var(--brand-border) !important;
   border-radius: 24px !important;
   background: rgb(255 255 255 / 90%) !important;
@@ -74,7 +74,7 @@
   box-shadow: var(--shadow-soft) !important;
 }
 
-.centros-kicker {
+.maestro-kicker {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -85,22 +85,22 @@
   text-transform: uppercase;
 }
 
-.centros-section-title {
+.maestro-section-title {
   color: #13342b;
   font-size: 0.8rem;
   font-weight: 800;
 }
 
-.centros-section-copy {
+.maestro-section-copy {
   color: #667085;
 }
 
-.centros-label {
+.maestro-label {
   color: #344054;
   font-weight: 700;
 }
 
-.centros-control {
+.maestro-control {
   min-height: 50px;
   border: 1px solid rgb(17 24 39 / 10%);
   border-radius: 16px;
@@ -112,7 +112,7 @@
     box-shadow 180ms ease;
 }
 
-.centros-control:focus {
+.maestro-control:focus {
   border-color: rgb(51 143 60 / 55%);
   background: #fff;
   box-shadow:
@@ -120,13 +120,13 @@
   transform: translateY(-1px);
 }
 
-.centros-control--textarea {
+.maestro-control--textarea {
   min-height: 120px;
   resize: vertical;
 }
 
-.centros-btn-primary,
-.centros-btn-secondary {
+.maestro-btn-primary,
+.maestro-btn-secondary {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
@@ -142,7 +142,7 @@
     background-color 180ms ease !important;
 }
 
-.centros-btn-primary {
+.maestro-btn-primary {
   color: #fff !important;
   border: 0 !important;
   background:
@@ -153,13 +153,13 @@
     ) !important;
 }
 
-.centros-btn-secondary {
+.maestro-btn-secondary {
   color: #1f2937 !important;
   border: 1px solid rgb(17 24 39 / 10%) !important;
   background: #fff !important;
 }
 
-.centros-btn-danger {
+.maestro-btn-danger {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
@@ -173,12 +173,12 @@
   font-weight: 800 !important;
 }
 
-.centros-btn-primary:hover,
-.centros-btn-secondary:hover {
+.maestro-btn-primary:hover,
+.maestro-btn-secondary:hover {
   transform: translateY(-2px);
 }
 
-.centros-table-header {
+.maestro-table-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -187,7 +187,7 @@
   padding: 12px 15px;
 }
 
-.centros-toolbar-btn {
+.maestro-toolbar-btn {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
@@ -210,11 +210,11 @@
     box-shadow 180ms ease;
 }
 
-.centros-toolbar-btn:hover {
+.maestro-toolbar-btn:hover {
   transform: translateY(-2px);
 }
 
-.centros-table thead th {
+.maestro-table thead th {
   padding: 12px 20px;
   border: 0;
   background: #0f5132;
@@ -224,40 +224,40 @@
   letter-spacing: 0.02em;
 }
 
-.centros-table thead th:first-child {
+.maestro-table thead th:first-child {
   border-top-left-radius: 18px;
 }
 
-.centros-table thead th:last-child {
+.maestro-table thead th:last-child {
   border-top-right-radius: 18px;
 }
 
-.centros-table tbody td {
+.maestro-table tbody td {
   padding: 10px 20px;
   border-color: rgb(15 23 42 / 6%);
   color: #1f2937;
 }
 
-.centros-table tbody td:last-child {
+.maestro-table tbody td:last-child {
   width: 120px;
 }
 
-.centros-table tbody tr {
+.maestro-table tbody tr {
   transition:
     transform 160ms ease,
     background-color 160ms ease;
 }
 
-.centros-table tbody tr:nth-child(even) {
+.maestro-table tbody tr:nth-child(even) {
   background: #fbfdfc;
 }
 
-.centros-table tbody tr:hover {
+.maestro-table tbody tr:hover {
   background: #eef8f0;
   transform: scale(0.997);
 }
 
-.centros-id-chip {
+.maestro-id-chip {
   display: inline-flex;
   padding: 8px 12px;
   border-radius: 999px;
@@ -266,14 +266,14 @@
   font-weight: 700;
 }
 
-.centros-cell-main {
+.maestro-cell-main {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   font-weight: 700;
 }
 
-.centros-cell-icon {
+.maestro-cell-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -284,7 +284,7 @@
   color: var(--brand-green-dark);
 }
 
-.centros-status {
+.maestro-status {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -294,24 +294,24 @@
   font-weight: 800;
 }
 
-.centros-status--active {
+.maestro-status--active {
   background: #e9f8ee;
   color: #0f7a42;
 }
 
-.centros-status--inactive {
+.maestro-status--inactive {
   background: #fef2f2;
   color: #b42318;
 }
 
-.centros-actions {
+.maestro-actions {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
 }
 
-.centros-action-btn {
+.maestro-action-btn {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
@@ -328,22 +328,22 @@
     background-color 180ms ease;
 }
 
-.centros-action-btn:hover {
+.maestro-action-btn:hover {
   transform: translateY(-1px);
   border-color: rgb(51 143 60 / 30%) !important;
   background: #eef8f0 !important;
 }
 
-.centros-action-btn--danger {
+.maestro-action-btn--danger {
   color: #b42318 !important;
 }
 
-.centros-action-btn--danger:hover {
+.maestro-action-btn--danger:hover {
   border-color: rgb(180 35 24 / 25%) !important;
   background: #fef3f2 !important;
 }
 
-.centros-modal-backdrop {
+.maestro-modal-backdrop {
   position: fixed;
   inset: 0;
   z-index: 1050;
@@ -355,21 +355,21 @@
   backdrop-filter: blur(6px);
 }
 
-.centros-modal-card {
+.maestro-modal-card {
   width: min(100%, 640px);
   border: 1px solid var(--brand-border);
   border-radius: 24px;
   background: #fff;
   box-shadow: 0 24px 60px rgb(15 23 42 / 20%);
-  animation: centros-fade-up 180ms ease;
+  animation: maestro-fade-up 180ms ease;
 }
 
-.centros-modal-card--sm {
+.maestro-modal-card--sm {
   width: min(100%, 460px);
   padding: 28px;
 }
 
-.centros-modal-header {
+.maestro-modal-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -377,19 +377,19 @@
   padding: 24px 24px 0;
 }
 
-.centros-modal-title {
+.maestro-modal-title {
   margin: 0;
   color: #13342b;
   font-size: 0.8rem;
   font-weight: 800;
 }
 
-.centros-modal-copy {
+.maestro-modal-copy {
   margin: 8px 0 0;
   color: #667085;
 }
 
-.centros-modal-close {
+.maestro-modal-close {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
@@ -401,11 +401,11 @@
   color: #344054 !important;
 }
 
-.centros-modal-body {
+.maestro-modal-body {
   padding: 24px;
 }
 
-.centros-modal-footer {
+.maestro-modal-footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -413,12 +413,12 @@
   padding: 0 24px 24px;
 }
 
-.centros-modal-footer--center {
+.maestro-modal-footer--center {
   justify-content: center;
   padding: 24px 0 0;
 }
 
-.centros-delete-icon {
+.maestro-delete-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -430,14 +430,14 @@
   color: #b42318;
 }
 
-.centros-delete-name {
+.maestro-delete-name {
   margin: 10px 0 0;
   color: #13342b;
   font-weight: 800;
   text-align: center;
 }
 
-.centros-empty-state {
+.maestro-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -447,7 +447,7 @@
   text-align: center;
 }
 
-.centros-pagination {
+.maestro-pagination {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -456,19 +456,19 @@
   border-top: 1px solid rgb(15 23 42 / 8%);
 }
 
-.centros-pagination__content {
+.maestro-pagination__content {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.centros-pagination__label {
+.maestro-pagination__label {
   color: #475467;
   font-size: 0.8rem;
   font-weight: 600;
 }
 
-.centros-pagination__select {
+.maestro-pagination__select {
   width: 75px;
   min-height: 35px;
   border-radius: 12px;
@@ -476,13 +476,13 @@
   border-color: rgb(17 24 39 / 10%);
 }
 
-.centros-pagination__nav {
+.maestro-pagination__nav {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.centros-page-btn {
+.maestro-page-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -501,24 +501,24 @@
     background-color 180ms ease;
 }
 
-.centros-page-btn:hover:not(:disabled) {
+.maestro-page-btn:hover:not(:disabled) {
   transform: translateY(-1px);
   border-color: rgb(51 143 60 / 35%);
   background: #eef8f0;
 }
 
-.centros-page-btn:disabled {
+.maestro-page-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
-.centros-page-btn--active {
+.maestro-page-btn--active {
   border-color: var(--brand-green);
   background: var(--brand-green);
   color: #fff;
 }
 
-@keyframes centros-fade-up {
+@keyframes maestro-fade-up {
   from {
     opacity: 0;
     transform: translateY(18px);
@@ -531,59 +531,59 @@
 }
 
 @media (max-width: 991px) {
-  .centros-table-header {
+  .maestro-table-header {
     padding: 20px 20px 10px;
   }
 
-  .centros-table thead th,
-  .centros-table tbody td {
+  .maestro-table thead th,
+  .maestro-table tbody td {
     padding: 14px 16px;
   }
 
-  .centros-pagination {
+  .maestro-pagination {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .centros-pagination__content {
+  .maestro-pagination__content {
     justify-content: space-between;
     flex-wrap: wrap;
   }
 
-  .centros-modal-backdrop {
+  .maestro-modal-backdrop {
     padding: 16px;
   }
 
-  .centros-modal-header,
-  .centros-modal-body,
-  .centros-modal-footer {
+  .maestro-modal-header,
+  .maestro-modal-body,
+  .maestro-modal-footer {
     padding-left: 18px;
     padding-right: 18px;
   }
 
-  .centros-modal-footer {
+  .maestro-modal-footer {
     flex-direction: column-reverse;
     align-items: stretch;
   }
 }
 
-.centros-filter-card .centros-kicker {
+.maestro-filter-card .maestro-kicker {
   font-size: 0.8rem;
 }
 
-.centros-filter-card .centros-section-title {
+.maestro-filter-card .maestro-section-title {
   font-size: 0.8rem;
 }
 
-.centros-filter-card .centros-section-copy {
+.maestro-filter-card .maestro-section-copy {
   font-size: 0.8rem;
 }
 
-.centros-filter-card .centros-label {
+.maestro-filter-card .maestro-label {
   font-size: 0.8rem;
 }
 
-.centros-filter-card .centros-control {
+.maestro-filter-card .maestro-control {
   min-height: 36px;
   height: 36px;
   font-size: 0.8rem;
@@ -591,14 +591,14 @@
   padding-bottom: 0.35rem;
 }
 
-.centros-filter-card .centros-btn-primary,
-.centros-filter-card .centros-btn-secondary {
+.maestro-filter-card .maestro-btn-primary,
+.maestro-filter-card .maestro-btn-secondary {
   min-height: 34px;
   padding: 0 12px;
   font-size: 0.8rem;
 }
 
-.centros-filter-actions {
+.maestro-filter-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -606,20 +606,20 @@
   align-items: center;
 }
 
-.centros-filter-btn {
+.maestro-filter-btn {
   min-height: 34px !important;
   padding: 10px 12px !important;
   border-radius: 12px !important;
 }
 
-.centros-select-wrap {
+.maestro-select-wrap {
   position: relative;
   transition:
     transform 180ms ease,
     box-shadow 180ms ease;
 }
 
-.centros-select-control {
+.maestro-select-control {
   appearance: none;
   padding-right: 2.1rem !important;
   border-color: #d7e3da !important;
@@ -633,7 +633,7 @@
     box-shadow 180ms ease !important;
 }
 
-.centros-select-wrap svg {
+.maestro-select-wrap svg {
   position: absolute;
   top: 50%;
   right: 12px;
@@ -645,16 +645,16 @@
     color 180ms ease;
 }
 
-.centros-select-wrap.is-open {
+.maestro-select-wrap.is-open {
   transform: translateY(-1px);
 }
 
-.centros-select-wrap.is-open svg {
+.maestro-select-wrap.is-open svg {
   transform: translateY(-50%) rotate(180deg);
   color: #53a975;
 }
 
-.centros-select-wrap.is-open .centros-select-control {
+.maestro-select-wrap.is-open .maestro-select-control {
   border-color: #53a975 !important;
   background: #fff !important;
   box-shadow:
@@ -662,7 +662,7 @@
     inset 0 1px 2px rgb(15 23 42 / 4%) !important;
 }
 
-.centros-select-control:focus {
+.maestro-select-control:focus {
   border-color: #53a975 !important;
   background: #fff !important;
   box-shadow:
@@ -670,31 +670,32 @@
     inset 0 1px 2px rgb(15 23 42 / 4%) !important;
 }
 
-.centros-table-card .centros-kicker {
+.maestro-table-card .maestro-kicker {
   font-size: 0.8rem;
 }
 
-.centros-table-card .centros-section-title {
+.maestro-table-card .maestro-section-title {
   font-size: 0.8rem;
 }
 
-.centros-table-card .centros-section-copy {
+.maestro-table-card .maestro-section-copy {
   font-size: 0.8rem;
 }
 
-.centros-table-card .centros-table thead th {
+.maestro-table-card .maestro-table thead th {
   font-size: 0.8rem;
 }
 
-.centros-table-card .centros-table td {
+.maestro-table-card .maestro-table td {
   font-size: 0.8rem;
 }
 
-.centros-table-card .centros-status {
+.maestro-table-card .maestro-status {
   font-size: 0.8rem;
 }
 
-.centros-table-card .centros-btn {
+.maestro-table-card .maestro-btn {
   min-height: 38px;
   font-size: 0.8rem;
 }
+

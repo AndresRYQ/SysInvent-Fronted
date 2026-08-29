@@ -34,11 +34,11 @@ export function TablaCategorias({
   onPageSizeChange,
 }: TablaCategoriasProps) {
   return (
-    <section className="categories-table-card card border-0 shadow-sm">
+    <section className="maestro-table-card card border-0 shadow-sm">
       <div className="card-body p-0">
-        <div className="categories-table-header">
+        <div className="maestro-table-header">
           <div>
-            <span className="categories-kicker">
+            <span className="maestro-kicker">
               <FolderKanban size={16} />
               Listado de categorías
             </span>
@@ -46,7 +46,7 @@ export function TablaCategorias({
 
           <button
             type="button"
-            className="btn categories-toolbar-btn"
+            className="btn maestro-toolbar-btn"
             onClick={onAgregar}
           >
             <Plus size={18} />
@@ -55,7 +55,7 @@ export function TablaCategorias({
         </div>
 
         <div className="table-responsive">
-          <table className="table categories-table align-middle mb-0">
+          <table className="table maestro-table align-middle mb-0">
             <thead>
               <tr>
                 <th>ID</th>
@@ -72,14 +72,14 @@ export function TablaCategorias({
                 categorias.map((categoria) => (
                   <tr key={categoria.id}>
                     <td>
-                      <span className="categories-id-chip">
+                      <span className="maestro-id-chip">
                         {categoria.id}
                       </span>
                     </td>
 
                     <td>
-                      <div className="categories-cell-main">
-                        <span className="categories-cell-icon">
+                      <div className="maestro-cell-main">
+                        <span className="maestro-cell-icon">
                           <Tag size={16} />
                         </span>
                         {categoria.nombre}
@@ -93,8 +93,8 @@ export function TablaCategorias({
                       <span
                         className={
                           categoria.estado
-                            ? 'categories-status categories-status--active'
-                            : 'categories-status categories-status--inactive'
+                            ? 'maestro-status maestro-status--active'
+                            : 'maestro-status maestro-status--inactive'
                         }
                       >
                         <ShieldCheck size={14} />
@@ -103,10 +103,10 @@ export function TablaCategorias({
                     </td>
 
                     <td>
-                      <div className="categories-actions">
+                      <div className="maestro-actions">
                         <button
                           type="button"
-                          className="btn categories-action-btn"
+                          className="btn maestro-action-btn"
                           onClick={() => onEditar(categoria)}
                           title="Editar"
                           aria-label={`Editar ${categoria.nombre}`}
@@ -116,7 +116,7 @@ export function TablaCategorias({
 
                         <button
                           type="button"
-                          className="btn categories-action-btn categories-action-btn--danger"
+                          className="btn maestro-action-btn maestro-action-btn--danger"
                           onClick={() => onEliminar(categoria)}
                           title="Eliminar"
                           aria-label={`Eliminar ${categoria.nombre}`}
@@ -130,7 +130,7 @@ export function TablaCategorias({
               ) : (
                 <tr>
                   <td colSpan={6}>
-                    <div className="categories-empty-state">
+                    <div className="maestro-empty-state">
                       <FolderKanban size={28} />
                       <p className="mb-1">
                         No se encontraron categorías
@@ -157,3 +157,4 @@ export function TablaCategorias({
     </section>
   )
 }
+

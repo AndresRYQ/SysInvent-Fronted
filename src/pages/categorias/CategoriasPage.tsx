@@ -9,7 +9,7 @@ import {
 import { TablaCategorias } from '../../components/categorias/TablaCategorias'
 import type { Categoria } from '../../types/categoria'
 import '../../styles/DashboardPage.css'
-import './CategoriasPage.css'
+import '../../styles/maestros.css'
 
 const FILTROS_INICIALES: FiltrosCategoriasValores = {
   nombre: '',
@@ -21,14 +21,14 @@ const CATEGORIAS_MOCK: Categoria[] = [
     id: 'CAT-001',
     nombre: 'Herramientas',
     estado: true,
-    descripcion: 'Implementos y accesorios de uso tecnico.',
+    descripcion: 'Implementos y accesorios de uso técnico.',
     fechaRegistro: '10/08/2026',
   },
   {
     id: 'CAT-002',
     nombre: 'Seguridad Industrial',
     estado: true,
-    descripcion: 'Equipos para proteccion personal.',
+    descripcion: 'Equipos para protección personal.',
     fechaRegistro: '11/08/2026',
   },
   {
@@ -49,7 +49,7 @@ const CATEGORIAS_MOCK: Categoria[] = [
     id: 'CAT-005',
     nombre: 'Limpieza',
     estado: false,
-    descripcion: 'Insumos para orden e higiene del almacen.',
+    descripcion: 'Insumos para orden e higiene del almacén.',
     fechaRegistro: '14/08/2026',
   },
 ]
@@ -146,16 +146,16 @@ export function CategoriasPage() {
 
   return (
     <>
-      <main className="dashboard-shell categories-page-shell">
-        <div className="container-xl px-0 categories-page-body">
-          <section className="categories-topbar">
-            <div className="categories-topbar__copy">
+      <main className="dashboard-shell maestro-page-shell">
+        <div className="container-xl px-0 maestro-page-body">
+          <section className="maestro-topbar">
+            <div className="maestro-topbar__copy">
               <h1>Categorías</h1>
               <p>Mantenimiento de categorías</p>
             </div>
           </section>
 
-          <div className="categories-panel">
+          <div className="maestro-panel">
             <FiltrosCategorias
               valores={filtros}
               onChange={(campo, valor) =>
@@ -176,7 +176,7 @@ export function CategoriasPage() {
             />
           </div>
 
-          <div className="categories-panel">
+          <div className="maestro-panel">
             <TablaCategorias
               categorias={categoriasPaginadas}
               totalItems={totalItems}
@@ -275,3 +275,4 @@ export function CategoriasPage() {
     </>
   )
 }
+

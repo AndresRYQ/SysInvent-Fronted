@@ -25,11 +25,11 @@ export function FiltrosCentrosCosto({
   const [estadoAbierto, setEstadoAbierto] = useState(false)
 
   return (
-    <section className="centros-filter-card card border-0 shadow-sm">
+    <section className="maestro-filter-card card border-0 shadow-sm">
       <div className="card-body p-3 p-lg-3">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2">
           <div>
-            <span className="centros-kicker">
+            <span className="maestro-kicker">
               <Filter size={16} />
               Filtros
             </span>
@@ -38,13 +38,13 @@ export function FiltrosCentrosCosto({
 
         <div className="row g-3">
           <div className="col-12 col-lg-8">
-            <label className="form-label centros-label" htmlFor="nombreCentroCosto">
+            <label className="form-label maestro-label" htmlFor="nombreCentroCosto">
               Nombre de centro de costo
             </label>
 
             <input
               id="nombreCentroCosto"
-              className="form-control centros-control"
+              className="form-control maestro-control"
               type="text"
               value={valores.nombre}
               placeholder="Ej. Producción, Mantenimiento, Administración"
@@ -55,16 +55,16 @@ export function FiltrosCentrosCosto({
           </div>
 
           <div className="col-12 col-md-6 col-lg-4">
-            <label className="form-label centros-label" htmlFor="estadoCentroCosto">
+            <label className="form-label maestro-label" htmlFor="estadoCentroCosto">
               Estado
             </label>
 
             <div
-              className={`centros-select-wrap${estadoAbierto ? ' is-open' : ''}`}
+              className={`maestro-select-wrap${estadoAbierto ? ' is-open' : ''}`}
             >
               <select
                 id="estadoCentroCosto"
-                className="form-select centros-control centros-select-control"
+                className="form-select maestro-control maestro-select-control"
                 value={valores.estado}
                 onMouseDown={() => setEstadoAbierto(true)}
                 onKeyDown={() => setEstadoAbierto(true)}
@@ -87,10 +87,10 @@ export function FiltrosCentrosCosto({
 
         <div className="row g-3 mt-1">
           <div className="col-12">
-            <div className="centros-filter-actions">
+            <div className="maestro-filter-actions">
               <button
                 type="button"
-                className="btn centros-btn-secondary centros-filter-btn"
+                className="btn maestro-btn-secondary maestro-filter-btn"
                 onClick={onLimpiar}
               >
                 <RotateCcw size={18} />
@@ -99,7 +99,7 @@ export function FiltrosCentrosCosto({
               
               <button
                 type="button"
-                className="btn centros-btn-primary centros-filter-btn"
+                className="btn maestro-btn-primary maestro-filter-btn"
                 onClick={onBuscar}
               >
                 <Search size={18} />
@@ -112,3 +112,4 @@ export function FiltrosCentrosCosto({
     </section>
   )
 }
+

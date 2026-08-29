@@ -9,7 +9,7 @@ import {
 import { TablaCentrosCosto } from '../../components/centros-costo/TablaCentrosCosto'
 import type { CentroCosto } from '../../types/centroCosto'
 import '../../styles/DashboardPage.css'
-import './CentrosCostoPage.css'
+import '../../styles/maestros.css'
 
 const FILTROS_INICIALES: FiltrosCentrosCostoValores = {
   nombre: '',
@@ -146,16 +146,16 @@ export function CentrosCostoPage() {
 
   return (
     <>
-      <main className="dashboard-shell centros-page-shell">
-        <div className="container-xl px-0 centros-page-body">
-          <section className="centros-topbar">
-            <div className="centros-topbar__copy">
+      <main className="dashboard-shell maestro-page-shell">
+        <div className="container-xl px-0 maestro-page-body">
+          <section className="maestro-topbar">
+            <div className="maestro-topbar__copy">
               <h1>Centros de costo</h1>
               <p>Mantenimiento de centros de costo</p>
             </div>
           </section>
 
-          <div className="centros-panel">
+          <div className="maestro-panel">
             <FiltrosCentrosCosto
               valores={filtros}
               onChange={(campo, valor) =>
@@ -176,7 +176,7 @@ export function CentrosCostoPage() {
             />
           </div>
 
-          <div className="centros-panel">
+          <div className="maestro-panel">
             <TablaCentrosCosto
               centrosCosto={centrosCostoPaginados}
               totalItems={totalItems}
@@ -275,3 +275,4 @@ export function CentrosCostoPage() {
     </>
   )
 }
+

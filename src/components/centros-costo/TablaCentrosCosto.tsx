@@ -34,11 +34,11 @@ export function TablaCentrosCosto({
   onPageSizeChange,
 }: TablaCentrosCostoProps) {
   return (
-    <section className="centros-table-card card border-0 shadow-sm">
+    <section className="maestro-table-card card border-0 shadow-sm">
       <div className="card-body p-0">
-        <div className="centros-table-header">
+        <div className="maestro-table-header">
           <div>
-            <span className="centros-kicker">
+            <span className="maestro-kicker">
               <FolderKanban size={16} />
               Listado de centros de costo
             </span>
@@ -46,7 +46,7 @@ export function TablaCentrosCosto({
 
           <button
             type="button"
-            className="btn centros-toolbar-btn"
+            className="btn maestro-toolbar-btn"
             onClick={onAgregar}
           >
             <Plus size={18} />
@@ -55,7 +55,7 @@ export function TablaCentrosCosto({
         </div>
 
         <div className="table-responsive">
-          <table className="table centros-table align-middle mb-0">
+          <table className="table maestro-table align-middle mb-0">
             <thead>
               <tr>
                 <th>ID</th>
@@ -72,14 +72,14 @@ export function TablaCentrosCosto({
                 centrosCosto.map((centroCosto) => (
                   <tr key={centroCosto.id}>
                     <td>
-                      <span className="centros-id-chip">
+                      <span className="maestro-id-chip">
                         {centroCosto.id}
                       </span>
                     </td>
 
                     <td>
-                      <div className="centros-cell-main">
-                        <span className="centros-cell-icon">
+                      <div className="maestro-cell-main">
+                        <span className="maestro-cell-icon">
                           <Store size={16} />
                         </span>
                         {centroCosto.nombre}
@@ -93,8 +93,8 @@ export function TablaCentrosCosto({
                       <span
                         className={
                           centroCosto.estado
-                            ? 'centros-status centros-status--active'
-                            : 'centros-status centros-status--inactive'
+                            ? 'maestro-status maestro-status--active'
+                            : 'maestro-status maestro-status--inactive'
                         }
                       >
                         <ShieldCheck size={14} />
@@ -103,10 +103,10 @@ export function TablaCentrosCosto({
                     </td>
 
                     <td>
-                      <div className="centros-actions">
+                      <div className="maestro-actions">
                         <button
                           type="button"
-                          className="btn centros-action-btn"
+                          className="btn maestro-action-btn"
                           onClick={() => onEditar(centroCosto)}
                           title="Editar"
                           aria-label={`Editar ${centroCosto.nombre}`}
@@ -116,7 +116,7 @@ export function TablaCentrosCosto({
 
                         <button
                           type="button"
-                          className="btn centros-action-btn centros-action-btn--danger"
+                          className="btn maestro-action-btn maestro-action-btn--danger"
                           onClick={() => onEliminar(centroCosto)}
                           title="Eliminar"
                           aria-label={`Eliminar ${centroCosto.nombre}`}
@@ -130,7 +130,7 @@ export function TablaCentrosCosto({
               ) : (
                 <tr>
                   <td colSpan={6}>
-                    <div className="centros-empty-state">
+                    <div className="maestro-empty-state">
                       <FolderKanban size={28} />
                       <p className="mb-1">
                         No se encontraron centros de costo
@@ -157,3 +157,4 @@ export function TablaCentrosCosto({
     </section>
   )
 }
+

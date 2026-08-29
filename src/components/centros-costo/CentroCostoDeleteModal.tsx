@@ -21,12 +21,12 @@ export function CentroCostoDeleteModal({
 
   return (
     <div
-      className="centros-modal-backdrop"
+      className="maestro-modal-backdrop"
       role="presentation"
       onClick={onClose}
     >
       <div
-        className="centros-modal-card centros-modal-card--sm"
+        className="maestro-modal-card maestro-modal-card--sm"
         role="dialog"
         aria-modal="true"
         aria-labelledby="centro-costo-delete-title"
@@ -34,29 +34,29 @@ export function CentroCostoDeleteModal({
           event.stopPropagation()
         }
       >
-        <div className="centros-delete-icon">
+        <div className="maestro-delete-icon">
           <AlertTriangle size={24} />
         </div>
 
         <h3
           id="centro-costo-delete-title"
-          className="centros-modal-title text-center"
+          className="maestro-modal-title text-center"
         >
-          Confirmar eliminacion
+          Confirmar eliminación
         </h3>
 
-        <p className="centros-modal-copy text-center mb-0">
+        <p className="maestro-modal-copy text-center mb-0">
           ¿Seguro que quiere eliminar este registro?
         </p>
 
-        <p className="centros-delete-name">
+        <p className="maestro-delete-name">
           {centroCosto.nombre}
         </p>
 
-        <div className="centros-modal-footer centros-modal-footer--center">
+        <div className="maestro-modal-footer maestro-modal-footer--center">
           <button
             type="button"
-            className="btn centros-btn-secondary"
+            className="btn maestro-btn-secondary"
             onClick={onClose}
           >
             Cancelar
@@ -64,7 +64,7 @@ export function CentroCostoDeleteModal({
 
           <button
             type="button"
-            className="btn centros-btn-danger"
+            className="btn maestro-btn-danger"
             onClick={onConfirm}
           >
             Aceptar
@@ -74,3 +74,4 @@ export function CentroCostoDeleteModal({
     </div>
   )
 }
+
