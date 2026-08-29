@@ -15,9 +15,19 @@ interface DestinoFormState {
   descripcion: string
 }
 
+interface DestinoFormErrores {
+  nombre: boolean
+  descripcion: boolean
+}
+
 const FORM_INICIAL: DestinoFormState = {
   nombre: '',
   descripcion: '',
+}
+
+const ERRORES_INICIALES: DestinoFormErrores = {
+  nombre: false,
+  descripcion: false,
 }
 
 export function DestinoFormModal({
@@ -27,6 +37,10 @@ export function DestinoFormModal({
   onSubmit,
 }: DestinoFormModalProps) {
   const [form, setForm] = useState<DestinoFormState>(FORM_INICIAL)
+  const [errores, setErrores] =
+    useState<DestinoFormErrores>(
+      ERRORES_INICIALES,
+    )
 
   useEffect(() => {
     if (!abierto) {
@@ -38,10 +52,12 @@ export function DestinoFormModal({
         nombre: destino.nombre,
         descripcion: destino.descripcion,
       })
+      setErrores(ERRORES_INICIALES)
       return
     }
 
     setForm(FORM_INICIAL)
+    setErrores(ERRORES_INICIALES)
   }, [abierto, destino])
 
   if (!abierto) {
@@ -62,14 +78,10 @@ export function DestinoFormModal({
         onClick={(event) => event.stopPropagation()}
       >
         <div className="maestro-modal-header">
-          <div>
+          <div className="maestro-modal-header__content">
             <h3 id="destino-form-title" className="maestro-modal-title">
               {destino ? 'Editar destino' : 'Registrar destino'}
             </h3>
-
-            <p className="maestro-modal-copy">
-              Completa los datos del destino.
-            </p>
           </div>
 
           <button
@@ -83,8 +95,25 @@ export function DestinoFormModal({
         </div>
 
         <form
+          noValidate
           onSubmit={(event) => {
             event.preventDefault()
+
+            const nuevosErrores = {
+              nombre:
+                form.nombre.trim().length === 0,
+              descripcion:
+                form.descripcion.trim().length === 0,
+            }
+
+            setErrores(nuevosErrores)
+
+            if (
+              nuevosErrores.nombre ||
+              nuevosErrores.descripcion
+            ) {
+              return
+            }
 
             onSubmit({
               nombre: form.nombre.trim(),
@@ -93,60 +122,129 @@ export function DestinoFormModal({
           }}
         >
           <div className="maestro-modal-body">
-            <div className="mb-3">
+            <div className="mb-2">
               <label
                 className="form-label maestro-label"
                 htmlFor="destinoNombreModal"
               >
                 Nombre de destino
+                <span className="maestro-required" aria-hidden="true">
+                  *
+                </span>
               </label>
 
               <input
                 id="destinoNombreModal"
-                className="form-control maestro-control"
+                className={`form-control maestro-control${
+                  errores.nombre
+                    ? ' maestro-control--error'
+                    : ''
+                }`}
                 type="text"
                 value={form.nombre}
-                onChange={(event) =>
+                aria-invalid={errores.nombre}
+                aria-describedby={
+                  errores.nombre
+                    ? 'destinoNombreModalError'
+                    : undefined
+                }
+                onChange={(event) => {
+                  const value = event.target.value
+
                   setForm((actual) => ({
                     ...actual,
-                    nombre: event.target.value,
+                    nombre: value,
                   }))
-                }
+
+                  if (
+                    errores.nombre &&
+                    value.trim().length > 0
+                  ) {
+                    setErrores((actual) => ({
+                      ...actual,
+                      nombre: false,
+                    }))
+                  }
+                }}
                 placeholder="Ej. Almacén Central, Planta, Sucursal"
                 required
               />
+
+              {errores.nombre && (
+                <div
+                  id="destinoNombreModalError"
+                  className="maestro-field-error"
+                >
+                  Campo requerido
+                </div>
+              )}
             </div>
 
-            <div className="mb-3">
+            <div>
               <label
                 className="form-label maestro-label"
                 htmlFor="destinoDescripcionModal"
               >
                 Descripción
+                <span className="maestro-required" aria-hidden="true">
+                  *
+                </span>
               </label>
 
               <textarea
                 id="destinoDescripcionModal"
-                className="form-control maestro-control maestro-control--textarea"
+                className={`form-control maestro-control maestro-control--textarea${
+                  errores.descripcion
+                    ? ' maestro-control--error'
+                    : ''
+                }`}
                 value={form.descripcion}
-                onChange={(event) =>
+                aria-invalid={errores.descripcion}
+                aria-describedby={
+                  errores.descripcion
+                    ? 'destinoDescripcionModalError'
+                    : undefined
+                }
+                onChange={(event) => {
+                  const value = event.target.value
+
                   setForm((actual) => ({
                     ...actual,
-                    descripcion: event.target.value,
+                    descripcion: value,
                   }))
-                }
+
+                  if (
+                    errores.descripcion &&
+                    value.trim().length > 0
+                  ) {
+                    setErrores((actual) => ({
+                      ...actual,
+                      descripcion: false,
+                    }))
+                  }
+                }}
                 rows={4}
                 required
               />
+
+              {errores.descripcion && (
+                <div
+                  id="destinoDescripcionModalError"
+                  className="maestro-field-error"
+                >
+                  Campo requerido
+                </div>
+              )}
             </div>
           </div>
 
           <div className="maestro-modal-footer">
             <button
               type="button"
-              className="btn maestro-btn-secondary"
+              className="btn maestro-btn-danger"
               onClick={onClose}
             >
+              <X size={18} />
               Cancelar
             </button>
 

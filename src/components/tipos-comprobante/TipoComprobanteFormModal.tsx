@@ -20,9 +20,19 @@ interface TipoComprobanteFormState {
   descripcion: string
 }
 
+interface TipoComprobanteFormErrores {
+  nombre: boolean
+  descripcion: boolean
+}
+
 const FORM_INICIAL: TipoComprobanteFormState = {
   nombre: '',
   descripcion: '',
+}
+
+const ERRORES_INICIALES: TipoComprobanteFormErrores = {
+  nombre: false,
+  descripcion: false,
 }
 
 export function TipoComprobanteFormModal({
@@ -33,6 +43,10 @@ export function TipoComprobanteFormModal({
 }: TipoComprobanteFormModalProps) {
   const [form, setForm] =
     useState<TipoComprobanteFormState>(FORM_INICIAL)
+  const [errores, setErrores] =
+    useState<TipoComprobanteFormErrores>(
+      ERRORES_INICIALES,
+    )
 
   useEffect(() => {
     if (!abierto) {
@@ -44,10 +58,12 @@ export function TipoComprobanteFormModal({
         nombre: tipoComprobante.nombre,
         descripcion: tipoComprobante.descripcion,
       })
+      setErrores(ERRORES_INICIALES)
       return
     }
 
     setForm(FORM_INICIAL)
+    setErrores(ERRORES_INICIALES)
   }, [abierto, tipoComprobante])
 
   if (!abierto) {
@@ -70,7 +86,7 @@ export function TipoComprobanteFormModal({
         }
       >
         <div className="maestro-modal-header">
-          <div>
+          <div className="maestro-modal-header__content">
             <h3
               id="tipo-comprobante-form-title"
               className="maestro-modal-title"
@@ -79,10 +95,6 @@ export function TipoComprobanteFormModal({
                 ? 'Editar tipo de comprobante'
                 : 'Registrar tipo de comprobante'}
             </h3>
-
-            <p className="maestro-modal-copy">
-              Completa los datos del tipo de comprobante.
-            </p>
           </div>
 
           <button
@@ -96,8 +108,25 @@ export function TipoComprobanteFormModal({
         </div>
 
         <form
+          noValidate
           onSubmit={(event) => {
             event.preventDefault()
+
+            const nuevosErrores = {
+              nombre:
+                form.nombre.trim().length === 0,
+              descripcion:
+                form.descripcion.trim().length === 0,
+            }
+
+            setErrores(nuevosErrores)
+
+            if (
+              nuevosErrores.nombre ||
+              nuevosErrores.descripcion
+            ) {
+              return
+            }
 
             onSubmit({
               nombre: form.nombre.trim(),
@@ -107,60 +136,128 @@ export function TipoComprobanteFormModal({
           }}
         >
           <div className="maestro-modal-body">
-            <div className="mb-3">
+            <div className="mb-2">
               <label
                 className="form-label maestro-label"
                 htmlFor="tipoComprobanteNombreModal"
               >
                 Nombre de tipo de comprobante
+                <span className="maestro-required" aria-hidden="true">
+                  *
+                </span>
               </label>
 
               <input
                 id="tipoComprobanteNombreModal"
-                className="form-control maestro-control"
+                className={`form-control maestro-control${
+                  errores.nombre
+                    ? ' maestro-control--error'
+                    : ''
+                }`}
                 type="text"
                 value={form.nombre}
-                onChange={(event) =>
+                aria-invalid={errores.nombre}
+                aria-describedby={
+                  errores.nombre
+                    ? 'tipoComprobanteNombreModalError'
+                    : undefined
+                }
+                onChange={(event) => {
+                  const value = event.target.value
+
                   setForm((actual) => ({
                     ...actual,
-                    nombre: event.target.value,
+                    nombre: value,
                   }))
-                }
+
+                  if (
+                    errores.nombre &&
+                    value.trim().length > 0
+                  ) {
+                    setErrores((actual) => ({
+                      ...actual,
+                      nombre: false,
+                    }))
+                  }
+                }}
                 required
               />
+
+              {errores.nombre && (
+                <div
+                  id="tipoComprobanteNombreModalError"
+                  className="maestro-field-error"
+                >
+                  Campo requerido
+                </div>
+              )}
             </div>
 
-            <div className="mb-3">
+            <div>
               <label
                 className="form-label maestro-label"
                 htmlFor="tipoComprobanteDescripcionModal"
               >
                 Descripción
+                <span className="maestro-required" aria-hidden="true">
+                  *
+                </span>
               </label>
 
               <textarea
                 id="tipoComprobanteDescripcionModal"
-                className="form-control maestro-control maestro-control--textarea"
+                className={`form-control maestro-control maestro-control--textarea${
+                  errores.descripcion
+                    ? ' maestro-control--error'
+                    : ''
+                }`}
                 value={form.descripcion}
-                onChange={(event) =>
+                aria-invalid={errores.descripcion}
+                aria-describedby={
+                  errores.descripcion
+                    ? 'tipoComprobanteDescripcionModalError'
+                    : undefined
+                }
+                onChange={(event) => {
+                  const value = event.target.value
+
                   setForm((actual) => ({
                     ...actual,
-                    descripcion:
-                      event.target.value,
+                    descripcion: value,
                   }))
-                }
+
+                  if (
+                    errores.descripcion &&
+                    value.trim().length > 0
+                  ) {
+                    setErrores((actual) => ({
+                      ...actual,
+                      descripcion: false,
+                    }))
+                  }
+                }}
                 rows={4}
                 required
               />
+
+              {errores.descripcion && (
+                <div
+                  id="tipoComprobanteDescripcionModalError"
+                  className="maestro-field-error"
+                >
+                  Campo requerido
+                </div>
+              )}
             </div>
           </div>
 
           <div className="maestro-modal-footer">
             <button
               type="button"
-              className="btn maestro-btn-secondary"
+              className="btn maestro-btn-danger"
               onClick={onClose}
             >
+              <X size={18} />
               Cancelar
             </button>
 

@@ -20,9 +20,19 @@ interface CategoriaFormState {
   descripcion: string
 }
 
+interface CategoriaFormErrores {
+  nombre: boolean
+  descripcion: boolean
+}
+
 const FORM_INICIAL: CategoriaFormState = {
   nombre: '',
   descripcion: '',
+}
+
+const ERRORES_INICIALES: CategoriaFormErrores = {
+  nombre: false,
+  descripcion: false,
 }
 
 export function CategoriaFormModal({
@@ -33,6 +43,10 @@ export function CategoriaFormModal({
 }: CategoriaFormModalProps) {
   const [form, setForm] =
     useState<CategoriaFormState>(FORM_INICIAL)
+  const [errores, setErrores] =
+    useState<CategoriaFormErrores>(
+      ERRORES_INICIALES,
+    )
 
   useEffect(() => {
     if (!abierto) {
@@ -44,10 +58,12 @@ export function CategoriaFormModal({
         nombre: categoria.nombre,
         descripcion: categoria.descripcion,
       })
+      setErrores(ERRORES_INICIALES)
       return
     }
 
     setForm(FORM_INICIAL)
+    setErrores(ERRORES_INICIALES)
   }, [abierto, categoria])
 
   if (!abierto) {
@@ -70,7 +86,7 @@ export function CategoriaFormModal({
         }
       >
         <div className="maestro-modal-header">
-          <div>
+          <div className="maestro-modal-header__content">
             <h3
               id="categoria-form-title"
               className="maestro-modal-title"
@@ -79,10 +95,6 @@ export function CategoriaFormModal({
                 ? 'Editar categoría'
                 : 'Registrar categoría'}
             </h3>
-
-            <p className="maestro-modal-copy">
-              Completa los datos de la categoría.
-            </p>
           </div>
 
           <button
@@ -96,8 +108,25 @@ export function CategoriaFormModal({
         </div>
 
         <form
+          noValidate
           onSubmit={(event) => {
             event.preventDefault()
+
+            const nuevosErrores = {
+              nombre:
+                form.nombre.trim().length === 0,
+              descripcion:
+                form.descripcion.trim().length === 0,
+            }
+
+            setErrores(nuevosErrores)
+
+            if (
+              nuevosErrores.nombre ||
+              nuevosErrores.descripcion
+            ) {
+              return
+            }
 
             onSubmit({
               nombre: form.nombre.trim(),
@@ -107,60 +136,128 @@ export function CategoriaFormModal({
           }}
         >
           <div className="maestro-modal-body">
-            <div className="mb-3">
+            <div className="mb-2">
               <label
                 className="form-label maestro-label"
                 htmlFor="categoriaNombreModal"
               >
                 Nombre de categoría
+                <span className="maestro-required" aria-hidden="true">
+                  *
+                </span>
               </label>
 
               <input
                 id="categoriaNombreModal"
-                className="form-control maestro-control"
+                className={`form-control maestro-control${
+                  errores.nombre
+                    ? ' maestro-control--error'
+                    : ''
+                }`}
                 type="text"
                 value={form.nombre}
-                onChange={(event) =>
+                aria-invalid={errores.nombre}
+                aria-describedby={
+                  errores.nombre
+                    ? 'categoriaNombreModalError'
+                    : undefined
+                }
+                onChange={(event) => {
+                  const value = event.target.value
+
                   setForm((actual) => ({
                     ...actual,
-                    nombre: event.target.value,
+                    nombre: value,
                   }))
-                }
+
+                  if (
+                    errores.nombre &&
+                    value.trim().length > 0
+                  ) {
+                    setErrores((actual) => ({
+                      ...actual,
+                      nombre: false,
+                    }))
+                  }
+                }}
                 required
               />
+
+              {errores.nombre && (
+                <div
+                  id="categoriaNombreModalError"
+                  className="maestro-field-error"
+                >
+                  Campo requerido
+                </div>
+              )}
             </div>
 
-            <div className="mb-3">
+            <div>
               <label
                 className="form-label maestro-label"
                 htmlFor="categoriaDescripcionModal"
               >
                 Descripción
+                <span className="maestro-required" aria-hidden="true">
+                  *
+                </span>
               </label>
 
               <textarea
                 id="categoriaDescripcionModal"
-                className="form-control maestro-control maestro-control--textarea"
+                className={`form-control maestro-control maestro-control--textarea${
+                  errores.descripcion
+                    ? ' maestro-control--error'
+                    : ''
+                }`}
                 value={form.descripcion}
-                onChange={(event) =>
+                aria-invalid={errores.descripcion}
+                aria-describedby={
+                  errores.descripcion
+                    ? 'categoriaDescripcionModalError'
+                    : undefined
+                }
+                onChange={(event) => {
+                  const value = event.target.value
+
                   setForm((actual) => ({
                     ...actual,
-                    descripcion:
-                      event.target.value,
+                    descripcion: value,
                   }))
-                }
+
+                  if (
+                    errores.descripcion &&
+                    value.trim().length > 0
+                  ) {
+                    setErrores((actual) => ({
+                      ...actual,
+                      descripcion: false,
+                    }))
+                  }
+                }}
                 rows={4}
                 required
               />
+
+              {errores.descripcion && (
+                <div
+                  id="categoriaDescripcionModalError"
+                  className="maestro-field-error"
+                >
+                  Campo requerido
+                </div>
+              )}
             </div>
           </div>
 
           <div className="maestro-modal-footer">
             <button
               type="button"
-              className="btn maestro-btn-secondary"
+              className="btn maestro-btn-danger"
               onClick={onClose}
             >
+              <X size={18} />
               Cancelar
             </button>
 
