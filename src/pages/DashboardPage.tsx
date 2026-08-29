@@ -327,8 +327,8 @@ const modules: Module[] = [
     category: 'Maestros',
   },
   {
-    title: 'Modelos de Caja',
-    description: 'Configuración de modelos.',
+    title: 'Tipos de comprobante',
+    description: 'Administración de tipos de comprobante.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -518,6 +518,10 @@ function DashboardPage() {
 
     if (moduleTitle === 'Tipos de producto') {
       navigate('/tipos-producto')
+    }
+
+    if (moduleTitle === 'Tipos de comprobante') {
+      navigate('/tipos-comprobante')
     }
 
     if (moduleTitle === 'Vales de Consumo') {

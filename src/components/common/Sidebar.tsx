@@ -5,6 +5,7 @@ import {
   ClipboardList,
   Coins,
   LayoutDashboard,
+  ReceiptText,
   Tags,
 } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
@@ -14,6 +15,11 @@ const ENLACES = [
   { to: '/categorias', label: 'Categorías', icon: Boxes },
   { to: '/centros-costo', label: 'Centros de costo', icon: Coins },
   { to: '/tipos-producto', label: 'Tipos de producto', icon: Tags },
+  {
+    to: '/tipos-comprobante',
+    label: 'Tipos de comprobante',
+    icon: ReceiptText,
+  },
   {
     to: '/vales-consumo',
     label: 'Vales de consumo',
