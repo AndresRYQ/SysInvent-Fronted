@@ -24,12 +24,6 @@ type IconName =
   | 'cart'
   | 'chart'
 
-type NavItem = {
-  label: string
-  icon: IconName
-  active?: boolean
-}
-
 type Metric = {
   label: string
   value: number
@@ -47,16 +41,6 @@ type Module = {
   tone: string
   category: string
 }
-
-const navItems: NavItem[] = [
-  { label: 'Inicio', icon: 'home', active: true },
-  { label: 'Productos', icon: 'box' },
-  { label: 'Entradas', icon: 'entry' },
-  { label: 'Salidas', icon: 'exit' },
-  { label: 'Reportes', icon: 'report' },
-  { label: 'Ordenes', icon: 'order' },
-  { label: 'Auditoria', icon: 'audit' },
-]
 
 const metrics: Metric[] = [
   {
@@ -513,10 +497,9 @@ function Icon({ name }: { name: IconName }) {
 
 function DashboardPage() {
   const navigate = useNavigate()
-  const { sesion, logout } = useAuth()
+  const { sesion } = useAuth()
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const nombreUsuario = sesion?.nombreCompleto ?? 'Frank Arone'
-  const rolUsuario = sesion?.rol ?? 'Administrador'
   const nombreSaludo = nombreUsuario.split(' ')[0] || 'Frank'
 
   const filteredModules =
@@ -536,38 +519,6 @@ function DashboardPage() {
 
   return (
     <main className="dashboard-shell">
-      <nav className="topbar" aria-label="Navegacion principal">
-        <a className="brand" href="/">
-          <span className="brand-mark">
-            <Icon name="leaf" />
-          </span>
-          <span className="brand-name">AGRIHUASA</span>
-          <span className="brand-system">FFPMS</span>
-        </a>
-
-        <div className="nav-links">
-          {navItems.map((item) => (
-            <a className={`nav-link ${item.active ? 'is-active' : ''}`} href="/" key={item.label}>
-              <Icon name={item.icon} />
-              <span>{item.label}</span>
-            </a>
-          ))}
-        </div>
-
-        <div className="topbar-actions">
-          <button className="notification-button" type="button" aria-label="Notificaciones">
-            <Icon name="bell" />
-            <span>3</span>
-          </button>
-          <button className="user-menu" type="button" onClick={logout}>
-            <span className="avatar">{nombreUsuario.slice(0, 2).toUpperCase()}</span>
-            <span>
-              <strong>{nombreUsuario}</strong>
-              <small>{rolUsuario}</small>
-            </span>
-          </button>
-        </div>
-      </nav>
 
       <section className="hero-panel">
         <div className="hero-copy">

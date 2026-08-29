@@ -41,10 +41,10 @@ const AuthContext =
     undefined,
   )
 
-const TIEMPO_INACTIVIDAD_MS =  2 * 60 * 1000
+// const TIEMPO_INACTIVIDAD_MS =  2 * 60 * 1000
 
 // Deshabilitado temporalmente
-const CIERRE_POR_INACTIVIDAD = false
+// const CIERRE_POR_INACTIVIDAD = false
 
 export function AuthProvider({
   children,
@@ -117,84 +117,85 @@ export function AuthProvider({
  * realiza ninguna actividad durante
  * dos minutos.
  */
-useEffect(() => {
-  if (!CIERRE_POR_INACTIVIDAD || !sesion) {
-    return
-  }
-
-  let temporizador:
-    number | undefined
-
-  const cerrarPorInactividad = () => {
-    sessionStorage.setItem(
-      'agrihusac_motivo_cierre',
-      'inactividad',
-    )
-
-    logout()
-  }
-
-  const reiniciarTemporizador = () => {
-    if (temporizador) {
-      window.clearTimeout(temporizador)
-    }
-
-    temporizador = window.setTimeout(
-      cerrarPorInactividad,
-      TIEMPO_INACTIVIDAD_MS,
-    )
-  }
-
-  reiniciarTemporizador()
-
-  window.addEventListener(
-    'pointerdown',
-    reiniciarTemporizador,
-  )
-
-  window.addEventListener(
-    'keydown',
-    reiniciarTemporizador,
-  )
-
-  window.addEventListener(
-    'scroll',
-    reiniciarTemporizador,
-    { passive: true },
-  )
-
-  window.addEventListener(
-    'touchstart',
-    reiniciarTemporizador,
-    { passive: true },
-  )
-
-  return () => {
-    if (temporizador) {
-      window.clearTimeout(temporizador)
-    }
-
-    window.removeEventListener(
-      'pointerdown',
-      reiniciarTemporizador,
-    )
-
-    window.removeEventListener(
-      'keydown',
-      reiniciarTemporizador,
-    )
-
-    window.removeEventListener(
-      'scroll',
-      reiniciarTemporizador,
-    )
-
-    window.removeEventListener(
-      'touchstart',
-      reiniciarTemporizador,
-    )
-  }
-}, [sesion, logout])
+// Comentado temporalmente (deslogueo por inactividad)
+// useEffect(() => {
+//   if (!CIERRE_POR_INACTIVIDAD || !sesion) {
+//     return
+//   }
+//
+//   let temporizador:
+//     number | undefined
+//
+//   const cerrarPorInactividad = () => {
+//     sessionStorage.setItem(
+//       'agrihusac_motivo_cierre',
+//       'inactividad',
+//     )
+//
+//     logout()
+//   }
+//
+//   const reiniciarTemporizador = () => {
+//     if (temporizador) {
+//       window.clearTimeout(temporizador)
+//     }
+//
+//     temporizador = window.setTimeout(
+//       cerrarPorInactividad,
+//       TIEMPO_INACTIVIDAD_MS,
+//     )
+//   }
+//
+//   reiniciarTemporizador()
+//
+//   window.addEventListener(
+//     'pointerdown',
+//     reiniciarTemporizador,
+//   )
+//
+//   window.addEventListener(
+//     'keydown',
+//     reiniciarTemporizador,
+//   )
+//
+//   window.addEventListener(
+//     'scroll',
+//     reiniciarTemporizador,
+//     { passive: true },
+//   )
+//
+//   window.addEventListener(
+//     'touchstart',
+//     reiniciarTemporizador,
+//     { passive: true },
+//   )
+//
+//   return () => {
+//     if (temporizador) {
+//       window.clearTimeout(temporizador)
+//     }
+//
+//     window.removeEventListener(
+//       'pointerdown',
+//       reiniciarTemporizador,
+//     )
+//
+//     window.removeEventListener(
+//       'keydown',
+//       reiniciarTemporizador,
+//     )
+//
+//     window.removeEventListener(
+//       'scroll',
+//       reiniciarTemporizador,
+//     )
+//
+//     window.removeEventListener(
+//       'touchstart',
+//       reiniciarTemporizador,
+//     )
+//   }
+// }, [sesion, logout])
 
   /*
    * Sincroniza el inicio y cierre

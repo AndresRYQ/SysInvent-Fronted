@@ -151,16 +151,10 @@ function crearFechaActual() {
 }
 
 export function CategoriasPage() {
-  const { sesion, logout } = useAuth()
+  const { sesion } = useAuth()
   const nombreCompleto = sesion?.nombreCompleto ?? 'Usuario sin sesión'
   const nombreUsuario = sesion?.usuario ?? 'usuario'
   const rolUsuario = sesion?.rol ?? 'Sin rol'
-  const inicialesUsuario = nombreCompleto
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((parte) => parte[0]?.toUpperCase() ?? '')
-    .join('') || 'US'
 
   const [categorias, setCategorias] =
     useState<Categoria[]>(CATEGORIAS_MOCK)
@@ -222,52 +216,6 @@ export function CategoriasPage() {
   return (
     <>
       <main className="dashboard-shell categories-page-shell">
-        <nav className="topbar" aria-label="Navegacion principal">
-          <a className="brand" href="/dashboard">
-            <span className="brand-mark">🌿</span>
-            <span className="brand-name">AGRIHUASA</span>
-            <span className="brand-system">FFPMS</span>
-          </a>
-
-          <div className="nav-links">
-            <a className="nav-link" href="/dashboard">
-              Inicio
-            </a>
-            <a className="nav-link is-active" href="/categorias">
-              Categorías
-            </a>
-            <a className="nav-link" href="/vales-consumo">
-              Vales de consumo
-            </a>
-            <a className="nav-link" href="/dashboard">
-              Reportes
-            </a>
-          </div>
-
-          <div className="topbar-actions">
-            <button
-              className="notification-button"
-              type="button"
-              aria-label="Notificaciones"
-            >
-              🔔
-              <span>3</span>
-            </button>
-
-            <button
-              className="user-menu"
-              type="button"
-              onClick={logout}
-            >
-              <span className="avatar">{inicialesUsuario}</span>
-              <span>
-                <strong>{nombreCompleto}</strong>
-                <small>{rolUsuario}</small>
-              </span>
-            </button>
-          </div>
-        </nav>
-
         <section className="categories-summary-wrapper">
           <div className="categories-summary-card">
             <span className="categories-kicker">Sesión activa</span>
