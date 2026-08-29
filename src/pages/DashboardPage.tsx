@@ -529,6 +529,14 @@ function DashboardPage() {
       navigate('/categorias')
     }
 
+    if (moduleTitle === 'Usuarios') {
+      navigate('/usuarios')
+    }
+
+    if (moduleTitle === 'Roles') {
+      navigate('/roles')
+    }
+
     if (moduleTitle === 'Vales de Consumo') {
       navigate('/vales-consumo')
     }

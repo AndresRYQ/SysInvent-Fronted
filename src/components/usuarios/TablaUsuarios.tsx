@@ -36,6 +36,7 @@ export function TablaUsuarios({
                 <th>ID</th>
                 <th>Usuario</th>
                 <th>Nombre completo</th>
+                <th>Correo</th>
                 <th>Rol</th>
                 <th>Estado</th>
               </tr>
@@ -61,6 +62,7 @@ export function TablaUsuarios({
                     </td>
 
                     <td>{usuario.nombreCompleto}</td>
+                    <td>{usuario.email || 'Sin correo'}</td>
                     <td>{usuario.rol}</td>
 
                     <td>
@@ -79,7 +81,7 @@ export function TablaUsuarios({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5}>
+                  <td colSpan={6}>
                     <div className="users-empty-state">
                       <Users size={28} />
                       <p className="mb-1">
