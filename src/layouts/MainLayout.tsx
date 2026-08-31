@@ -13,6 +13,7 @@ const ABRE_CERRADO = [
   '/tipos-comprobante',
   '/unidades-medida',
   '/destinos',
+  '/ingresos-almacen',
   '/vales-consumo',
 ]
 

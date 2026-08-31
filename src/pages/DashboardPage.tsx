@@ -532,6 +532,10 @@ function DashboardPage() {
       navigate('/destinos')
     }
 
+    if (moduleTitle === 'Ingresos de Almacén') {
+      navigate('/ingresos-almacen')
+    }
+
     if (moduleTitle === 'Vales de Consumo') {
       navigate('/vales-consumo')
     }
