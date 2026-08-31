@@ -6,6 +6,7 @@ import {
   Coins,
   LayoutDashboard,
   MapPin,
+  PackagePlus,
   ReceiptText,
   Ruler,
   Tags,
@@ -31,6 +32,11 @@ const ENLACES = [
     to: '/destinos',
     label: 'Destinos',
     icon: MapPin,
+  },
+  {
+    to: '/ingresos-almacen',
+    label: 'Ingresos de almacén',
+    icon: PackagePlus,
   },
   {
     to: '/vales-consumo',
