@@ -1,50 +1,50 @@
 import { useEffect, useState } from 'react'
 import { Save, X } from 'lucide-react'
 
-import type { Categoria } from '../../types/categoria'
+import type { TipoComprobante } from '../../types/tipoComprobante'
 
-interface CategoriaFormModalProps {
+interface TipoComprobanteFormModalProps {
   abierto: boolean
-  categoria: Categoria | null
+  tipoComprobante: TipoComprobante | null
   onClose: () => void
   onSubmit: (
-    categoria: Pick<
-      Categoria,
+    tipoComprobante: Pick<
+      TipoComprobante,
       'nombre' | 'descripcion'
     >,
   ) => void
 }
 
-interface CategoriaFormState {
+interface TipoComprobanteFormState {
   nombre: string
   descripcion: string
 }
 
-interface CategoriaFormErrores {
+interface TipoComprobanteFormErrores {
   nombre: boolean
   descripcion: boolean
 }
 
-const FORM_INICIAL: CategoriaFormState = {
+const FORM_INICIAL: TipoComprobanteFormState = {
   nombre: '',
   descripcion: '',
 }
 
-const ERRORES_INICIALES: CategoriaFormErrores = {
+const ERRORES_INICIALES: TipoComprobanteFormErrores = {
   nombre: false,
   descripcion: false,
 }
 
-export function CategoriaFormModal({
+export function TipoComprobanteFormModal({
   abierto,
-  categoria,
+  tipoComprobante,
   onClose,
   onSubmit,
-}: CategoriaFormModalProps) {
+}: TipoComprobanteFormModalProps) {
   const [form, setForm] =
-    useState<CategoriaFormState>(FORM_INICIAL)
+    useState<TipoComprobanteFormState>(FORM_INICIAL)
   const [errores, setErrores] =
-    useState<CategoriaFormErrores>(
+    useState<TipoComprobanteFormErrores>(
       ERRORES_INICIALES,
     )
 
@@ -53,10 +53,10 @@ export function CategoriaFormModal({
       return
     }
 
-    if (categoria) {
+    if (tipoComprobante) {
       setForm({
-        nombre: categoria.nombre,
-        descripcion: categoria.descripcion,
+        nombre: tipoComprobante.nombre,
+        descripcion: tipoComprobante.descripcion,
       })
       setErrores(ERRORES_INICIALES)
       return
@@ -64,7 +64,7 @@ export function CategoriaFormModal({
 
     setForm(FORM_INICIAL)
     setErrores(ERRORES_INICIALES)
-  }, [abierto, categoria])
+  }, [abierto, tipoComprobante])
 
   if (!abierto) {
     return null
@@ -80,7 +80,7 @@ export function CategoriaFormModal({
         className="maestro-modal-card"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="categoria-form-title"
+        aria-labelledby="tipo-comprobante-form-title"
         onClick={(event) =>
           event.stopPropagation()
         }
@@ -88,12 +88,12 @@ export function CategoriaFormModal({
         <div className="maestro-modal-header">
           <div className="maestro-modal-header__content">
             <h3
-              id="categoria-form-title"
+              id="tipo-comprobante-form-title"
               className="maestro-modal-title"
             >
-              {categoria
-                ? 'Editar categoría'
-                : 'Registrar categoría'}
+              {tipoComprobante
+                ? 'Editar tipo de comprobante'
+                : 'Registrar tipo de comprobante'}
             </h3>
           </div>
 
@@ -139,16 +139,16 @@ export function CategoriaFormModal({
             <div className="mb-2">
               <label
                 className="form-label maestro-label"
-                htmlFor="categoriaNombreModal"
+                htmlFor="tipoComprobanteNombreModal"
               >
-                Nombre de categoría
+                Nombre de tipo de comprobante
                 <span className="maestro-required" aria-hidden="true">
                   *
                 </span>
               </label>
 
               <input
-                id="categoriaNombreModal"
+                id="tipoComprobanteNombreModal"
                 className={`form-control maestro-control${
                   errores.nombre
                     ? ' maestro-control--error'
@@ -159,7 +159,7 @@ export function CategoriaFormModal({
                 aria-invalid={errores.nombre}
                 aria-describedby={
                   errores.nombre
-                    ? 'categoriaNombreModalError'
+                    ? 'tipoComprobanteNombreModalError'
                     : undefined
                 }
                 onChange={(event) => {
@@ -185,7 +185,7 @@ export function CategoriaFormModal({
 
               {errores.nombre && (
                 <div
-                  id="categoriaNombreModalError"
+                  id="tipoComprobanteNombreModalError"
                   className="maestro-field-error"
                 >
                   Campo requerido
@@ -196,7 +196,7 @@ export function CategoriaFormModal({
             <div>
               <label
                 className="form-label maestro-label"
-                htmlFor="categoriaDescripcionModal"
+                htmlFor="tipoComprobanteDescripcionModal"
               >
                 Descripción
                 <span className="maestro-required" aria-hidden="true">
@@ -205,7 +205,7 @@ export function CategoriaFormModal({
               </label>
 
               <textarea
-                id="categoriaDescripcionModal"
+                id="tipoComprobanteDescripcionModal"
                 className={`form-control maestro-control maestro-control--textarea${
                   errores.descripcion
                     ? ' maestro-control--error'
@@ -215,7 +215,7 @@ export function CategoriaFormModal({
                 aria-invalid={errores.descripcion}
                 aria-describedby={
                   errores.descripcion
-                    ? 'categoriaDescripcionModalError'
+                    ? 'tipoComprobanteDescripcionModalError'
                     : undefined
                 }
                 onChange={(event) => {
@@ -242,7 +242,7 @@ export function CategoriaFormModal({
 
               {errores.descripcion && (
                 <div
-                  id="categoriaDescripcionModalError"
+                  id="tipoComprobanteDescripcionModalError"
                   className="maestro-field-error"
                 >
                   Campo requerido
@@ -274,4 +274,3 @@ export function CategoriaFormModal({
     </div>
   )
 }
-

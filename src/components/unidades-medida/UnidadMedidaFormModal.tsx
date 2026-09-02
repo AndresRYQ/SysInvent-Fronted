@@ -1,50 +1,47 @@
 import { useEffect, useState } from 'react'
 import { Save, X } from 'lucide-react'
 
-import type { Categoria } from '../../types/categoria'
+import type { UnidadMedida } from '../../types/unidadMedida'
 
-interface CategoriaFormModalProps {
+interface UnidadMedidaFormModalProps {
   abierto: boolean
-  categoria: Categoria | null
+  unidadMedida: UnidadMedida | null
   onClose: () => void
   onSubmit: (
-    categoria: Pick<
-      Categoria,
-      'nombre' | 'descripcion'
-    >,
+    unidadMedida: Pick<UnidadMedida, 'nombre' | 'descripcion'>,
   ) => void
 }
 
-interface CategoriaFormState {
+interface UnidadMedidaFormState {
   nombre: string
   descripcion: string
 }
 
-interface CategoriaFormErrores {
+interface UnidadMedidaFormErrores {
   nombre: boolean
   descripcion: boolean
 }
 
-const FORM_INICIAL: CategoriaFormState = {
+const FORM_INICIAL: UnidadMedidaFormState = {
   nombre: '',
   descripcion: '',
 }
 
-const ERRORES_INICIALES: CategoriaFormErrores = {
+const ERRORES_INICIALES: UnidadMedidaFormErrores = {
   nombre: false,
   descripcion: false,
 }
 
-export function CategoriaFormModal({
+export function UnidadMedidaFormModal({
   abierto,
-  categoria,
+  unidadMedida,
   onClose,
   onSubmit,
-}: CategoriaFormModalProps) {
+}: UnidadMedidaFormModalProps) {
   const [form, setForm] =
-    useState<CategoriaFormState>(FORM_INICIAL)
+    useState<UnidadMedidaFormState>(FORM_INICIAL)
   const [errores, setErrores] =
-    useState<CategoriaFormErrores>(
+    useState<UnidadMedidaFormErrores>(
       ERRORES_INICIALES,
     )
 
@@ -53,10 +50,10 @@ export function CategoriaFormModal({
       return
     }
 
-    if (categoria) {
+    if (unidadMedida) {
       setForm({
-        nombre: categoria.nombre,
-        descripcion: categoria.descripcion,
+        nombre: unidadMedida.nombre,
+        descripcion: unidadMedida.descripcion,
       })
       setErrores(ERRORES_INICIALES)
       return
@@ -64,7 +61,7 @@ export function CategoriaFormModal({
 
     setForm(FORM_INICIAL)
     setErrores(ERRORES_INICIALES)
-  }, [abierto, categoria])
+  }, [abierto, unidadMedida])
 
   if (!abierto) {
     return null
@@ -80,7 +77,7 @@ export function CategoriaFormModal({
         className="maestro-modal-card"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="categoria-form-title"
+        aria-labelledby="unidad-medida-form-title"
         onClick={(event) =>
           event.stopPropagation()
         }
@@ -88,12 +85,12 @@ export function CategoriaFormModal({
         <div className="maestro-modal-header">
           <div className="maestro-modal-header__content">
             <h3
-              id="categoria-form-title"
+              id="unidad-medida-form-title"
               className="maestro-modal-title"
             >
-              {categoria
-                ? 'Editar categoría'
-                : 'Registrar categoría'}
+              {unidadMedida
+                ? 'Editar unidad de medida'
+                : 'Registrar unidad de medida'}
             </h3>
           </div>
 
@@ -130,8 +127,7 @@ export function CategoriaFormModal({
 
             onSubmit({
               nombre: form.nombre.trim(),
-              descripcion:
-                form.descripcion.trim(),
+              descripcion: form.descripcion.trim(),
             })
           }}
         >
@@ -139,16 +135,16 @@ export function CategoriaFormModal({
             <div className="mb-2">
               <label
                 className="form-label maestro-label"
-                htmlFor="categoriaNombreModal"
+                htmlFor="unidadMedidaNombreModal"
               >
-                Nombre de categoría
+                Nombre de unidad de medida
                 <span className="maestro-required" aria-hidden="true">
                   *
                 </span>
               </label>
 
               <input
-                id="categoriaNombreModal"
+                id="unidadMedidaNombreModal"
                 className={`form-control maestro-control${
                   errores.nombre
                     ? ' maestro-control--error'
@@ -159,7 +155,7 @@ export function CategoriaFormModal({
                 aria-invalid={errores.nombre}
                 aria-describedby={
                   errores.nombre
-                    ? 'categoriaNombreModalError'
+                    ? 'unidadMedidaNombreModalError'
                     : undefined
                 }
                 onChange={(event) => {
@@ -180,12 +176,13 @@ export function CategoriaFormModal({
                     }))
                   }
                 }}
+                placeholder="Ej. Unidad, Kilogramo, Litro, Metro"
                 required
               />
 
               {errores.nombre && (
                 <div
-                  id="categoriaNombreModalError"
+                  id="unidadMedidaNombreModalError"
                   className="maestro-field-error"
                 >
                   Campo requerido
@@ -196,7 +193,7 @@ export function CategoriaFormModal({
             <div>
               <label
                 className="form-label maestro-label"
-                htmlFor="categoriaDescripcionModal"
+                htmlFor="unidadMedidaDescripcionModal"
               >
                 Descripción
                 <span className="maestro-required" aria-hidden="true">
@@ -205,7 +202,7 @@ export function CategoriaFormModal({
               </label>
 
               <textarea
-                id="categoriaDescripcionModal"
+                id="unidadMedidaDescripcionModal"
                 className={`form-control maestro-control maestro-control--textarea${
                   errores.descripcion
                     ? ' maestro-control--error'
@@ -215,7 +212,7 @@ export function CategoriaFormModal({
                 aria-invalid={errores.descripcion}
                 aria-describedby={
                   errores.descripcion
-                    ? 'categoriaDescripcionModalError'
+                    ? 'unidadMedidaDescripcionModalError'
                     : undefined
                 }
                 onChange={(event) => {
@@ -242,7 +239,7 @@ export function CategoriaFormModal({
 
               {errores.descripcion && (
                 <div
-                  id="categoriaDescripcionModalError"
+                  id="unidadMedidaDescripcionModalError"
                   className="maestro-field-error"
                 >
                   Campo requerido
@@ -274,4 +271,3 @@ export function CategoriaFormModal({
     </div>
   )
 }
-

@@ -1,50 +1,50 @@
 import { useEffect, useState } from 'react'
 import { Save, X } from 'lucide-react'
 
-import type { Categoria } from '../../types/categoria'
+import type { TipoProducto } from '../../types/tipoProducto'
 
-interface CategoriaFormModalProps {
+interface TipoProductoFormModalProps {
   abierto: boolean
-  categoria: Categoria | null
+  tipoProducto: TipoProducto | null
   onClose: () => void
   onSubmit: (
-    categoria: Pick<
-      Categoria,
+    tipoProducto: Pick<
+      TipoProducto,
       'nombre' | 'descripcion'
     >,
   ) => void
 }
 
-interface CategoriaFormState {
+interface TipoProductoFormState {
   nombre: string
   descripcion: string
 }
 
-interface CategoriaFormErrores {
+interface TipoProductoFormErrores {
   nombre: boolean
   descripcion: boolean
 }
 
-const FORM_INICIAL: CategoriaFormState = {
+const FORM_INICIAL: TipoProductoFormState = {
   nombre: '',
   descripcion: '',
 }
 
-const ERRORES_INICIALES: CategoriaFormErrores = {
+const ERRORES_INICIALES: TipoProductoFormErrores = {
   nombre: false,
   descripcion: false,
 }
 
-export function CategoriaFormModal({
+export function TipoProductoFormModal({
   abierto,
-  categoria,
+  tipoProducto,
   onClose,
   onSubmit,
-}: CategoriaFormModalProps) {
+}: TipoProductoFormModalProps) {
   const [form, setForm] =
-    useState<CategoriaFormState>(FORM_INICIAL)
+    useState<TipoProductoFormState>(FORM_INICIAL)
   const [errores, setErrores] =
-    useState<CategoriaFormErrores>(
+    useState<TipoProductoFormErrores>(
       ERRORES_INICIALES,
     )
 
@@ -53,10 +53,10 @@ export function CategoriaFormModal({
       return
     }
 
-    if (categoria) {
+    if (tipoProducto) {
       setForm({
-        nombre: categoria.nombre,
-        descripcion: categoria.descripcion,
+        nombre: tipoProducto.nombre,
+        descripcion: tipoProducto.descripcion,
       })
       setErrores(ERRORES_INICIALES)
       return
@@ -64,7 +64,7 @@ export function CategoriaFormModal({
 
     setForm(FORM_INICIAL)
     setErrores(ERRORES_INICIALES)
-  }, [abierto, categoria])
+  }, [abierto, tipoProducto])
 
   if (!abierto) {
     return null
@@ -80,7 +80,7 @@ export function CategoriaFormModal({
         className="maestro-modal-card"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="categoria-form-title"
+        aria-labelledby="tipo-producto-form-title"
         onClick={(event) =>
           event.stopPropagation()
         }
@@ -88,12 +88,12 @@ export function CategoriaFormModal({
         <div className="maestro-modal-header">
           <div className="maestro-modal-header__content">
             <h3
-              id="categoria-form-title"
+              id="tipo-producto-form-title"
               className="maestro-modal-title"
             >
-              {categoria
-                ? 'Editar categoría'
-                : 'Registrar categoría'}
+              {tipoProducto
+                ? 'Editar tipo de producto'
+                : 'Registrar tipo de producto'}
             </h3>
           </div>
 
@@ -139,16 +139,16 @@ export function CategoriaFormModal({
             <div className="mb-2">
               <label
                 className="form-label maestro-label"
-                htmlFor="categoriaNombreModal"
+                htmlFor="tipoProductoNombreModal"
               >
-                Nombre de categoría
+                Nombre de tipo de producto
                 <span className="maestro-required" aria-hidden="true">
                   *
                 </span>
               </label>
 
               <input
-                id="categoriaNombreModal"
+                id="tipoProductoNombreModal"
                 className={`form-control maestro-control${
                   errores.nombre
                     ? ' maestro-control--error'
@@ -159,7 +159,7 @@ export function CategoriaFormModal({
                 aria-invalid={errores.nombre}
                 aria-describedby={
                   errores.nombre
-                    ? 'categoriaNombreModalError'
+                    ? 'tipoProductoNombreModalError'
                     : undefined
                 }
                 onChange={(event) => {
@@ -185,7 +185,7 @@ export function CategoriaFormModal({
 
               {errores.nombre && (
                 <div
-                  id="categoriaNombreModalError"
+                  id="tipoProductoNombreModalError"
                   className="maestro-field-error"
                 >
                   Campo requerido
@@ -196,7 +196,7 @@ export function CategoriaFormModal({
             <div>
               <label
                 className="form-label maestro-label"
-                htmlFor="categoriaDescripcionModal"
+                htmlFor="tipoProductoDescripcionModal"
               >
                 Descripción
                 <span className="maestro-required" aria-hidden="true">
@@ -205,7 +205,7 @@ export function CategoriaFormModal({
               </label>
 
               <textarea
-                id="categoriaDescripcionModal"
+                id="tipoProductoDescripcionModal"
                 className={`form-control maestro-control maestro-control--textarea${
                   errores.descripcion
                     ? ' maestro-control--error'
@@ -215,7 +215,7 @@ export function CategoriaFormModal({
                 aria-invalid={errores.descripcion}
                 aria-describedby={
                   errores.descripcion
-                    ? 'categoriaDescripcionModalError'
+                    ? 'tipoProductoDescripcionModalError'
                     : undefined
                 }
                 onChange={(event) => {
@@ -242,7 +242,7 @@ export function CategoriaFormModal({
 
               {errores.descripcion && (
                 <div
-                  id="categoriaDescripcionModalError"
+                  id="tipoProductoDescripcionModalError"
                   className="maestro-field-error"
                 >
                   Campo requerido
@@ -274,4 +274,3 @@ export function CategoriaFormModal({
     </div>
   )
 }
-

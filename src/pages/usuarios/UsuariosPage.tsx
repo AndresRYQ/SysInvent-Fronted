@@ -1,5 +1,4 @@
-import { useMemo, useState } from 'react'
-import { LayoutDashboard } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { FiltrosUsuarios } from '../../components/usuarios/FiltrosUsuarios'
 import { TablaUsuarios } from '../../components/usuarios/TablaUsuarios'
@@ -9,7 +8,8 @@ import {
   STORAGE_KEYS,
 } from '../../services/storageService'
 import type { UsuarioLogin } from '../../types/auth'
-import './UsuariosPage.css'
+import '../../styles/DashboardPage.css'
+import '../../styles/maestros.css'
 
 interface FiltrosUsuariosState {
   busqueda: string
@@ -61,19 +61,19 @@ function filtrarUsuarios(
 }
 
 export function UsuariosPage() {
-  const [usuarios] = useState<UsuarioLogin[]>(
+  const [usuarios, setUsuarios] = useState<UsuarioLogin[]>(
     () => obtenerUsuarios(),
   )
-
   const [filtros, setFiltros] =
     useState<FiltrosUsuariosState>(
       FILTROS_INICIALES,
     )
-
   const [filtrosAplicados, setFiltrosAplicados] =
     useState<FiltrosUsuariosState>(
       FILTROS_INICIALES,
     )
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
   const usuariosFiltrados = useMemo(
     () =>
@@ -81,101 +81,82 @@ export function UsuariosPage() {
     [usuarios, filtrosAplicados],
   )
 
-  const usuariosActivos = useMemo(
-    () =>
-      usuarios.filter((usuario) => usuario.estado)
-        .length,
-    [usuarios],
-  )
+  const totalItems = usuariosFiltrados.length
 
-  const rolesActivos = useMemo(
-    () =>
-      new Set(
-        usuarios.map((usuario) => usuario.rol),
-      ).size,
-    [usuarios],
-  )
+  const usuariosPaginados = useMemo(() => {
+    const startIndex = (page - 1) * pageSize
+    const endIndex = startIndex + pageSize
+
+    return usuariosFiltrados.slice(
+      startIndex,
+      endIndex,
+    )
+  }, [
+    usuariosFiltrados,
+    page,
+    pageSize,
+  ])
+
+  useEffect(() => {
+    const totalPages = Math.max(
+      1,
+      Math.ceil(totalItems / pageSize),
+    )
+
+    if (page > totalPages) {
+      setPage(totalPages)
+    }
+  }, [page, pageSize, totalItems])
 
   return (
-    <main className="users-page app-shell">
-      <div className="container-xl px-0">
-        <section className="users-hero">
-          <span className="users-badge">
-            <LayoutDashboard size={16} />
-            Gestión segura
-          </span>
-
-          <h1>Gestión de usuarios</h1>
-
-          <p>
-            Pantalla de consulta con filtros rápidos, acciones claras y una tabla
-            estilizada en línea con la referencia visual del proyecto.
-          </p>
-
-          <div className="row g-3 users-stat-grid">
-            <div className="col-12 col-md-4">
-              <article className="users-stat-card">
-                <div className="users-stat-label">
-                  Usuarios registrados
-                </div>
-
-                <div className="users-stat-value">
-                  {usuarios.length}
-                </div>
-              </article>
+    <>
+      <main className="dashboard-shell maestro-page-shell">
+        <div className="container-xl px-0 maestro-page-body">
+          <section className="maestro-topbar">
+            <div className="maestro-topbar__copy">
+              <h1>Usuarios</h1>
+              <p>Mantenimiento de usuarios del sistema</p>
             </div>
+          </section>
 
-            <div className="col-12 col-md-4">
-              <article className="users-stat-card">
-                <div className="users-stat-label">
-                  Activos
-                </div>
-
-                <div className="users-stat-value">
-                  {usuariosActivos}
-                </div>
-              </article>
-            </div>
-
-            <div className="col-12 col-md-4">
-              <article className="users-stat-card">
-                <div className="users-stat-label">
-                  Roles detectados
-                </div>
-
-                <div className="users-stat-value">
-                  {rolesActivos}
-                </div>
-              </article>
-            </div>
+          <div className="maestro-panel">
+            <FiltrosUsuarios
+              valores={filtros}
+              onChange={(campo, valor) =>
+                setFiltros((actual) => ({
+                  ...actual,
+                  [campo]: valor,
+                }))
+              }
+              onBuscar={() => {
+                setFiltrosAplicados(filtros)
+                setPage(1)
+              }}
+              onLimpiar={() => {
+                setFiltros(FILTROS_INICIALES)
+                setFiltrosAplicados(FILTROS_INICIALES)
+                setPage(1)
+              }}
+            />
           </div>
-        </section>
 
-        <div className="users-panel">
-          <FiltrosUsuarios
-            valores={filtros}
-            onChange={(campo, valor) =>
-              setFiltros((actual) => ({
-                ...actual,
-                [campo]: valor,
-              }))
-            }
-            onBuscar={() =>
-              setFiltrosAplicados(filtros)
-            }
-            onLimpiar={() => {
-              setFiltros(FILTROS_INICIALES)
-              setFiltrosAplicados(FILTROS_INICIALES)
-            }}
-          />
+          <div className="maestro-panel">
+            <TablaUsuarios
+              usuarios={usuariosPaginados}
+              totalItems={totalItems}
+              page={page}
+              pageSize={pageSize}
+              onPageChange={(nextPage) =>
+                setPage(nextPage)
+              }
+              onPageSizeChange={(nextPageSize) => {
+                setPageSize(nextPageSize)
+                setPage(1)
+              }}
+            />
+          </div>
         </div>
-
-        <div className="users-panel">
-          <TablaUsuarios
-            usuarios={usuariosFiltrados}
-          />
-        </div>
-      </div>
-    </main>
+      </main>
+    </>
   )
 }

@@ -293,20 +293,22 @@ export function obtenerSesion():
     return null
   }
 
-  const fechaExpiracion = Date.parse(
-    sesion.fechaExpiracion,
-  )
-
-  const fechaInvalida =
-    Number.isNaN(fechaExpiracion)
-
-  const sesionVencida =
-    Date.now() >= fechaExpiracion
-
-  if (fechaInvalida || sesionVencida) {
-    cerrarSesion()
-    return null
-  }
+  // Comentado temporalmente: validaciÃ³n
+  // de expiraciÃ³n por tiempo.
+  // const fechaExpiracion = Date.parse(
+  //   sesion.fechaExpiracion,
+  // )
+  //
+  // const fechaInvalida =
+  //   Number.isNaN(fechaExpiracion)
+  //
+  // const sesionVencida =
+  //   Date.now() >= fechaExpiracion
+  //
+  // if (fechaInvalida || sesionVencida) {
+  //   cerrarSesion()
+  //   return null
+  // }
 
   return sesion
 }

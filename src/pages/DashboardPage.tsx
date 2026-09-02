@@ -24,12 +24,6 @@ type IconName =
   | 'cart'
   | 'chart'
 
-type NavItem = {
-  label: string
-  icon: IconName
-  active?: boolean
-}
-
 type Metric = {
   label: string
   value: number
@@ -47,16 +41,6 @@ type Module = {
   tone: string
   category: string
 }
-
-const navItems: NavItem[] = [
-  { label: 'Inicio', icon: 'home', active: true },
-  { label: 'Productos', icon: 'box' },
-  { label: 'Entradas', icon: 'entry' },
-  { label: 'Salidas', icon: 'exit' },
-  { label: 'Reportes', icon: 'report' },
-  { label: 'Ordenes', icon: 'order' },
-  { label: 'Auditoria', icon: 'audit' },
-]
 
 const metrics: Metric[] = [
   {
@@ -322,8 +306,8 @@ const modules: Module[] = [
     category: 'Reportes',
   },
   {
-    title: 'Especies',
-    description: 'Mantenimiento de especies.',
+    title: 'Centros de costo',
+    description: 'Mantenimiento de centros de costo.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -336,30 +320,30 @@ const modules: Module[] = [
     category: 'Maestros',
   },
   {
-    title: 'Marcas de Caja',
-    description: 'Administración de marcas.',
+    title: 'Tipos de producto',
+    description: 'Administración de tipos de producto.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
   },
   {
-    title: 'Modelos de Caja',
-    description: 'Configuración de modelos.',
+    title: 'Tipos de comprobante',
+    description: 'Administración de tipos de comprobante.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
   },
   {
-    title: 'Cámaras de Frío',
-    description: 'Administración de cámaras.',
+    title: 'Unidades de medida',
+    description: 'Administración de unidades de medida.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
   },
   {
-    title: 'Acopiadores',
-    description: 'Gestión de acopiadores.',
-    icon: 'users',
+    title: 'Destinos',
+    description: 'Administración de destinos.',
+    icon: 'box',
     tone: 'green',
     category: 'Maestros',
   },
@@ -513,10 +497,9 @@ function Icon({ name }: { name: IconName }) {
 
 function DashboardPage() {
   const navigate = useNavigate()
-  const { sesion, logout } = useAuth()
+  const { sesion } = useAuth()
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const nombreUsuario = sesion?.nombreCompleto ?? 'Frank Arone'
-  const rolUsuario = sesion?.rol ?? 'Administrador'
   const nombreSaludo = nombreUsuario.split(' ')[0] || 'Frank'
 
   const filteredModules =
@@ -537,6 +520,30 @@ function DashboardPage() {
       navigate('/roles')
     }
 
+    if (moduleTitle === 'Centros de costo') {
+      navigate('/centros-costo')
+    }
+
+    if (moduleTitle === 'Tipos de producto') {
+      navigate('/tipos-producto')
+    }
+
+    if (moduleTitle === 'Tipos de comprobante') {
+      navigate('/tipos-comprobante')
+    }
+
+    if (moduleTitle === 'Unidades de medida') {
+      navigate('/unidades-medida')
+    }
+
+    if (moduleTitle === 'Destinos') {
+      navigate('/destinos')
+    }
+
+    if (moduleTitle === 'Ingresos de Almacén') {
+      navigate('/ingresos-almacen')
+    }
+
     if (moduleTitle === 'Vales de Consumo') {
       navigate('/vales-consumo')
     }
@@ -544,38 +551,6 @@ function DashboardPage() {
 
   return (
     <main className="dashboard-shell">
-      <nav className="topbar" aria-label="Navegacion principal">
-        <a className="brand" href="/">
-          <span className="brand-mark">
-            <Icon name="leaf" />
-          </span>
-          <span className="brand-name">AGRIHUASA</span>
-          <span className="brand-system">FFPMS</span>
-        </a>
-
-        <div className="nav-links">
-          {navItems.map((item) => (
-            <a className={`nav-link ${item.active ? 'is-active' : ''}`} href="/" key={item.label}>
-              <Icon name={item.icon} />
-              <span>{item.label}</span>
-            </a>
-          ))}
-        </div>
-
-        <div className="topbar-actions">
-          <button className="notification-button" type="button" aria-label="Notificaciones">
-            <Icon name="bell" />
-            <span>3</span>
-          </button>
-          <button className="user-menu" type="button" onClick={logout}>
-            <span className="avatar">{nombreUsuario.slice(0, 2).toUpperCase()}</span>
-            <span>
-              <strong>{nombreUsuario}</strong>
-              <small>{rolUsuario}</small>
-            </span>
-          </button>
-        </div>
-      </nav>
 
       <section className="hero-panel">
         <div className="hero-copy">

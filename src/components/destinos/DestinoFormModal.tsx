@@ -1,50 +1,44 @@
 import { useEffect, useState } from 'react'
 import { Save, X } from 'lucide-react'
 
-import type { Categoria } from '../../types/categoria'
+import type { Destino } from '../../types/destino'
 
-interface CategoriaFormModalProps {
+interface DestinoFormModalProps {
   abierto: boolean
-  categoria: Categoria | null
+  destino: Destino | null
   onClose: () => void
-  onSubmit: (
-    categoria: Pick<
-      Categoria,
-      'nombre' | 'descripcion'
-    >,
-  ) => void
+  onSubmit: (destino: Pick<Destino, 'nombre' | 'descripcion'>) => void
 }
 
-interface CategoriaFormState {
+interface DestinoFormState {
   nombre: string
   descripcion: string
 }
 
-interface CategoriaFormErrores {
+interface DestinoFormErrores {
   nombre: boolean
   descripcion: boolean
 }
 
-const FORM_INICIAL: CategoriaFormState = {
+const FORM_INICIAL: DestinoFormState = {
   nombre: '',
   descripcion: '',
 }
 
-const ERRORES_INICIALES: CategoriaFormErrores = {
+const ERRORES_INICIALES: DestinoFormErrores = {
   nombre: false,
   descripcion: false,
 }
 
-export function CategoriaFormModal({
+export function DestinoFormModal({
   abierto,
-  categoria,
+  destino,
   onClose,
   onSubmit,
-}: CategoriaFormModalProps) {
-  const [form, setForm] =
-    useState<CategoriaFormState>(FORM_INICIAL)
+}: DestinoFormModalProps) {
+  const [form, setForm] = useState<DestinoFormState>(FORM_INICIAL)
   const [errores, setErrores] =
-    useState<CategoriaFormErrores>(
+    useState<DestinoFormErrores>(
       ERRORES_INICIALES,
     )
 
@@ -53,10 +47,10 @@ export function CategoriaFormModal({
       return
     }
 
-    if (categoria) {
+    if (destino) {
       setForm({
-        nombre: categoria.nombre,
-        descripcion: categoria.descripcion,
+        nombre: destino.nombre,
+        descripcion: destino.descripcion,
       })
       setErrores(ERRORES_INICIALES)
       return
@@ -64,7 +58,7 @@ export function CategoriaFormModal({
 
     setForm(FORM_INICIAL)
     setErrores(ERRORES_INICIALES)
-  }, [abierto, categoria])
+  }, [abierto, destino])
 
   if (!abierto) {
     return null
@@ -80,20 +74,13 @@ export function CategoriaFormModal({
         className="maestro-modal-card"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="categoria-form-title"
-        onClick={(event) =>
-          event.stopPropagation()
-        }
+        aria-labelledby="destino-form-title"
+        onClick={(event) => event.stopPropagation()}
       >
         <div className="maestro-modal-header">
           <div className="maestro-modal-header__content">
-            <h3
-              id="categoria-form-title"
-              className="maestro-modal-title"
-            >
-              {categoria
-                ? 'Editar categoría'
-                : 'Registrar categoría'}
+            <h3 id="destino-form-title" className="maestro-modal-title">
+              {destino ? 'Editar destino' : 'Registrar destino'}
             </h3>
           </div>
 
@@ -130,8 +117,7 @@ export function CategoriaFormModal({
 
             onSubmit({
               nombre: form.nombre.trim(),
-              descripcion:
-                form.descripcion.trim(),
+              descripcion: form.descripcion.trim(),
             })
           }}
         >
@@ -139,16 +125,16 @@ export function CategoriaFormModal({
             <div className="mb-2">
               <label
                 className="form-label maestro-label"
-                htmlFor="categoriaNombreModal"
+                htmlFor="destinoNombreModal"
               >
-                Nombre de categoría
+                Nombre de destino
                 <span className="maestro-required" aria-hidden="true">
                   *
                 </span>
               </label>
 
               <input
-                id="categoriaNombreModal"
+                id="destinoNombreModal"
                 className={`form-control maestro-control${
                   errores.nombre
                     ? ' maestro-control--error'
@@ -159,7 +145,7 @@ export function CategoriaFormModal({
                 aria-invalid={errores.nombre}
                 aria-describedby={
                   errores.nombre
-                    ? 'categoriaNombreModalError'
+                    ? 'destinoNombreModalError'
                     : undefined
                 }
                 onChange={(event) => {
@@ -180,12 +166,13 @@ export function CategoriaFormModal({
                     }))
                   }
                 }}
+                placeholder="Ej. Almacén Central, Planta, Sucursal"
                 required
               />
 
               {errores.nombre && (
                 <div
-                  id="categoriaNombreModalError"
+                  id="destinoNombreModalError"
                   className="maestro-field-error"
                 >
                   Campo requerido
@@ -196,7 +183,7 @@ export function CategoriaFormModal({
             <div>
               <label
                 className="form-label maestro-label"
-                htmlFor="categoriaDescripcionModal"
+                htmlFor="destinoDescripcionModal"
               >
                 Descripción
                 <span className="maestro-required" aria-hidden="true">
@@ -205,7 +192,7 @@ export function CategoriaFormModal({
               </label>
 
               <textarea
-                id="categoriaDescripcionModal"
+                id="destinoDescripcionModal"
                 className={`form-control maestro-control maestro-control--textarea${
                   errores.descripcion
                     ? ' maestro-control--error'
@@ -215,7 +202,7 @@ export function CategoriaFormModal({
                 aria-invalid={errores.descripcion}
                 aria-describedby={
                   errores.descripcion
-                    ? 'categoriaDescripcionModalError'
+                    ? 'destinoDescripcionModalError'
                     : undefined
                 }
                 onChange={(event) => {
@@ -242,7 +229,7 @@ export function CategoriaFormModal({
 
               {errores.descripcion && (
                 <div
-                  id="categoriaDescripcionModalError"
+                  id="destinoDescripcionModalError"
                   className="maestro-field-error"
                 >
                   Campo requerido
@@ -261,10 +248,7 @@ export function CategoriaFormModal({
               Cancelar
             </button>
 
-            <button
-              type="submit"
-              className="btn maestro-btn-primary"
-            >
+            <button type="submit" className="btn maestro-btn-primary">
               <Save size={18} />
               Guardar
             </button>
@@ -274,4 +258,3 @@ export function CategoriaFormModal({
     </div>
   )
 }
-

@@ -7,10 +7,9 @@ import {
   type FiltrosCategoriasValores,
 } from '../../components/categorias/FiltrosCategorias'
 import { TablaCategorias } from '../../components/categorias/TablaCategorias'
-import { useAuth } from '../../hooks/useAuth'
 import type { Categoria } from '../../types/categoria'
 import '../../styles/DashboardPage.css'
-import './CategoriasPage.css'
+import '../../styles/maestros.css'
 
 const FILTROS_INICIALES: FiltrosCategoriasValores = {
   nombre: '',
@@ -22,14 +21,14 @@ const CATEGORIAS_MOCK: Categoria[] = [
     id: 'CAT-001',
     nombre: 'Herramientas',
     estado: true,
-    descripcion: 'Implementos y accesorios de uso tecnico.',
+    descripcion: 'Implementos y accesorios de uso técnico.',
     fechaRegistro: '10/08/2026',
   },
   {
     id: 'CAT-002',
     nombre: 'Seguridad Industrial',
     estado: true,
-    descripcion: 'Equipos para proteccion personal.',
+    descripcion: 'Equipos para protección personal.',
     fechaRegistro: '11/08/2026',
   },
   {
@@ -50,71 +49,8 @@ const CATEGORIAS_MOCK: Categoria[] = [
     id: 'CAT-005',
     nombre: 'Limpieza',
     estado: false,
-    descripcion: 'Insumos para orden e higiene del almacen.',
+    descripcion: 'Insumos para orden e higiene del almacén.',
     fechaRegistro: '14/08/2026',
-  },
-  {
-    id: 'CAT-006',
-    nombre: 'Oficina',
-    estado: true,
-    descripcion: 'Utiles y materiales administrativos.',
-    fechaRegistro: '15/08/2026',
-  },
-  {
-    id: 'CAT-007',
-    nombre: 'Electricos',
-    estado: true,
-    descripcion: 'Consumibles y partes para instalaciones.',
-    fechaRegistro: '16/08/2026',
-  },
-  {
-    id: 'CAT-008',
-    nombre: 'Mecanica',
-    estado: false,
-    descripcion: 'Elementos para soporte de maquinaria.',
-    fechaRegistro: '17/08/2026',
-  },
-  {
-    id: 'CAT-009',
-    nombre: 'Soldadura',
-    estado: true,
-    descripcion: 'Materiales para trabajos de union y corte.',
-    fechaRegistro: '18/08/2026',
-  },
-  {
-    id: 'CAT-010',
-    nombre: 'Lubricantes',
-    estado: true,
-    descripcion: 'Aceites y grasas para mantenimiento.',
-    fechaRegistro: '19/08/2026',
-  },
-  {
-    id: 'CAT-011',
-    nombre: 'Jardineria',
-    estado: false,
-    descripcion: 'Herramientas e insumos para areas verdes.',
-    fechaRegistro: '20/08/2026',
-  },
-  {
-    id: 'CAT-012',
-    nombre: 'Construccion',
-    estado: true,
-    descripcion: 'Materiales de obra y acabados.',
-    fechaRegistro: '21/08/2026',
-  },
-  {
-    id: 'CAT-013',
-    nombre: 'Pinturas',
-    estado: true,
-    descripcion: 'Recubrimientos y accesorios de aplicacion.',
-    fechaRegistro: '22/08/2026',
-  },
-  {
-    id: 'CAT-014',
-    nombre: 'Senalizacion',
-    estado: true,
-    descripcion: 'Elementos visuales de orientacion y seguridad.',
-    fechaRegistro: '23/08/2026',
   },
 ]
 
@@ -151,17 +87,6 @@ function crearFechaActual() {
 }
 
 export function CategoriasPage() {
-  const { sesion, logout } = useAuth()
-  const nombreCompleto = sesion?.nombreCompleto ?? 'Usuario sin sesión'
-  const nombreUsuario = sesion?.usuario ?? 'usuario'
-  const rolUsuario = sesion?.rol ?? 'Sin rol'
-  const inicialesUsuario = nombreCompleto
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((parte) => parte[0]?.toUpperCase() ?? '')
-    .join('') || 'US'
-
   const [categorias, setCategorias] =
     useState<Categoria[]>(CATEGORIAS_MOCK)
   const [filtros, setFiltros] =
@@ -221,68 +146,16 @@ export function CategoriasPage() {
 
   return (
     <>
-      <main className="dashboard-shell categories-page-shell">
-        <nav className="topbar" aria-label="Navegacion principal">
-          <a className="brand" href="/dashboard">
-            <span className="brand-mark">🌿</span>
-            <span className="brand-name">AGRIHUASA</span>
-            <span className="brand-system">FFPMS</span>
-          </a>
+      <main className="dashboard-shell maestro-page-shell">
+        <div className="container-xl px-0 maestro-page-body">
+          <section className="maestro-topbar">
+            <div className="maestro-topbar__copy">
+              <h1>Categorías</h1>
+              <p>Mantenimiento de categorías</p>
+            </div>
+          </section>
 
-          <div className="nav-links">
-            <a className="nav-link" href="/dashboard">
-              Inicio
-            </a>
-            <a className="nav-link is-active" href="/categorias">
-              Categorías
-            </a>
-            <a className="nav-link" href="/vales-consumo">
-              Vales de consumo
-            </a>
-            <a className="nav-link" href="/dashboard">
-              Reportes
-            </a>
-          </div>
-
-          <div className="topbar-actions">
-            <button
-              className="notification-button"
-              type="button"
-              aria-label="Notificaciones"
-            >
-              🔔
-              <span>3</span>
-            </button>
-
-            <button
-              className="user-menu"
-              type="button"
-              onClick={logout}
-            >
-              <span className="avatar">{inicialesUsuario}</span>
-              <span>
-                <strong>{nombreCompleto}</strong>
-                <small>{rolUsuario}</small>
-              </span>
-            </button>
-          </div>
-        </nav>
-
-        <section className="categories-summary-wrapper">
-          <div className="categories-summary-card">
-            <span className="categories-kicker">Sesión activa</span>
-            <h1 className="categories-section-title">
-              Módulo de categorías
-            </h1>
-            <p className="categories-section-copy">
-              Usuario activo: <strong>{nombreCompleto}</strong> ·{' '}
-              {nombreUsuario} · {rolUsuario}
-            </p>
-          </div>
-        </section>
-
-        <div className="container-xl px-0 categories-page-body">
-          <div className="categories-panel">
+          <div className="maestro-panel">
             <FiltrosCategorias
               valores={filtros}
               onChange={(campo, valor) =>
@@ -303,7 +176,7 @@ export function CategoriasPage() {
             />
           </div>
 
-          <div className="categories-panel">
+          <div className="maestro-panel">
             <TablaCategorias
               categorias={categoriasPaginadas}
               totalItems={totalItems}
@@ -402,3 +275,4 @@ export function CategoriasPage() {
     </>
   )
 }
+

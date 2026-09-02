@@ -1,5 +1,3 @@
-import { useEffect } from 'react'
-
 import {
   Navigate,
   Outlet,
@@ -9,25 +7,10 @@ import {
 import { useAuth } from '../hooks/useAuth'
 
 export function ProtectedRoute() {
-  const { sesion, logout } = useAuth()
+  const { sesion } = useAuth()
   const ubicacion = useLocation()
 
-  const fechaExpiracion = sesion
-    ? Date.parse(sesion.fechaExpiracion)
-    : Number.NaN
-
-  const tokenValido =
-    Boolean(sesion?.token) &&
-    !Number.isNaN(fechaExpiracion) &&
-    Date.now() < fechaExpiracion
-
-  useEffect(() => {
-    if (sesion && !tokenValido) {
-      logout()
-    }
-  }, [sesion, tokenValido, logout])
-
-  if (!sesion || !tokenValido) {
+  if (!sesion) {
     return (
       <Navigate
         to="/login"

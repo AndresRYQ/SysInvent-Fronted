@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react'
-import { LayoutDashboard } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { FiltrosRoles, type FiltrosRolesValores } from '../../components/roles/FiltrosRoles'
 import { TablaRoles, type RolResumen } from '../../components/roles/TablaRoles'
-import '../../pages/usuarios/UsuariosPage.css'
+import '../../styles/DashboardPage.css'
+import '../../styles/maestros.css'
 
 const FILTROS_INICIALES: FiltrosRolesValores = {
   busqueda: '',
@@ -60,86 +60,83 @@ function filtrarRoles(roles: RolResumen[], filtros: FiltrosRolesValores) {
 }
 
 export function RolesPage() {
-  const [roles] = useState<RolResumen[]>(ROLES_INICIALES)
+  const [roles, setRoles] = useState<RolResumen[]>(ROLES_INICIALES)
   const [filtros, setFiltros] = useState<FiltrosRolesValores>(FILTROS_INICIALES)
   const [filtrosAplicados, setFiltrosAplicados] = useState<FiltrosRolesValores>(FILTROS_INICIALES)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
   const rolesFiltrados = useMemo(
     () => filtrarRoles(roles, filtrosAplicados),
     [roles, filtrosAplicados],
   )
 
-  const rolesActivos = useMemo(
-    () => roles.filter((rol) => rol.estado).length,
-    [roles],
-  )
+  const totalItems = rolesFiltrados.length
 
-  const totalUsuariosEnRoles = useMemo(
-    () => roles.reduce((total, rol) => total + rol.usuarios, 0),
-    [roles],
-  )
+  const rolesPaginados = useMemo(() => {
+    const startIndex = (page - 1) * pageSize
+    const endIndex = startIndex + pageSize
+
+    return rolesFiltrados.slice(startIndex, endIndex)
+  }, [rolesFiltrados, page, pageSize])
+
+  useEffect(() => {
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
+
+    if (page > totalPages) {
+      setPage(totalPages)
+    }
+  }, [page, pageSize, totalItems])
 
   return (
-    <main className="users-page app-shell">
-      <div className="container-xl px-0">
-        <section className="users-hero">
-          <span className="users-badge">
-            <LayoutDashboard size={16} />
-            Seguridad
-          </span>
-
-          <h1>Gestión de roles</h1>
-
-          <p>
-            Administra los perfiles del sistema y controla el acceso según el tipo
-            de usuario que debe operar cada módulo.
-          </p>
-
-          <div className="row g-3 users-stat-grid">
-            <div className="col-12 col-md-4">
-              <article className="users-stat-card">
-                <div className="users-stat-label">Roles registrados</div>
-                <div className="users-stat-value">{roles.length}</div>
-              </article>
+    <>
+      <main className="dashboard-shell maestro-page-shell">
+        <div className="container-xl px-0 maestro-page-body">
+          <section className="maestro-topbar">
+            <div className="maestro-topbar__copy">
+              <h1>Roles</h1>
+              <p>Mantenimiento de roles del sistema</p>
             </div>
+          </section>
 
-            <div className="col-12 col-md-4">
-              <article className="users-stat-card">
-                <div className="users-stat-label">Activos</div>
-                <div className="users-stat-value">{rolesActivos}</div>
-              </article>
-            </div>
-
-            <div className="col-12 col-md-4">
-              <article className="users-stat-card">
-                <div className="users-stat-label">Usuarios asignados</div>
-                <div className="users-stat-value">{totalUsuariosEnRoles}</div>
-              </article>
-            </div>
+          <div className="maestro-panel">
+            <FiltrosRoles
+              valores={filtros}
+              onChange={(campo, valor) =>
+                setFiltros((actual) => ({
+                  ...actual,
+                  [campo]: valor,
+                }))
+              }
+              onBuscar={() => {
+                setFiltrosAplicados(filtros)
+                setPage(1)
+              }}
+              onLimpiar={() => {
+                setFiltros(FILTROS_INICIALES)
+                setFiltrosAplicados(FILTROS_INICIALES)
+                setPage(1)
+              }}
+            />
           </div>
-        </section>
 
-        <div className="users-panel">
-          <FiltrosRoles
-            valores={filtros}
-            onChange={(campo, valor) =>
-              setFiltros((actual) => ({
-                ...actual,
-                [campo]: valor,
-              }))
-            }
-            onBuscar={() => setFiltrosAplicados(filtros)}
-            onLimpiar={() => {
-              setFiltros(FILTROS_INICIALES)
-              setFiltrosAplicados(FILTROS_INICIALES)
-            }}
-          />
+          <div className="maestro-panel">
+            <TablaRoles
+              roles={rolesPaginados}
+              totalItems={totalItems}
+              page={page}
+              pageSize={pageSize}
+              onPageChange={(nextPage) =>
+                setPage(nextPage)
+              }
+              onPageSizeChange={(nextPageSize) => {
+                setPageSize(nextPageSize)
+                setPage(1)
+              }}
+            />
+          </div>
         </div>
-
-        <div className="users-panel">
-          <TablaRoles roles={rolesFiltrados} />
-        </div>
-      </div>
-    </main>
+      </main>
+    </>
   )
 }
