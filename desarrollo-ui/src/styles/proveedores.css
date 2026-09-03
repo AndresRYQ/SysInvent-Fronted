@@ -1,44 +1,39 @@
 /* ============================================
-   UI Components - Paleta del proyecto
+   UI Components - Paleta AGRIHUASA
    ============================================ */
 
 .ui-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
 
 .ui-field--full {
   grid-column: 1 / -1;
-  padding: 10px 12px;
-  border: 1px solid var(--line, rgba(16, 24, 40, 0.12));
-  border-radius: 8px;
-  font-size: 14px;
-  background: #fff;
-  color: var(--ink, #101828);
-  transition: border-color 0.2s, box-shadow 0.2s;
-  
 }
 
 .ui-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #303a33;
+  font-size: 12px;
+  font-weight: 700;
+  color: #17352a;
+  letter-spacing: 0.02em;
 }
 
 .ui-input,
 .ui-select {
-  padding: 10px 12px;
-  border: 1px solid #cfd2cf;
-  border-radius: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #e3e9e5;
+  border-radius: 10px;
   font-size: 14px;
+  font-family: inherit;
   background: #ffffff;
-  color: #4c514e;
+  color: #17352a;
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
 .ui-input::placeholder {
-  color: #6f7370;
+  color: #9ca8a0;
   opacity: 1;
 }
 
@@ -46,17 +41,18 @@
 .ui-select:focus {
   outline: none;
   border-color: #338f3c;
-  box-shadow: 0 0 0 4px rgb(51 143 60 / 11%);
+  box-shadow: 0 0 0 3px rgba(51, 143, 60, 0.12);
 }
 
 .ui-input--error,
 .ui-select--error {
-  border-color: #b3261e;
+  border-color: #c73b3b;
 }
 
 .ui-error {
-  font-size: 12px;
-  color: #b3261e;
+  font-size: 11px;
+  color: #c73b3b;
+  margin-top: 2px;
 }
 
 /* ============================================
@@ -69,81 +65,91 @@
   justify-content: center;
   gap: 6px;
   font-weight: 600;
+  font-family: inherit;
   border: none;
-  border-radius: 11px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+  transition: all 160ms ease;
 }
 
 .ui-btn:active {
-  transform: translateY(0);
+  transform: scale(0.98);
 }
 
 .ui-btn--md {
-  padding: 10px 20px;
+  padding: 10px 22px;
   font-size: 14px;
 }
 
 .ui-btn--sm {
-  padding: 6px 12px;
+  padding: 6px 14px;
   font-size: 12px;
+  border-radius: 8px;
 }
 
 .ui-btn--primary {
   background: #338f3c;
   color: #ffffff;
-  box-shadow: 0 7px 15px rgb(51 143 60 / 17%);
+  box-shadow: 0 2px 8px rgba(51, 143, 60, 0.25);
 }
 
 .ui-btn--primary:hover {
   background: #287f32;
-  box-shadow: 0 9px 20px rgb(51 143 60 / 25%);
+  box-shadow: 0 4px 14px rgba(51, 143, 60, 0.35);
   transform: translateY(-1px);
 }
 
 .ui-btn--primary:focus-visible {
-  outline: 3px solid rgb(51 143 60 / 30%);
-  outline-offset: 3px;
+  outline: 3px solid rgba(51, 143, 60, 0.3);
+  outline-offset: 2px;
 }
 
 .ui-btn--secondary {
   background: #f0f7f0;
-  color: #303a33;
-  border: 1px solid #cfd2cf;
+  color: #17352a;
+  border: 1px solid #e3e9e5;
 }
 
 .ui-btn--secondary:hover {
   background: #e4f0e4;
+  border-color: #338f3c;
 }
 
 .ui-btn--danger {
   background: transparent;
-  color: #b3261e;
-  border: 1px solid #b3261e;
+  color: #c73b3b;
+  border: 1px solid #c73b3b;
 }
 
 .ui-btn--danger:hover {
-  background: rgb(179 38 30 / 8%);
+  background: #fff0f0;
 }
 
 .ui-btn--ghost {
   background: transparent;
   color: #338f3c;
+  border: 1px solid transparent;
 }
 
 .ui-btn--ghost:hover {
-  background: #f0f7f0;
+  background: #e7f6ec;
+  border-color: #338f3c;
 }
 
 /* ============================================
-   Proveedores Page
+   Proveedores Page - Fondo degradado
    ============================================ */
 
 .proveedores-page {
-  padding: 24px;
-  max-width: 1280px;
+  min-height: 100vh;
+  padding: 28px 32px;
+  max-width: 1320px;
   margin: 0 auto;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background:
+    radial-gradient(ellipse at 10% 20%, rgba(51, 143, 60, 0.10), transparent 50%),
+    radial-gradient(ellipse at 90% 80%, rgba(170, 130, 220, 0.07), transparent 50%),
+    #f6f8f6;
 }
 
 .proveedores-page__header {
@@ -155,96 +161,101 @@
 
 .proveedores-page__header h2 {
   margin: 0;
-  font-size: 22px;
-  font-weight: 700;
-  color: #ecf3ee;
+  font-size: 28px;
+  font-weight: 800;
+  color: #087536;
+  letter-spacing: -0.3px;
 }
 
 .proveedores-page__subtitulo {
-  margin: 4px 0 0;
-  font-size: 14px;
+  margin: 6px 0 0;
+  font-size: 16px;
   color: #6d716e;
+  font-weight: 400;
 }
 
 /* ============================================
-   Filtros
+   Filtros - Card blanca
    ============================================ */
 
 .filtros-proveedores {
   display: flex;
-  gap: 16px;
+  gap: 20px;
   align-items: flex-end;
-  padding: 16px 20px;
+  padding: 20px 24px;
   background: #ffffff;
-  border: 1px solid #cfd2cf;
-  border-radius: 12px;
-  margin-bottom: 20px;
+  border: 1px solid #e3e9e5;
+  border-radius: 16px;
+  margin-bottom: 22px;
+  box-shadow: 0 1px 4px rgba(23, 53, 42, 0.05);
 }
 
 .filtros-proveedores .ui-field {
   flex: 1;
-  max-width: 320px;
+  max-width: 340px;
 }
 
 /* ============================================
-   Formulario
+   Formulario - Card blanca
    ============================================ */
 
 .form-proveedor {
-  padding: 24px;
+  padding: 28px;
   background: #ffffff;
-  border: 1px solid #cfd2cf;
-  border-radius: 12px;
+  border: 1px solid #e3e9e5;
+  border-radius: 16px;
+  box-shadow: 0 1px 4px rgba(23, 53, 42, 0.05);
 }
 
 .form-proveedor__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 18px;
 }
 
 .form-proveedor__acciones {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid #cfd2cf;
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid #e3e9e5;
 }
 
 /* ============================================
-   Tabla
+   Tabla - Card blanca, header verde oscuro
    ============================================ */
 
 .tabla-proveedores {
   background: #ffffff;
-  border: 1px solid #cfd2cf;
-  border-radius: 12px;
+  border: 1px solid #e3e9e5;
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 1px 4px rgba(23, 53, 42, 0.05);
 }
 
 .tabla-proveedores__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid #cfd2cf;
+  padding: 18px 24px;
+  background: #075b36;
 }
 
 .tabla-proveedores__header h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 700;
-  color: #303a33;
+  color: #ffffff;
 }
 
 .tabla-proveedores__badge {
   font-size: 12px;
   font-weight: 600;
-  padding: 4px 10px;
+  padding: 5px 14px;
   border-radius: 20px;
-  background: rgb(51 143 60 / 14%);
-  color: #338f3c;
+  background: #e7f6ec;
+  color: #19733f;
 }
 
 .tabla-proveedores__scroll {
@@ -262,56 +273,105 @@
 }
 
 .tabla-proveedores th {
-  padding: 12px 16px;
+  padding: 13px 18px;
   text-align: left;
-  font-weight: 600;
-  font-size: 12px;
+  font-weight: 700;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   color: #6d716e;
-  border-bottom: 1px solid #cfd2cf;
+  border-bottom: 1px solid #e3e9e5;
 }
 
 .tabla-proveedores td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #e9ecec;
-  color: #303a33;
+  padding: 13px 18px;
+  border-bottom: 1px solid #f0f3f1;
+  color: #17352a;
+}
+
+.tabla-proveedores tbody tr {
+  transition: background 120ms ease;
 }
 
 .tabla-proveedores tbody tr:hover {
-  background: rgb(51 143 60 / 4%);
+  background: #f2faf4;
 }
 
 .tabla-proveedores__nombre {
   font-weight: 600;
+  color: #17352a;
 }
 
 .tabla-proveedores__vacio {
   text-align: center;
-  padding: 40px 16px !important;
+  padding: 48px 18px !important;
   color: #6d716e;
   font-style: italic;
 }
 
 .tabla-proveedores__estado {
   display: inline-block;
-  padding: 3px 10px;
+  padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
 }
 
 .tabla-proveedores__estado--activo {
-  background: rgb(51 143 60 / 14%);
-  color: #338f3c;
+  background: #e7f6ec;
+  color: #19733f;
 }
 
 .tabla-proveedores__estado--inactivo {
-  background: rgb(179 38 30 / 12%);
-  color: #b3261e;
+  background: #fff0f0;
+  color: #c73b3b;
 }
 
 .tabla-proveedores__acciones {
   display: flex;
-  gap: 6px;
+  gap: 8px;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .proveedores-page {
+    padding: 20px 16px;
+  }
+
+  .proveedores-page__header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .proveedores-page__header h2 {
+    font-size: 24px;
+  }
+
+  .proveedores-page__subtitulo {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .filtros-proveedores {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .filtros-proveedores .ui-field {
+    max-width: 100%;
+  }
+
+  .form-proveedor__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tabla-proveedores__header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
 }
