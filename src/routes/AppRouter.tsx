@@ -22,6 +22,7 @@ import { UsuariosPage } from '../pages/usuarios/UsuariosPage'
 import { RolesPage } from '../pages/roles/RolesPage'
 import { ProtectedRoute } from './ProtectedRoute'
 import { RoleRoute } from './RoleRoute'
+import { ReportesKardexPage } from '../pages/reportes/ReportesKardexPage'
 
 export function AppRouter() {
   return (
@@ -45,6 +46,10 @@ export function AppRouter() {
 
           <Route element={<ProtectedRoute />}>
             <Route element={<MainLayout />}>
+              <Route element={<RoleRoute rolesPermitidos={['Administrador', 'Almacenero']} />}>
+                <Route path="/reportes" element={<Navigate to="/reportes/kardex" replace />} />
+                <Route path="/reportes/kardex" element={<ReportesKardexPage />} />
+              </Route>
               <Route
                 path="/dashboard"
                 element={<DashboardPage />}

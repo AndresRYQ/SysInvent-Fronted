@@ -508,6 +508,9 @@ function DashboardPage() {
       : modules.filter((module) => module.category === selectedCategory)
 
   const manejarAbrirModulo = (moduleTitle: string) => {
+    if (moduleTitle === 'Reporte Kardex') {
+      navigate('/reportes/kardex')
+    }
     if (moduleTitle === 'Categorías') {
       navigate('/categorias')
     }
