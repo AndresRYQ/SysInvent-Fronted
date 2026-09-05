@@ -107,4 +107,3 @@ export function FiltrosRoles({
   )
 }
 
-export type { FiltrosRolesValores }
