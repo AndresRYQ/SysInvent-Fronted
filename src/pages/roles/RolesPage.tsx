@@ -60,7 +60,7 @@ function filtrarRoles(roles: RolResumen[], filtros: FiltrosRolesValores) {
 }
 
 export function RolesPage() {
-  const [roles, setRoles] = useState<RolResumen[]>(ROLES_INICIALES)
+  const [roles] = useState<RolResumen[]>(ROLES_INICIALES)
   const [filtros, setFiltros] = useState<FiltrosRolesValores>(FILTROS_INICIALES)
   const [filtrosAplicados, setFiltrosAplicados] = useState<FiltrosRolesValores>(FILTROS_INICIALES)
   const [page, setPage] = useState(1)

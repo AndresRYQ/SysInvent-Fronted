@@ -61,7 +61,7 @@ function filtrarUsuarios(
 }
 
 export function UsuariosPage() {
-  const [usuarios, setUsuarios] = useState<UsuarioLogin[]>(
+  const [usuarios] = useState<UsuarioLogin[]>(
     () => obtenerUsuarios(),
   )
   const [filtros, setFiltros] =
