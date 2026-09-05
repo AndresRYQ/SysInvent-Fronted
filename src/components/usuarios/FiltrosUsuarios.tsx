@@ -143,4 +143,3 @@ export function FiltrosUsuarios({
   )
 }
 
-export type { FiltrosUsuariosValores }
