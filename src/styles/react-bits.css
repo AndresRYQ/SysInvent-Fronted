@@ -1,0 +1,52 @@
+.rb-animated-content {
+  animation: rb-rise-in 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--rb-delay, 0ms);
+}
+
+.rb-spotlight-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.rb-spotlight-card::before {
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 24% 18%, var(--rb-spotlight), transparent 34%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.98));
+  content: "";
+  opacity: 0.95;
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+.rb-spotlight-card:hover::before {
+  opacity: 1;
+  transform: scale(1.025);
+}
+
+@keyframes rb-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-animated-content {
+    animation: none;
+  }
+
+  .rb-spotlight-card::before {
+    transition: none;
+  }
+}
