@@ -1,18 +1,30 @@
-import { useEffect, useMemo, useState } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
 import {
   FiltrosTiposComprobante,
   type FiltrosTiposComprobanteValores,
 } from '../../components/tipos-comprobante/FiltrosTiposComprobante'
+
 import { TablaTiposComprobante } from '../../components/tipos-comprobante/TablaTiposComprobante'
 import { TipoComprobanteDeleteModal } from '../../components/tipos-comprobante/TipoComprobanteDeleteModal'
 import { TipoComprobanteFormModal } from '../../components/tipos-comprobante/TipoComprobanteFormModal'
-import type { TipoComprobante } from '../../types/tipoComprobante'
+
 import {
-  guardarStorage,
-  obtenerStorage,
-  STORAGE_KEYS,
-} from '../../services/storageService'
+  actualizarTipoDocumento,
+  crearTipoDocumento,
+  eliminarTipoDocumento,
+  obtenerTiposDocumento,
+} from '../../services/tipoComprobanteService'
+
+import type {
+  TipoComprobante,
+  TipoComprobanteFormData,
+} from '../../types/tipoComprobante'
+
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
@@ -21,103 +33,120 @@ const FILTROS_INICIALES: FiltrosTiposComprobanteValores = {
   estado: '',
 }
 
-function filtrarTiposComprobante(
-  tiposComprobante: TipoComprobante[],
+interface MensajePagina {
+  tipo: 'success' | 'danger'
+  texto: string
+}
+
+function filtrarTiposDocumento(
+  tiposDocumento: TipoComprobante[],
   filtros: FiltrosTiposComprobanteValores,
-) {
+): TipoComprobante[] {
   const nombre = filtros.nombre
     .trim()
     .toLowerCase()
 
-  return tiposComprobante
-    .filter((tipoComprobante) => {
-    const coincideNombre =
-      nombre.length === 0 ||
-      tipoComprobante.nombre
-        .toLowerCase()
-        .includes(nombre)
+  return tiposDocumento.filter(
+    (tipoDocumento) => {
+      const coincideNombre =
+        !nombre ||
+        tipoDocumento.nombre
+          .toLowerCase()
+          .includes(nombre)
 
-    const coincideEstado =
-      filtros.estado.length === 0 ||
-      (filtros.estado === 'activo' &&
-        tipoComprobante.activo === 1) ||
-      (filtros.estado === 'inactivo' &&
-        tipoComprobante.activo === 0)
+      const coincideEstado =
+        !filtros.estado ||
+        (filtros.estado === 'activo' &&
+          tipoDocumento.estado) ||
+        (filtros.estado === 'inactivo' &&
+          !tipoDocumento.estado)
 
-    return coincideNombre && coincideEstado
-    })
-    .sort((a, b) => a.id - b.id)
+      return coincideNombre && coincideEstado
+    },
+  )
+}
+
+function obtenerMensajeError(error: unknown): string {
+  return error instanceof Error
+    ? error.message
+    : 'Ocurrió un error inesperado.'
 }
 
 export function TiposComprobantePage() {
-  const [tiposComprobante, setTiposComprobante] =
-    useState<TipoComprobante[]>(() =>
-      obtenerStorage<TipoComprobante[]>(
-        STORAGE_KEYS.tiposComprobante,
-        [],
-      ).map((tipoComprobante) => ({
-        ...tipoComprobante,
-        id: Number(
-          String(tipoComprobante.id).replace('TC-', ''),
-        ),
-      })),
-    )
+  const [
+    tiposDocumento,
+    setTiposDocumento,
+  ] = useState<TipoComprobante[]>(() =>
+    obtenerTiposDocumento(),
+  )
+
   const [filtros, setFiltros] =
     useState<FiltrosTiposComprobanteValores>(
       FILTROS_INICIALES,
     )
-  const [filtrosAplicados, setFiltrosAplicados] =
-    useState<FiltrosTiposComprobanteValores>(
-      FILTROS_INICIALES,
-    )
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
-  const [modalFormOpen, setModalFormOpen] =
-    useState(false)
-  const [tipoComprobanteEnEdicion, setTipoComprobanteEnEdicion] =
-    useState<TipoComprobante | null>(null)
-  const [modalDeleteOpen, setModalDeleteOpen] =
-    useState(false)
-  const [tipoComprobanteAEliminar, setTipoComprobanteAEliminar] =
-    useState<TipoComprobante | null>(null)
-  const [modalSoloLectura, setModalSoloLectura] =
-    useState(false)
-  const [modalReactivarOpen, setModalReactivarOpen] =
-    useState(false)
-  const [tipoComprobanteAReactivar, setTipoComprobanteAReactivar] =
-    useState<TipoComprobante | null>(null)
 
-  const tiposComprobanteFiltrados = useMemo(
-    () =>
-      filtrarTiposComprobante(
-        tiposComprobante,
-        filtrosAplicados,
-      ),
-    [tiposComprobante, filtrosAplicados],
+  const [
+    filtrosAplicados,
+    setFiltrosAplicados,
+  ] = useState<FiltrosTiposComprobanteValores>(
+    FILTROS_INICIALES,
   )
 
-  const totalItems = tiposComprobanteFiltrados.length
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
-  const tiposComprobantePaginados = useMemo(() => {
-    const startIndex = (page - 1) * pageSize
-    const endIndex = startIndex + pageSize
+  const [modalFormOpen, setModalFormOpen] =
+    useState(false)
 
-    return tiposComprobanteFiltrados.slice(
-      startIndex,
-      endIndex,
-    )
-  }, [
-    tiposComprobanteFiltrados,
-    page,
-    pageSize,
-  ])
+  const [
+    tipoDocumentoEnEdicion,
+    setTipoDocumentoEnEdicion,
+  ] = useState<TipoComprobante | null>(null)
 
-  useEffect(() => {
-    guardarStorage(
-      STORAGE_KEYS.tiposComprobante,
-      tiposComprobante,
-    )
-  }, [tiposComprobante])
+  const [errorFormulario, setErrorFormulario] =
+    useState('')
+
+  const [
+    modalDeleteOpen,
+    setModalDeleteOpen,
+  ] = useState(false)
+
+  const [
+    tipoDocumentoAEliminar,
+    setTipoDocumentoAEliminar,
+  ] = useState<TipoComprobante | null>(null)
+
+  const [mensaje, setMensaje] =
+    useState<MensajePagina | null>(null)
+
+  const tiposDocumentoFiltrados = useMemo(
+    () =>
+      filtrarTiposDocumento(
+        tiposDocumento,
+        filtrosAplicados,
+      ),
+    [tiposDocumento, filtrosAplicados],
+  )
+
+  const totalItems =
+    tiposDocumentoFiltrados.length
+
+  const tiposDocumentoPaginados = useMemo(
+    () => {
+      const startIndex =
+        (page - 1) * pageSize
+
+      return tiposDocumentoFiltrados.slice(
+        startIndex,
+        startIndex + pageSize,
+      )
+    },
+    [
+      tiposDocumentoFiltrados,
+      page,
+      pageSize,
+    ],
+  )
 
   useEffect(() => {
     const totalPages = Math.max(
@@ -130,16 +159,144 @@ export function TiposComprobantePage() {
     }
   }, [page, pageSize, totalItems])
 
+  function recargarTiposDocumento(): void {
+    setTiposDocumento(
+      obtenerTiposDocumento(),
+    )
+  }
+
+  function abrirFormularioNuevo(): void {
+    setMensaje(null)
+    setErrorFormulario('')
+    setTipoDocumentoEnEdicion(null)
+    setModalFormOpen(true)
+  }
+
+  function abrirFormularioEdicion(
+    tipoDocumento: TipoComprobante,
+  ): void {
+    setMensaje(null)
+    setErrorFormulario('')
+    setTipoDocumentoEnEdicion(
+      tipoDocumento,
+    )
+    setModalFormOpen(true)
+  }
+
+  function cerrarFormulario(): void {
+    setModalFormOpen(false)
+    setTipoDocumentoEnEdicion(null)
+    setErrorFormulario('')
+  }
+
+  function guardarTipoDocumento(
+    datos: TipoComprobanteFormData,
+  ): void {
+    try {
+      if (tipoDocumentoEnEdicion) {
+        actualizarTipoDocumento(
+          tipoDocumentoEnEdicion.id,
+          datos,
+        )
+
+        setMensaje({
+          tipo: 'success',
+          texto:
+            'Tipo de documento actualizado correctamente.',
+        })
+      } else {
+        crearTipoDocumento(datos)
+
+        setMensaje({
+          tipo: 'success',
+          texto:
+            'Tipo de documento registrado correctamente.',
+        })
+      }
+
+      recargarTiposDocumento()
+      cerrarFormulario()
+      setPage(1)
+    } catch (error) {
+      setErrorFormulario(
+        obtenerMensajeError(error),
+      )
+    }
+  }
+
+  function abrirConfirmacionEliminar(
+    tipoDocumento: TipoComprobante,
+  ): void {
+    setMensaje(null)
+    setTipoDocumentoAEliminar(
+      tipoDocumento,
+    )
+    setModalDeleteOpen(true)
+  }
+
+  function cerrarConfirmacionEliminar(): void {
+    setModalDeleteOpen(false)
+    setTipoDocumentoAEliminar(null)
+  }
+
+  function confirmarEliminacion(): void {
+    if (!tipoDocumentoAEliminar) {
+      return
+    }
+
+    try {
+      eliminarTipoDocumento(
+        tipoDocumentoAEliminar.id,
+      )
+
+      recargarTiposDocumento()
+      cerrarConfirmacionEliminar()
+
+      setMensaje({
+        tipo: 'success',
+        texto:
+          'Tipo de documento eliminado correctamente.',
+      })
+    } catch (error) {
+      cerrarConfirmacionEliminar()
+
+      setMensaje({
+        tipo: 'danger',
+        texto: obtenerMensajeError(error),
+      })
+    }
+  }
+
   return (
     <>
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
-              <h1>Tipos de comprobante</h1>
-              <p>Mantenimiento de tipos de comprobante</p>
+              <h1>Tipos de documento</h1>
+
+              <p>
+                Administración de los documentos
+                utilizados en las operaciones del almacén.
+              </p>
             </div>
           </section>
+
+          {mensaje && (
+            <div
+              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
+              role="alert"
+            >
+              {mensaje.texto}
+
+              <button
+                type="button"
+                className="btn-close"
+                aria-label="Cerrar"
+                onClick={() => setMensaje(null)}
+              />
+            </div>
+          )}
 
           <div className="maestro-panel">
             <FiltrosTiposComprobante
@@ -151,12 +308,16 @@ export function TiposComprobantePage() {
                 }))
               }
               onBuscar={() => {
-                setFiltrosAplicados(filtros)
+                setFiltrosAplicados({
+                  ...filtros,
+                })
                 setPage(1)
               }}
               onLimpiar={() => {
                 setFiltros(FILTROS_INICIALES)
-                setFiltrosAplicados(FILTROS_INICIALES)
+                setFiltrosAplicados(
+                  FILTROS_INICIALES,
+                )
                 setPage(1)
               }}
             />
@@ -164,37 +325,25 @@ export function TiposComprobantePage() {
 
           <div className="maestro-panel">
             <TablaTiposComprobante
-              tiposComprobante={tiposComprobantePaginados}
+              tiposComprobante={
+                tiposDocumentoPaginados
+              }
               totalItems={totalItems}
               page={page}
               pageSize={pageSize}
-              onAgregar={() => {
-                setTipoComprobanteEnEdicion(null)
-                setModalSoloLectura(false)
-                setModalFormOpen(true)
-              }}
-              onEditar={(tipoComprobante) => {
-                setTipoComprobanteEnEdicion(tipoComprobante)
-                setModalSoloLectura(false)
-                setModalFormOpen(true)
-              }}
-              onVisualizar={(tipoComprobante) => {
-                setTipoComprobanteEnEdicion(tipoComprobante)
-                setModalSoloLectura(true)
-                setModalFormOpen(true)
-              }}
-              onEliminar={(tipoComprobante) => {
-                setTipoComprobanteAEliminar(tipoComprobante)
-                setModalDeleteOpen(true)
-              }}
-              onReactivar={(tipoComprobante) => {
-                setTipoComprobanteAReactivar(tipoComprobante)
-                setModalReactivarOpen(true)
-              }}
-              onPageChange={(nextPage) =>
-                setPage(nextPage)
+              onAgregar={
+                abrirFormularioNuevo
               }
-              onPageSizeChange={(nextPageSize) => {
+              onEditar={
+                abrirFormularioEdicion
+              }
+              onEliminar={
+                abrirConfirmacionEliminar
+              }
+              onPageChange={setPage}
+              onPageSizeChange={(
+                nextPageSize,
+              ) => {
                 setPageSize(nextPageSize)
                 setPage(1)
               }}
@@ -205,98 +354,23 @@ export function TiposComprobantePage() {
 
       <TipoComprobanteFormModal
         abierto={modalFormOpen}
-        tipoComprobante={tipoComprobanteEnEdicion}
-        soloLectura={modalSoloLectura}
-        onClose={() => {
-          setModalFormOpen(false)
-          setTipoComprobanteEnEdicion(null)
-          setModalSoloLectura(false)
-        }}
-        onSubmit={(payload) => {
-          if (tipoComprobanteEnEdicion) {
-            setTiposComprobante((actual) =>
-              actual.map((tipoComprobante) =>
-                tipoComprobante.id ===
-                tipoComprobanteEnEdicion.id
-                  ? {
-                      ...tipoComprobante,
-                      ...payload,
-                    }
-                  : tipoComprobante,
-              ),
-            )
-          } else {
-            setTiposComprobante((actual) => {
-              const ultimoId = actual.reduce(
-                (maximo, tipoComprobante) =>
-                  Number.isNaN(tipoComprobante.id)
-                    ? maximo
-                    : Math.max(maximo, tipoComprobante.id),
-                0,
-              )
-
-              return [
-                {
-                  id: ultimoId + 1,
-                  activo: 1,
-                  ...payload,
-                },
-                ...actual,
-              ]
-            })
-          }
-
-          setModalFormOpen(false)
-          setTipoComprobanteEnEdicion(null)
-          setModalSoloLectura(false)
-        }}
+        tipoComprobante={
+          tipoDocumentoEnEdicion
+        }
+        error={errorFormulario}
+        onClose={cerrarFormulario}
+        onSubmit={guardarTipoDocumento}
       />
 
       <TipoComprobanteDeleteModal
         abierto={modalDeleteOpen}
-        tipoComprobante={tipoComprobanteAEliminar}
-        onClose={() => {
-          setModalDeleteOpen(false)
-          setTipoComprobanteAEliminar(null)
-        }}
-        onConfirm={() => {
-          if (tipoComprobanteAEliminar) {
-            setTiposComprobante((actual) =>
-              actual.map((tipoComprobante) =>
-                tipoComprobante.id !== tipoComprobanteAEliminar.id
-                  ? tipoComprobante
-                  : { ...tipoComprobante, activo: 0 },
-              ),
-            )
-          }
-
-          setModalDeleteOpen(false)
-          setTipoComprobanteAEliminar(null)
-        }}
-      />
-
-      <TipoComprobanteDeleteModal
-        abierto={modalReactivarOpen}
-        tipoComprobante={tipoComprobanteAReactivar}
-        accion="reactivar"
-        onClose={() => {
-          setModalReactivarOpen(false)
-          setTipoComprobanteAReactivar(null)
-        }}
-        onConfirm={() => {
-          if (tipoComprobanteAReactivar) {
-            setTiposComprobante((actual) =>
-              actual.map((tipoComprobante) =>
-                tipoComprobante.id === tipoComprobanteAReactivar.id
-                  ? { ...tipoComprobante, activo: 1 }
-                  : tipoComprobante,
-              ),
-            )
-          }
-
-          setModalReactivarOpen(false)
-          setTipoComprobanteAReactivar(null)
-        }}
+        tipoComprobante={
+          tipoDocumentoAEliminar
+        }
+        onClose={
+          cerrarConfirmacionEliminar
+        }
+        onConfirm={confirmarEliminacion}
       />
     </>
   )

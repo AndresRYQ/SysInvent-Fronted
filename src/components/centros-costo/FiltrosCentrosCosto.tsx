@@ -47,7 +47,7 @@ export function FiltrosCentrosCosto({
               className="form-control maestro-control"
               type="text"
               value={valores.nombre}
-              placeholder="Buscar"
+              placeholder="Ej. Producción, Mantenimiento, Administración"
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }
@@ -75,7 +75,7 @@ export function FiltrosCentrosCosto({
                   setEstadoAbierto(false)
                 }}
               >
-                <option value="">Seleccionar</option>
+                <option value="">Todos</option>
                 <option value="activo">Activo</option>
                 <option value="inactivo">Inactivo</option>
               </select>

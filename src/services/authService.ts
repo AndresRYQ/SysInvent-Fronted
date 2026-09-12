@@ -1,4 +1,5 @@
 import { USUARIOS_INICIALES } from '../data/usuarios'
+import { registrarEventoBitacora } from './bitacoraService'
 
 import type {
   CredencialesLogin,
@@ -191,6 +192,12 @@ export function iniciarSesion(
 
   const usuarios = inicializarUsuarios()
 
+  const usuarioRegistrado = usuarios.find(
+    (usuario) =>
+      usuario.usuario.toLowerCase() ===
+      usuarioNormalizado,
+  )
+
   const usuarioEncontrado = usuarios.find(
     (usuario) =>
       usuario.usuario.toLowerCase() ===
@@ -217,6 +224,23 @@ export function iniciarSesion(
         usuario: usuarioNormalizado,
         intentosFallidos: nuevosIntentos,
         bloqueadoHasta,
+      })
+
+      registrarEventoBitacora({
+        modulo: 'Inicio de sesión',
+        accion: 'BLOQUEO_LOGIN',
+        detalle:
+          'Usuario bloqueado durante 5 minutos después de 3 intentos fallidos.',
+        registroId:
+          usuarioRegistrado?.id ?? null,
+        usuario:
+          usuarioNormalizado || 'sin-usuario',
+        nombreCompleto:
+          usuarioRegistrado?.nombreCompleto ??
+          'Usuario no identificado',
+        rol:
+          usuarioRegistrado?.rol ??
+          'No identificado',
       })
 
       return {
@@ -265,6 +289,14 @@ export function iniciarSesion(
     sesion,
   )
 
+  registrarEventoBitacora({
+    modulo: 'Inicio de sesión',
+    accion: 'INICIO_SESION',
+    detalle:
+      'El usuario inició sesión correctamente.',
+    registroId: sesion.id,
+  })
+
   return {
     exitoso: true,
     sesion,
@@ -287,33 +319,52 @@ export function obtenerSesion():
 
   if (
     !sesion.token ||
+    !sesion.fechaInicio ||
     !sesion.fechaExpiracion
   ) {
     cerrarSesion()
     return null
   }
 
-  // Comentado temporalmente: validaciÃ³n
-  // de expiraciÃ³n por tiempo.
-  // const fechaExpiracion = Date.parse(
-  //   sesion.fechaExpiracion,
-  // )
-  //
-  // const fechaInvalida =
-  //   Number.isNaN(fechaExpiracion)
-  //
-  // const sesionVencida =
-  //   Date.now() >= fechaExpiracion
-  //
-  // if (fechaInvalida || sesionVencida) {
-  //   cerrarSesion()
-  //   return null
-  // }
+  const fechaExpiracion = Date.parse(
+    sesion.fechaExpiracion,
+  )
+
+  const fechaInvalida =
+    Number.isNaN(fechaExpiracion)
+
+  const sesionVencida =
+    Date.now() >= fechaExpiracion
+
+  if (fechaInvalida || sesionVencida) {
+    cerrarSesion(
+      'La sesión se cerró al alcanzar el tiempo máximo de 5 minutos.',
+    )
+    return null
+  }
 
   return sesion
 }
 
-export function cerrarSesion(): void {
+export function cerrarSesion(
+  detalle =
+    'El usuario cerró la sesión manualmente.',
+): void {
+  const sesionActual =
+    obtenerStorage<SesionUsuario | null>(
+      STORAGE_KEYS.sesion,
+      null,
+    )
+
+  if (sesionActual) {
+    registrarEventoBitacora({
+      modulo: 'Inicio de sesión',
+      accion: 'CIERRE_SESION',
+      detalle,
+      registroId: sesionActual.id,
+    })
+  }
+
   eliminarStorage(STORAGE_KEYS.sesion)
 }
 

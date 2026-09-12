@@ -1,18 +1,30 @@
-import { useEffect, useMemo, useState } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
 import {
   FiltrosDestinos,
   type FiltrosDestinosValores,
 } from '../../components/destinos/FiltrosDestinos'
+
 import { TablaDestinos } from '../../components/destinos/TablaDestinos'
 import { DestinoDeleteModal } from '../../components/destinos/DestinoDeleteModal'
 import { DestinoFormModal } from '../../components/destinos/DestinoFormModal'
-import type { Destino } from '../../types/destino'
+
 import {
-  guardarStorage,
-  obtenerStorage,
-  STORAGE_KEYS,
-} from '../../services/storageService'
+  actualizarDestino,
+  crearDestino,
+  eliminarDestino,
+  obtenerDestinos,
+} from '../../services/destinoService'
+
+import type {
+  Destino,
+  DestinoFormData,
+} from '../../types/destino'
+
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
@@ -21,48 +33,94 @@ const FILTROS_INICIALES: FiltrosDestinosValores = {
   estado: '',
 }
 
-function filtrarDestinos(destinos: Destino[], filtros: FiltrosDestinosValores) {
-  const nombre = filtros.nombre.trim().toLowerCase()
+interface MensajePagina {
+  tipo: 'success' | 'danger'
+  texto: string
+}
 
-  return destinos
-    .filter((destino) => {
+function filtrarDestinos(
+  destinos: Destino[],
+  filtros: FiltrosDestinosValores,
+): Destino[] {
+  const nombre = filtros.nombre
+    .trim()
+    .toLowerCase()
+
+  return destinos.filter((destino) => {
     const coincideNombre =
-      nombre.length === 0 || destino.nombre.toLowerCase().includes(nombre)
+      !nombre ||
+      destino.nombre
+        .toLowerCase()
+        .includes(nombre)
 
     const coincideEstado =
-      filtros.estado.length === 0 ||
-      (filtros.estado === 'activo' && destino.activo === 1) ||
-      (filtros.estado === 'inactivo' && destino.activo === 0)
+      !filtros.estado ||
+      (filtros.estado === 'activo' &&
+        destino.estado) ||
+      (filtros.estado === 'inactivo' &&
+        !destino.estado)
 
     return coincideNombre && coincideEstado
-    })
-    .sort((a, b) => a.id - b.id)
+  })
+}
+
+function obtenerMensajeError(error: unknown): string {
+  return error instanceof Error
+    ? error.message
+    : 'Ocurrió un error inesperado.'
 }
 
 export function DestinosPage() {
-  const [destinos, setDestinos] = useState<Destino[]>(() =>
-    obtenerStorage<Destino[]>(STORAGE_KEYS.destinos, []).map((destino) => ({
-      ...destino,
-      id: Number(String(destino.id).replace('DES-', '')),
-    })),
-  )
+  const [destinos, setDestinos] =
+    useState<Destino[]>(() =>
+      obtenerDestinos(),
+    )
+
   const [filtros, setFiltros] =
-    useState<FiltrosDestinosValores>(FILTROS_INICIALES)
-  const [filtrosAplicados, setFiltrosAplicados] =
-    useState<FiltrosDestinosValores>(FILTROS_INICIALES)
+    useState<FiltrosDestinosValores>(
+      FILTROS_INICIALES,
+    )
+
+  const [
+    filtrosAplicados,
+    setFiltrosAplicados,
+  ] = useState<FiltrosDestinosValores>(
+    FILTROS_INICIALES,
+  )
+
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [modalFormOpen, setModalFormOpen] = useState(false)
-  const [destinoEnEdicion, setDestinoEnEdicion] =
-    useState<Destino | null>(null)
-  const [modalDeleteOpen, setModalDeleteOpen] = useState(false)
-  const [destinoAEliminar, setDestinoAEliminar] = useState<Destino | null>(null)
-  const [modalSoloLectura, setModalSoloLectura] = useState(false)
-  const [modalReactivarOpen, setModalReactivarOpen] = useState(false)
-  const [destinoAReactivar, setDestinoAReactivar] = useState<Destino | null>(null)
+
+  const [modalFormOpen, setModalFormOpen] =
+    useState(false)
+
+  const [
+    destinoEnEdicion,
+    setDestinoEnEdicion,
+  ] = useState<Destino | null>(null)
+
+  const [errorFormulario, setErrorFormulario] =
+    useState('')
+
+  const [
+    modalDeleteOpen,
+    setModalDeleteOpen,
+  ] = useState(false)
+
+  const [
+    destinoAEliminar,
+    setDestinoAEliminar,
+  ] = useState<Destino | null>(null)
+
+  const [mensaje, setMensaje] =
+    useState<MensajePagina | null>(null)
 
   const destinosFiltrados = useMemo(
-    () => filtrarDestinos(destinos, filtrosAplicados),
+    () =>
+      filtrarDestinos(
+        destinos,
+        filtrosAplicados,
+      ),
     [destinos, filtrosAplicados],
   )
 
@@ -70,22 +128,129 @@ export function DestinosPage() {
 
   const destinosPaginados = useMemo(() => {
     const startIndex = (page - 1) * pageSize
-    const endIndex = startIndex + pageSize
 
-    return destinosFiltrados.slice(startIndex, endIndex)
-  }, [destinosFiltrados, page, pageSize])
+    return destinosFiltrados.slice(
+      startIndex,
+      startIndex + pageSize,
+    )
+  }, [
+    destinosFiltrados,
+    page,
+    pageSize,
+  ])
 
   useEffect(() => {
-    guardarStorage(STORAGE_KEYS.destinos, destinos)
-  }, [destinos])
-
-  useEffect(() => {
-    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
+    const totalPages = Math.max(
+      1,
+      Math.ceil(totalItems / pageSize),
+    )
 
     if (page > totalPages) {
       setPage(totalPages)
     }
   }, [page, pageSize, totalItems])
+
+  function recargarDestinos(): void {
+    setDestinos(obtenerDestinos())
+  }
+
+  function abrirFormularioNuevo(): void {
+    setMensaje(null)
+    setErrorFormulario('')
+    setDestinoEnEdicion(null)
+    setModalFormOpen(true)
+  }
+
+  function abrirFormularioEdicion(
+    destino: Destino,
+  ): void {
+    setMensaje(null)
+    setErrorFormulario('')
+    setDestinoEnEdicion(destino)
+    setModalFormOpen(true)
+  }
+
+  function cerrarFormulario(): void {
+    setModalFormOpen(false)
+    setDestinoEnEdicion(null)
+    setErrorFormulario('')
+  }
+
+  function guardarDestino(
+    datos: DestinoFormData,
+  ): void {
+    try {
+      if (destinoEnEdicion) {
+        actualizarDestino(
+          destinoEnEdicion.id,
+          datos,
+        )
+
+        setMensaje({
+          tipo: 'success',
+          texto:
+            'Destino actualizado correctamente.',
+        })
+      } else {
+        crearDestino(datos)
+
+        setMensaje({
+          tipo: 'success',
+          texto:
+            'Destino registrado correctamente.',
+        })
+      }
+
+      recargarDestinos()
+      cerrarFormulario()
+      setPage(1)
+    } catch (error) {
+      setErrorFormulario(
+        obtenerMensajeError(error),
+      )
+    }
+  }
+
+  function abrirConfirmacionEliminar(
+    destino: Destino,
+  ): void {
+    setMensaje(null)
+    setDestinoAEliminar(destino)
+    setModalDeleteOpen(true)
+  }
+
+  function cerrarConfirmacionEliminar(): void {
+    setModalDeleteOpen(false)
+    setDestinoAEliminar(null)
+  }
+
+  function confirmarEliminacion(): void {
+    if (!destinoAEliminar) {
+      return
+    }
+
+    try {
+      eliminarDestino(
+        destinoAEliminar.id,
+      )
+
+      recargarDestinos()
+      cerrarConfirmacionEliminar()
+
+      setMensaje({
+        tipo: 'success',
+        texto:
+          'Destino eliminado correctamente.',
+      })
+    } catch (error) {
+      cerrarConfirmacionEliminar()
+
+      setMensaje({
+        tipo: 'danger',
+        texto: obtenerMensajeError(error),
+      })
+    }
+  }
 
   return (
     <>
@@ -94,9 +259,29 @@ export function DestinosPage() {
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
               <h1>Destinos</h1>
-              <p>Mantenimiento de destinos</p>
+
+              <p>
+                Administración de los destinos
+                utilizados en las operaciones del almacén.
+              </p>
             </div>
           </section>
+
+          {mensaje && (
+            <div
+              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
+              role="alert"
+            >
+              {mensaje.texto}
+
+              <button
+                type="button"
+                className="btn-close"
+                aria-label="Cerrar"
+                onClick={() => setMensaje(null)}
+              />
+            </div>
+          )}
 
           <div className="maestro-panel">
             <FiltrosDestinos
@@ -108,12 +293,16 @@ export function DestinosPage() {
                 }))
               }
               onBuscar={() => {
-                setFiltrosAplicados(filtros)
+                setFiltrosAplicados({
+                  ...filtros,
+                })
                 setPage(1)
               }}
               onLimpiar={() => {
                 setFiltros(FILTROS_INICIALES)
-                setFiltrosAplicados(FILTROS_INICIALES)
+                setFiltrosAplicados(
+                  FILTROS_INICIALES,
+                )
                 setPage(1)
               }}
             />
@@ -125,31 +314,19 @@ export function DestinosPage() {
               totalItems={totalItems}
               page={page}
               pageSize={pageSize}
-              onAgregar={() => {
-                setDestinoEnEdicion(null)
-                setModalSoloLectura(false)
-                setModalFormOpen(true)
-              }}
-              onEditar={(destino) => {
-                setDestinoEnEdicion(destino)
-                setModalSoloLectura(false)
-                setModalFormOpen(true)
-              }}
-              onVisualizar={(destino) => {
-                setDestinoEnEdicion(destino)
-                setModalSoloLectura(true)
-                setModalFormOpen(true)
-              }}
-              onEliminar={(destino) => {
-                setDestinoAEliminar(destino)
-                setModalDeleteOpen(true)
-              }}
-              onReactivar={(destino) => {
-                setDestinoAReactivar(destino)
-                setModalReactivarOpen(true)
-              }}
-              onPageChange={(nextPage) => setPage(nextPage)}
-              onPageSizeChange={(nextPageSize) => {
+              onAgregar={
+                abrirFormularioNuevo
+              }
+              onEditar={
+                abrirFormularioEdicion
+              }
+              onEliminar={
+                abrirConfirmacionEliminar
+              }
+              onPageChange={setPage}
+              onPageSizeChange={(
+                nextPageSize,
+              ) => {
                 setPageSize(nextPageSize)
                 setPage(1)
               }}
@@ -161,92 +338,18 @@ export function DestinosPage() {
       <DestinoFormModal
         abierto={modalFormOpen}
         destino={destinoEnEdicion}
-        soloLectura={modalSoloLectura}
-        onClose={() => {
-          setModalFormOpen(false)
-          setDestinoEnEdicion(null)
-          setModalSoloLectura(false)
-        }}
-        onSubmit={(payload) => {
-          if (destinoEnEdicion) {
-            setDestinos((actual) =>
-              actual.map((destino) =>
-                destino.id === destinoEnEdicion.id
-                  ? { ...destino, ...payload }
-                  : destino,
-              ),
-            )
-          } else {
-            setDestinos((actual) => {
-              const ultimoId = actual.reduce(
-                (maximo, destino) =>
-                  Number.isNaN(destino.id)
-                    ? maximo
-                    : Math.max(maximo, destino.id),
-                0,
-              )
-
-              return [
-                {
-                  id: ultimoId + 1,
-                  activo: 1,
-                  ...payload,
-                },
-                ...actual,
-              ]
-            })
-          }
-
-          setModalFormOpen(false)
-          setDestinoEnEdicion(null)
-          setModalSoloLectura(false)
-        }}
+        error={errorFormulario}
+        onClose={cerrarFormulario}
+        onSubmit={guardarDestino}
       />
 
       <DestinoDeleteModal
         abierto={modalDeleteOpen}
         destino={destinoAEliminar}
-        onClose={() => {
-          setModalDeleteOpen(false)
-          setDestinoAEliminar(null)
-        }}
-        onConfirm={() => {
-          if (destinoAEliminar) {
-            setDestinos((actual) =>
-              actual.map((destino) =>
-                destino.id !== destinoAEliminar.id
-                  ? destino
-                  : { ...destino, activo: 0 },
-              ),
-            )
-          }
-
-          setModalDeleteOpen(false)
-          setDestinoAEliminar(null)
-        }}
-      />
-
-      <DestinoDeleteModal
-        abierto={modalReactivarOpen}
-        destino={destinoAReactivar}
-        accion="reactivar"
-        onClose={() => {
-          setModalReactivarOpen(false)
-          setDestinoAReactivar(null)
-        }}
-        onConfirm={() => {
-          if (destinoAReactivar) {
-            setDestinos((actual) =>
-              actual.map((destino) =>
-                destino.id === destinoAReactivar.id
-                  ? { ...destino, activo: 1 }
-                  : destino,
-              ),
-            )
-          }
-          setModalReactivarOpen(false)
-          setDestinoAReactivar(null)
-        }}
+        onClose={
+          cerrarConfirmacionEliminar
+        }
+        onConfirm={confirmarEliminacion}
       />
     </>
   )

@@ -47,7 +47,7 @@ export function FiltrosUnidadesMedida({
               className="form-control maestro-control"
               type="text"
               value={valores.nombre}
-              placeholder="Buscar"
+              placeholder="Ej. Unidad, Kilogramo, Litro, Metro"
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }
@@ -75,7 +75,7 @@ export function FiltrosUnidadesMedida({
                   setEstadoAbierto(false)
                 }}
               >
-                <option value="">Seleccionar</option>
+                <option value="">Todos</option>
                 <option value="activo">Activo</option>
                 <option value="inactivo">Inactivo</option>
               </select>
