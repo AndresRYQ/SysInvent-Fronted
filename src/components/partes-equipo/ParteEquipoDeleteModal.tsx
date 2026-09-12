@@ -1,4 +1,4 @@
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Check, X } from 'lucide-react'
 
 import type { ParteEquipo } from '../../types/parteEquipo'
 
@@ -7,6 +7,7 @@ interface ParteEquipoDeleteModalProps {
   parteEquipo: ParteEquipo | null
   onClose: () => void
   onConfirm: () => void
+  modo?: 'desactivar' | 'reactivar'
 }
 
 export function ParteEquipoDeleteModal({
@@ -14,6 +15,7 @@ export function ParteEquipoDeleteModal({
   parteEquipo,
   onClose,
   onConfirm,
+  modo = 'desactivar',
 }: ParteEquipoDeleteModalProps) {
   if (!abierto || !parteEquipo) {
     return null
@@ -21,9 +23,8 @@ export function ParteEquipoDeleteModal({
 
   return (
     <div
-      className="maestro-modal-backdrop"
+      className="maestro-modal-backdrop partes-equipo-page"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="maestro-modal-card maestro-modal-card--sm"
@@ -42,12 +43,11 @@ export function ParteEquipoDeleteModal({
           id="parte-equipo-delete-title"
           className="maestro-modal-title text-center"
         >
-          Confirmar eliminación
+          {modo === 'reactivar' ? 'Confirmar reactivación' : 'Confirmar desactivación'}
         </h3>
 
         <p className="maestro-modal-copy text-center mb-0">
-          ¿Seguro que quieres eliminar esta
-          parte de equipo?
+          {modo === 'reactivar' ? '¿Desea reactivar esta parte de equipo?' : '¿Desea desactivar esta parte de equipo?'}
         </p>
 
         <p className="maestro-delete-name">
@@ -58,18 +58,20 @@ export function ParteEquipoDeleteModal({
         <div className="maestro-modal-footer maestro-modal-footer--center">
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn maestro-btn-danger"
             onClick={onClose}
           >
+            <X size={18} />
             Cancelar
           </button>
 
           <button
             type="button"
-            className="btn maestro-btn-danger"
+            className="btn maestro-btn-primary"
             onClick={onConfirm}
           >
-            Aceptar
+            <Check size={18} />
+            {modo === 'reactivar' ? 'Reactivar' : 'Aceptar'}
           </button>
         </div>
       </div>

@@ -1,9 +1,5 @@
-import {
-  ChevronDown,
-  Filter,
-  RotateCcw,
-  Search,
-} from 'lucide-react'
+import { Filter, RotateCcw, Search } from 'lucide-react'
+import { MaestroEstadoSelect } from '../common/MaestroEstadoSelect'
 
 export interface FiltrosPartesEquipoValores {
   busqueda: string
@@ -56,7 +52,7 @@ export function FiltrosPartesEquipo({
               className="form-control maestro-control"
               type="text"
               value={valores.busqueda}
-              placeholder="Ej. MOT-001 o Motor principal"
+              placeholder="Buscar"
               onChange={(event) =>
                 onChange(
                   'busqueda',
@@ -74,33 +70,11 @@ export function FiltrosPartesEquipo({
               Estado
             </label>
 
-            <div className="maestro-select-wrap">
-              <select
-                id="estadoParteEquipo"
-                className="form-select maestro-control maestro-select-control"
-                value={valores.estado}
-                onChange={(event) =>
-                  onChange(
-                    'estado',
-                    event.target.value,
-                  )
-                }
-              >
-                <option value="">
-                  Todos
-                </option>
-
-                <option value="activo">
-                  Activo
-                </option>
-
-                <option value="inactivo">
-                  Inactivo
-                </option>
-              </select>
-
-              <ChevronDown size={16} />
-            </div>
+            <MaestroEstadoSelect
+              inputId="estadoParteEquipo"
+              value={valores.estado}
+              onChange={(value) => onChange('estado', value)}
+            />
           </div>
 
           <div className="col-12">

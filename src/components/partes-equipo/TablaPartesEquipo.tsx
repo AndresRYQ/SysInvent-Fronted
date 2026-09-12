@@ -2,7 +2,8 @@ import {
   Boxes,
   Pencil,
   Plus,
-  ShieldCheck,
+  RotateCcw,
+  Eye,
   Trash2,
 } from 'lucide-react'
 
@@ -22,6 +23,12 @@ interface TablaPartesEquipoProps {
   onEliminar: (
     parteEquipo: ParteEquipo,
   ) => void
+  onReactivar: (
+    parteEquipo: ParteEquipo,
+  ) => void
+  onVisualizar: (
+    parteEquipo: ParteEquipo,
+  ) => void
   onPageChange: (
     page: number,
   ) => void
@@ -38,6 +45,8 @@ export function TablaPartesEquipo({
   onAgregar,
   onEditar,
   onEliminar,
+  onReactivar,
+  onVisualizar,
   onPageChange,
   onPageSizeChange,
 }: TablaPartesEquipoProps) {
@@ -64,7 +73,7 @@ export function TablaPartesEquipo({
           <table className="table maestro-table align-middle mb-0">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>N°</th>
                 <th>Código</th>
                 <th>Nombre</th>
                 <th>Descripción</th>
@@ -83,7 +92,7 @@ export function TablaPartesEquipo({
                     <tr key={parte.id}>
                       <td>
                         <span className="maestro-id-chip">
-                          {parte.id}
+                          {Number(parte.id)}
                         </span>
                       </td>
 
@@ -123,8 +132,9 @@ export function TablaPartesEquipo({
                               : 'maestro-status maestro-status--inactive'
                           }
                         >
-                          <ShieldCheck
-                            size={14}
+                          <span
+                            className="maestro-status__dot"
+                            aria-hidden="true"
                           />
 
                           {parte.estado
@@ -135,7 +145,7 @@ export function TablaPartesEquipo({
 
                       <td>
                         <div className="maestro-actions">
-                          <button
+                          {parte.estado ? <button
                             type="button"
                             className="btn maestro-action-btn"
                             title="Editar"
@@ -147,9 +157,9 @@ export function TablaPartesEquipo({
                             <Pencil
                               size={16}
                             />
-                          </button>
+                          </button> : <><button type="button" className="btn maestro-action-btn" title="Visualizar" aria-label={`Visualizar ${parte.nombre}`} onClick={() => onVisualizar(parte)}><Eye size={16} /></button><button type="button" className="btn maestro-action-btn" title="Reactivar" aria-label={`Reactivar ${parte.nombre}`} onClick={() => onReactivar(parte)}><RotateCcw size={16} /></button></>}
 
-                          <button
+                          {parte.estado && <button
                             type="button"
                             className="btn maestro-action-btn maestro-action-btn--danger"
                             title="Eliminar"
@@ -161,7 +171,7 @@ export function TablaPartesEquipo({
                             <Trash2
                               size={16}
                             />
-                          </button>
+                          </button>}
                         </div>
                       </td>
                     </tr>

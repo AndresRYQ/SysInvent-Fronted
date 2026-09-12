@@ -18,6 +18,7 @@ import {
   crearParteEquipo,
   eliminarParteEquipo,
   obtenerPartesEquipo,
+  reactivarParteEquipo,
 } from '../../services/parteEquipoService'
 
 import type {
@@ -33,11 +34,6 @@ const FILTROS_INICIALES:
     busqueda: '',
     estado: '',
   }
-
-interface MensajePagina {
-  tipo: 'success' | 'danger'
-  texto: string
-}
 
 function filtrarPartesEquipo(
   partesEquipo: ParteEquipo[],
@@ -118,12 +114,16 @@ export function PartesEquipoPage() {
     setFormularioAbierto,
   ] = useState(false)
 
+  const [modoConfirmacion, setModoConfirmacion] = useState<'desactivar' | 'reactivar'>('desactivar')
+
   const [
     parteEnEdicion,
     setParteEnEdicion,
   ] = useState<ParteEquipo | null>(
     null,
   )
+
+  const [soloLectura, setSoloLectura] = useState(false)
 
   const [
     errorFormulario,
@@ -141,11 +141,6 @@ export function PartesEquipoPage() {
   ] = useState<ParteEquipo | null>(
     null,
   )
-
-  const [mensaje, setMensaje] =
-    useState<MensajePagina | null>(
-      null,
-    )
 
   const partesFiltradas =
     useMemo(
@@ -202,24 +197,32 @@ export function PartesEquipoPage() {
   }
 
   function abrirFormularioNuevo(): void {
-    setMensaje(null)
     setErrorFormulario('')
     setParteEnEdicion(null)
+    setSoloLectura(false)
     setFormularioAbierto(true)
   }
 
   function abrirFormularioEdicion(
     parte: ParteEquipo,
   ): void {
-    setMensaje(null)
     setErrorFormulario('')
     setParteEnEdicion(parte)
+    setSoloLectura(false)
+    setFormularioAbierto(true)
+  }
+
+  function abrirVisualizacion(parte: ParteEquipo): void {
+    setErrorFormulario('')
+    setParteEnEdicion(parte)
+    setSoloLectura(true)
     setFormularioAbierto(true)
   }
 
   function cerrarFormulario(): void {
     setFormularioAbierto(false)
     setParteEnEdicion(null)
+    setSoloLectura(false)
     setErrorFormulario('')
   }
 
@@ -233,19 +236,8 @@ export function PartesEquipoPage() {
           datos,
         )
 
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Parte de equipo actualizada correctamente.',
-        })
       } else {
         crearParteEquipo(datos)
-
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Parte de equipo registrada correctamente.',
-        })
       }
 
       recargarPartes()
@@ -261,8 +253,14 @@ export function PartesEquipoPage() {
   function abrirConfirmacionEliminar(
     parte: ParteEquipo,
   ): void {
-    setMensaje(null)
     setParteAEliminar(parte)
+    setModoConfirmacion('desactivar')
+    setEliminarAbierto(true)
+  }
+
+  function abrirConfirmacionReactivar(parte: ParteEquipo): void {
+    setParteAEliminar(parte)
+    setModoConfirmacion('reactivar')
     setEliminarAbierto(true)
   }
 
@@ -278,31 +276,24 @@ export function PartesEquipoPage() {
     }
 
     try {
-      eliminarParteEquipo(
-        parteAEliminar.id,
-      )
+      if (modoConfirmacion === 'reactivar') {
+        reactivarParteEquipo(parteAEliminar.id)
+      } else {
+        eliminarParteEquipo(parteAEliminar.id)
+      }
 
       recargarPartes()
       cerrarConfirmacionEliminar()
 
-      setMensaje({
-        tipo: 'success',
-        texto:
-          'Parte de equipo eliminada correctamente.',
-      })
     } catch (error) {
       cerrarConfirmacionEliminar()
-
-      setMensaje({
-        tipo: 'danger',
-        texto:
-          obtenerMensajeError(error),
-      })
+      console.error(obtenerMensajeError(error))
     }
   }
 
   return (
     <>
+      <div className="partes-equipo-page">
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
@@ -316,24 +307,6 @@ export function PartesEquipoPage() {
               </p>
             </div>
           </section>
-
-          {mensaje && (
-            <div
-              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
-              role="alert"
-            >
-              {mensaje.texto}
-
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={() =>
-                  setMensaje(null)
-                }
-              />
-            </div>
-          )}
 
           <div className="maestro-panel">
             <FiltrosPartesEquipo
@@ -386,6 +359,12 @@ export function PartesEquipoPage() {
               onEliminar={
                 abrirConfirmacionEliminar
               }
+              onReactivar={
+                abrirConfirmacionReactivar
+              }
+              onVisualizar={
+                abrirVisualizacion
+              }
               onPageChange={setPage}
               onPageSizeChange={(
                 cantidad,
@@ -397,11 +376,13 @@ export function PartesEquipoPage() {
           </div>
         </div>
       </main>
+      </div>
 
       <FormularioParteEquipo
         abierto={formularioAbierto}
         parteEquipo={parteEnEdicion}
         error={errorFormulario}
+        soloLectura={soloLectura}
         onClose={cerrarFormulario}
         onSubmit={guardarParte}
       />
@@ -415,6 +396,7 @@ export function PartesEquipoPage() {
         onConfirm={
           confirmarEliminacion
         }
+        modo={modoConfirmacion}
       />
     </>
   )

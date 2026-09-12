@@ -8,13 +8,12 @@ import { registrarEventoBitacora } from './bitacoraService'
 const STORAGE_KEY =
   'agrihusac_partes_equipo'
 
-const INGRESOS_STORAGE_KEY =
-  'agrihusac_ingresos_almacen'
+type RegistroGuardado = Partial<ParteEquipo> & { id?: number | string }
 
 const PARTES_INICIALES:
   ParteEquipo[] = [
     {
-      id: 'PE-001',
+      id: 1,
       codigo: 'MOT-001',
       nombre: 'Motor principal',
       descripcion:
@@ -23,7 +22,7 @@ const PARTES_INICIALES:
       fechaRegistro: '10/08/2026',
     },
     {
-      id: 'PE-002',
+      id: 2,
       codigo: 'SIS-HID-001',
       nombre: 'Sistema hidráulico',
       descripcion:
@@ -32,7 +31,7 @@ const PARTES_INICIALES:
       fechaRegistro: '11/08/2026',
     },
     {
-      id: 'PE-003',
+      id: 3,
       codigo: 'TAB-ELE-001',
       nombre: 'Tablero eléctrico',
       descripcion:
@@ -41,7 +40,7 @@ const PARTES_INICIALES:
       fechaRegistro: '12/08/2026',
     },
     {
-      id: 'PE-004',
+      id: 4,
       codigo: 'BOM-001',
       nombre: 'Bomba de agua',
       descripcion:
@@ -50,7 +49,7 @@ const PARTES_INICIALES:
       fechaRegistro: '13/08/2026',
     },
     {
-      id: 'PE-005',
+      id: 5,
       codigo: 'TRA-001',
       nombre: 'Sistema de transmisión',
       descripcion:
@@ -63,9 +62,22 @@ const PARTES_INICIALES:
 function copiarPartes(
   partes: ParteEquipo[],
 ): ParteEquipo[] {
-  return partes.map((parte) => ({
-    ...parte,
-  }))
+  return partes.map((parte) => ({ ...parte })).sort((a, b) => a.id - b.id)
+}
+
+function normalizarParte(registro: RegistroGuardado): ParteEquipo | null {
+  const id = typeof registro.id === 'number'
+    ? registro.id
+    : Number(String(registro.id ?? '').match(/\d+/)?.[0] ?? '')
+  if (!Number.isInteger(id) || id <= 0 || !registro.nombre) return null
+  return {
+    id,
+    codigo: String(registro.codigo ?? '').trim(),
+    nombre: String(registro.nombre).trim(),
+    descripcion: String(registro.descripcion ?? '').trim(),
+    estado: registro.estado !== false,
+    fechaRegistro: String(registro.fechaRegistro ?? ''),
+  }
 }
 
 function guardarPartes(
@@ -93,24 +105,8 @@ function crearFechaActual(): string {
 
 function crearSiguienteId(
   partes: ParteEquipo[],
-): string {
-  const numeroMayor =
-    partes.reduce(
-      (mayor, parte) => {
-        const numero = Number(
-          parte.id.replace('PE-', ''),
-        )
-
-        return Number.isNaN(numero)
-          ? mayor
-          : Math.max(mayor, numero)
-      },
-      0,
-    )
-
-  return `PE-${String(
-    numeroMayor + 1,
-  ).padStart(3, '0')}`
+): number {
+  return partes.reduce((mayor, parte) => Math.max(mayor, parte.id), 0) + 1
 }
 
 function validarDatos(
@@ -157,39 +153,6 @@ function validarDatos(
   }
 }
 
-function parteEstaEnUso(
-  parteEquipoId: string,
-): boolean {
-  try {
-    const datosGuardados =
-      localStorage.getItem(
-        INGRESOS_STORAGE_KEY,
-      )
-
-    if (!datosGuardados) {
-      return false
-    }
-
-    const ingresos = JSON.parse(
-      datosGuardados,
-    )
-
-    if (!Array.isArray(ingresos)) {
-      return false
-    }
-
-    return ingresos.some(
-      (ingreso) =>
-        typeof ingreso === 'object' &&
-        ingreso !== null &&
-        ingreso.parteEquipoId ===
-          parteEquipoId,
-    )
-  } catch {
-    return false
-  }
-}
-
 export function obtenerPartesEquipo():
   ParteEquipo[] {
   const datosGuardados =
@@ -216,9 +179,11 @@ export function obtenerPartesEquipo():
       )
     }
 
-    return copiarPartes(
-      datos as ParteEquipo[],
-    )
+    const normalizados = datos
+      .map((registro) => normalizarParte(registro as RegistroGuardado))
+      .filter((parte): parte is ParteEquipo => Boolean(parte))
+    guardarPartes(normalizados)
+    return copiarPartes(normalizados)
   } catch {
     guardarPartes(
       PARTES_INICIALES,
@@ -231,7 +196,7 @@ export function obtenerPartesEquipo():
 }
 
 export function obtenerParteEquipoPorId(
-  id: string,
+  id: number,
 ): ParteEquipo | null {
   const parte =
     obtenerPartesEquipo().find(
@@ -290,7 +255,7 @@ export function crearParteEquipo(
     nombre: datos.nombre.trim(),
     descripcion:
       datos.descripcion.trim(),
-    estado: datos.estado,
+    estado: true,
     fechaRegistro:
       crearFechaActual(),
   }
@@ -305,14 +270,14 @@ export function crearParteEquipo(
     accion: 'CREAR',
     detalle:
       `Se creó la parte de equipo "${nuevaParte.nombre}" con código ${nuevaParte.codigo}.`,
-    registroId: nuevaParte.id,
+    registroId: String(nuevaParte.id),
   })
 
   return { ...nuevaParte }
 }
 
 export function actualizarParteEquipo(
-  id: string,
+  id: number,
   datos: ParteEquipoFormData,
 ): ParteEquipo {
   validarDatos(datos)
@@ -374,7 +339,7 @@ export function actualizarParteEquipo(
       nombre: datos.nombre.trim(),
       descripcion:
         datos.descripcion.trim(),
-      estado: datos.estado,
+      estado: parteActual.estado,
     }
 
   guardarPartes(
@@ -390,15 +355,14 @@ export function actualizarParteEquipo(
     accion: 'EDITAR',
     detalle:
       `Se actualizó la parte de equipo "${parteActualizada.nombre}".`,
-    registroId:
-      parteActualizada.id,
+    registroId: String(parteActualizada.id),
   })
 
   return { ...parteActualizada }
 }
 
 export function eliminarParteEquipo(
-  id: string,
+  id: number,
 ): void {
   const partes =
     obtenerPartesEquipo()
@@ -413,23 +377,24 @@ export function eliminarParteEquipo(
     )
   }
 
-  if (parteEstaEnUso(id)) {
-    throw new Error(
-      'No puedes eliminar esta parte porque está asignada a uno o más ingresos de almacén. Puedes desactivarla.',
-    )
-  }
-
   guardarPartes(
-    partes.filter(
-      (item) => item.id !== id,
+    partes.map((item) =>
+      item.id === id ? { ...item, estado: false } : item,
     ),
   )
 
   registrarEventoBitacora({
     modulo: 'Partes de equipo',
-    accion: 'ELIMINAR',
+    accion: 'EDITAR',
     detalle:
-      `Se eliminó la parte de equipo "${parte.nombre}".`,
-    registroId: parte.id,
+      `Se desactivó la parte de equipo "${parte.nombre}".`,
+    registroId: String(parte.id),
   })
+}
+
+export function reactivarParteEquipo(id: number): void {
+  const partes = obtenerPartesEquipo()
+  const parte = partes.find((item) => item.id === id)
+  if (!parte) throw new Error('La parte de equipo no existe.')
+  guardarPartes(partes.map((item) => item.id === id ? { ...item, estado: true } : item))
 }

@@ -16,6 +16,7 @@ import type {
 interface FormularioParteEquipoProps {
   abierto: boolean
   parteEquipo: ParteEquipo | null
+  soloLectura?: boolean
   error: string
   onClose: () => void
   onSubmit: (
@@ -47,6 +48,7 @@ const ERRORES_INICIALES:
 export function FormularioParteEquipo({
   abierto,
   parteEquipo,
+  soloLectura = false,
   error,
   onClose,
   onSubmit,
@@ -150,7 +152,6 @@ export function FormularioParteEquipo({
     <div
       className="maestro-modal-backdrop"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="maestro-modal-card"
@@ -167,16 +168,11 @@ export function FormularioParteEquipo({
               id="parte-equipo-form-title"
               className="maestro-modal-title"
             >
-              {parteEquipo
+              {soloLectura ? 'Visualizar parte de equipo' : parteEquipo
                 ? 'Editar parte de equipo'
                 : 'Registrar parte de equipo'}
             </h3>
 
-            <p className="maestro-modal-copy mb-0">
-              Completa la información de la
-              parte que será utilizada en
-              los movimientos del almacén.
-            </p>
           </div>
 
           <button
@@ -207,11 +203,11 @@ export function FormularioParteEquipo({
                 form.nombre.trim(),
               descripcion:
                 form.descripcion.trim(),
-              estado: form.estado,
             })
           }}
         >
-          <div className="maestro-modal-body">
+          <div className={`maestro-modal-body${soloLectura ? ' modo-visualizacion' : ''}`}>
+            <fieldset disabled={soloLectura}>
             {error && (
               <div
                 className="alert alert-danger py-2"
@@ -373,47 +369,14 @@ export function FormularioParteEquipo({
                 </div>
               </div>
 
-              <div className="col-12">
-                <label
-                  className="form-label maestro-label"
-                  htmlFor="parteEquipoEstado"
-                >
-                  Estado
-                </label>
-
-                <select
-                  id="parteEquipoEstado"
-                  className="form-select maestro-control"
-                  value={
-                    form.estado
-                      ? 'activo'
-                      : 'inactivo'
-                  }
-                  onChange={(event) =>
-                    setForm((actual) => ({
-                      ...actual,
-                      estado:
-                        event.target.value ===
-                        'activo',
-                    }))
-                  }
-                >
-                  <option value="activo">
-                    Activo
-                  </option>
-
-                  <option value="inactivo">
-                    Inactivo
-                  </option>
-                </select>
-              </div>
             </div>
+            </fieldset>
           </div>
 
-          <div className="maestro-modal-footer">
+          {!soloLectura && <div className="maestro-modal-footer">
             <button
               type="button"
-              className="btn maestro-btn-secondary"
+              className="btn maestro-btn-danger"
               onClick={onClose}
             >
               <X size={18} />
@@ -430,7 +393,7 @@ export function FormularioParteEquipo({
                 ? 'Guardar cambios'
                 : 'Registrar'}
             </button>
-          </div>
+          </div>}
         </form>
       </div>
     </div>
