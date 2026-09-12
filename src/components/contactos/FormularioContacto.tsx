@@ -7,6 +7,7 @@ import {
   Save,
   X,
 } from 'lucide-react'
+import Select from 'react-select'
 
 import type {
   Contacto,
@@ -18,6 +19,7 @@ import type { Proveedor } from '../../types/proveedor'
 interface FormularioContactoProps {
   abierto: boolean
   contacto: Contacto | null
+  soloLectura?: boolean
   proveedores: Proveedor[]
   error: string
   onClose: () => void
@@ -40,7 +42,6 @@ const FORM_INICIAL: ContactoFormData = {
   cargo: '',
   telefono: '',
   correo: '',
-  estado: true,
 }
 
 const ERRORES_INICIALES:
@@ -52,9 +53,34 @@ const ERRORES_INICIALES:
     correo: '',
   }
 
+const estilosSelect = (tieneError: boolean) => ({
+  control: (base: any, state: any) => ({
+    ...base,
+    minHeight: 36,
+    height: 36,
+    borderRadius: 8,
+    borderColor: tieneError ? '#dc2626' : state.isFocused ? '#198754' : '#dee2e6',
+    boxShadow: tieneError
+      ? '0 0 0 3px rgb(220 38 38 / 14%)'
+      : state.isFocused
+        ? '0 0 0 3px rgb(25 135 84 / 14%)'
+        : 'none',
+    '&:hover': { borderColor: tieneError ? '#dc2626' : '#198754' },
+  }),
+  valueContainer: (base: any) => ({ ...base, fontSize: '.8rem' }),
+  menu: (base: any) => ({ ...base, zIndex: 20 }),
+  option: (base: any, state: any) => ({
+    ...base,
+    fontSize: '.8rem',
+    backgroundColor: state.isSelected ? '#198754' : state.isFocused ? '#e9f5ee' : '#fff',
+    color: state.isSelected ? '#fff' : '#212529',
+  }),
+})
+
 export function FormularioContacto({
   abierto,
   contacto,
+  soloLectura = false,
   proveedores,
   error,
   onClose,
@@ -84,7 +110,6 @@ export function FormularioContacto({
         cargo: contacto.cargo,
         telefono: contacto.telefono,
         correo: contacto.correo,
-        estado: contacto.estado,
       })
     } else {
       setForm(FORM_INICIAL)
@@ -177,9 +202,8 @@ export function FormularioContacto({
 
   return (
     <div
-      className="maestro-modal-backdrop"
+      className="maestro-modal-backdrop contactos-page"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="maestro-modal-card"
@@ -196,15 +220,11 @@ export function FormularioContacto({
               id="contacto-form-title"
               className="maestro-modal-title"
             >
-              {contacto
+              {soloLectura ? 'Visualizar contacto' : contacto
                 ? 'Editar contacto'
                 : 'Registrar contacto'}
             </h3>
 
-            <p className="maestro-modal-copy mb-0">
-              Registra el contacto comercial
-              asociado a un proveedor.
-            </p>
           </div>
 
           <button
@@ -238,11 +258,11 @@ export function FormularioContacto({
                 form.correo
                   .trim()
                   .toLowerCase(),
-              estado: form.estado,
             })
           }}
         >
-          <div className="maestro-modal-body">
+          <div className={`maestro-modal-body${soloLectura ? ' modo-visualizacion' : ''}`}>
+            <fieldset disabled={soloLectura}>
             {error && (
               <div
                 className="alert alert-danger py-2"
@@ -263,42 +283,35 @@ export function FormularioContacto({
                 </span>
               </label>
 
-              <select
-                id="contactoProveedor"
-                className={`form-select maestro-control${
-                  errores.proveedorId
-                    ? ' maestro-control--error'
-                    : ''
-                }`}
-                value={form.proveedorId}
-                onChange={(event) => {
+              <Select
+                inputId="contactoProveedor"
+                options={proveedores.map((proveedor) => ({
+                  value: String(proveedor.id),
+                  label: proveedor.razonSocial,
+                }))}
+                value={proveedores
+                  .map((proveedor) => ({
+                    value: String(proveedor.id),
+                    label: proveedor.razonSocial,
+                  }))
+                  .find((opcion) => opcion.value === form.proveedorId) ?? null}
+                onChange={(opcion) => {
                   setForm((actual) => ({
                     ...actual,
                     proveedorId:
-                      event.target.value,
+                      opcion?.value ?? '',
                   }))
 
-                  setErrores((actual) => ({
-                    ...actual,
-                    proveedorId: '',
-                  }))
+                setErrores((actual) => ({
+                  ...actual,
+                  proveedorId: '',
+                }))
                 }}
-              >
-                <option value="">
-                  Selecciona un proveedor
-                </option>
-
-                {proveedores.map(
-                  (proveedor) => (
-                    <option
-                      key={proveedor.id}
-                      value={proveedor.id}
-                    >
-                      {proveedor.razonSocial}
-                    </option>
-                  ),
-                )}
-              </select>
+                placeholder="Seleccionar"
+                isClearable
+                isSearchable
+                styles={estilosSelect(Boolean(errores.proveedorId))}
+              />
 
               {errores.proveedorId && (
                 <div className="maestro-field-error">
@@ -492,47 +505,14 @@ export function FormularioContacto({
                 )}
               </div>
 
-              <div className="col-12">
-                <label
-                  className="form-label maestro-label"
-                  htmlFor="contactoEstado"
-                >
-                  Estado
-                </label>
-
-                <select
-                  id="contactoEstado"
-                  className="form-select maestro-control"
-                  value={
-                    form.estado
-                      ? 'activo'
-                      : 'inactivo'
-                  }
-                  onChange={(event) =>
-                    setForm((actual) => ({
-                      ...actual,
-                      estado:
-                        event.target.value ===
-                        'activo',
-                    }))
-                  }
-                >
-                  <option value="activo">
-                    Activo
-                  </option>
-
-                  <option value="inactivo">
-                    Inactivo
-                  </option>
-                </select>
-              </div>
             </div>
+            </fieldset>
           </div>
 
-          <div className="maestro-modal-footer">
+          {!soloLectura && <div className="maestro-modal-footer">
             <button
               type="button"
-              className="btn maestro-btn-secondary"
+              className="btn maestro-btn-danger"
               onClick={onClose}
             >
               <X size={18} />
@@ -549,7 +529,7 @@ export function FormularioContacto({
                 ? 'Guardar cambios'
                 : 'Registrar'}
             </button>
-          </div>
+          </div>}
         </form>
       </div>
     </div>

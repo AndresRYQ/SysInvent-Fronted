@@ -1,4 +1,4 @@
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Check, X } from 'lucide-react'
 
 import type { Contacto } from '../../types/contacto'
 
@@ -7,6 +7,7 @@ interface ContactoDeleteModalProps {
   contacto: Contacto | null
   onClose: () => void
   onConfirm: () => void
+  modo?: 'desactivar' | 'reactivar'
 }
 
 export function ContactoDeleteModal({
@@ -14,6 +15,7 @@ export function ContactoDeleteModal({
   contacto,
   onClose,
   onConfirm,
+  modo = 'desactivar',
 }: ContactoDeleteModalProps) {
   if (!abierto || !contacto) {
     return null
@@ -21,9 +23,8 @@ export function ContactoDeleteModal({
 
   return (
     <div
-      className="maestro-modal-backdrop"
+      className="maestro-modal-backdrop contactos-page"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="maestro-modal-card maestro-modal-card--sm"
@@ -42,12 +43,11 @@ export function ContactoDeleteModal({
           id="contacto-delete-title"
           className="maestro-modal-title text-center"
         >
-          Confirmar eliminación
+          {modo === 'reactivar' ? 'Confirmar reactivación' : 'Confirmar desactivación'}
         </h3>
 
         <p className="maestro-modal-copy text-center mb-0">
-          ¿Seguro que quieres eliminar este
-          contacto?
+          {modo === 'reactivar' ? '¿Desea reactivar este contacto?' : '¿Desea desactivar este contacto?'}
         </p>
 
         <p className="maestro-delete-name">
@@ -57,18 +57,20 @@ export function ContactoDeleteModal({
         <div className="maestro-modal-footer maestro-modal-footer--center">
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn maestro-btn-danger"
             onClick={onClose}
           >
+            <X size={18} />
             Cancelar
           </button>
 
           <button
             type="button"
-            className="btn maestro-btn-danger"
+            className="btn maestro-btn-primary"
             onClick={onConfirm}
           >
-            Aceptar
+            <Check size={18} />
+            {modo === 'reactivar' ? 'Reactivar' : 'Aceptar'}
           </button>
         </div>
       </div>

@@ -1,11 +1,12 @@
 export interface Contacto {
-  id: string
+  id: number
   proveedorId: string
   nombreCompleto: string
   cargo: string
   telefono: string
   correo: string
-  estado: boolean
+  activo: 0 | 1
+  estado?: boolean
   fechaRegistro: string
 }
 
@@ -15,5 +16,4 @@ export interface ContactoFormData {
   cargo: string
   telefono: string
   correo: string
-  estado: boolean
 }

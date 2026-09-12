@@ -72,7 +72,7 @@ export function AuthProvider({
           motivo === 'inactividad'
             ? 'La sesión se cerró después de 2 minutos de inactividad.'
             : motivo === 'vencimiento'
-              ? 'La sesión se cerró al alcanzar el tiempo máximo de 5 minutos.'
+              ? 'La sesión se cerró al alcanzar el tiempo máximo de 1 hora.'
               : 'El usuario cerró la sesión manualmente.'
 
         cerrarSesion(detalle)
@@ -114,7 +114,7 @@ export function AuthProvider({
 
   /*
    * Cierra automáticamente la sesión
-   * cuando se cumplen los 5 minutos.
+   * cuando se cumple 1 hora.
    */
   useEffect(() => {
     if (!sesion) {

@@ -92,7 +92,7 @@ export function LoginPage() {
 
   if (motivoCierre === 'vencimiento') {
     setMensajeError(
-      'Tu sesión alcanzó el tiempo máximo de 5 minutos. Inicia sesión nuevamente.',
+      'Tu sesión alcanzó el tiempo máximo de 1 hora. Inicia sesión nuevamente.',
     )
   }
 

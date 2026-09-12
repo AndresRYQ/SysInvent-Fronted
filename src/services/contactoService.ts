@@ -9,13 +9,16 @@ import { obtenerProveedores } from './proveedorService'
 const STORAGE_KEY =
   'agrihusac_contactos'
 
-const INGRESOS_STORAGE_KEY =
-  'agrihusac_ingresos_almacen'
+type RegistroGuardado = Partial<Contacto> & {
+  id?: number | string
+  activo?: 0 | 1
+  estado?: boolean
+}
 
 const CONTACTOS_INICIALES:
   Contacto[] = [
     {
-      id: 'CONT-001',
+      id: 1,
       proveedorId: 'PROV-001',
       nombreCompleto:
         'Carlos Mendoza',
@@ -24,11 +27,11 @@ const CONTACTOS_INICIALES:
       telefono: '987654321',
       correo:
         'carlos.mendoza@ferreteriaindustrial.pe',
-      estado: true,
+      activo: 1,
       fechaRegistro: '10/08/2026',
     },
     {
-      id: 'CONT-002',
+      id: 2,
       proveedorId: 'PROV-002',
       nombreCompleto:
         'María Salazar',
@@ -37,11 +40,11 @@ const CONTACTOS_INICIALES:
       telefono: '945678210',
       correo:
         'maria.salazar@suministrosnorte.pe',
-      estado: true,
+      activo: 1,
       fechaRegistro: '11/08/2026',
     },
     {
-      id: 'CONT-003',
+      id: 3,
       proveedorId: 'PROV-003',
       nombreCompleto:
         'José Ramírez',
@@ -50,11 +53,11 @@ const CONTACTOS_INICIALES:
       telefono: '912345678',
       correo:
         'jose.ramirez@equiposrepuestos.pe',
-      estado: true,
+      activo: 1,
       fechaRegistro: '12/08/2026',
     },
     {
-      id: 'CONT-004',
+      id: 4,
       proveedorId: 'PROV-004',
       nombreCompleto:
         'Ana Torres',
@@ -63,7 +66,7 @@ const CONTACTOS_INICIALES:
       telefono: '901234567',
       correo:
         'ana.torres@dahuaral.pe',
-      estado: false,
+      activo: 0,
       fechaRegistro: '13/08/2026',
     },
   ]
@@ -71,11 +74,34 @@ const CONTACTOS_INICIALES:
 function copiarContactos(
   contactos: Contacto[],
 ): Contacto[] {
-  return contactos.map(
-    (contacto) => ({
-      ...contacto,
-    }),
-  )
+  return contactos
+    .map((contacto) => ({ ...contacto }))
+    .sort((a, b) => a.id - b.id)
+}
+
+function normalizarContacto(
+  registro: RegistroGuardado,
+): Contacto | null {
+  const id = typeof registro.id === 'number'
+    ? registro.id
+    : Number(String(registro.id ?? '').replace(/^CONT-/, ''))
+
+  if (!Number.isInteger(id) || id <= 0 || !registro.nombreCompleto) {
+    return null
+  }
+
+  return {
+    id,
+    proveedorId: String(registro.proveedorId ?? ''),
+    nombreCompleto: String(registro.nombreCompleto).trim(),
+    cargo: String(registro.cargo ?? '').trim(),
+    telefono: String(registro.telefono ?? '').trim(),
+    correo: String(registro.correo ?? '').trim().toLowerCase(),
+    activo: registro.activo === 0 || registro.activo === 1
+      ? registro.activo
+      : registro.estado === false ? 0 : 1,
+    fechaRegistro: String(registro.fechaRegistro ?? ''),
+  }
 }
 
 function guardarContactos(
@@ -103,27 +129,11 @@ function crearFechaActual(): string {
 
 function crearSiguienteId(
   contactos: Contacto[],
-): string {
-  const numeroMayor =
-    contactos.reduce(
-      (mayor, contacto) => {
-        const numero = Number(
-          contacto.id.replace(
-            'CONT-',
-            '',
-          ),
-        )
-
-        return Number.isNaN(numero)
-          ? mayor
-          : Math.max(mayor, numero)
-      },
-      0,
-    )
-
-  return `CONT-${String(
-    numeroMayor + 1,
-  ).padStart(3, '0')}`
+): number {
+  return contactos.reduce(
+    (mayor, contacto) => Math.max(mayor, contacto.id),
+    0,
+  ) + 1
 }
 
 function validarDatos(
@@ -203,39 +213,6 @@ function validarDatos(
   }
 }
 
-function contactoEstaEnUso(
-  contactoId: string,
-): boolean {
-  try {
-    const datosGuardados =
-      localStorage.getItem(
-        INGRESOS_STORAGE_KEY,
-      )
-
-    if (!datosGuardados) {
-      return false
-    }
-
-    const ingresos = JSON.parse(
-      datosGuardados,
-    )
-
-    if (!Array.isArray(ingresos)) {
-      return false
-    }
-
-    return ingresos.some(
-      (ingreso) =>
-        typeof ingreso === 'object' &&
-        ingreso !== null &&
-        ingreso.contactoId ===
-          contactoId,
-    )
-  } catch {
-    return false
-  }
-}
-
 export function obtenerContactos():
   Contacto[] {
   const datosGuardados =
@@ -262,9 +239,12 @@ export function obtenerContactos():
       )
     }
 
-    return copiarContactos(
-      datos as Contacto[],
-    )
+    const normalizados = datos
+      .map((registro) => normalizarContacto(registro as RegistroGuardado))
+      .filter((contacto): contacto is Contacto => Boolean(contacto))
+
+    guardarContactos(normalizados)
+    return copiarContactos(normalizados)
   } catch {
     guardarContactos(
       CONTACTOS_INICIALES,
@@ -277,7 +257,7 @@ export function obtenerContactos():
 }
 
 export function obtenerContactoPorId(
-  id: string,
+  id: number,
 ): Contacto | null {
   const contacto =
     obtenerContactos().find(
@@ -329,7 +309,7 @@ export function crearContacto(
       datos.correo
         .trim()
         .toLowerCase(),
-    estado: datos.estado,
+    activo: 1,
     fechaRegistro:
       crearFechaActual(),
   }
@@ -345,14 +325,14 @@ export function crearContacto(
     detalle:
       `Se creó el contacto "${nuevoContacto.nombreCompleto}".`,
     registroId:
-      nuevoContacto.id,
+      String(nuevoContacto.id),
   })
 
   return { ...nuevoContacto }
 }
 
 export function actualizarContacto(
-  id: string,
+  id: number,
   datos: ContactoFormData,
 ): Contacto {
   validarDatos(datos)
@@ -406,7 +386,7 @@ export function actualizarContacto(
         datos.correo
           .trim()
           .toLowerCase(),
-      estado: datos.estado,
+      activo: contactoActual.activo,
     }
 
   guardarContactos(
@@ -423,7 +403,7 @@ export function actualizarContacto(
     detalle:
       `Se actualizó el contacto "${contactoActualizado.nombreCompleto}".`,
     registroId:
-      contactoActualizado.id,
+      String(contactoActualizado.id),
   })
 
   return {
@@ -431,8 +411,8 @@ export function actualizarContacto(
   }
 }
 
-export function eliminarContacto(
-  id: string,
+export function desactivarContacto(
+  id: number,
 ): void {
   const contactos =
     obtenerContactos()
@@ -447,23 +427,32 @@ export function eliminarContacto(
     )
   }
 
-  if (contactoEstaEnUso(id)) {
-    throw new Error(
-      'No puedes eliminar este contacto porque está asignado a uno o más ingresos de almacén. Puedes desactivarlo.',
-    )
-  }
-
   guardarContactos(
-    contactos.filter(
-      (item) => item.id !== id,
+    contactos.map((item) =>
+      item.id === id ? { ...item, activo: 0 } : item,
     ),
   )
 
   registrarEventoBitacora({
     modulo: 'Contactos',
-    accion: 'ELIMINAR',
+    accion: 'EDITAR',
     detalle:
-      `Se eliminó el contacto "${contacto.nombreCompleto}".`,
-    registroId: contacto.id,
+      `Se desactivó el contacto "${contacto.nombreCompleto}".`,
+    registroId: String(contacto.id),
   })
+}
+
+export function reactivarContacto(id: number): void {
+  const contactos = obtenerContactos()
+  const contacto = contactos.find((item) => item.id === id)
+
+  if (!contacto) {
+    throw new Error('El contacto no existe.')
+  }
+
+  guardarContactos(
+    contactos.map((item) =>
+      item.id === id ? { ...item, activo: 1 } : item,
+    ),
+  )
 }

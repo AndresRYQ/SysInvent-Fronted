@@ -16,7 +16,7 @@ import {
   STORAGE_KEYS,
 } from './storageService'
 
-const DURACION_SESION_MINUTOS = 5
+const DURACION_SESION_MINUTOS = 60
 const MAXIMO_INTENTOS = 3
 const DURACION_BLOQUEO_MINUTOS = 5
 

@@ -1074,6 +1074,54 @@
   box-shadow: none !important;
 }
 
+.contactos-page .maestro-btn-primary:hover,
+.contactos-page .maestro-btn-secondary:hover,
+.contactos-page .maestro-btn-danger:hover {
+  transform: none !important;
+}
+
+.contactos-page .maestro-btn-primary,
+.contactos-page .maestro-btn-secondary,
+.contactos-page .maestro-btn-danger {
+  transition: none !important;
+}
+
+.contactos-page .maestro-toolbar-btn:hover,
+.contactos-page .maestro-action-btn:hover,
+.contactos-page .maestro-page-btn:hover:not(:disabled) {
+  transform: none !important;
+}
+
+.contactos-page .maestro-table tbody tr:hover {
+  transform: none !important;
+  background: transparent !important;
+}
+
+.contactos-page .maestro-table tbody tr:nth-child(even):hover {
+  background: #fbfdfc !important;
+}
+
+.contactos-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+  transform: none !important;
+  border-color: rgb(17 24 39 / 10%) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.contactos-page .maestro-page-btn--active:hover:not(:disabled) {
+  transform: none !important;
+  border-color: var(--brand-green) !important;
+  background: var(--brand-green) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.contactos-page .maestro-toolbar-btn,
+.contactos-page .maestro-action-btn,
+.contactos-page .maestro-page-btn {
+  transition: none !important;
+}
+
 .modo-visualizacion .maestro-required {
   display: none;
 }

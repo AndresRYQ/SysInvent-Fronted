@@ -15,8 +15,9 @@ import { TablaContactos } from '../../components/contactos/TablaContactos'
 import {
   actualizarContacto,
   crearContacto,
-  eliminarContacto,
+  desactivarContacto,
   obtenerContactos,
+  reactivarContacto,
 } from '../../services/contactoService'
 
 import { obtenerProveedores } from '../../services/proveedorService'
@@ -37,11 +38,6 @@ const FILTROS_INICIALES:
     proveedorId: '',
     estado: '',
   }
-
-interface MensajePagina {
-  tipo: 'success' | 'danger'
-  texto: string
-}
 
 function filtrarContactos(
   contactos: Contacto[],
@@ -88,10 +84,10 @@ function filtrarContactos(
         !filtros.estado ||
         (filtros.estado ===
           'activo' &&
-          contacto.estado) ||
+          contacto.activo === 1) ||
         (filtros.estado ===
           'inactivo' &&
-          !contacto.estado)
+          contacto.activo === 0)
 
       return (
         coincideBusqueda &&
@@ -143,12 +139,17 @@ export function ContactosPage() {
     setModalFormularioAbierto,
   ] = useState(false)
 
+  const [modoConfirmacion, setModoConfirmacion] =
+    useState<'desactivar' | 'reactivar'>('desactivar')
+
   const [
     contactoEnEdicion,
     setContactoEnEdicion,
   ] = useState<Contacto | null>(
     null,
   )
+
+  const [soloLectura, setSoloLectura] = useState(false)
 
   const [
     errorFormulario,
@@ -166,11 +167,6 @@ export function ContactosPage() {
   ] = useState<Contacto | null>(
     null,
   )
-
-  const [mensaje, setMensaje] =
-    useState<MensajePagina | null>(
-      null,
-    )
 
   const contactosFiltrados =
     useMemo(
@@ -229,24 +225,32 @@ export function ContactosPage() {
   }
 
   function abrirFormularioNuevo(): void {
-    setMensaje(null)
     setErrorFormulario('')
     setContactoEnEdicion(null)
+    setSoloLectura(false)
     setModalFormularioAbierto(true)
   }
 
   function abrirFormularioEdicion(
     contacto: Contacto,
   ): void {
-    setMensaje(null)
     setErrorFormulario('')
     setContactoEnEdicion(contacto)
+    setSoloLectura(false)
+    setModalFormularioAbierto(true)
+  }
+
+  function abrirVisualizacion(contacto: Contacto): void {
+    setErrorFormulario('')
+    setContactoEnEdicion(contacto)
+    setSoloLectura(true)
     setModalFormularioAbierto(true)
   }
 
   function cerrarFormulario(): void {
     setModalFormularioAbierto(false)
     setContactoEnEdicion(null)
+    setSoloLectura(false)
     setErrorFormulario('')
   }
 
@@ -260,19 +264,8 @@ export function ContactosPage() {
           datos,
         )
 
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Contacto actualizado correctamente.',
-        })
       } else {
         crearContacto(datos)
-
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Contacto registrado correctamente.',
-        })
       }
 
       recargarContactos()
@@ -288,7 +281,15 @@ export function ContactosPage() {
   function abrirConfirmacionEliminar(
     contacto: Contacto,
   ): void {
-    setMensaje(null)
+    setModoConfirmacion('desactivar')
+    setContactoAEliminar(contacto)
+    setModalEliminarAbierto(true)
+  }
+
+  function abrirConfirmacionReactivar(
+    contacto: Contacto,
+  ): void {
+    setModoConfirmacion('reactivar')
     setContactoAEliminar(contacto)
     setModalEliminarAbierto(true)
   }
@@ -305,31 +306,24 @@ export function ContactosPage() {
     }
 
     try {
-      eliminarContacto(
-        contactoAEliminar.id,
-      )
+      if (modoConfirmacion === 'reactivar') {
+        reactivarContacto(contactoAEliminar.id)
+      } else {
+        desactivarContacto(contactoAEliminar.id)
+      }
 
       recargarContactos()
       cerrarConfirmacionEliminar()
 
-      setMensaje({
-        tipo: 'success',
-        texto:
-          'Contacto eliminado correctamente.',
-      })
     } catch (error) {
       cerrarConfirmacionEliminar()
-
-      setMensaje({
-        tipo: 'danger',
-        texto:
-          obtenerMensajeError(error),
-      })
+      console.error(obtenerMensajeError(error))
     }
   }
 
   return (
     <>
+      <div className="contactos-page">
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
@@ -343,24 +337,6 @@ export function ContactosPage() {
               </p>
             </div>
           </section>
-
-          {mensaje && (
-            <div
-              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
-              role="alert"
-            >
-              {mensaje.texto}
-
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={() =>
-                  setMensaje(null)
-                }
-              />
-            </div>
-          )}
 
           <div className="maestro-panel">
             <FiltrosContactos
@@ -412,8 +388,14 @@ export function ContactosPage() {
               onEditar={
                 abrirFormularioEdicion
               }
+              onVisualizar={
+                abrirVisualizacion
+              }
               onEliminar={
                 abrirConfirmacionEliminar
+              }
+              onReactivar={
+                abrirConfirmacionReactivar
               }
               onPageChange={setPage}
               onPageSizeChange={(
@@ -426,6 +408,7 @@ export function ContactosPage() {
           </div>
         </div>
       </main>
+      </div>
 
       <FormularioContacto
         abierto={
@@ -436,6 +419,7 @@ export function ContactosPage() {
         }
         proveedores={proveedores}
         error={errorFormulario}
+        soloLectura={soloLectura}
         onClose={cerrarFormulario}
         onSubmit={guardarContacto}
       />
@@ -453,6 +437,7 @@ export function ContactosPage() {
         onConfirm={
           confirmarEliminacion
         }
+        modo={modoConfirmacion}
       />
     </>
   )

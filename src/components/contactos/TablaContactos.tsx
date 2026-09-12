@@ -1,7 +1,8 @@
 import {
   Pencil,
   Plus,
-  ShieldCheck,
+  RotateCcw,
+  Eye,
   Trash2,
   UserRound,
   Users,
@@ -22,7 +23,13 @@ interface TablaContactosProps {
   onEditar: (
     contacto: Contacto,
   ) => void
+  onVisualizar: (
+    contacto: Contacto,
+  ) => void
   onEliminar: (
+    contacto: Contacto,
+  ) => void
+  onReactivar: (
     contacto: Contacto,
   ) => void
   onPageChange: (
@@ -41,7 +48,9 @@ export function TablaContactos({
   pageSize,
   onAgregar,
   onEditar,
+  onVisualizar,
   onEliminar,
+  onReactivar,
   onPageChange,
   onPageSizeChange,
 }: TablaContactosProps) {
@@ -80,7 +89,7 @@ export function TablaContactos({
           <table className="table maestro-table align-middle mb-0">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>N°</th>
                 <th>Contacto</th>
                 <th>Proveedor</th>
                 <th>Cargo</th>
@@ -142,54 +151,29 @@ export function TablaContactos({
                       <td>
                         <span
                           className={
-                            contacto.estado
+                            contacto.activo === 1
                               ? 'maestro-status maestro-status--active'
                               : 'maestro-status maestro-status--inactive'
                           }
                         >
-                          <ShieldCheck
-                            size={14}
+                          <span
+                            className="maestro-status__dot"
+                            aria-hidden="true"
                           />
 
-                          {contacto.estado
-                            ? 'Activo'
-                            : 'Inactivo'}
+                          {contacto.activo === 1 ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
 
                       <td>
                         <div className="maestro-actions">
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            title="Editar"
-                            aria-label={`Editar ${contacto.nombreCompleto}`}
-                            onClick={() =>
-                              onEditar(
-                                contacto,
-                              )
-                            }
-                          >
-                            <Pencil
-                              size={16}
-                            />
-                          </button>
-
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn maestro-action-btn--danger"
-                            title="Eliminar"
-                            aria-label={`Eliminar ${contacto.nombreCompleto}`}
-                            onClick={() =>
-                              onEliminar(
-                                contacto,
-                              )
-                            }
-                          >
-                            <Trash2
-                              size={16}
-                            />
-                          </button>
+                          {contacto.activo === 1 ? <>
+                            <button type="button" className="btn maestro-action-btn" title="Editar" aria-label={`Editar ${contacto.nombreCompleto}`} onClick={() => onEditar(contacto)}><Pencil size={16} /></button>
+                            <button type="button" className="btn maestro-action-btn maestro-action-btn--danger" title="Desactivar" aria-label={`Desactivar ${contacto.nombreCompleto}`} onClick={() => onEliminar(contacto)}><Trash2 size={16} /></button>
+                          </> : <>
+                            <button type="button" className="btn maestro-action-btn" title="Visualizar" aria-label={`Visualizar ${contacto.nombreCompleto}`} onClick={() => onVisualizar(contacto)}><Eye size={16} /></button>
+                            <button type="button" className="btn maestro-action-btn" title="Reactivar" aria-label={`Reactivar ${contacto.nombreCompleto}`} onClick={() => onReactivar(contacto)}><RotateCcw size={16} /></button>
+                          </>}
                         </div>
                       </td>
                     </tr>
