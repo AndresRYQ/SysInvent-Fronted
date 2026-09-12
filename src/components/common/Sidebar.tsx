@@ -220,17 +220,8 @@ const seccionesPermitidas =
     to === '/dashboard' ? pathname === to : pathname.startsWith(to)
 
   const manejarPointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0 || !sidebarRef.current) {
-      return
-    }
-
-    dragRef.current = {
-      active: true,
-      dragged: false,
-      startY: event.clientY,
-      startScrollTop: sidebarRef.current.scrollTop,
-    }
-    sidebarRef.current.setPointerCapture(event.pointerId)
+    void event
+    dragRef.current.active = false
   }
 
   const manejarPointerMove = (event: PointerEvent<HTMLDivElement>) => {
@@ -264,11 +255,10 @@ const seccionesPermitidas =
   }
 
   const evitarClickTrasArrastre = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (dragRef.current.dragged) {
-      event.preventDefault()
-      event.stopPropagation()
-      dragRef.current.dragged = false
-    }
+    // La navegación de los enlaces no debe ser cancelada por la captura
+    // del clic del contenedor desplazable.
+    void event
+    dragRef.current.dragged = false
   }
 
   return (
