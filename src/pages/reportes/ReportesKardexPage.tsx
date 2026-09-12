@@ -44,8 +44,8 @@ export function ReportesKardexPage() {
     <div className="dashboard-shell maestro-page-shell kardex-page">
       <header className="maestro-topbar kardex-heading">
         <div className="maestro-topbar__copy">
-          <span className="maestro-kicker">Reportes / Almacén</span>
-          <h1>Reportes y Kardex</h1>
+          <span className="maestro-kicker">Inventario / Control de almacén</span>
+          <h1>Control de almacén</h1>
           <p>Consulta las entradas, salidas y existencias de tus productos.</p>
         </div>
         <button className="btn maestro-btn-primary" onClick={exportar} disabled={!movimientos.length}>

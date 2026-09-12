@@ -1,6 +1,5 @@
 import {
   Archive,
-  ChartNoAxesCombined,
   Boxes,
   ChevronLeft,
   ChevronRight,
@@ -50,7 +49,6 @@ const SECCIONES: SidebarSection[] = [
   {
     label: 'Reportes',
     items: [
-      { to: '/reportes/kardex', label: 'Reportes y Kardex', icon: ChartNoAxesCombined },
       { label: 'Reporte de ingreso', icon: FileText },
       { label: 'Reporte de vale', icon: FileText },
       { label: 'Reporte de producto más pedido', icon: FileText },

@@ -46,10 +46,10 @@ export function AppRouter() {
 
           <Route element={<ProtectedRoute />}>
             <Route element={<MainLayout />}>
+              <Route path="/control-almacen" element={<ReportesKardexPage />} />
               <Route element={<RoleRoute rolesPermitidos={['Administrador', 'Almacenero']} />}>
-                <Route path="/control-almacen" element={<ReportesKardexPage />} />
-                <Route path="/reportes" element={<Navigate to="/reportes/kardex" replace />} />
-                <Route path="/reportes/kardex" element={<ReportesKardexPage />} />
+                <Route path="/reportes" element={<Navigate to="/control-almacen" replace />} />
+                <Route path="/reportes/kardex" element={<Navigate to="/control-almacen" replace />} />
               </Route>
               <Route
                 path="/dashboard"
