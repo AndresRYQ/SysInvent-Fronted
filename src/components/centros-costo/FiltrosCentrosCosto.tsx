@@ -50,7 +50,7 @@ export function FiltrosCentrosCosto({
               className="form-control maestro-control"
               type="text"
               value={valores.nombre}
-              placeholder="Ej. Producción, Mantenimiento, Administración"
+              placeholder="Buscar"
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }

@@ -19,6 +19,7 @@ import {
   crearCentroCosto,
   eliminarCentroCosto,
   obtenerCentrosCosto,
+  reactivarCentroCosto,
 } from '../../services/centroCostoService'
 
 import type {
@@ -32,11 +33,6 @@ import '../../styles/maestros.css'
 const FILTROS_INICIALES: FiltrosCentrosCostoValores = {
   nombre: '',
   estado: '',
-}
-
-interface MensajePagina {
-  tipo: 'success' | 'danger'
-  texto: string
 }
 
 function filtrarCentrosCosto(
@@ -58,9 +54,9 @@ function filtrarCentrosCosto(
       const coincideEstado =
         !filtros.estado ||
         (filtros.estado === 'activo' &&
-          centroCosto.estado) ||
+          centroCosto.activo === 1) ||
         (filtros.estado === 'inactivo' &&
-          !centroCosto.estado)
+          centroCosto.activo === 0)
 
       return coincideNombre && coincideEstado
     },
@@ -98,11 +94,13 @@ export function CentrosCostoPage() {
 
   const [modalFormOpen, setModalFormOpen] =
     useState(false)
+  const [modoVisualizacion, setModoVisualizacion] = useState(false)
 
   const [
     centroCostoEnEdicion,
     setCentroCostoEnEdicion,
   ] = useState<CentroCosto | null>(null)
+  const [centroCostoAReactivar, setCentroCostoAReactivar] = useState<CentroCosto | null>(null)
 
   const [errorFormulario, setErrorFormulario] =
     useState('')
@@ -116,9 +114,6 @@ export function CentrosCostoPage() {
     centroCostoAEliminar,
     setCentroCostoAEliminar,
   ] = useState<CentroCosto | null>(null)
-
-  const [mensaje, setMensaje] =
-    useState<MensajePagina | null>(null)
 
   const centrosCostoFiltrados = useMemo(
     () =>
@@ -167,24 +162,32 @@ export function CentrosCostoPage() {
   }
 
   function abrirFormularioNuevo(): void {
-    setMensaje(null)
     setErrorFormulario('')
     setCentroCostoEnEdicion(null)
+    setModoVisualizacion(false)
     setModalFormOpen(true)
   }
 
   function abrirFormularioEdicion(
     centroCosto: CentroCosto,
   ): void {
-    setMensaje(null)
     setErrorFormulario('')
     setCentroCostoEnEdicion(centroCosto)
+    setModoVisualizacion(false)
+    setModalFormOpen(true)
+  }
+
+  function abrirVisualizacion(centroCosto: CentroCosto): void {
+    setErrorFormulario('')
+    setCentroCostoEnEdicion(centroCosto)
+    setModoVisualizacion(true)
     setModalFormOpen(true)
   }
 
   function cerrarFormulario(): void {
     setModalFormOpen(false)
     setCentroCostoEnEdicion(null)
+    setModoVisualizacion(false)
     setErrorFormulario('')
   }
 
@@ -198,19 +201,9 @@ export function CentrosCostoPage() {
           datos,
         )
 
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Centro de costo actualizado correctamente.',
-        })
       } else {
         crearCentroCosto(datos)
 
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Centro de costo registrado correctamente.',
-        })
       }
 
       recargarCentrosCosto()
@@ -226,7 +219,6 @@ export function CentrosCostoPage() {
   function abrirConfirmacionEliminar(
     centroCosto: CentroCosto,
   ): void {
-    setMensaje(null)
     setCentroCostoAEliminar(centroCosto)
     setModalDeleteOpen(true)
   }
@@ -234,6 +226,17 @@ export function CentrosCostoPage() {
   function cerrarConfirmacionEliminar(): void {
     setModalDeleteOpen(false)
     setCentroCostoAEliminar(null)
+  }
+
+  function confirmarReactivacion(): void {
+    if (!centroCostoAReactivar) return
+    try {
+      reactivarCentroCosto(centroCostoAReactivar.id)
+      recargarCentrosCosto()
+    } catch (error) {
+      console.error(obtenerMensajeError(error))
+    }
+    setCentroCostoAReactivar(null)
   }
 
   function confirmarEliminacion(): void {
@@ -249,23 +252,15 @@ export function CentrosCostoPage() {
       recargarCentrosCosto()
       cerrarConfirmacionEliminar()
 
-      setMensaje({
-        tipo: 'success',
-        texto:
-          'Centro de costo eliminado correctamente.',
-      })
     } catch (error) {
       cerrarConfirmacionEliminar()
 
-      setMensaje({
-        tipo: 'danger',
-        texto: obtenerMensajeError(error),
-      })
+      console.error(obtenerMensajeError(error))
     }
   }
 
   return (
-    <>
+    <div className="centro-costo-page">
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
@@ -278,22 +273,6 @@ export function CentrosCostoPage() {
               </p>
             </div>
           </section>
-
-          {mensaje && (
-            <div
-              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
-              role="alert"
-            >
-              {mensaje.texto}
-
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={() => setMensaje(null)}
-              />
-            </div>
-          )}
 
           <div className="maestro-panel">
             <FiltrosCentrosCosto
@@ -334,9 +313,11 @@ export function CentrosCostoPage() {
               onEditar={
                 abrirFormularioEdicion
               }
+              onVisualizar={abrirVisualizacion}
               onEliminar={
                 abrirConfirmacionEliminar
               }
+              onReactivar={(centroCosto) => setCentroCostoAReactivar(centroCosto)}
               onPageChange={setPage}
               onPageSizeChange={(
                 nextPageSize,
@@ -355,8 +336,16 @@ export function CentrosCostoPage() {
           centroCostoEnEdicion
         }
         error={errorFormulario}
+        soloLectura={modoVisualizacion}
         onClose={cerrarFormulario}
         onSubmit={guardarCentroCosto}
+      />
+      <CentroCostoDeleteModal
+        abierto={Boolean(centroCostoAReactivar)}
+        centroCosto={centroCostoAReactivar}
+        modo="reactivar"
+        onClose={() => setCentroCostoAReactivar(null)}
+        onConfirm={confirmarReactivacion}
       />
 
       <CentroCostoDeleteModal
@@ -369,6 +358,6 @@ export function CentrosCostoPage() {
         }
         onConfirm={confirmarEliminacion}
       />
-    </>
+    </div>
   )
 }

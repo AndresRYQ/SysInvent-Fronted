@@ -121,16 +121,16 @@
 }
 
 .maestro-control--textarea {
-  min-height: 120px;
   resize: vertical;
 }
 
 .maestro-btn-primary,
-.maestro-btn-secondary {
+.maestro-btn-secondary,
+.maestro-btn-danger {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 5px;
   min-height: 50px;
   padding: 0 18px;
   border-radius: 16px !important;
@@ -160,21 +160,14 @@
 }
 
 .maestro-btn-danger {
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-height: 50px;
-  padding: 0 18px;
   border: 0 !important;
-  border-radius: 16px !important;
   background: #b42318 !important;
   color: #fff !important;
-  font-weight: 800 !important;
 }
 
 .maestro-btn-primary:hover,
-.maestro-btn-secondary:hover {
+.maestro-btn-secondary:hover,
+.maestro-btn-danger:hover {
   transform: translateY(-2px);
 }
 
@@ -291,7 +284,15 @@
   padding: 8px 12px;
   border-radius: 999px;
   font-size: 0.8rem;
-  font-weight: 800;
+  font-weight: 400;
+}
+
+.maestro-status__dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: currentColor;
 }
 
 .maestro-status--active {
@@ -302,6 +303,40 @@
 .maestro-status--inactive {
   background: #fef2f2;
   color: #b42318;
+}
+
+/* Centro de costos: los controles no se elevan al pasar el cursor. */
+.centro-costo-page .maestro-btn-primary:hover,
+.centro-costo-page .maestro-btn-secondary:hover,
+.centro-costo-page .maestro-btn-danger:hover,
+.centro-costo-page .maestro-toolbar-btn:hover,
+.centro-costo-page .maestro-action-btn:hover,
+.centro-costo-page .maestro-page-btn:hover:not(:disabled) {
+  transform: none !important;
+}
+
+.centro-costo-page .maestro-table tbody tr:hover {
+  transform: none !important;
+  background: transparent !important;
+}
+
+.centro-costo-page .maestro-table tbody tr:nth-child(even):hover {
+  background: #fbfdfc !important;
+}
+
+.centro-costo-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+  transform: none !important;
+  border-color: rgb(17 24 39 / 10%) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.centro-costo-page .maestro-page-btn--active:hover:not(:disabled) {
+  transform: none !important;
+  border-color: var(--brand-green) !important;
+  background: var(--brand-green) !important;
+  color: #fff !important;
+  box-shadow: none !important;
 }
 
 .maestro-actions {
@@ -425,7 +460,6 @@
 }
 
 .maestro-modal-body .maestro-control--textarea {
-  min-height: 120px;
   height: auto;
 }
 
