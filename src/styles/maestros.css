@@ -371,6 +371,37 @@
   background: #fbfdfc !important;
 }
 
+.tipos-producto-page .maestro-btn-primary:hover,
+.tipos-producto-page .maestro-btn-secondary:hover,
+.tipos-producto-page .maestro-btn-danger:hover,
+.tipos-producto-page .maestro-toolbar-btn:hover,
+.tipos-producto-page .maestro-action-btn:hover,
+.tipos-producto-page .maestro-page-btn:hover {
+  transform: none !important;
+}
+
+.tipos-producto-page .maestro-table tbody tr:hover {
+  transform: none !important;
+  background: transparent !important;
+}
+
+.tipos-producto-page .maestro-table tbody tr:nth-child(even):hover {
+  background: #fbfdfc !important;
+}
+
+.tipos-producto-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+  border-color: rgb(17 24 39 / 10%) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.tipos-producto-page .maestro-page-btn--active:hover:not(:disabled) {
+  border-color: var(--brand-green) !important;
+  background: var(--brand-green) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
 .maestro-actions {
   display: flex;
   align-items: center;
@@ -898,4 +929,23 @@
   .role-permissions-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.tipos-documento-page .maestro-btn-primary:hover,
+.tipos-documento-page .maestro-btn-secondary:hover,
+.tipos-documento-page .maestro-btn-danger:hover,
+.tipos-documento-page .maestro-toolbar-btn:hover,
+.tipos-documento-page .maestro-action-btn:hover,
+.tipos-documento-page .maestro-table tbody tr:hover,
+.tipos-documento-page .maestro-pagination .maestro-page-btn:hover {
+  transform: none;
+  background-color: inherit;
+  border-color: inherit;
+  color: inherit;
+  box-shadow: none;
+}
+
+.tipos-documento-page .maestro-pagination .maestro-page-btn--active:hover {
+  background-color: var(--brand-green);
+  color: #fff;
 }

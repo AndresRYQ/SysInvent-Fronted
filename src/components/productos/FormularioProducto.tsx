@@ -170,8 +170,8 @@ export function FormularioProducto({
       obtenerTiposProducto().filter(
         (tipo) =>
           tipo.estado ||
-          tipo.id ===
-            producto?.tipoProductoId,
+          String(tipo.id) ===
+            String(producto?.tipoProductoId),
       ),
     [producto],
   )

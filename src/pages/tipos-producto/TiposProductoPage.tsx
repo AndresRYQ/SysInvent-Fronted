@@ -16,6 +16,7 @@ import {
   crearTipoProducto,
   eliminarTipoProducto,
   obtenerTiposProducto,
+  reactivarTipoProducto,
 } from '../../services/tipoProductoService'
 import type {
   TipoProducto,
@@ -27,11 +28,6 @@ import '../../styles/maestros.css'
 const FILTROS_INICIALES: FiltrosTiposProductoValores = {
   nombre: '',
   estado: '',
-}
-
-interface MensajePagina {
-  tipo: 'success' | 'danger'
-  texto: string
 }
 
 function filtrarTiposProducto(
@@ -52,9 +48,9 @@ function filtrarTiposProducto(
     const coincideEstado =
       !filtros.estado ||
       (filtros.estado === 'activo' &&
-        tipoProducto.estado) ||
+        tipoProducto.activo === 1) ||
       (filtros.estado === 'inactivo' &&
-        !tipoProducto.estado)
+        tipoProducto.activo === 0)
 
     return coincideNombre && coincideEstado
   })
@@ -87,6 +83,7 @@ export function TiposProductoPage() {
 
   const [modalFormOpen, setModalFormOpen] =
     useState(false)
+  const [modoVisualizacion, setModoVisualizacion] = useState(false)
 
   const [tipoProductoEnEdicion, setTipoProductoEnEdicion] =
     useState<TipoProducto | null>(null)
@@ -99,9 +96,8 @@ export function TiposProductoPage() {
 
   const [tipoProductoAEliminar, setTipoProductoAEliminar] =
     useState<TipoProducto | null>(null)
-
-  const [mensaje, setMensaje] =
-    useState<MensajePagina | null>(null)
+  const [modalReactivarOpen, setModalReactivarOpen] = useState(false)
+  const [tipoProductoAReactivar, setTipoProductoAReactivar] = useState<TipoProducto | null>(null)
 
   const tiposProductoFiltrados = useMemo(
     () =>
@@ -143,24 +139,32 @@ export function TiposProductoPage() {
   }
 
   function abrirFormularioNuevo(): void {
-    setMensaje(null)
     setErrorFormulario('')
     setTipoProductoEnEdicion(null)
+    setModoVisualizacion(false)
     setModalFormOpen(true)
   }
 
   function abrirFormularioEdicion(
     tipoProducto: TipoProducto,
   ): void {
-    setMensaje(null)
     setErrorFormulario('')
     setTipoProductoEnEdicion(tipoProducto)
+    setModoVisualizacion(false)
+    setModalFormOpen(true)
+  }
+
+  function abrirVisualizacion(tipoProducto: TipoProducto): void {
+    setErrorFormulario('')
+    setTipoProductoEnEdicion(tipoProducto)
+    setModoVisualizacion(true)
     setModalFormOpen(true)
   }
 
   function cerrarFormulario(): void {
     setModalFormOpen(false)
     setTipoProductoEnEdicion(null)
+    setModoVisualizacion(false)
     setErrorFormulario('')
   }
 
@@ -173,20 +177,8 @@ export function TiposProductoPage() {
           tipoProductoEnEdicion.id,
           datos,
         )
-
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Tipo de producto actualizado correctamente.',
-        })
       } else {
         crearTipoProducto(datos)
-
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Tipo de producto registrado correctamente.',
-        })
       }
 
       recargarTiposProducto()
@@ -202,7 +194,6 @@ export function TiposProductoPage() {
   function abrirConfirmacionEliminar(
     tipoProducto: TipoProducto,
   ): void {
-    setMensaje(null)
     setTipoProductoAEliminar(tipoProducto)
     setModalDeleteOpen(true)
   }
@@ -210,6 +201,19 @@ export function TiposProductoPage() {
   function cerrarConfirmacionEliminar(): void {
     setModalDeleteOpen(false)
     setTipoProductoAEliminar(null)
+  }
+
+  function abrirConfirmacionReactivar(tipoProducto: TipoProducto): void {
+    setTipoProductoAReactivar(tipoProducto)
+    setModalReactivarOpen(true)
+  }
+
+  function confirmarReactivacion(): void {
+    if (!tipoProductoAReactivar) return
+    reactivarTipoProducto(tipoProductoAReactivar.id)
+    recargarTiposProducto()
+    setModalReactivarOpen(false)
+    setTipoProductoAReactivar(null)
   }
 
   function confirmarEliminacion(): void {
@@ -224,24 +228,14 @@ export function TiposProductoPage() {
 
       recargarTiposProducto()
       cerrarConfirmacionEliminar()
-
-      setMensaje({
-        tipo: 'success',
-        texto:
-          'Tipo de producto eliminado correctamente.',
-      })
     } catch (error) {
       cerrarConfirmacionEliminar()
-
-      setMensaje({
-        tipo: 'danger',
-        texto: obtenerMensajeError(error),
-      })
+      console.error(obtenerMensajeError(error))
     }
   }
 
   return (
-    <>
+    <div className="tipos-producto-page">
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
@@ -253,22 +247,6 @@ export function TiposProductoPage() {
               </p>
             </div>
           </section>
-
-          {mensaje && (
-            <div
-              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
-              role="alert"
-            >
-              {mensaje.texto}
-
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={() => setMensaje(null)}
-              />
-            </div>
-          )}
 
           <div className="maestro-panel">
             <FiltrosTiposProducto
@@ -305,9 +283,11 @@ export function TiposProductoPage() {
               pageSize={pageSize}
               onAgregar={abrirFormularioNuevo}
               onEditar={abrirFormularioEdicion}
+              onVisualizar={abrirVisualizacion}
               onEliminar={
                 abrirConfirmacionEliminar
               }
+              onReactivar={abrirConfirmacionReactivar}
               onPageChange={setPage}
               onPageSizeChange={(
                 nextPageSize,
@@ -324,6 +304,7 @@ export function TiposProductoPage() {
         abierto={modalFormOpen}
         tipoProducto={tipoProductoEnEdicion}
         error={errorFormulario}
+        soloLectura={modoVisualizacion}
         onClose={cerrarFormulario}
         onSubmit={guardarTipoProducto}
       />
@@ -338,6 +319,13 @@ export function TiposProductoPage() {
         }
         onConfirm={confirmarEliminacion}
       />
-    </>
+      <TipoProductoDeleteModal
+        abierto={modalReactivarOpen}
+        tipoProducto={tipoProductoAReactivar}
+        modo="reactivar"
+        onClose={() => { setModalReactivarOpen(false); setTipoProductoAReactivar(null) }}
+        onConfirm={confirmarReactivacion}
+      />
+    </div>
   )
 }

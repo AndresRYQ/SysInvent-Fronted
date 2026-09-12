@@ -45,7 +45,7 @@ export function FiltrosTiposProducto({
               className="form-control maestro-control"
               type="text"
               value={valores.nombre}
-              placeholder="Ej. Insumo, Producto terminado, Material"
+              placeholder="Buscar"
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }

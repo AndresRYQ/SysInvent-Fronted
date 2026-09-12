@@ -5,7 +5,7 @@ import {
 } from 'lucide-react'
 
 export interface OpcionFiltroProducto {
-  id: string
+  id: string | number
   nombre: string
 }
 

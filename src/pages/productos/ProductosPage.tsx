@@ -188,8 +188,8 @@ export function ProductosPage() {
       tipoProductoNombre:
         tiposProducto.find(
           (tipo) =>
-            tipo.id ===
-            producto.tipoProductoId,
+          String(tipo.id) ===
+            String(producto.tipoProductoId),
         )?.nombre ?? 'Sin tipo',
 
       categoriaNombre:
