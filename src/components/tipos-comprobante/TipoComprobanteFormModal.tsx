@@ -1,50 +1,55 @@
-import { useEffect, useState } from 'react'
+import {
+  useEffect,
+  useState,
+} from 'react'
+
 import { Save, X } from 'lucide-react'
 
-import type { TipoComprobante } from '../../types/tipoComprobante'
+import type {
+  TipoComprobante,
+  TipoComprobanteFormData,
+} from '../../types/tipoComprobante'
 
 interface TipoComprobanteFormModalProps {
   abierto: boolean
   tipoComprobante: TipoComprobante | null
+  error: string
   onClose: () => void
   onSubmit: (
-    tipoComprobante: Pick<
-      TipoComprobante,
-      'nombre' | 'descripcion'
-    >,
+    datos: TipoComprobanteFormData,
   ) => void
 }
 
-interface TipoComprobanteFormState {
+interface ErroresFormulario {
   nombre: string
   descripcion: string
 }
 
-interface TipoComprobanteFormErrores {
-  nombre: boolean
-  descripcion: boolean
-}
-
-const FORM_INICIAL: TipoComprobanteFormState = {
+const FORM_INICIAL: TipoComprobanteFormData = {
   nombre: '',
   descripcion: '',
+  estado: true,
 }
 
-const ERRORES_INICIALES: TipoComprobanteFormErrores = {
-  nombre: false,
-  descripcion: false,
+const ERRORES_INICIALES: ErroresFormulario = {
+  nombre: '',
+  descripcion: '',
 }
 
 export function TipoComprobanteFormModal({
   abierto,
   tipoComprobante,
+  error,
   onClose,
   onSubmit,
 }: TipoComprobanteFormModalProps) {
   const [form, setForm] =
-    useState<TipoComprobanteFormState>(FORM_INICIAL)
+    useState<TipoComprobanteFormData>(
+      FORM_INICIAL,
+    )
+
   const [errores, setErrores] =
-    useState<TipoComprobanteFormErrores>(
+    useState<ErroresFormulario>(
       ERRORES_INICIALES,
     )
 
@@ -56,18 +61,56 @@ export function TipoComprobanteFormModal({
     if (tipoComprobante) {
       setForm({
         nombre: tipoComprobante.nombre,
-        descripcion: tipoComprobante.descripcion,
+        descripcion:
+          tipoComprobante.descripcion,
+        estado: tipoComprobante.estado,
       })
-      setErrores(ERRORES_INICIALES)
-      return
+    } else {
+      setForm(FORM_INICIAL)
     }
 
-    setForm(FORM_INICIAL)
     setErrores(ERRORES_INICIALES)
   }, [abierto, tipoComprobante])
 
   if (!abierto) {
     return null
+  }
+
+  function validarFormulario(): boolean {
+    const nuevosErrores: ErroresFormulario = {
+      nombre: '',
+      descripcion: '',
+    }
+
+    const nombre = form.nombre.trim()
+    const descripcion =
+      form.descripcion.trim()
+
+    if (!nombre) {
+      nuevosErrores.nombre =
+        'Campo requerido'
+    } else if (nombre.length < 2) {
+      nuevosErrores.nombre =
+        'Debe tener al menos 2 caracteres'
+    } else if (nombre.length > 80) {
+      nuevosErrores.nombre =
+        'No puede superar los 80 caracteres'
+    }
+
+    if (!descripcion) {
+      nuevosErrores.descripcion =
+        'Campo requerido'
+    } else if (descripcion.length > 250) {
+      nuevosErrores.descripcion =
+        'No puede superar los 250 caracteres'
+    }
+
+    setErrores(nuevosErrores)
+
+    return (
+      !nuevosErrores.nombre &&
+      !nuevosErrores.descripcion
+    )
   }
 
   return (
@@ -80,7 +123,7 @@ export function TipoComprobanteFormModal({
         className="maestro-modal-card"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="tipo-comprobante-form-title"
+        aria-labelledby="tipo-documento-form-title"
         onClick={(event) =>
           event.stopPropagation()
         }
@@ -88,20 +131,24 @@ export function TipoComprobanteFormModal({
         <div className="maestro-modal-header">
           <div className="maestro-modal-header__content">
             <h3
-              id="tipo-comprobante-form-title"
+              id="tipo-documento-form-title"
               className="maestro-modal-title"
             >
               {tipoComprobante
-                ? 'Editar tipo de comprobante'
-                : 'Registrar tipo de comprobante'}
+                ? 'Editar tipo de documento'
+                : 'Registrar tipo de documento'}
             </h3>
+
+            <p className="maestro-modal-copy mb-0">
+              Completa los datos solicitados.
+            </p>
           </div>
 
           <button
             type="button"
             className="btn maestro-modal-close"
             onClick={onClose}
-            aria-label="Cerrar modal"
+            aria-label="Cerrar"
           >
             <X size={18} />
           </button>
@@ -112,19 +159,7 @@ export function TipoComprobanteFormModal({
           onSubmit={(event) => {
             event.preventDefault()
 
-            const nuevosErrores = {
-              nombre:
-                form.nombre.trim().length === 0,
-              descripcion:
-                form.descripcion.trim().length === 0,
-            }
-
-            setErrores(nuevosErrores)
-
-            if (
-              nuevosErrores.nombre ||
-              nuevosErrores.descripcion
-            ) {
+            if (!validarFormulario()) {
               return
             }
 
@@ -132,129 +167,158 @@ export function TipoComprobanteFormModal({
               nombre: form.nombre.trim(),
               descripcion:
                 form.descripcion.trim(),
+              estado: form.estado,
             })
           }}
         >
           <div className="maestro-modal-body">
-            <div className="mb-2">
+            {error && (
+              <div
+                className="alert alert-danger py-2"
+                role="alert"
+              >
+                {error}
+              </div>
+            )}
+
+            <div className="mb-3">
               <label
                 className="form-label maestro-label"
-                htmlFor="tipoComprobanteNombreModal"
+                htmlFor="tipoDocumentoNombre"
               >
-                Nombre de tipo de comprobante
-                <span className="maestro-required" aria-hidden="true">
+                Nombre del tipo de documento
+                <span className="maestro-required">
                   *
                 </span>
               </label>
 
               <input
-                id="tipoComprobanteNombreModal"
+                id="tipoDocumentoNombre"
                 className={`form-control maestro-control${
                   errores.nombre
                     ? ' maestro-control--error'
                     : ''
                 }`}
                 type="text"
+                maxLength={80}
+                placeholder="Ej. Factura"
                 value={form.nombre}
-                aria-invalid={errores.nombre}
-                aria-describedby={
-                  errores.nombre
-                    ? 'tipoComprobanteNombreModalError'
-                    : undefined
-                }
+                aria-invalid={Boolean(
+                  errores.nombre,
+                )}
                 onChange={(event) => {
-                  const value = event.target.value
-
                   setForm((actual) => ({
                     ...actual,
-                    nombre: value,
+                    nombre: event.target.value,
                   }))
 
-                  if (
-                    errores.nombre &&
-                    value.trim().length > 0
-                  ) {
-                    setErrores((actual) => ({
-                      ...actual,
-                      nombre: false,
-                    }))
-                  }
+                  setErrores((actual) => ({
+                    ...actual,
+                    nombre: '',
+                  }))
                 }}
-                required
               />
 
               {errores.nombre && (
-                <div
-                  id="tipoComprobanteNombreModalError"
-                  className="maestro-field-error"
-                >
-                  Campo requerido
+                <div className="maestro-field-error">
+                  {errores.nombre}
                 </div>
               )}
             </div>
 
-            <div>
+            <div className="mb-3">
               <label
                 className="form-label maestro-label"
-                htmlFor="tipoComprobanteDescripcionModal"
+                htmlFor="tipoDocumentoDescripcion"
               >
                 Descripción
-                <span className="maestro-required" aria-hidden="true">
+                <span className="maestro-required">
                   *
                 </span>
               </label>
 
               <textarea
-                id="tipoComprobanteDescripcionModal"
+                id="tipoDocumentoDescripcion"
                 className={`form-control maestro-control maestro-control--textarea${
                   errores.descripcion
                     ? ' maestro-control--error'
                     : ''
                 }`}
+                rows={4}
+                maxLength={250}
                 value={form.descripcion}
-                aria-invalid={errores.descripcion}
-                aria-describedby={
-                  errores.descripcion
-                    ? 'tipoComprobanteDescripcionModalError'
-                    : undefined
-                }
+                aria-invalid={Boolean(
+                  errores.descripcion,
+                )}
                 onChange={(event) => {
-                  const value = event.target.value
-
                   setForm((actual) => ({
                     ...actual,
-                    descripcion: value,
+                    descripcion:
+                      event.target.value,
                   }))
 
-                  if (
-                    errores.descripcion &&
-                    value.trim().length > 0
-                  ) {
-                    setErrores((actual) => ({
-                      ...actual,
-                      descripcion: false,
-                    }))
-                  }
+                  setErrores((actual) => ({
+                    ...actual,
+                    descripcion: '',
+                  }))
                 }}
-                rows={4}
-                required
               />
 
-              {errores.descripcion && (
-                <div
-                  id="tipoComprobanteDescripcionModalError"
-                  className="maestro-field-error"
-                >
-                  Campo requerido
+              <div className="d-flex justify-content-between">
+                <div>
+                  {errores.descripcion && (
+                    <span className="maestro-field-error">
+                      {errores.descripcion}
+                    </span>
+                  )}
                 </div>
-              )}
+
+                <small className="text-muted">
+                  {form.descripcion.length}/250
+                </small>
+              </div>
+            </div>
+
+            <div>
+              <label
+                className="form-label maestro-label"
+                htmlFor="tipoDocumentoEstado"
+              >
+                Estado
+              </label>
+
+              <select
+                id="tipoDocumentoEstado"
+                className="form-select maestro-control"
+                value={
+                  form.estado
+                    ? 'activo'
+                    : 'inactivo'
+                }
+                onChange={(event) =>
+                  setForm((actual) => ({
+                    ...actual,
+                    estado:
+                      event.target.value ===
+                      'activo',
+                  }))
+                }
+              >
+                <option value="activo">
+                  Activo
+                </option>
+
+                <option value="inactivo">
+                  Inactivo
+                </option>
+              </select>
             </div>
           </div>
 
           <div className="maestro-modal-footer">
             <button
               type="button"
-              className="btn maestro-btn-danger"
+              className="btn maestro-btn-secondary"
               onClick={onClose}
             >
               <X size={18} />
@@ -266,7 +330,10 @@ export function TipoComprobanteFormModal({
               className="btn maestro-btn-primary"
             >
               <Save size={18} />
-              Guardar
+
+              {tipoComprobante
+                ? 'Guardar cambios'
+                : 'Registrar'}
             </button>
           </div>
         </form>

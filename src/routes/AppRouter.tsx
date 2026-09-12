@@ -25,6 +25,9 @@ import { RoleRoute } from './RoleRoute'
 import { ProveedoresPage } from '../pages/proveedores/ProveedoresPage'
 import { NuevoProveedorPage } from '../pages/proveedores/NuevoProveedorPage'
 import { EditarProveedorPage } from '../pages/proveedores/EditarProveedorPage'
+import { ProductosPage } from '../pages/productos/ProductosPage'
+import { NuevoProductoPage } from '../pages/productos/NuevoProductoPage'
+import { EditarProductoPage } from '../pages/productos/EditarProductoPage'
 
 export function AppRouter() {
   return (
@@ -119,7 +122,7 @@ export function AppRouter() {
                 }
               >
                 <Route
-                  path="/tipos-comprobante"
+                  path="/tipos-documento"
                   element={
                     <TiposComprobantePage />
                   }
@@ -191,6 +194,26 @@ export function AppRouter() {
                 <Route
                   path="/proveedores/:id/editar"
                   element={<EditarProveedorPage />}
+                />
+              </Route>
+              <Route
+                element={
+                  <RoleRoute modulo="productos" />
+                }
+              >
+                <Route
+                  path="/productos"
+                  element={<ProductosPage />}
+                />
+
+                <Route
+                  path="/productos/nuevo"
+                  element={<NuevoProductoPage />}
+                />
+
+                <Route
+                  path="/productos/:id/editar"
+                  element={<EditarProductoPage />}
                 />
               </Route>
             </Route>

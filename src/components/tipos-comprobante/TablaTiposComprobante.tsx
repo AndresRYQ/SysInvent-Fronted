@@ -40,7 +40,7 @@ export function TablaTiposComprobante({
           <div>
             <span className="maestro-kicker">
               <FolderKanban size={16} />
-              Listado de tipos de comprobante
+              Listado de tipos de documento
             </span>
           </div>
 
@@ -50,7 +50,7 @@ export function TablaTiposComprobante({
             onClick={onAgregar}
           >
             <Plus size={18} />
-            Agregar tipo de comprobante
+            Agregar tipo de documento
           </button>
         </div>
 
@@ -59,7 +59,7 @@ export function TablaTiposComprobante({
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Nombre de tipo de comprobante</th>
+                <th>Nombre del tipo de documento</th>
                 <th>Descripción</th>
                 <th>Fecha de registro</th>
                 <th>Estado</th>
@@ -133,7 +133,7 @@ export function TablaTiposComprobante({
                     <div className="maestro-empty-state">
                       <FolderKanban size={28} />
                       <p className="mb-1">
-                        No se encontraron tipos de comprobante
+                        No se encontraron tipos de documento.
                       </p>
                       <span>
                         Ajusta los filtros o limpia la búsqueda.

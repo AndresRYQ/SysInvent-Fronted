@@ -195,6 +195,7 @@ const modules: Module[] = [
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
+    route: '/productos',
   },
   {
     id: 'bitacora',

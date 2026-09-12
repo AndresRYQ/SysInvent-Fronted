@@ -39,7 +39,7 @@ export function FiltrosTiposComprobante({
         <div className="row g-3">
           <div className="col-12 col-lg-8">
             <label className="form-label maestro-label" htmlFor="nombreTipoComprobante">
-              Nombre de tipo de comprobante
+              Nombre del tipo de documento
             </label>
 
             <input
@@ -47,7 +47,7 @@ export function FiltrosTiposComprobante({
               className="form-control maestro-control"
               type="text"
               value={valores.nombre}
-              placeholder="Ej. Factura, Boleta, Nota de crédito"
+              placeholder="Ej. Factura, guía de remisión, orden de compra"
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }

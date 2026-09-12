@@ -99,6 +99,7 @@ const SECCIONES: SidebarSection[] = [
         moduleId: 'proveedores',
       },
       {
+        to: '/productos',
         label: 'Productos',
         icon: Boxes,
         moduleId: 'productos',
@@ -132,7 +133,7 @@ const SECCIONES: SidebarSection[] = [
         moduleId: 'tipos-producto',
       },
       {
-        to: '/tipos-comprobante',
+        to: '/tipos-documento',
         label: 'Tipos de documento',
         icon: FileText,
         moduleId: 'tipos-documento',
