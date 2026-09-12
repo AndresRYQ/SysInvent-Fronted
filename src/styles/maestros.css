@@ -949,3 +949,22 @@
   background-color: var(--brand-green);
   color: #fff;
 }
+
+.unidades-medida-page .maestro-btn-primary:hover,
+.unidades-medida-page .maestro-btn-secondary:hover,
+.unidades-medida-page .maestro-btn-danger:hover,
+.unidades-medida-page .maestro-toolbar-btn:hover,
+.unidades-medida-page .maestro-action-btn:hover,
+.unidades-medida-page .maestro-table tbody tr:hover,
+.unidades-medida-page .maestro-pagination .maestro-page-btn:hover {
+  transform: none;
+  background-color: inherit;
+  border-color: inherit;
+  color: inherit;
+  box-shadow: none;
+}
+
+.unidades-medida-page .maestro-pagination .maestro-page-btn--active:hover {
+  background-color: var(--brand-green);
+  color: #fff;
+}
