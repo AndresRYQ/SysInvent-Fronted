@@ -1,4 +1,5 @@
 import {
+  Archive,
   ChartNoAxesCombined,
   Boxes,
   ChevronLeft,
@@ -17,6 +18,7 @@ import {
 import { Link, useLocation } from 'react-router-dom'
 
 const ENLACES = [
+  { to: '/control-almacen', label: 'Control de almacén', icon: Archive },
   { to: '/reportes', label: 'Reportes y Kardex', icon: ChartNoAxesCombined },
   { to: '/dashboard', label: 'Inicio', icon: LayoutDashboard },
   { to: '/categorias', label: 'Categorías', icon: Boxes },
