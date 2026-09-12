@@ -6,58 +6,74 @@ import {
   ChevronRight,
   ClipboardList,
   Coins,
+  FileText,
   LayoutDashboard,
   MapPin,
   PackagePlus,
-  ReceiptText,
   Ruler,
   Tags,
   Users,
   Shield,
+  UserCircle,
 } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
-const ENLACES = [
-  { to: '/control-almacen', label: 'Control de almacén', icon: Archive },
-  { to: '/reportes', label: 'Reportes y Kardex', icon: ChartNoAxesCombined },
-  { to: '/dashboard', label: 'Inicio', icon: LayoutDashboard },
-  { to: '/categorias', label: 'Categorías', icon: Boxes },
-  { to: '/centros-costo', label: 'Centros de costo', icon: Coins },
-  { to: '/tipos-producto', label: 'Tipos de producto', icon: Tags },
+type SidebarItem = {
+  label: string
+  icon: typeof LayoutDashboard
+  to?: string
+}
+
+type SidebarSection = {
+  label: string
+  items: SidebarItem[]
+}
+
+const SECCIONES: SidebarSection[] = [
   {
-    to: '/tipos-comprobante',
-    label: 'Tipos de comprobante',
-    icon: ReceiptText,
+    label: 'General',
+    items: [{ to: '/dashboard', label: 'Inicio', icon: LayoutDashboard }],
   },
   {
-    to: '/unidades-medida',
-    label: 'Unidades de medida',
-    icon: Ruler,
+    label: 'Inventario',
+    items: [
+      { label: 'Proveedores', icon: Users },
+      { label: 'Productos', icon: Boxes },
+      { label: 'Bitácora', icon: FileText },
+      { label: 'Contactos', icon: Users },
+      { label: 'Partes de equipo', icon: Archive },
+      { to: '/control-almacen', label: 'Control de almacén', icon: Archive },
+      { to: '/vales-consumo', label: 'Vales de consumo', icon: ClipboardList },
+      { to: '/ingresos-almacen', label: 'Ingresos de almacén', icon: PackagePlus },
+    ],
   },
   {
-    to: '/destinos',
-    label: 'Destinos',
-    icon: MapPin,
+    label: 'Reportes',
+    items: [
+      { to: '/reportes/kardex', label: 'Reportes y Kardex', icon: ChartNoAxesCombined },
+      { label: 'Reporte de ingreso', icon: FileText },
+      { label: 'Reporte de vale', icon: FileText },
+      { label: 'Reporte de producto más pedido', icon: FileText },
+    ],
   },
   {
-    to: '/ingresos-almacen',
-    label: 'Ingresos de almacén',
-    icon: PackagePlus,
+    label: 'Maestros',
+    items: [
+      { to: '/centros-costo', label: 'Centros de costo', icon: Coins },
+      { to: '/categorias', label: 'Categorías', icon: Boxes },
+      { to: '/tipos-producto', label: 'Tipos de producto', icon: Tags },
+      { to: '/tipos-comprobante', label: 'Tipos de documento', icon: FileText },
+      { to: '/unidades-medida', label: 'Unidades de medida', icon: Ruler },
+      { to: '/destinos', label: 'Destinos', icon: MapPin },
+    ],
   },
   {
-    to: '/vales-consumo',
-    label: 'Vales de consumo',
-    icon: ClipboardList,
-  },
-  {
-    to: '/usuarios',
-    label: 'Usuarios',
-    icon: Users,
-  },
-  {
-    to: '/roles',
-    label: 'Roles',
-    icon: Shield,
+    label: 'Seguridad',
+    items: [
+      { to: '/usuarios', label: 'Usuarios', icon: Users },
+      { to: '/roles', label: 'Roles', icon: Shield },
+      { label: 'Perfil de usuario', icon: UserCircle },
+    ],
   },
 ]
 
@@ -92,23 +108,45 @@ export function Sidebar({ abierto, onToggle }: SidebarProps) {
           <span className="sidebar-title">Menú</span>
         </div>
 
-        <nav className="sidebar-nav">
-          {ENLACES.map((enlace) => {
-            const Icon = enlace.icon
-            const esActivo = activo(enlace.to)
+        <nav
+          className="sidebar-nav"
+          tabIndex={0}
+          aria-label="Navegación principal"
+        >
+          {SECCIONES.map((seccion) => (
+            <div className="sidebar-section" key={seccion.label}>
+              {abierto && <span className="sidebar-section-label">{seccion.label}</span>}
+              {seccion.items.map((enlace) => {
+                const Icon = enlace.icon
+                const esActivo = enlace.to ? activo(enlace.to) : false
+                const className = `sidebar-link ${esActivo ? 'is-active' : ''} ${
+                  enlace.to ? '' : 'sidebar-link--disabled'
+                }`
 
-            return (
-              <Link
-                key={enlace.to}
-                to={enlace.to}
-                className={`sidebar-link ${esActivo ? 'is-active' : ''}`}
-                title={!abierto ? enlace.label : undefined}
-              >
-                <Icon size={18} />
-                {abierto && <span>{enlace.label}</span>}
-              </Link>
-            )
-          })}
+                return enlace.to ? (
+                  <Link
+                    key={enlace.label}
+                    to={enlace.to}
+                    className={className}
+                    title={!abierto ? enlace.label : undefined}
+                  >
+                    <Icon size={18} />
+                    {abierto && <span>{enlace.label}</span>}
+                  </Link>
+                ) : (
+                  <span
+                    key={enlace.label}
+                    className={className}
+                    title={!abierto ? `${enlace.label} (En desarrollo)` : `${enlace.label} (En desarrollo)`}
+                    aria-disabled="true"
+                  >
+                    <Icon size={18} />
+                    {abierto && <span>{enlace.label}</span>}
+                  </span>
+                )
+              })}
+            </div>
+          ))}
         </nav>
       </div>
     </aside>
