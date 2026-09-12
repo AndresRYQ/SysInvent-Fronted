@@ -10,7 +10,7 @@ const ABRE_CERRADO = [
   '/categorias',
   '/centros-costo',
   '/tipos-producto',
-  '/tipos-comprobante',
+  '/tipos-documento',
   '/unidades-medida',
   '/destinos',
   '/ingresos-almacen',

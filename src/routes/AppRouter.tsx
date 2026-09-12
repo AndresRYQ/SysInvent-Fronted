@@ -15,7 +15,7 @@ import { CentrosCostoPage } from '../pages/centros-costos/CentrosCostoPage'
 import { DestinosPage } from '../pages/destinos/DestinosPage'
 import { IngresosAlmacenPage } from '../pages/ingresos-almacen/IngresosAlmacenPage'
 import { RolesPage } from '../pages/roles/RolesPage'
-import { TiposComprobantePage } from '../pages/tipos-comprobante/TiposComprobantePage'
+import { TiposDocumentoPage } from '../pages/tipos-documento/TiposDocumentoPage'
 import { TiposProductoPage } from '../pages/tipos-producto/TiposProductoPage'
 import { UnidadesMedidaPage } from '../pages/unidades-medida/UnidadesMedidaPage'
 import { UsuariosPage } from '../pages/usuarios/UsuariosPage'
@@ -127,7 +127,7 @@ export function AppRouter() {
                 <Route
                   path="/tipos-documento"
                   element={
-                    <TiposComprobantePage />
+                    <TiposDocumentoPage />
                   }
                 />
               </Route>
