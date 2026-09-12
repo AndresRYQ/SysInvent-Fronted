@@ -1,9 +1,10 @@
 import {
   FolderKanban,
+  Eye,
   Pencil,
   Plus,
   ReceiptText,
-  ShieldCheck,
+  RotateCcw,
   Trash2,
 } from 'lucide-react'
 
@@ -17,7 +18,9 @@ interface TablaTiposComprobanteProps {
   pageSize: number
   onAgregar: () => void
   onEditar: (tipoComprobante: TipoComprobante) => void
+  onVisualizar: (tipoComprobante: TipoComprobante) => void
   onEliminar: (tipoComprobante: TipoComprobante) => void
+  onReactivar: (tipoComprobante: TipoComprobante) => void
   onPageChange: (page: number) => void
   onPageSizeChange: (pageSize: number) => void
 }
@@ -29,7 +32,9 @@ export function TablaTiposComprobante({
   pageSize,
   onAgregar,
   onEditar,
+  onVisualizar,
   onEliminar,
+  onReactivar,
   onPageChange,
   onPageSizeChange,
 }: TablaTiposComprobanteProps) {
@@ -58,10 +63,9 @@ export function TablaTiposComprobante({
           <table className="table maestro-table align-middle mb-0">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>N°</th>
                 <th>Nombre de tipo de comprobante</th>
                 <th>Descripción</th>
-                <th>Fecha de registro</th>
                 <th>Estado</th>
                 <th className="text-center">Acciones</th>
               </tr>
@@ -87,49 +91,71 @@ export function TablaTiposComprobante({
                     </td>
 
                     <td>{tipoComprobante.descripcion}</td>
-                    <td>{tipoComprobante.fechaRegistro}</td>
-
                     <td>
                       <span
                         className={
-                          tipoComprobante.estado
+                          tipoComprobante.activo === 1
                             ? 'maestro-status maestro-status--active'
                             : 'maestro-status maestro-status--inactive'
                         }
                       >
-                        <ShieldCheck size={14} />
-                        {tipoComprobante.estado ? 'Activo' : 'Inactivo'}
+                        <span className="maestro-status__dot" aria-hidden="true" />
+                        {tipoComprobante.activo === 1 ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
 
                     <td>
                       <div className="maestro-actions">
-                        <button
-                          type="button"
-                          className="btn maestro-action-btn"
-                          onClick={() => onEditar(tipoComprobante)}
-                          title="Editar"
-                          aria-label={`Editar ${tipoComprobante.nombre}`}
-                        >
-                          <Pencil size={16} />
-                        </button>
+                        {tipoComprobante.activo === 1 ? (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn"
+                            onClick={() => onEditar(tipoComprobante)}
+                            title="Editar"
+                            aria-label={`Editar ${tipoComprobante.nombre}`}
+                          >
+                            <Pencil size={16} />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn"
+                            onClick={() => onVisualizar(tipoComprobante)}
+                            title="Visualizar"
+                            aria-label={`Visualizar ${tipoComprobante.nombre}`}
+                          >
+                            <Eye size={16} />
+                          </button>
+                        )}
 
-                        <button
-                          type="button"
-                          className="btn maestro-action-btn maestro-action-btn--danger"
-                          onClick={() => onEliminar(tipoComprobante)}
-                          title="Eliminar"
-                          aria-label={`Eliminar ${tipoComprobante.nombre}`}
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        {tipoComprobante.activo === 1 ? (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn maestro-action-btn--danger"
+                            onClick={() => onEliminar(tipoComprobante)}
+                            title="Eliminar"
+                            aria-label={`Eliminar ${tipoComprobante.nombre}`}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn"
+                            onClick={() => onReactivar(tipoComprobante)}
+                            title="Reactivar"
+                            aria-label={`Reactivar ${tipoComprobante.nombre}`}
+                          >
+                            <RotateCcw size={16} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6}>
+                  <td colSpan={5}>
                     <div className="maestro-empty-state">
                       <FolderKanban size={28} />
                       <p className="mb-1">

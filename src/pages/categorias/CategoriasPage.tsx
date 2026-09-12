@@ -21,44 +21,6 @@ const FILTROS_INICIALES: FiltrosCategoriasValores = {
   estado: '',
 }
 
-const CATEGORIAS_MOCK: Categoria[] = [
-  {
-    id: 'CAT-001',
-    nombre: 'Herramientas',
-    estado: true,
-    descripcion: 'Implementos y accesorios de uso técnico.',
-    fechaRegistro: '10/08/2026',
-  },
-  {
-    id: 'CAT-002',
-    nombre: 'Seguridad Industrial',
-    estado: true,
-    descripcion: 'Equipos para protección personal.',
-    fechaRegistro: '11/08/2026',
-  },
-  {
-    id: 'CAT-003',
-    nombre: 'Ferreteria',
-    estado: true,
-    descripcion: 'Materiales y piezas de soporte operativo.',
-    fechaRegistro: '12/08/2026',
-  },
-  {
-    id: 'CAT-004',
-    nombre: 'Repuestos',
-    estado: true,
-    descripcion: 'Piezas de reemplazo para mantenimiento.',
-    fechaRegistro: '13/08/2026',
-  },
-  {
-    id: 'CAT-005',
-    nombre: 'Limpieza',
-    estado: false,
-    descripcion: 'Insumos para orden e higiene del almacén.',
-    fechaRegistro: '14/08/2026',
-  },
-]
-
 function filtrarCategorias(
   categorias: Categoria[],
   filtros: FiltrosCategoriasValores,

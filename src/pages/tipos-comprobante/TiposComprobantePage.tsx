@@ -8,6 +8,11 @@ import { TablaTiposComprobante } from '../../components/tipos-comprobante/TablaT
 import { TipoComprobanteDeleteModal } from '../../components/tipos-comprobante/TipoComprobanteDeleteModal'
 import { TipoComprobanteFormModal } from '../../components/tipos-comprobante/TipoComprobanteFormModal'
 import type { TipoComprobante } from '../../types/tipoComprobante'
+import {
+  guardarStorage,
+  obtenerStorage,
+  STORAGE_KEYS,
+} from '../../services/storageService'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
@@ -15,44 +20,6 @@ const FILTROS_INICIALES: FiltrosTiposComprobanteValores = {
   nombre: '',
   estado: '',
 }
-
-const TIPOS_COMPROBANTE_MOCK: TipoComprobante[] = [
-  {
-    id: 'TC-001',
-    nombre: 'Factura',
-    estado: true,
-    descripcion: 'Comprobante de venta con derecho a crédito fiscal.',
-    fechaRegistro: '10/08/2026',
-  },
-  {
-    id: 'TC-002',
-    nombre: 'Boleta',
-    estado: true,
-    descripcion: 'Comprobante de venta sin derecho a crédito fiscal.',
-    fechaRegistro: '11/08/2026',
-  },
-  {
-    id: 'TC-003',
-    nombre: 'Nota de crédito',
-    estado: true,
-    descripcion: 'Documento que anula parcial o totalmente una operación.',
-    fechaRegistro: '12/08/2026',
-  },
-  {
-    id: 'TC-004',
-    nombre: 'Nota de débito',
-    estado: true,
-    descripcion: 'Documento que incrementa el monto de una operación.',
-    fechaRegistro: '13/08/2026',
-  },
-  {
-    id: 'TC-005',
-    nombre: 'Guía de remisión',
-    estado: false,
-    descripcion: 'Documento que sustenta el traslado de mercadería.',
-    fechaRegistro: '14/08/2026',
-  },
-]
 
 function filtrarTiposComprobante(
   tiposComprobante: TipoComprobante[],
@@ -62,7 +29,8 @@ function filtrarTiposComprobante(
     .trim()
     .toLowerCase()
 
-  return tiposComprobante.filter((tipoComprobante) => {
+  return tiposComprobante
+    .filter((tipoComprobante) => {
     const coincideNombre =
       nombre.length === 0 ||
       tipoComprobante.nombre
@@ -72,23 +40,28 @@ function filtrarTiposComprobante(
     const coincideEstado =
       filtros.estado.length === 0 ||
       (filtros.estado === 'activo' &&
-        tipoComprobante.estado) ||
+        tipoComprobante.activo === 1) ||
       (filtros.estado === 'inactivo' &&
-        !tipoComprobante.estado)
+        tipoComprobante.activo === 0)
 
     return coincideNombre && coincideEstado
-  })
-}
-
-function crearFechaActual() {
-  return new Intl.DateTimeFormat('es-PE').format(
-    new Date(),
-  )
+    })
+    .sort((a, b) => a.id - b.id)
 }
 
 export function TiposComprobantePage() {
   const [tiposComprobante, setTiposComprobante] =
-    useState<TipoComprobante[]>(TIPOS_COMPROBANTE_MOCK)
+    useState<TipoComprobante[]>(() =>
+      obtenerStorage<TipoComprobante[]>(
+        STORAGE_KEYS.tiposComprobante,
+        [],
+      ).map((tipoComprobante) => ({
+        ...tipoComprobante,
+        id: Number(
+          String(tipoComprobante.id).replace('TC-', ''),
+        ),
+      })),
+    )
   const [filtros, setFiltros] =
     useState<FiltrosTiposComprobanteValores>(
       FILTROS_INICIALES,
@@ -106,6 +79,12 @@ export function TiposComprobantePage() {
   const [modalDeleteOpen, setModalDeleteOpen] =
     useState(false)
   const [tipoComprobanteAEliminar, setTipoComprobanteAEliminar] =
+    useState<TipoComprobante | null>(null)
+  const [modalSoloLectura, setModalSoloLectura] =
+    useState(false)
+  const [modalReactivarOpen, setModalReactivarOpen] =
+    useState(false)
+  const [tipoComprobanteAReactivar, setTipoComprobanteAReactivar] =
     useState<TipoComprobante | null>(null)
 
   const tiposComprobanteFiltrados = useMemo(
@@ -132,6 +111,13 @@ export function TiposComprobantePage() {
     page,
     pageSize,
   ])
+
+  useEffect(() => {
+    guardarStorage(
+      STORAGE_KEYS.tiposComprobante,
+      tiposComprobante,
+    )
+  }, [tiposComprobante])
 
   useEffect(() => {
     const totalPages = Math.max(
@@ -184,15 +170,26 @@ export function TiposComprobantePage() {
               pageSize={pageSize}
               onAgregar={() => {
                 setTipoComprobanteEnEdicion(null)
+                setModalSoloLectura(false)
                 setModalFormOpen(true)
               }}
               onEditar={(tipoComprobante) => {
                 setTipoComprobanteEnEdicion(tipoComprobante)
+                setModalSoloLectura(false)
+                setModalFormOpen(true)
+              }}
+              onVisualizar={(tipoComprobante) => {
+                setTipoComprobanteEnEdicion(tipoComprobante)
+                setModalSoloLectura(true)
                 setModalFormOpen(true)
               }}
               onEliminar={(tipoComprobante) => {
                 setTipoComprobanteAEliminar(tipoComprobante)
                 setModalDeleteOpen(true)
+              }}
+              onReactivar={(tipoComprobante) => {
+                setTipoComprobanteAReactivar(tipoComprobante)
+                setModalReactivarOpen(true)
               }}
               onPageChange={(nextPage) =>
                 setPage(nextPage)
@@ -209,9 +206,11 @@ export function TiposComprobantePage() {
       <TipoComprobanteFormModal
         abierto={modalFormOpen}
         tipoComprobante={tipoComprobanteEnEdicion}
+        soloLectura={modalSoloLectura}
         onClose={() => {
           setModalFormOpen(false)
           setTipoComprobanteEnEdicion(null)
+          setModalSoloLectura(false)
         }}
         onSubmit={(payload) => {
           if (tipoComprobanteEnEdicion) {
@@ -228,16 +227,18 @@ export function TiposComprobantePage() {
             )
           } else {
             setTiposComprobante((actual) => {
-              const nextId = String(
-                actual.length + 1,
-              ).padStart(3, '0')
+              const ultimoId = actual.reduce(
+                (maximo, tipoComprobante) =>
+                  Number.isNaN(tipoComprobante.id)
+                    ? maximo
+                    : Math.max(maximo, tipoComprobante.id),
+                0,
+              )
 
               return [
                 {
-                  id: `TC-${nextId}`,
-                  fechaRegistro:
-                    crearFechaActual(),
-                  estado: true,
+                  id: ultimoId + 1,
+                  activo: 1,
                   ...payload,
                 },
                 ...actual,
@@ -247,6 +248,7 @@ export function TiposComprobantePage() {
 
           setModalFormOpen(false)
           setTipoComprobanteEnEdicion(null)
+          setModalSoloLectura(false)
         }}
       />
 
@@ -260,16 +262,40 @@ export function TiposComprobantePage() {
         onConfirm={() => {
           if (tipoComprobanteAEliminar) {
             setTiposComprobante((actual) =>
-              actual.filter(
-                (tipoComprobante) =>
-                  tipoComprobante.id !==
-                  tipoComprobanteAEliminar.id,
+              actual.map((tipoComprobante) =>
+                tipoComprobante.id !== tipoComprobanteAEliminar.id
+                  ? tipoComprobante
+                  : { ...tipoComprobante, activo: 0 },
               ),
             )
           }
 
           setModalDeleteOpen(false)
           setTipoComprobanteAEliminar(null)
+        }}
+      />
+
+      <TipoComprobanteDeleteModal
+        abierto={modalReactivarOpen}
+        tipoComprobante={tipoComprobanteAReactivar}
+        accion="reactivar"
+        onClose={() => {
+          setModalReactivarOpen(false)
+          setTipoComprobanteAReactivar(null)
+        }}
+        onConfirm={() => {
+          if (tipoComprobanteAReactivar) {
+            setTiposComprobante((actual) =>
+              actual.map((tipoComprobante) =>
+                tipoComprobante.id === tipoComprobanteAReactivar.id
+                  ? { ...tipoComprobante, activo: 1 }
+                  : tipoComprobante,
+              ),
+            )
+          }
+
+          setModalReactivarOpen(false)
+          setTipoComprobanteAReactivar(null)
         }}
       />
     </>
