@@ -6,6 +6,7 @@ import type { Categoria } from '../../types/categoria'
 interface CategoriaFormModalProps {
   abierto: boolean
   categoria: Categoria | null
+  soloLectura?: boolean
   onClose: () => void
   onSubmit: (
     categoria: Pick<
@@ -38,6 +39,7 @@ const ERRORES_INICIALES: CategoriaFormErrores = {
 export function CategoriaFormModal({
   abierto,
   categoria,
+  soloLectura = false,
   onClose,
   onSubmit,
 }: CategoriaFormModalProps) {
@@ -74,7 +76,6 @@ export function CategoriaFormModal({
     <div
       className="maestro-modal-backdrop"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="maestro-modal-card"
@@ -156,6 +157,7 @@ export function CategoriaFormModal({
                 }`}
                 type="text"
                 value={form.nombre}
+                readOnly={soloLectura}
                 aria-invalid={errores.nombre}
                 aria-describedby={
                   errores.nombre
@@ -212,6 +214,7 @@ export function CategoriaFormModal({
                     : ''
                 }`}
                 value={form.descripcion}
+                readOnly={soloLectura}
                 aria-invalid={errores.descripcion}
                 aria-describedby={
                   errores.descripcion
@@ -236,7 +239,7 @@ export function CategoriaFormModal({
                     }))
                   }
                 }}
-                rows={4}
+                rows={2}
                 required
               />
 
@@ -251,7 +254,8 @@ export function CategoriaFormModal({
             </div>
           </div>
 
-          <div className="maestro-modal-footer">
+          {!soloLectura && (
+            <div className="maestro-modal-footer">
             <button
               type="button"
               className="btn maestro-btn-danger"
@@ -268,7 +272,8 @@ export function CategoriaFormModal({
               <Save size={18} />
               Guardar
             </button>
-          </div>
+            </div>
+          )}
         </form>
       </div>
     </div>

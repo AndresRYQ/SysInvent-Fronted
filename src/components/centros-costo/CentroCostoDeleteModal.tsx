@@ -22,7 +22,7 @@ export function CentroCostoDeleteModal({
   const esReactivacion = accion === 'reactivar'
 
   return (
-    <div className="maestro-modal-backdrop" role="presentation" onClick={onClose}>
+    <div className="maestro-modal-backdrop" role="presentation">
       <div
         className="maestro-modal-card maestro-modal-card--sm"
         role="dialog"

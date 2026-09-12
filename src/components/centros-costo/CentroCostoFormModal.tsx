@@ -76,7 +76,6 @@ export function CentroCostoFormModal({
     <div
       className="maestro-modal-backdrop"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="maestro-modal-card"

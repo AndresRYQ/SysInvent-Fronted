@@ -1,7 +1,6 @@
 export interface Categoria {
-  id: string
+  id: number
   nombre: string
-  estado: boolean
   descripcion: string
-  fechaRegistro: string
+  activo: 0 | 1
 }
