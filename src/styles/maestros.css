@@ -987,3 +987,32 @@
   background-color: var(--brand-green);
   color: #fff;
 }
+
+.proveedores-page .maestro-btn-primary:hover,
+.proveedores-page .maestro-btn-secondary:hover,
+.proveedores-page .maestro-btn-danger:hover,
+.proveedores-page .maestro-toolbar-btn:hover,
+.proveedores-page .maestro-action-btn:hover,
+.proveedores-page .maestro-table tbody tr:hover,
+.proveedores-page .maestro-pagination .maestro-page-btn:hover {
+  transform: none;
+  background-color: inherit;
+  border-color: inherit;
+  color: inherit;
+  box-shadow: none;
+}
+
+.proveedores-page .maestro-pagination .maestro-page-btn--active:hover {
+  background-color: var(--brand-green);
+  color: #fff;
+}
+
+.maestro-modal-card--provider {
+  width: min(960px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+
+.maestro-modal-card--provider > form {
+  box-shadow: none;
+}

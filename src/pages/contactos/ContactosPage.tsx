@@ -57,7 +57,7 @@ function filtrarContactos(
       const nombreProveedor =
         proveedores.find(
           (proveedor) =>
-            proveedor.id ===
+          String(proveedor.id) ===
             contacto.proveedorId,
         )?.razonSocial ?? ''
 

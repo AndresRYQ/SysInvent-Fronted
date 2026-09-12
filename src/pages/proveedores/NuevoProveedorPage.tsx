@@ -31,13 +31,7 @@ export function NuevoProveedorPage() {
     try {
       crearProveedor(datos)
 
-      navigate('/proveedores', {
-        replace: true,
-        state: {
-          mensaje:
-            'Proveedor registrado correctamente.',
-        },
-      })
+      navigate('/proveedores', { replace: true })
     } catch (errorGuardado) {
       setError(
         obtenerMensajeError(errorGuardado),

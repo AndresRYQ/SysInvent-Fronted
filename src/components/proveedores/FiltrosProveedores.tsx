@@ -3,6 +3,7 @@ import {
   RotateCcw,
   Search,
 } from 'lucide-react'
+import { MaestroEstadoSelect } from '../common/MaestroEstadoSelect'
 
 export interface FiltrosProveedoresValores {
   busqueda: string
@@ -55,7 +56,7 @@ export function FiltrosProveedores({
               className="form-control maestro-control"
               type="text"
               value={valores.busqueda}
-              placeholder="Buscar proveedor"
+              placeholder="Buscar"
               onChange={(event) =>
                 onChange(
                   'busqueda',
@@ -73,25 +74,11 @@ export function FiltrosProveedores({
               Estado
             </label>
 
-            <select
-              id="estadoProveedor"
-              className="form-select maestro-control"
+            <MaestroEstadoSelect
+              inputId="estadoProveedor"
               value={valores.estado}
-              onChange={(event) =>
-                onChange(
-                  'estado',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">Todos</option>
-              <option value="activo">
-                Activo
-              </option>
-              <option value="inactivo">
-                Inactivo
-              </option>
-            </select>
+              onChange={(value) => onChange('estado', value)}
+            />
           </div>
 
           <div className="col-12">

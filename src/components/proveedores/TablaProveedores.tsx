@@ -1,10 +1,11 @@
 import {
   Building2,
   Mail,
+  Eye,
   Pencil,
   Phone,
   Plus,
-  ShieldCheck,
+  RotateCcw,
   Trash2,
 } from 'lucide-react'
 
@@ -18,7 +19,9 @@ interface TablaProveedoresProps {
   pageSize: number
   onAgregar: () => void
   onEditar: (proveedor: Proveedor) => void
+  onVisualizar: (proveedor: Proveedor) => void
   onEliminar: (proveedor: Proveedor) => void
+  onReactivar: (proveedor: Proveedor) => void
   onPageChange: (page: number) => void
   onPageSizeChange: (
     pageSize: number,
@@ -32,7 +35,9 @@ export function TablaProveedores({
   pageSize,
   onAgregar,
   onEditar,
+  onVisualizar,
   onEliminar,
+  onReactivar,
   onPageChange,
   onPageSizeChange,
 }: TablaProveedoresProps) {
@@ -59,12 +64,11 @@ export function TablaProveedores({
           <table className="table maestro-table align-middle mb-0">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>N°</th>
                 <th>RUC</th>
                 <th>Razón social</th>
                 <th>Contacto</th>
                 <th>Dirección</th>
-                <th>Registro</th>
                 <th>Estado</th>
                 <th className="text-center">
                   Acciones
@@ -116,22 +120,16 @@ export function TablaProveedores({
                       </td>
 
                       <td>
-                        {proveedor.fechaRegistro}
-                      </td>
-
-                      <td>
                         <span
                           className={
-                            proveedor.estado
+                            proveedor.activo === 1
                               ? 'maestro-status maestro-status--active'
                               : 'maestro-status maestro-status--inactive'
                           }
                         >
-                          <ShieldCheck
-                            size={14}
-                          />
+                          <span className="maestro-status__dot" aria-hidden="true" />
 
-                          {proveedor.estado
+                          {proveedor.activo === 1
                             ? 'Activo'
                             : 'Inactivo'}
                         </span>
@@ -139,7 +137,7 @@ export function TablaProveedores({
 
                       <td>
                         <div className="maestro-actions">
-                          <button
+                        {proveedor.activo === 1 ? <><button
                             type="button"
                             className="btn maestro-action-btn"
                             title="Editar"
@@ -156,7 +154,7 @@ export function TablaProveedores({
                           <button
                             type="button"
                             className="btn maestro-action-btn maestro-action-btn--danger"
-                            title="Eliminar"
+                          title="Desactivar"
                             aria-label={`Eliminar ${proveedor.razonSocial}`}
                             onClick={() =>
                               onEliminar(
@@ -165,7 +163,7 @@ export function TablaProveedores({
                             }
                           >
                             <Trash2 size={16} />
-                          </button>
+                        </button></> : <><button type="button" className="btn maestro-action-btn" title="Visualizar" onClick={() => onVisualizar(proveedor)}><Eye size={16} /></button><button type="button" className="btn maestro-action-btn" title="Reactivar" onClick={() => onReactivar(proveedor)}><RotateCcw size={16} /></button></>}
                         </div>
                       </td>
                     </tr>
@@ -173,7 +171,7 @@ export function TablaProveedores({
                 )
               ) : (
                 <tr>
-                  <td colSpan={8}>
+                  <td colSpan={7}>
                     <div className="maestro-empty-state">
                       <Building2 size={28} />
 

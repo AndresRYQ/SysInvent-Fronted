@@ -51,7 +51,7 @@ export function TablaContactos({
     return (
       proveedores.find(
         (proveedor) =>
-          proveedor.id === proveedorId,
+          String(proveedor.id) === proveedorId,
       )?.razonSocial ??
       'Proveedor no disponible'
     )

@@ -8,6 +8,7 @@ import { ArrowLeft } from 'lucide-react'
 import {
   useNavigate,
   useParams,
+  useLocation,
 } from 'react-router-dom'
 
 import { FormularioProveedor } from '../../components/proveedores/FormularioProveedor'
@@ -30,7 +31,9 @@ function obtenerMensajeError(error: unknown): string {
 
 export function EditarProveedorPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { id } = useParams<{ id: string }>()
+  const soloLectura = Boolean((location.state as { soloLectura?: boolean } | null)?.soloLectura)
 
   const [error, setError] = useState('')
 
@@ -39,8 +42,7 @@ export function EditarProveedorPage() {
     : null
 
   useEffect(() => {
-    document.title =
-      'Editar proveedor | AGRIHUSAC'
+    document.title = soloLectura ? 'Visualizar proveedor | AGRIHUSAC' : 'Editar proveedor | AGRIHUSAC'
   }, [])
 
   function guardarCambios(
@@ -56,13 +58,7 @@ export function EditarProveedorPage() {
     try {
       actualizarProveedor(id, datos)
 
-      navigate('/proveedores', {
-        replace: true,
-        state: {
-          mensaje:
-            'Proveedor actualizado correctamente.',
-        },
-      })
+      navigate('/proveedores', { replace: true })
     } catch (errorGuardado) {
       setError(
         obtenerMensajeError(errorGuardado),
@@ -113,7 +109,7 @@ export function EditarProveedorPage() {
       <div className="container-xl px-0 maestro-page-body">
         <section className="maestro-topbar">
           <div className="maestro-topbar__copy">
-            <h1>Editar proveedor</h1>
+            <h1>{soloLectura ? 'Visualizar proveedor' : 'Editar proveedor'}</h1>
 
             <p>
               Actualiza los datos fiscales y de
@@ -136,6 +132,7 @@ export function EditarProveedorPage() {
         <div className="maestro-panel">
           <FormularioProveedor
             proveedor={proveedor}
+            soloLectura={soloLectura}
             error={error}
             onSubmit={guardarCambios}
             onCancelar={() =>

@@ -146,7 +146,7 @@ function validarDatos(
   const proveedorExiste =
     obtenerProveedores().some(
       (proveedor) =>
-        proveedor.id ===
+        String(proveedor.id) ===
         datos.proveedorId,
     )
 

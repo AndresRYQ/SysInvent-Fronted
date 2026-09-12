@@ -209,7 +209,7 @@ export function ProductosPage() {
       proveedorNombre:
         proveedores.find(
           (proveedor) =>
-            proveedor.id ===
+            String(proveedor.id) ===
             producto.proveedorId,
         )?.razonSocial ?? 'Sin proveedor',
     }))

@@ -181,7 +181,7 @@ export function FormularioProducto({
       obtenerProveedores().filter(
         (proveedor) =>
           proveedor.estado ||
-          proveedor.id ===
+          String(proveedor.id) ===
             producto?.proveedorId,
       ),
     [producto],
