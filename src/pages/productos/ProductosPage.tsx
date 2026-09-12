@@ -21,8 +21,11 @@ import {
 } from '../../components/productos/TablaProductos'
 
 import { ProductoDeleteModal } from '../../components/productos/ProductoDeleteModal'
+import { FormularioProducto } from '../../components/productos/FormularioProducto'
 
 import {
+  actualizarProducto,
+  crearProducto,
   eliminarProducto,
   obtenerProductos,
 } from '../../services/productoService'
@@ -152,6 +155,11 @@ export function ProductosPage() {
 
   const [modalDeleteOpen, setModalDeleteOpen] =
     useState(false)
+
+  const [modalFormOpen, setModalFormOpen] = useState(false)
+  const [productoEnEdicion, setProductoEnEdicion] = useState<Producto | null>(null)
+  const [modoVisualizacion, setModoVisualizacion] = useState(false)
+  const [errorFormulario, setErrorFormulario] = useState('')
 
   const [mensaje, setMensaje] =
     useState<MensajePagina | null>(null)
@@ -343,8 +351,26 @@ export function ProductosPage() {
     }
   }
 
+  function cerrarFormulario(): void {
+    setModalFormOpen(false)
+    setProductoEnEdicion(null)
+    setModoVisualizacion(false)
+    setErrorFormulario('')
+  }
+
+  function guardarProducto(datos: import('../../types/producto').ProductoFormData): void {
+    try {
+      productoEnEdicion ? actualizarProducto(productoEnEdicion.id, datos) : crearProducto(datos)
+      setProductos(obtenerProductos())
+      cerrarFormulario()
+    } catch (error) {
+      setErrorFormulario(obtenerMensajeError(error))
+    }
+  }
+
   return (
     <>
+      <div className="productos-page">
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
@@ -407,14 +433,9 @@ export function ProductosPage() {
               totalItems={totalItems}
               page={page}
               pageSize={pageSize}
-              onAgregar={() =>
-                navigate('/productos/nuevo')
-              }
-              onEditar={(producto) =>
-                navigate(
-                  `/productos/${producto.id}/editar`,
-                )
-              }
+              onAgregar={() => { setProductoEnEdicion(null); setModoVisualizacion(false); setErrorFormulario(''); setModalFormOpen(true) }}
+              onEditar={(producto) => { setProductoEnEdicion(producto); setModoVisualizacion(false); setErrorFormulario(''); setModalFormOpen(true) }}
+              onVisualizar={(producto) => { setProductoEnEdicion(producto); setModoVisualizacion(true); setErrorFormulario(''); setModalFormOpen(true) }}
               onEliminar={(producto) => {
                 setMensaje(null)
                 setProductoAEliminar(producto)
@@ -431,6 +452,7 @@ export function ProductosPage() {
           </div>
         </div>
       </main>
+      </div>
 
       <ProductoDeleteModal
         abierto={modalDeleteOpen}
@@ -441,6 +463,7 @@ export function ProductosPage() {
         }}
         onConfirm={confirmarEliminacion}
       />
+      {modalFormOpen && <div className="maestro-modal-backdrop productos-page" role="presentation"><div className="maestro-modal-card maestro-modal-card--product" role="dialog" aria-modal="true"><div className="maestro-modal-header"><h3 className="maestro-modal-title">{modoVisualizacion ? 'Visualizar producto' : productoEnEdicion ? 'Editar producto' : 'Registrar producto'}</h3><button type="button" className="btn maestro-modal-close" onClick={cerrarFormulario} aria-label="Cerrar modal">×</button></div><FormularioProducto producto={productoEnEdicion} soloLectura={modoVisualizacion} error={errorFormulario} onSubmit={guardarProducto} onCancelar={cerrarFormulario} /></div></div>}
     </>
   )
 }

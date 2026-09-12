@@ -1,4 +1,4 @@
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Check, X } from 'lucide-react'
 
 import type { Producto } from '../../types/producto'
 
@@ -21,9 +21,8 @@ export function ProductoDeleteModal({
 
   return (
     <div
-      className="maestro-modal-backdrop"
+      className="maestro-modal-backdrop productos-page"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="maestro-modal-card maestro-modal-card--sm"
@@ -56,18 +55,20 @@ export function ProductoDeleteModal({
         <div className="maestro-modal-footer maestro-modal-footer--center">
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn maestro-btn-danger"
             onClick={onClose}
           >
+            <X size={18} />
             Cancelar
           </button>
 
           <button
             type="button"
-            className="btn maestro-btn-danger"
+            className="btn maestro-btn-primary"
             onClick={onConfirm}
           >
-            Eliminar
+            <Check size={18} />
+            Aceptar
           </button>
         </div>
       </div>

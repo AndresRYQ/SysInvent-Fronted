@@ -298,7 +298,7 @@ export function crearProducto(
     stockMinimo: datos.stockMinimo,
     precioUnitario:
       datos.precioUnitario,
-    estado: datos.estado,
+    estado: true,
     fechaRegistro: crearFechaActual(),
   }
 
@@ -380,7 +380,7 @@ export function actualizarProducto(
     stockMinimo: datos.stockMinimo,
     precioUnitario:
       datos.precioUnitario,
-    estado: datos.estado,
+    estado: productoActual.estado,
   }
 
   guardarProductos(

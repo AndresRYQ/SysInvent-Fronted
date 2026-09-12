@@ -24,5 +24,5 @@ export interface ProductoFormData {
   proveedorId: string
   stockMinimo: number
   precioUnitario: number
-  estado: boolean
+  estado?: boolean
 }

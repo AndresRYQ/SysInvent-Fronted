@@ -5,11 +5,8 @@ import {
   type FormEvent,
 } from 'react'
 
-import {
-  Package,
-  Save,
-  X,
-} from 'lucide-react'
+import { Package, Save, X } from 'lucide-react'
+import Select from 'react-select'
 
 import { obtenerProveedores } from '../../services/proveedorService'
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
@@ -21,6 +18,7 @@ import type {
 
 interface FormularioProductoProps {
   producto?: Producto | null
+  soloLectura?: boolean
   error: string
   onSubmit: (
     datos: ProductoFormData,
@@ -112,7 +110,6 @@ const FORM_INICIAL: ProductoFormData = {
   proveedorId: '',
   stockMinimo: 0,
   precioUnitario: 0,
-  estado: true,
 }
 
 const ERRORES_INICIALES: ErroresFormulario = {
@@ -151,6 +148,7 @@ function obtenerOpcionesLocales(
 
 export function FormularioProducto({
   producto,
+  soloLectura = false,
   error,
   onSubmit,
   onCancelar,
@@ -233,7 +231,6 @@ export function FormularioProducto({
           producto.stockMinimo,
         precioUnitario:
           producto.precioUnitario,
-        estado: producto.estado,
       })
     } else {
       setForm(FORM_INICIAL)
@@ -354,7 +351,7 @@ export function FormularioProducto({
 
   return (
     <form
-      className="card border-0 shadow-sm"
+      className={`card border-0 shadow-sm${soloLectura ? ' modo-visualizacion' : ''}`}
       noValidate
       onSubmit={manejarEnvio}
     >
@@ -377,7 +374,8 @@ export function FormularioProducto({
         </div>
       </div>
 
-      <div className="card-body p-4">
+      <div className="maestro-modal-body">
+        <fieldset disabled={soloLectura}>
         {error && (
           <div
             className="alert alert-danger"
@@ -467,7 +465,7 @@ export function FormularioProducto({
             )}
           </div>
 
-          <div className="col-12 col-lg-6">
+          <div className="col-12 col-md-4">
             <label
               className="form-label maestro-label"
               htmlFor="productoTipo"
@@ -476,39 +474,36 @@ export function FormularioProducto({
               <span className="maestro-required">*</span>
             </label>
 
-            <select
-              id="productoTipo"
-              className={`form-select maestro-control${
-                errores.tipoProductoId
-                  ? ' maestro-control--error'
-                  : ''
-              }`}
-              value={form.tipoProductoId}
-              onChange={(event) => {
+            <Select
+              inputId="productoTipo"
+              options={tiposProducto.map((tipo) => ({
+                value: String(tipo.id),
+                label: tipo.nombre,
+              }))}
+              value={
+                tiposProducto
+                  .map((tipo) => ({
+                    value: String(tipo.id),
+                    label: tipo.nombre,
+                  }))
+                  .find((opcion) => opcion.value === form.tipoProductoId) ?? null
+              }
+              onChange={(opcion) => {
                 setForm((actual) => ({
                   ...actual,
                   tipoProductoId:
-                    event.target.value,
+                    opcion?.value ?? '',
                 }))
 
                 limpiarError(
                   'tipoProductoId',
                 )
               }}
-            >
-              <option value="">
-                Seleccionar
-              </option>
-
-              {tiposProducto.map((tipo) => (
-                <option
-                  key={tipo.id}
-                  value={tipo.id}
-                >
-                  {tipo.nombre}
-                </option>
-              ))}
-            </select>
+              placeholder="Seleccionar"
+              isClearable
+              isSearchable
+              styles={estilosSelect(Boolean(errores.tipoProductoId))}
+            />
 
             {errores.tipoProductoId && (
               <div className="maestro-field-error">
@@ -517,7 +512,7 @@ export function FormularioProducto({
             )}
           </div>
 
-          <div className="col-12 col-lg-6">
+          <div className="col-12 col-md-4">
             <label
               className="form-label maestro-label"
               htmlFor="productoCategoria"
@@ -526,37 +521,34 @@ export function FormularioProducto({
               <span className="maestro-required">*</span>
             </label>
 
-            <select
-              id="productoCategoria"
-              className={`form-select maestro-control${
-                errores.categoriaId
-                  ? ' maestro-control--error'
-                  : ''
-              }`}
-              value={form.categoriaId}
-              onChange={(event) => {
+            <Select
+              inputId="productoCategoria"
+              options={categorias.map((categoria) => ({
+                value: String(categoria.id),
+                label: categoria.nombre,
+              }))}
+              value={
+                categorias
+                  .map((categoria) => ({
+                    value: String(categoria.id),
+                    label: categoria.nombre,
+                  }))
+                  .find((opcion) => opcion.value === form.categoriaId) ?? null
+              }
+              onChange={(opcion) => {
                 setForm((actual) => ({
                   ...actual,
                   categoriaId:
-                    event.target.value,
+                    opcion?.value ?? '',
                 }))
 
                 limpiarError('categoriaId')
               }}
-            >
-              <option value="">
-                Seleccionar
-              </option>
-
-              {categorias.map((categoria) => (
-                <option
-                  key={categoria.id}
-                  value={categoria.id}
-                >
-                  {categoria.nombre}
-                </option>
-              ))}
-            </select>
+              placeholder="Seleccionar"
+              isClearable
+              isSearchable
+              styles={estilosSelect(Boolean(errores.categoriaId))}
+            />
 
             {errores.categoriaId && (
               <div className="maestro-field-error">
@@ -565,7 +557,7 @@ export function FormularioProducto({
             )}
           </div>
 
-          <div className="col-12 col-lg-6">
+          <div className="col-12 col-md-4">
             <label
               className="form-label maestro-label"
               htmlFor="productoUnidad"
@@ -574,39 +566,36 @@ export function FormularioProducto({
               <span className="maestro-required">*</span>
             </label>
 
-            <select
-              id="productoUnidad"
-              className={`form-select maestro-control${
-                errores.unidadMedidaId
-                  ? ' maestro-control--error'
-                  : ''
-              }`}
-              value={form.unidadMedidaId}
-              onChange={(event) => {
+            <Select
+              inputId="productoUnidad"
+              options={unidadesMedida.map((unidad) => ({
+                value: String(unidad.id),
+                label: unidad.nombre,
+              }))}
+              value={
+                unidadesMedida
+                  .map((unidad) => ({
+                    value: String(unidad.id),
+                    label: unidad.nombre,
+                  }))
+                  .find((opcion) => opcion.value === form.unidadMedidaId) ?? null
+              }
+              onChange={(opcion) => {
                 setForm((actual) => ({
                   ...actual,
                   unidadMedidaId:
-                    event.target.value,
+                    opcion?.value ?? '',
                 }))
 
                 limpiarError(
                   'unidadMedidaId',
                 )
               }}
-            >
-              <option value="">
-                Seleccionar
-              </option>
-
-              {unidadesMedida.map((unidad) => (
-                <option
-                  key={unidad.id}
-                  value={unidad.id}
-                >
-                  {unidad.nombre}
-                </option>
-              ))}
-            </select>
+              placeholder="Seleccionar"
+              isClearable
+              isSearchable
+              styles={estilosSelect(Boolean(errores.unidadMedidaId))}
+            />
 
             {errores.unidadMedidaId && (
               <div className="maestro-field-error">
@@ -615,7 +604,7 @@ export function FormularioProducto({
             )}
           </div>
 
-          <div className="col-12 col-lg-6">
+          <div className="col-12 col-md-4">
             <label
               className="form-label maestro-label"
               htmlFor="productoProveedor"
@@ -624,39 +613,34 @@ export function FormularioProducto({
               <span className="maestro-required">*</span>
             </label>
 
-            <select
-              id="productoProveedor"
-              className={`form-select maestro-control${
-                errores.proveedorId
-                  ? ' maestro-control--error'
-                  : ''
-              }`}
-              value={form.proveedorId}
-              onChange={(event) => {
+            <Select
+              inputId="productoProveedor"
+              options={proveedores.map((proveedor) => ({
+                value: String(proveedor.id),
+                label: proveedor.razonSocial,
+              }))}
+              value={
+                proveedores
+                  .map((proveedor) => ({
+                    value: String(proveedor.id),
+                    label: proveedor.razonSocial,
+                  }))
+                  .find((opcion) => opcion.value === String(form.proveedorId)) ?? null
+              }
+              onChange={(opcion) => {
                 setForm((actual) => ({
                   ...actual,
                   proveedorId:
-                    event.target.value,
+                    opcion?.value ?? '',
                 }))
 
                 limpiarError('proveedorId')
               }}
-            >
-              <option value="">
-                Seleccionar
-              </option>
-
-              {proveedores.map(
-                (proveedor) => (
-                  <option
-                    key={proveedor.id}
-                    value={proveedor.id}
-                  >
-                    {proveedor.razonSocial}
-                  </option>
-                ),
-              )}
-            </select>
+              placeholder="Seleccionar"
+              isClearable
+              isSearchable
+              styles={estilosSelect(Boolean(errores.proveedorId))}
+            />
 
             {errores.proveedorId && (
               <div className="maestro-field-error">
@@ -665,7 +649,7 @@ export function FormularioProducto({
             )}
           </div>
 
-          <div className="col-12 col-lg-4">
+          <div className="col-12 col-md-4">
             <label
               className="form-label maestro-label"
               htmlFor="productoStockMinimo"
@@ -707,7 +691,7 @@ export function FormularioProducto({
             )}
           </div>
 
-          <div className="col-12 col-lg-4">
+          <div className="col-12 col-md-4">
             <label
               className="form-label maestro-label"
               htmlFor="productoPrecio"
@@ -755,41 +739,6 @@ export function FormularioProducto({
                 {errores.precioUnitario}
               </div>
             )}
-          </div>
-
-          <div className="col-12 col-lg-4">
-            <label
-              className="form-label maestro-label"
-              htmlFor="productoEstado"
-            >
-              Estado
-            </label>
-
-            <select
-              id="productoEstado"
-              className="form-select maestro-control"
-              value={
-                form.estado
-                  ? 'activo'
-                  : 'inactivo'
-              }
-              onChange={(event) =>
-                setForm((actual) => ({
-                  ...actual,
-                  estado:
-                    event.target.value ===
-                    'activo',
-                }))
-              }
-            >
-              <option value="activo">
-                Activo
-              </option>
-
-              <option value="inactivo">
-                Inactivo
-              </option>
-            </select>
           </div>
 
           {producto && (
@@ -855,13 +804,14 @@ export function FormularioProducto({
             </div>
           </div>
         </div>
+        </fieldset>
       </div>
 
-      <div className="card-footer bg-white border-top p-4">
+      {!soloLectura && <div className="maestro-modal-footer">
         <div className="d-flex flex-wrap justify-content-end gap-2">
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn maestro-btn-danger"
             onClick={onCancelar}
           >
             <X size={18} />
@@ -879,7 +829,51 @@ export function FormularioProducto({
               : 'Registrar producto'}
           </button>
         </div>
-      </div>
+      </div>}
     </form>
   )
 }
+
+const estilosSelect = (tieneError: boolean) => ({
+  control: (base: any, state: any) => ({
+    ...base,
+    minHeight: 38,
+    height: 38,
+    borderRadius: 8,
+    borderColor: tieneError
+      ? '#dc3545'
+      : state.isFocused
+        ? '#198754'
+        : '#dee2e6',
+    boxShadow: tieneError
+      ? '0 0 0 .15rem rgba(220, 53, 69, .15)'
+      : state.isFocused
+        ? '0 0 0 .15rem rgba(25, 135, 84, .15)'
+        : 'none',
+    '&:hover': {
+      borderColor: tieneError ? '#dc3545' : '#198754',
+    },
+  }),
+  valueContainer: (base: any) => ({
+    ...base,
+    fontSize: '.8rem',
+  }),
+  indicatorsContainer: (base: any) => ({
+    ...base,
+    height: 36,
+  }),
+  menu: (base: any) => ({
+    ...base,
+    zIndex: 20,
+  }),
+  option: (base: any, state: any) => ({
+    ...base,
+    fontSize: '.8rem',
+    backgroundColor: state.isSelected
+      ? '#198754'
+      : state.isFocused
+        ? '#e9f5ee'
+        : '#fff',
+    color: state.isSelected ? '#fff' : '#212529',
+  }),
+})

@@ -1016,3 +1016,64 @@
 .maestro-modal-card--provider > form {
   box-shadow: none;
 }
+
+.maestro-modal-card--product {
+  width: min(1040px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+
+.maestro-modal-card--product > form {
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.maestro-modal-card--product .card-header {
+  display: none;
+}
+
+.productos-page .maestro-btn-primary:hover,
+.productos-page .maestro-btn-secondary:hover,
+.productos-page .maestro-btn-danger:hover,
+.productos-page .maestro-toolbar-btn:hover,
+.productos-page .maestro-action-btn:hover,
+.productos-page .maestro-page-btn:hover:not(:disabled) {
+  transform: none !important;
+}
+
+.productos-page .maestro-btn-primary,
+.productos-page .maestro-btn-secondary,
+.productos-page .maestro-btn-danger,
+.productos-page .maestro-toolbar-btn,
+.productos-page .maestro-action-btn,
+.productos-page .maestro-page-btn {
+  transition: none !important;
+}
+
+.productos-page .maestro-table tbody tr:hover {
+  transform: none !important;
+  background: transparent !important;
+}
+
+.productos-page .maestro-table tbody tr:nth-child(even):hover {
+  background: #fbfdfc !important;
+}
+
+.productos-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+  transform: none !important;
+  border-color: rgb(17 24 39 / 10%) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.productos-page .maestro-page-btn--active:hover:not(:disabled) {
+  transform: none !important;
+  border-color: var(--brand-green) !important;
+  background: var(--brand-green) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.modo-visualizacion .maestro-required {
+  display: none;
+}
