@@ -7,6 +7,11 @@ import {
   type FiltrosCategoriasValores,
 } from '../../components/categorias/FiltrosCategorias'
 import { TablaCategorias } from '../../components/categorias/TablaCategorias'
+import {
+  guardarStorage,
+  obtenerStorage,
+  STORAGE_KEYS,
+} from '../../services/storageService'
 import type { Categoria } from '../../types/categoria'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
@@ -16,44 +21,6 @@ const FILTROS_INICIALES: FiltrosCategoriasValores = {
   estado: '',
 }
 
-const CATEGORIAS_MOCK: Categoria[] = [
-  {
-    id: 'CAT-001',
-    nombre: 'Herramientas',
-    estado: true,
-    descripcion: 'Implementos y accesorios de uso técnico.',
-    fechaRegistro: '10/08/2026',
-  },
-  {
-    id: 'CAT-002',
-    nombre: 'Seguridad Industrial',
-    estado: true,
-    descripcion: 'Equipos para protección personal.',
-    fechaRegistro: '11/08/2026',
-  },
-  {
-    id: 'CAT-003',
-    nombre: 'Ferreteria',
-    estado: true,
-    descripcion: 'Materiales y piezas de soporte operativo.',
-    fechaRegistro: '12/08/2026',
-  },
-  {
-    id: 'CAT-004',
-    nombre: 'Repuestos',
-    estado: true,
-    descripcion: 'Piezas de reemplazo para mantenimiento.',
-    fechaRegistro: '13/08/2026',
-  },
-  {
-    id: 'CAT-005',
-    nombre: 'Limpieza',
-    estado: false,
-    descripcion: 'Insumos para orden e higiene del almacén.',
-    fechaRegistro: '14/08/2026',
-  },
-]
-
 function filtrarCategorias(
   categorias: Categoria[],
   filtros: FiltrosCategoriasValores,
@@ -62,7 +29,8 @@ function filtrarCategorias(
     .trim()
     .toLowerCase()
 
-  return categorias.filter((categoria) => {
+  return categorias
+    .filter((categoria) => {
     const coincideNombre =
       nombre.length === 0 ||
       categoria.nombre
@@ -72,23 +40,28 @@ function filtrarCategorias(
     const coincideEstado =
       filtros.estado.length === 0 ||
       (filtros.estado === 'activo' &&
-        categoria.estado) ||
+        categoria.activo === 1) ||
       (filtros.estado === 'inactivo' &&
-        !categoria.estado)
+        categoria.activo === 0)
 
     return coincideNombre && coincideEstado
-  })
-}
-
-function crearFechaActual() {
-  return new Intl.DateTimeFormat('es-PE').format(
-    new Date(),
-  )
+    })
+    .sort((a, b) => a.id - b.id)
 }
 
 export function CategoriasPage() {
   const [categorias, setCategorias] =
-    useState<Categoria[]>(CATEGORIAS_MOCK)
+    useState<Categoria[]>(() =>
+      obtenerStorage<Categoria[]>(
+        STORAGE_KEYS.categorias,
+        [],
+      ).map((categoria) => ({
+        ...categoria,
+        id: Number(
+          String(categoria.id).replace('CAT-', ''),
+        ),
+      })),
+    )
   const [filtros, setFiltros] =
     useState<FiltrosCategoriasValores>(
       FILTROS_INICIALES,
@@ -106,6 +79,12 @@ export function CategoriasPage() {
   const [modalDeleteOpen, setModalDeleteOpen] =
     useState(false)
   const [categoriaAEliminar, setCategoriaAEliminar] =
+    useState<Categoria | null>(null)
+  const [modalSoloLectura, setModalSoloLectura] =
+    useState(false)
+  const [modalReactivarOpen, setModalReactivarOpen] =
+    useState(false)
+  const [categoriaAReactivar, setCategoriaAReactivar] =
     useState<Categoria | null>(null)
 
   const categoriasFiltradas = useMemo(
@@ -132,6 +111,13 @@ export function CategoriasPage() {
     page,
     pageSize,
   ])
+
+  useEffect(() => {
+    guardarStorage(
+      STORAGE_KEYS.categorias,
+      categorias,
+    )
+  }, [categorias])
 
   useEffect(() => {
     const totalPages = Math.max(
@@ -184,15 +170,26 @@ export function CategoriasPage() {
               pageSize={pageSize}
               onAgregar={() => {
                 setCategoriaEnEdicion(null)
+                setModalSoloLectura(false)
                 setModalFormOpen(true)
               }}
               onEditar={(categoria) => {
                 setCategoriaEnEdicion(categoria)
+                setModalSoloLectura(false)
+                setModalFormOpen(true)
+              }}
+              onVisualizar={(categoria) => {
+                setCategoriaEnEdicion(categoria)
+                setModalSoloLectura(true)
                 setModalFormOpen(true)
               }}
               onEliminar={(categoria) => {
                 setCategoriaAEliminar(categoria)
                 setModalDeleteOpen(true)
+              }}
+              onReactivar={(categoria) => {
+                setCategoriaAReactivar(categoria)
+                setModalReactivarOpen(true)
               }}
               onPageChange={(nextPage) =>
                 setPage(nextPage)
@@ -209,9 +206,11 @@ export function CategoriasPage() {
       <CategoriaFormModal
         abierto={modalFormOpen}
         categoria={categoriaEnEdicion}
+        soloLectura={modalSoloLectura}
         onClose={() => {
           setModalFormOpen(false)
           setCategoriaEnEdicion(null)
+          setModalSoloLectura(false)
         }}
         onSubmit={(payload) => {
           if (categoriaEnEdicion) {
@@ -228,16 +227,18 @@ export function CategoriasPage() {
             )
           } else {
             setCategorias((actual) => {
-              const nextId = String(
-                actual.length + 1,
-              ).padStart(3, '0')
+              const ultimoId = actual.reduce(
+                (maximo, categoria) =>
+                  Number.isNaN(categoria.id)
+                    ? maximo
+                    : Math.max(maximo, categoria.id),
+                0,
+              )
 
               return [
                 {
-                  id: `CAT-${nextId}`,
-                  fechaRegistro:
-                    crearFechaActual(),
-                  estado: true,
+                  id: ultimoId + 1,
+                  activo: 1,
                   ...payload,
                 },
                 ...actual,
@@ -247,6 +248,7 @@ export function CategoriasPage() {
 
           setModalFormOpen(false)
           setCategoriaEnEdicion(null)
+          setModalSoloLectura(false)
         }}
       />
 
@@ -260,16 +262,40 @@ export function CategoriasPage() {
         onConfirm={() => {
           if (categoriaAEliminar) {
             setCategorias((actual) =>
-              actual.filter(
-                (categoria) =>
-                  categoria.id !==
-                  categoriaAEliminar.id,
+              actual.map((categoria) =>
+                categoria.id !== categoriaAEliminar.id
+                  ? categoria
+                  : { ...categoria, activo: 0 },
               ),
             )
           }
 
           setModalDeleteOpen(false)
           setCategoriaAEliminar(null)
+        }}
+      />
+
+      <CategoriaDeleteModal
+        abierto={modalReactivarOpen}
+        categoria={categoriaAReactivar}
+        accion="reactivar"
+        onClose={() => {
+          setModalReactivarOpen(false)
+          setCategoriaAReactivar(null)
+        }}
+        onConfirm={() => {
+          if (categoriaAReactivar) {
+            setCategorias((actual) =>
+              actual.map((categoria) =>
+                categoria.id === categoriaAReactivar.id
+                  ? { ...categoria, activo: 1 }
+                  : categoria,
+              ),
+            )
+          }
+
+          setModalReactivarOpen(false)
+          setCategoriaAReactivar(null)
         }}
       />
     </>

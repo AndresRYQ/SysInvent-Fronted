@@ -47,7 +47,7 @@ export function FiltrosTiposComprobante({
               className="form-control maestro-control"
               type="text"
               value={valores.nombre}
-              placeholder="Ej. Factura, Boleta, Nota de crédito"
+              placeholder="Buscar"
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }
@@ -75,7 +75,7 @@ export function FiltrosTiposComprobante({
                   setEstadoAbierto(false)
                 }}
               >
-                <option value="">Todos</option>
+                <option value="">Seleccionar</option>
                 <option value="activo">Activo</option>
                 <option value="inactivo">Inactivo</option>
               </select>

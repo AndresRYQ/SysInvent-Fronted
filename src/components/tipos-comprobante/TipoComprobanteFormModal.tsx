@@ -6,6 +6,7 @@ import type { TipoComprobante } from '../../types/tipoComprobante'
 interface TipoComprobanteFormModalProps {
   abierto: boolean
   tipoComprobante: TipoComprobante | null
+  soloLectura?: boolean
   onClose: () => void
   onSubmit: (
     tipoComprobante: Pick<
@@ -38,6 +39,7 @@ const ERRORES_INICIALES: TipoComprobanteFormErrores = {
 export function TipoComprobanteFormModal({
   abierto,
   tipoComprobante,
+  soloLectura = false,
   onClose,
   onSubmit,
 }: TipoComprobanteFormModalProps) {
@@ -74,7 +76,6 @@ export function TipoComprobanteFormModal({
     <div
       className="maestro-modal-backdrop"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="maestro-modal-card"
@@ -156,6 +157,7 @@ export function TipoComprobanteFormModal({
                 }`}
                 type="text"
                 value={form.nombre}
+                readOnly={soloLectura}
                 aria-invalid={errores.nombre}
                 aria-describedby={
                   errores.nombre
@@ -212,6 +214,7 @@ export function TipoComprobanteFormModal({
                     : ''
                 }`}
                 value={form.descripcion}
+                readOnly={soloLectura}
                 aria-invalid={errores.descripcion}
                 aria-describedby={
                   errores.descripcion
@@ -236,7 +239,7 @@ export function TipoComprobanteFormModal({
                     }))
                   }
                 }}
-                rows={4}
+                rows={2}
                 required
               />
 
@@ -251,7 +254,8 @@ export function TipoComprobanteFormModal({
             </div>
           </div>
 
-          <div className="maestro-modal-footer">
+          {!soloLectura && (
+            <div className="maestro-modal-footer">
             <button
               type="button"
               className="btn maestro-btn-danger"
@@ -268,7 +272,8 @@ export function TipoComprobanteFormModal({
               <Save size={18} />
               Guardar
             </button>
-          </div>
+            </div>
+          )}
         </form>
       </div>
     </div>

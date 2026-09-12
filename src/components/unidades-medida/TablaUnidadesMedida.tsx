@@ -1,9 +1,10 @@
 import {
   FolderKanban,
+  Eye,
   Pencil,
   Plus,
   Ruler,
-  ShieldCheck,
+  RotateCcw,
   Trash2,
 } from 'lucide-react'
 
@@ -17,7 +18,9 @@ interface TablaUnidadesMedidaProps {
   pageSize: number
   onAgregar: () => void
   onEditar: (unidad: UnidadMedida) => void
+  onVisualizar: (unidad: UnidadMedida) => void
   onEliminar: (unidad: UnidadMedida) => void
+  onReactivar: (unidad: UnidadMedida) => void
   onPageChange: (page: number) => void
   onPageSizeChange: (pageSize: number) => void
 }
@@ -29,7 +32,9 @@ export function TablaUnidadesMedida({
   pageSize,
   onAgregar,
   onEditar,
+  onVisualizar,
   onEliminar,
+  onReactivar,
   onPageChange,
   onPageSizeChange,
 }: TablaUnidadesMedidaProps) {
@@ -58,10 +63,9 @@ export function TablaUnidadesMedida({
           <table className="table maestro-table align-middle mb-0">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>N°</th>
                 <th>Nombre de unidad de medida</th>
                 <th>Descripción</th>
-                <th>Fecha de registro</th>
                 <th>Estado</th>
                 <th className="text-center">Acciones</th>
               </tr>
@@ -85,49 +89,71 @@ export function TablaUnidadesMedida({
                     </td>
 
                     <td>{unidad.descripcion}</td>
-                    <td>{unidad.fechaRegistro}</td>
-
                     <td>
                       <span
                         className={
-                          unidad.estado
+                          unidad.activo === 1
                             ? 'maestro-status maestro-status--active'
                             : 'maestro-status maestro-status--inactive'
                         }
                       >
-                        <ShieldCheck size={14} />
-                        {unidad.estado ? 'Activo' : 'Inactivo'}
+                        <span className="maestro-status__dot" aria-hidden="true" />
+                        {unidad.activo === 1 ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
 
                     <td>
                       <div className="maestro-actions">
-                        <button
-                          type="button"
-                          className="btn maestro-action-btn"
-                          onClick={() => onEditar(unidad)}
-                          title="Editar"
-                          aria-label={`Editar ${unidad.nombre}`}
-                        >
-                          <Pencil size={16} />
-                        </button>
+                        {unidad.activo === 1 ? (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn"
+                            onClick={() => onEditar(unidad)}
+                            title="Editar"
+                            aria-label={`Editar ${unidad.nombre}`}
+                          >
+                            <Pencil size={16} />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn"
+                            onClick={() => onVisualizar(unidad)}
+                            title="Visualizar"
+                            aria-label={`Visualizar ${unidad.nombre}`}
+                          >
+                            <Eye size={16} />
+                          </button>
+                        )}
 
-                        <button
-                          type="button"
-                          className="btn maestro-action-btn maestro-action-btn--danger"
-                          onClick={() => onEliminar(unidad)}
-                          title="Eliminar"
-                          aria-label={`Eliminar ${unidad.nombre}`}
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        {unidad.activo === 1 ? (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn maestro-action-btn--danger"
+                            onClick={() => onEliminar(unidad)}
+                            title="Eliminar"
+                            aria-label={`Eliminar ${unidad.nombre}`}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn"
+                            onClick={() => onReactivar(unidad)}
+                            title="Reactivar"
+                            aria-label={`Reactivar ${unidad.nombre}`}
+                          >
+                            <RotateCcw size={16} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6}>
+                  <td colSpan={5}>
                     <div className="maestro-empty-state">
                       <FolderKanban size={28} />
                       <p className="mb-1">

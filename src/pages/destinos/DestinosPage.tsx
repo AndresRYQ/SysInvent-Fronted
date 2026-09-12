@@ -8,6 +8,11 @@ import { TablaDestinos } from '../../components/destinos/TablaDestinos'
 import { DestinoDeleteModal } from '../../components/destinos/DestinoDeleteModal'
 import { DestinoFormModal } from '../../components/destinos/DestinoFormModal'
 import type { Destino } from '../../types/destino'
+import {
+  guardarStorage,
+  obtenerStorage,
+  STORAGE_KEYS,
+} from '../../services/storageService'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
@@ -16,66 +21,31 @@ const FILTROS_INICIALES: FiltrosDestinosValores = {
   estado: '',
 }
 
-const DESTINOS_MOCK: Destino[] = [
-  {
-    id: 'DES-001',
-    nombre: 'Almacén Central',
-    estado: true,
-    descripcion: 'Almacén principal de la empresa.',
-    fechaRegistro: '10/08/2026',
-  },
-  {
-    id: 'DES-002',
-    nombre: 'Planta de procesamiento',
-    estado: true,
-    descripcion: 'Planta donde se procesa la mercadería.',
-    fechaRegistro: '11/08/2026',
-  },
-  {
-    id: 'DES-003',
-    nombre: 'Sucursal Norte',
-    estado: true,
-    descripcion: 'Sucursal ubicada en la zona norte del país.',
-    fechaRegistro: '12/08/2026',
-  },
-  {
-    id: 'DES-004',
-    nombre: 'Punto de venta Sur',
-    estado: true,
-    descripcion: 'Punto de venta ubicado en la zona sur.',
-    fechaRegistro: '13/08/2026',
-  },
-  {
-    id: 'DES-005',
-    nombre: 'Depósito temporal',
-    estado: false,
-    descripcion: 'Depósito de almacenamiento temporal de productos.',
-    fechaRegistro: '14/08/2026',
-  },
-]
-
 function filtrarDestinos(destinos: Destino[], filtros: FiltrosDestinosValores) {
   const nombre = filtros.nombre.trim().toLowerCase()
 
-  return destinos.filter((destino) => {
+  return destinos
+    .filter((destino) => {
     const coincideNombre =
       nombre.length === 0 || destino.nombre.toLowerCase().includes(nombre)
 
     const coincideEstado =
       filtros.estado.length === 0 ||
-      (filtros.estado === 'activo' && destino.estado) ||
-      (filtros.estado === 'inactivo' && !destino.estado)
+      (filtros.estado === 'activo' && destino.activo === 1) ||
+      (filtros.estado === 'inactivo' && destino.activo === 0)
 
     return coincideNombre && coincideEstado
-  })
-}
-
-function crearFechaActual() {
-  return new Intl.DateTimeFormat('es-PE').format(new Date())
+    })
+    .sort((a, b) => a.id - b.id)
 }
 
 export function DestinosPage() {
-  const [destinos, setDestinos] = useState<Destino[]>(DESTINOS_MOCK)
+  const [destinos, setDestinos] = useState<Destino[]>(() =>
+    obtenerStorage<Destino[]>(STORAGE_KEYS.destinos, []).map((destino) => ({
+      ...destino,
+      id: Number(String(destino.id).replace('DES-', '')),
+    })),
+  )
   const [filtros, setFiltros] =
     useState<FiltrosDestinosValores>(FILTROS_INICIALES)
   const [filtrosAplicados, setFiltrosAplicados] =
@@ -87,6 +57,9 @@ export function DestinosPage() {
     useState<Destino | null>(null)
   const [modalDeleteOpen, setModalDeleteOpen] = useState(false)
   const [destinoAEliminar, setDestinoAEliminar] = useState<Destino | null>(null)
+  const [modalSoloLectura, setModalSoloLectura] = useState(false)
+  const [modalReactivarOpen, setModalReactivarOpen] = useState(false)
+  const [destinoAReactivar, setDestinoAReactivar] = useState<Destino | null>(null)
 
   const destinosFiltrados = useMemo(
     () => filtrarDestinos(destinos, filtrosAplicados),
@@ -101,6 +74,10 @@ export function DestinosPage() {
 
     return destinosFiltrados.slice(startIndex, endIndex)
   }, [destinosFiltrados, page, pageSize])
+
+  useEffect(() => {
+    guardarStorage(STORAGE_KEYS.destinos, destinos)
+  }, [destinos])
 
   useEffect(() => {
     const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
@@ -150,15 +127,26 @@ export function DestinosPage() {
               pageSize={pageSize}
               onAgregar={() => {
                 setDestinoEnEdicion(null)
+                setModalSoloLectura(false)
                 setModalFormOpen(true)
               }}
               onEditar={(destino) => {
                 setDestinoEnEdicion(destino)
+                setModalSoloLectura(false)
+                setModalFormOpen(true)
+              }}
+              onVisualizar={(destino) => {
+                setDestinoEnEdicion(destino)
+                setModalSoloLectura(true)
                 setModalFormOpen(true)
               }}
               onEliminar={(destino) => {
                 setDestinoAEliminar(destino)
                 setModalDeleteOpen(true)
+              }}
+              onReactivar={(destino) => {
+                setDestinoAReactivar(destino)
+                setModalReactivarOpen(true)
               }}
               onPageChange={(nextPage) => setPage(nextPage)}
               onPageSizeChange={(nextPageSize) => {
@@ -173,9 +161,11 @@ export function DestinosPage() {
       <DestinoFormModal
         abierto={modalFormOpen}
         destino={destinoEnEdicion}
+        soloLectura={modalSoloLectura}
         onClose={() => {
           setModalFormOpen(false)
           setDestinoEnEdicion(null)
+          setModalSoloLectura(false)
         }}
         onSubmit={(payload) => {
           if (destinoEnEdicion) {
@@ -188,13 +178,18 @@ export function DestinosPage() {
             )
           } else {
             setDestinos((actual) => {
-              const nextId = String(actual.length + 1).padStart(3, '0')
+              const ultimoId = actual.reduce(
+                (maximo, destino) =>
+                  Number.isNaN(destino.id)
+                    ? maximo
+                    : Math.max(maximo, destino.id),
+                0,
+              )
 
               return [
                 {
-                  id: `DES-${nextId}`,
-                  fechaRegistro: crearFechaActual(),
-                  estado: true,
+                  id: ultimoId + 1,
+                  activo: 1,
                   ...payload,
                 },
                 ...actual,
@@ -204,6 +199,7 @@ export function DestinosPage() {
 
           setModalFormOpen(false)
           setDestinoEnEdicion(null)
+          setModalSoloLectura(false)
         }}
       />
 
@@ -217,12 +213,39 @@ export function DestinosPage() {
         onConfirm={() => {
           if (destinoAEliminar) {
             setDestinos((actual) =>
-              actual.filter((destino) => destino.id !== destinoAEliminar.id),
+              actual.map((destino) =>
+                destino.id !== destinoAEliminar.id
+                  ? destino
+                  : { ...destino, activo: 0 },
+              ),
             )
           }
 
           setModalDeleteOpen(false)
           setDestinoAEliminar(null)
+        }}
+      />
+
+      <DestinoDeleteModal
+        abierto={modalReactivarOpen}
+        destino={destinoAReactivar}
+        accion="reactivar"
+        onClose={() => {
+          setModalReactivarOpen(false)
+          setDestinoAReactivar(null)
+        }}
+        onConfirm={() => {
+          if (destinoAReactivar) {
+            setDestinos((actual) =>
+              actual.map((destino) =>
+                destino.id === destinoAReactivar.id
+                  ? { ...destino, activo: 1 }
+                  : destino,
+              ),
+            )
+          }
+          setModalReactivarOpen(false)
+          setDestinoAReactivar(null)
         }}
       />
     </>

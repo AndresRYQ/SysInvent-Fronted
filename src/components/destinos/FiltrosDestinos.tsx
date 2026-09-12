@@ -44,7 +44,7 @@ export function FiltrosDestinos({
               className="form-control maestro-control"
               type="text"
               value={valores.nombre}
-              placeholder="Ej. Almacén Central, Planta, Sucursal"
+              placeholder="Buscar"
               onChange={(event) => onChange('nombre', event.target.value)}
             />
           </div>
@@ -70,7 +70,7 @@ export function FiltrosDestinos({
                   setEstadoAbierto(false)
                 }}
               >
-                <option value="">Todos</option>
+                <option value="">Seleccionar</option>
                 <option value="activo">Activo</option>
                 <option value="inactivo">Inactivo</option>
               </select>

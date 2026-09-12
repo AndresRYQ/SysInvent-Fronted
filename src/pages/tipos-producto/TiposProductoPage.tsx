@@ -7,6 +7,11 @@ import {
 import { TablaTiposProducto } from '../../components/tipos-productos/TablaTiposProducto'
 import { TipoProductoDeleteModal } from '../../components/tipos-productos/TipoProductoDeleteModal'
 import { TipoProductoFormModal } from '../../components/tipos-productos/TipoProductoFormModal'
+import {
+  guardarStorage,
+  obtenerStorage,
+  STORAGE_KEYS,
+} from '../../services/storageService'
 import type { TipoProducto } from '../../types/tipoProducto'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
@@ -16,44 +21,6 @@ const FILTROS_INICIALES: FiltrosTiposProductoValores = {
   estado: '',
 }
 
-const TIPOS_PRODUCTO_MOCK: TipoProducto[] = [
-  {
-    id: 'TP-001',
-    nombre: 'Insumo',
-    estado: true,
-    descripcion: 'Materia prima utilizada en los procesos.',
-    fechaRegistro: '10/08/2026',
-  },
-  {
-    id: 'TP-002',
-    nombre: 'Producto terminado',
-    estado: true,
-    descripcion: 'Artículos listos para su comercialización.',
-    fechaRegistro: '11/08/2026',
-  },
-  {
-    id: 'TP-003',
-    nombre: 'Material de empaque',
-    estado: true,
-    descripcion: 'Insumos para el embalaje de los productos.',
-    fechaRegistro: '12/08/2026',
-  },
-  {
-    id: 'TP-004',
-    nombre: 'Repuesto',
-    estado: true,
-    descripcion: 'Piezas de reemplazo para mantenimiento.',
-    fechaRegistro: '13/08/2026',
-  },
-  {
-    id: 'TP-005',
-    nombre: 'Material de oficina',
-    estado: false,
-    descripcion: 'Útiles y suministros para labores administrativas.',
-    fechaRegistro: '14/08/2026',
-  },
-]
-
 function filtrarTiposProducto(
   tiposProducto: TipoProducto[],
   filtros: FiltrosTiposProductoValores,
@@ -62,7 +29,8 @@ function filtrarTiposProducto(
     .trim()
     .toLowerCase()
 
-  return tiposProducto.filter((tipoProducto) => {
+  return tiposProducto
+    .filter((tipoProducto) => {
     const coincideNombre =
       nombre.length === 0 ||
       tipoProducto.nombre
@@ -72,23 +40,28 @@ function filtrarTiposProducto(
     const coincideEstado =
       filtros.estado.length === 0 ||
       (filtros.estado === 'activo' &&
-        tipoProducto.estado) ||
+        tipoProducto.activo === 1) ||
       (filtros.estado === 'inactivo' &&
-        !tipoProducto.estado)
+        tipoProducto.activo === 0)
 
     return coincideNombre && coincideEstado
-  })
-}
-
-function crearFechaActual() {
-  return new Intl.DateTimeFormat('es-PE').format(
-    new Date(),
-  )
+    })
+    .sort((a, b) => a.id - b.id)
 }
 
 export function TiposProductoPage() {
   const [tiposProducto, setTiposProducto] =
-    useState<TipoProducto[]>(TIPOS_PRODUCTO_MOCK)
+    useState<TipoProducto[]>(() =>
+      obtenerStorage<TipoProducto[]>(
+        STORAGE_KEYS.tiposProducto,
+        [],
+      ).map((tipoProducto) => ({
+        ...tipoProducto,
+        id: Number(
+          String(tipoProducto.id).replace('TP-', ''),
+        ),
+      })),
+    )
   const [filtros, setFiltros] =
     useState<FiltrosTiposProductoValores>(
       FILTROS_INICIALES,
@@ -106,6 +79,12 @@ export function TiposProductoPage() {
   const [modalDeleteOpen, setModalDeleteOpen] =
     useState(false)
   const [tipoProductoAEliminar, setTipoProductoAEliminar] =
+    useState<TipoProducto | null>(null)
+  const [modalSoloLectura, setModalSoloLectura] =
+    useState(false)
+  const [modalReactivarOpen, setModalReactivarOpen] =
+    useState(false)
+  const [tipoProductoAReactivar, setTipoProductoAReactivar] =
     useState<TipoProducto | null>(null)
 
   const tiposProductoFiltrados = useMemo(
@@ -132,6 +111,13 @@ export function TiposProductoPage() {
     page,
     pageSize,
   ])
+
+  useEffect(() => {
+    guardarStorage(
+      STORAGE_KEYS.tiposProducto,
+      tiposProducto,
+    )
+  }, [tiposProducto])
 
   useEffect(() => {
     const totalPages = Math.max(
@@ -184,15 +170,26 @@ export function TiposProductoPage() {
               pageSize={pageSize}
               onAgregar={() => {
                 setTipoProductoEnEdicion(null)
+                setModalSoloLectura(false)
                 setModalFormOpen(true)
               }}
               onEditar={(tipoProducto) => {
                 setTipoProductoEnEdicion(tipoProducto)
+                setModalSoloLectura(false)
+                setModalFormOpen(true)
+              }}
+              onVisualizar={(tipoProducto) => {
+                setTipoProductoEnEdicion(tipoProducto)
+                setModalSoloLectura(true)
                 setModalFormOpen(true)
               }}
               onEliminar={(tipoProducto) => {
                 setTipoProductoAEliminar(tipoProducto)
                 setModalDeleteOpen(true)
+              }}
+              onReactivar={(tipoProducto) => {
+                setTipoProductoAReactivar(tipoProducto)
+                setModalReactivarOpen(true)
               }}
               onPageChange={(nextPage) =>
                 setPage(nextPage)
@@ -209,9 +206,11 @@ export function TiposProductoPage() {
       <TipoProductoFormModal
         abierto={modalFormOpen}
         tipoProducto={tipoProductoEnEdicion}
+        soloLectura={modalSoloLectura}
         onClose={() => {
           setModalFormOpen(false)
           setTipoProductoEnEdicion(null)
+          setModalSoloLectura(false)
         }}
         onSubmit={(payload) => {
           if (tipoProductoEnEdicion) {
@@ -228,16 +227,18 @@ export function TiposProductoPage() {
             )
           } else {
             setTiposProducto((actual) => {
-              const nextId = String(
-                actual.length + 1,
-              ).padStart(3, '0')
+              const ultimoId = actual.reduce(
+                (maximo, tipoProducto) =>
+                  Number.isNaN(tipoProducto.id)
+                    ? maximo
+                    : Math.max(maximo, tipoProducto.id),
+                0,
+              )
 
               return [
                 {
-                  id: `TP-${nextId}`,
-                  fechaRegistro:
-                    crearFechaActual(),
-                  estado: true,
+                  id: ultimoId + 1,
+                  activo: 1,
                   ...payload,
                 },
                 ...actual,
@@ -247,6 +248,7 @@ export function TiposProductoPage() {
 
           setModalFormOpen(false)
           setTipoProductoEnEdicion(null)
+          setModalSoloLectura(false)
         }}
       />
 
@@ -260,16 +262,40 @@ export function TiposProductoPage() {
         onConfirm={() => {
           if (tipoProductoAEliminar) {
             setTiposProducto((actual) =>
-              actual.filter(
-                (tipoProducto) =>
-                  tipoProducto.id !==
-                  tipoProductoAEliminar.id,
+              actual.map((tipoProducto) =>
+                tipoProducto.id !== tipoProductoAEliminar.id
+                  ? tipoProducto
+                  : { ...tipoProducto, activo: 0 },
               ),
             )
           }
 
           setModalDeleteOpen(false)
           setTipoProductoAEliminar(null)
+        }}
+      />
+
+      <TipoProductoDeleteModal
+        abierto={modalReactivarOpen}
+        tipoProducto={tipoProductoAReactivar}
+        accion="reactivar"
+        onClose={() => {
+          setModalReactivarOpen(false)
+          setTipoProductoAReactivar(null)
+        }}
+        onConfirm={() => {
+          if (tipoProductoAReactivar) {
+            setTiposProducto((actual) =>
+              actual.map((tipoProducto) =>
+                tipoProducto.id === tipoProductoAReactivar.id
+                  ? { ...tipoProducto, activo: 1 }
+                  : tipoProducto,
+              ),
+            )
+          }
+
+          setModalReactivarOpen(false)
+          setTipoProductoAReactivar(null)
         }}
       />
     </>
