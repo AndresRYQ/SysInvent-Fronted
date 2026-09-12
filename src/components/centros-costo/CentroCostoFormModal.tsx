@@ -6,6 +6,7 @@ import type { CentroCosto } from '../../types/centroCosto'
 interface CentroCostoFormModalProps {
   abierto: boolean
   centroCosto: CentroCosto | null
+  soloLectura?: boolean
   onClose: () => void
   onSubmit: (
     centroCosto: Pick<
@@ -38,6 +39,7 @@ const ERRORES_INICIALES: CentroCostoFormErrores = {
 export function CentroCostoFormModal({
   abierto,
   centroCosto,
+  soloLectura = false,
   onClose,
   onSubmit,
 }: CentroCostoFormModalProps) {
@@ -91,8 +93,10 @@ export function CentroCostoFormModal({
               id="centro-costo-form-title"
               className="maestro-modal-title"
             >
-              {centroCosto
-                ? 'Editar centro de costo'
+              {soloLectura
+                ? 'Visualizar centro de costo'
+                : centroCosto
+                  ? 'Editar centro de costo'
                 : 'Registrar centro de costo'}
             </h3>
           </div>
@@ -156,6 +160,7 @@ export function CentroCostoFormModal({
                 }`}
                 type="text"
                 value={form.nombre}
+                readOnly={soloLectura}
                 aria-invalid={errores.nombre}
                 aria-describedby={
                   errores.nombre
@@ -212,6 +217,7 @@ export function CentroCostoFormModal({
                     : ''
                 }`}
                 value={form.descripcion}
+                readOnly={soloLectura}
                 aria-invalid={errores.descripcion}
                 aria-describedby={
                   errores.descripcion
@@ -236,7 +242,7 @@ export function CentroCostoFormModal({
                     }))
                   }
                 }}
-                rows={4}
+                rows={2}
                 required
               />
 
@@ -251,24 +257,26 @@ export function CentroCostoFormModal({
             </div>
           </div>
 
-          <div className="maestro-modal-footer">
-            <button
-              type="button"
-              className="btn maestro-btn-danger"
-              onClick={onClose}
-            >
-              <X size={18} />
-              Cancelar
-            </button>
+          {!soloLectura && (
+            <div className="maestro-modal-footer">
+              <button
+                type="button"
+                className="btn maestro-btn-danger"
+                onClick={onClose}
+              >
+                <X size={18} />
+                Cancelar
+              </button>
 
-            <button
-              type="submit"
-              className="btn maestro-btn-primary"
-            >
-              <Save size={18} />
-              Guardar
-            </button>
-          </div>
+              <button
+                type="submit"
+                className="btn maestro-btn-primary"
+              >
+                <Save size={18} />
+                Guardar
+              </button>
+            </div>
+          )}
         </form>
       </div>
     </div>

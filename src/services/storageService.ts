@@ -2,6 +2,7 @@ export const STORAGE_KEYS = {
   usuarios: 'agrihusac_usuarios',
   sesion: 'agrihusac_sesion',
   intentosLogin: 'agrihusac_intentos_login',
+  centrosCosto: 'agrihusac_centros_costo',
 } as const
 
 export function obtenerStorage<T>(

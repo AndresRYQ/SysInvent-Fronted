@@ -7,6 +7,11 @@ import {
   type FiltrosCentrosCostoValores,
 } from '../../components/centros-costo/FiltrosCentrosCosto'
 import { TablaCentrosCosto } from '../../components/centros-costo/TablaCentrosCosto'
+import {
+  guardarStorage,
+  obtenerStorage,
+  STORAGE_KEYS,
+} from '../../services/storageService'
 import type { CentroCosto } from '../../types/centroCosto'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
@@ -16,44 +21,6 @@ const FILTROS_INICIALES: FiltrosCentrosCostoValores = {
   estado: '',
 }
 
-const CENTROS_COSTO_MOCK: CentroCosto[] = [
-  {
-    id: 'CC-001',
-    nombre: 'Administración',
-    estado: true,
-    descripcion: 'Gestión general y dirección de la organización.',
-    fechaRegistro: '10/08/2026',
-  },
-  {
-    id: 'CC-002',
-    nombre: 'Producción',
-    estado: true,
-    descripcion: 'Procesos de fabricación y ensamblaje.',
-    fechaRegistro: '11/08/2026',
-  },
-  {
-    id: 'CC-003',
-    nombre: 'Mantenimiento',
-    estado: true,
-    descripcion: 'Conservación de equipos e instalaciones.',
-    fechaRegistro: '12/08/2026',
-  },
-  {
-    id: 'CC-004',
-    nombre: 'Logística',
-    estado: true,
-    descripcion: 'Almacenamiento y distribución de materiales.',
-    fechaRegistro: '13/08/2026',
-  },
-  {
-    id: 'CC-005',
-    nombre: 'Ventas',
-    estado: false,
-    descripcion: 'Comercialización de productos y servicios.',
-    fechaRegistro: '14/08/2026',
-  },
-]
-
 function filtrarCentrosCosto(
   centrosCosto: CentroCosto[],
   filtros: FiltrosCentrosCostoValores,
@@ -62,33 +29,39 @@ function filtrarCentrosCosto(
     .trim()
     .toLowerCase()
 
-  return centrosCosto.filter((centroCosto) => {
-    const coincideNombre =
-      nombre.length === 0 ||
-      centroCosto.nombre
-        .toLowerCase()
-        .includes(nombre)
+  return centrosCosto
+    .filter((centroCosto) => {
+      const coincideNombre =
+        nombre.length === 0 ||
+        centroCosto.nombre
+          .toLowerCase()
+          .includes(nombre)
 
-    const coincideEstado =
-      filtros.estado.length === 0 ||
-      (filtros.estado === 'activo' &&
-        centroCosto.estado) ||
-      (filtros.estado === 'inactivo' &&
-        !centroCosto.estado)
+      const coincideEstado =
+        filtros.estado.length === 0 ||
+        (filtros.estado === 'activo' &&
+          centroCosto.activo === 1) ||
+        (filtros.estado === 'inactivo' &&
+          centroCosto.activo === 0)
 
-    return coincideNombre && coincideEstado
-  })
-}
-
-function crearFechaActual() {
-  return new Intl.DateTimeFormat('es-PE').format(
-    new Date(),
-  )
+      return coincideNombre && coincideEstado
+    })
+    .sort((a, b) => a.id - b.id)
 }
 
 export function CentrosCostoPage() {
   const [centrosCosto, setCentrosCosto] =
-    useState<CentroCosto[]>(CENTROS_COSTO_MOCK)
+    useState<CentroCosto[]>(() =>
+      obtenerStorage<CentroCosto[]>(
+        STORAGE_KEYS.centrosCosto,
+        [],
+      ).map((centroCosto) => ({
+        ...centroCosto,
+        id: Number(
+          String(centroCosto.id).replace('CC-', ''),
+        ),
+      })),
+    )
   const [filtros, setFiltros] =
     useState<FiltrosCentrosCostoValores>(
       FILTROS_INICIALES,
@@ -103,9 +76,15 @@ export function CentrosCostoPage() {
     useState(false)
   const [centroCostoEnEdicion, setCentroCostoEnEdicion] =
     useState<CentroCosto | null>(null)
+  const [modalSoloLectura, setModalSoloLectura] =
+    useState(false)
   const [modalDeleteOpen, setModalDeleteOpen] =
     useState(false)
   const [centroCostoAEliminar, setCentroCostoAEliminar] =
+    useState<CentroCosto | null>(null)
+  const [modalReactivarOpen, setModalReactivarOpen] =
+    useState(false)
+  const [centroCostoAReactivar, setCentroCostoAReactivar] =
     useState<CentroCosto | null>(null)
 
   const centrosCostoFiltrados = useMemo(
@@ -132,6 +111,13 @@ export function CentrosCostoPage() {
     page,
     pageSize,
   ])
+
+  useEffect(() => {
+    guardarStorage(
+      STORAGE_KEYS.centrosCosto,
+      centrosCosto,
+    )
+  }, [centrosCosto])
 
   useEffect(() => {
     const totalPages = Math.max(
@@ -188,11 +174,21 @@ export function CentrosCostoPage() {
               }}
               onEditar={(centroCosto) => {
                 setCentroCostoEnEdicion(centroCosto)
+                setModalSoloLectura(false)
+                setModalFormOpen(true)
+              }}
+              onVisualizar={(centroCosto) => {
+                setCentroCostoEnEdicion(centroCosto)
+                setModalSoloLectura(true)
                 setModalFormOpen(true)
               }}
               onEliminar={(centroCosto) => {
                 setCentroCostoAEliminar(centroCosto)
                 setModalDeleteOpen(true)
+              }}
+              onReactivar={(centroCosto) => {
+                setCentroCostoAReactivar(centroCosto)
+                setModalReactivarOpen(true)
               }}
               onPageChange={(nextPage) =>
                 setPage(nextPage)
@@ -209,9 +205,11 @@ export function CentrosCostoPage() {
       <CentroCostoFormModal
         abierto={modalFormOpen}
         centroCosto={centroCostoEnEdicion}
+        soloLectura={modalSoloLectura}
         onClose={() => {
           setModalFormOpen(false)
           setCentroCostoEnEdicion(null)
+          setModalSoloLectura(false)
         }}
         onSubmit={(payload) => {
           if (centroCostoEnEdicion) {
@@ -228,16 +226,19 @@ export function CentrosCostoPage() {
             )
           } else {
             setCentrosCosto((actual) => {
-              const nextId = String(
-                actual.length + 1,
-              ).padStart(3, '0')
+              const ultimoId = actual.reduce(
+                (maximo, centroCosto) => {
+                  return Number.isNaN(centroCosto.id)
+                    ? maximo
+                    : Math.max(maximo, centroCosto.id)
+                },
+                0,
+              )
 
               return [
                 {
-                  id: `CC-${nextId}`,
-                  fechaRegistro:
-                    crearFechaActual(),
-                  estado: true,
+                  id: ultimoId + 1,
+                  activo: 1,
                   ...payload,
                 },
                 ...actual,
@@ -247,6 +248,7 @@ export function CentrosCostoPage() {
 
           setModalFormOpen(false)
           setCentroCostoEnEdicion(null)
+          setModalSoloLectura(false)
         }}
       />
 
@@ -260,16 +262,40 @@ export function CentrosCostoPage() {
         onConfirm={() => {
           if (centroCostoAEliminar) {
             setCentrosCosto((actual) =>
-              actual.filter(
-                (centroCosto) =>
-                  centroCosto.id !==
-                  centroCostoAEliminar.id,
+              actual.map((centroCosto) =>
+                centroCosto.id !== centroCostoAEliminar.id
+                  ? centroCosto
+                  : { ...centroCosto, activo: 0 },
               ),
             )
           }
 
           setModalDeleteOpen(false)
           setCentroCostoAEliminar(null)
+        }}
+      />
+
+      <CentroCostoDeleteModal
+        abierto={modalReactivarOpen}
+        centroCosto={centroCostoAReactivar}
+        accion="reactivar"
+        onClose={() => {
+          setModalReactivarOpen(false)
+          setCentroCostoAReactivar(null)
+        }}
+        onConfirm={() => {
+          if (centroCostoAReactivar) {
+            setCentrosCosto((actual) =>
+              actual.map((registro) =>
+                registro.id === centroCostoAReactivar.id
+                  ? { ...registro, activo: 1 }
+                  : registro,
+              ),
+            )
+          }
+
+          setModalReactivarOpen(false)
+          setCentroCostoAReactivar(null)
         }}
       />
     </>
