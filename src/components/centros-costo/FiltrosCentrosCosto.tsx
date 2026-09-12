@@ -50,7 +50,7 @@ export function FiltrosCentrosCosto({
               className="form-control maestro-control"
               type="text"
               value={valores.nombre}
-              placeholder="Buscar"
+              placeholder="Ej. Producción, Mantenimiento, Administración"
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }
@@ -62,6 +62,7 @@ export function FiltrosCentrosCosto({
               Estado
             </label>
 
+<<<<<<< HEAD
             <Select
               inputId="estadoCentroCosto"
               options={opcionesEstado}
@@ -130,6 +131,30 @@ export function FiltrosCentrosCosto({
                 }),
               }}
             />
+=======
+            <div
+              className={`maestro-select-wrap${estadoAbierto ? ' is-open' : ''}`}
+            >
+              <select
+                id="estadoCentroCosto"
+                className="form-select maestro-control maestro-select-control"
+                value={valores.estado}
+                onMouseDown={() => setEstadoAbierto(true)}
+                onKeyDown={() => setEstadoAbierto(true)}
+                onFocus={() => setEstadoAbierto(true)}
+                onBlur={() => setEstadoAbierto(false)}
+                onChange={(event) => {
+                  onChange('estado', event.target.value)
+                  setEstadoAbierto(false)
+                }}
+              >
+                <option value="">Todos</option>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+              <ChevronDown size={16} />
+            </div>
+>>>>>>> 62b19fcf30321b21ea7cf9198aa091470de57ac8
           </div>
 
         </div>

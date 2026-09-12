@@ -1,50 +1,47 @@
 import { useEffect, useState } from 'react'
 import { Save, X } from 'lucide-react'
 
-import type { TipoProducto } from '../../types/tipoProducto'
+import type {
+  TipoProducto,
+  TipoProductoFormData,
+} from '../../types/tipoProducto'
 
 interface TipoProductoFormModalProps {
   abierto: boolean
   tipoProducto: TipoProducto | null
-  soloLectura?: boolean
+  error: string
   onClose: () => void
   onSubmit: (
-    tipoProducto: Pick<
-      TipoProducto,
-      'nombre' | 'descripcion'
-    >,
+    datos: TipoProductoFormData,
   ) => void
 }
 
-interface TipoProductoFormState {
+interface TipoProductoFormErrores {
   nombre: string
   descripcion: string
 }
 
-interface TipoProductoFormErrores {
-  nombre: boolean
-  descripcion: boolean
-}
-
-const FORM_INICIAL: TipoProductoFormState = {
+const FORM_INICIAL: TipoProductoFormData = {
   nombre: '',
   descripcion: '',
+  estado: true,
 }
 
 const ERRORES_INICIALES: TipoProductoFormErrores = {
-  nombre: false,
-  descripcion: false,
+  nombre: '',
+  descripcion: '',
 }
 
 export function TipoProductoFormModal({
   abierto,
   tipoProducto,
-  soloLectura = false,
+  error,
   onClose,
   onSubmit,
 }: TipoProductoFormModalProps) {
   const [form, setForm] =
-    useState<TipoProductoFormState>(FORM_INICIAL)
+    useState<TipoProductoFormData>(FORM_INICIAL)
+
   const [errores, setErrores] =
     useState<TipoProductoFormErrores>(
       ERRORES_INICIALES,
@@ -59,12 +56,12 @@ export function TipoProductoFormModal({
       setForm({
         nombre: tipoProducto.nombre,
         descripcion: tipoProducto.descripcion,
+        estado: tipoProducto.estado,
       })
-      setErrores(ERRORES_INICIALES)
-      return
+    } else {
+      setForm(FORM_INICIAL)
     }
 
-    setForm(FORM_INICIAL)
     setErrores(ERRORES_INICIALES)
   }, [abierto, tipoProducto])
 
@@ -72,10 +69,46 @@ export function TipoProductoFormModal({
     return null
   }
 
+  function validarFormulario(): boolean {
+    const nuevosErrores: TipoProductoFormErrores = {
+      nombre: '',
+      descripcion: '',
+    }
+
+    const nombre = form.nombre.trim()
+    const descripcion = form.descripcion.trim()
+
+    if (!nombre) {
+      nuevosErrores.nombre = 'Campo requerido'
+    } else if (nombre.length < 2) {
+      nuevosErrores.nombre =
+        'Debe tener al menos 2 caracteres'
+    } else if (nombre.length > 80) {
+      nuevosErrores.nombre =
+        'No puede superar los 80 caracteres'
+    }
+
+    if (!descripcion) {
+      nuevosErrores.descripcion =
+        'Campo requerido'
+    } else if (descripcion.length > 250) {
+      nuevosErrores.descripcion =
+        'No puede superar los 250 caracteres'
+    }
+
+    setErrores(nuevosErrores)
+
+    return (
+      !nuevosErrores.nombre &&
+      !nuevosErrores.descripcion
+    )
+  }
+
   return (
     <div
       className="maestro-modal-backdrop"
       role="presentation"
+      onClick={onClose}
     >
       <div
         className="maestro-modal-card"
@@ -92,12 +125,14 @@ export function TipoProductoFormModal({
               id="tipo-producto-form-title"
               className="maestro-modal-title"
             >
-              {soloLectura
-                ? 'Visualizar tipo de producto'
-                : tipoProducto
-                  ? 'Editar tipo de producto'
-                  : 'Registrar tipo de producto'}
+              {tipoProducto
+                ? 'Editar tipo de producto'
+                : 'Registrar tipo de producto'}
             </h3>
+
+            <p className="maestro-modal-copy mb-0">
+              Completa los datos solicitados.
+            </p>
           </div>
 
           <button
@@ -115,19 +150,7 @@ export function TipoProductoFormModal({
           onSubmit={(event) => {
             event.preventDefault()
 
-            const nuevosErrores = {
-              nombre:
-                form.nombre.trim().length === 0,
-              descripcion:
-                form.descripcion.trim().length === 0,
-            }
-
-            setErrores(nuevosErrores)
-
-            if (
-              nuevosErrores.nombre ||
-              nuevosErrores.descripcion
-            ) {
+            if (!validarFormulario()) {
               return
             }
 
@@ -135,17 +158,30 @@ export function TipoProductoFormModal({
               nombre: form.nombre.trim(),
               descripcion:
                 form.descripcion.trim(),
+              estado: form.estado,
             })
           }}
         >
           <div className="maestro-modal-body">
-            <div className="mb-2">
+            {error && (
+              <div
+                className="alert alert-danger py-2"
+                role="alert"
+              >
+                {error}
+              </div>
+            )}
+
+            <div className="mb-3">
               <label
                 className="form-label maestro-label"
                 htmlFor="tipoProductoNombreModal"
               >
                 Nombre de tipo de producto
-                <span className="maestro-required" aria-hidden="true">
+                <span
+                  className="maestro-required"
+                  aria-hidden="true"
+                >
                   *
                 </span>
               </label>
@@ -158,14 +194,11 @@ export function TipoProductoFormModal({
                     : ''
                 }`}
                 type="text"
+                maxLength={80}
                 value={form.nombre}
-                readOnly={soloLectura}
-                aria-invalid={errores.nombre}
-                aria-describedby={
-                  errores.nombre
-                    ? 'tipoProductoNombreModalError'
-                    : undefined
-                }
+                aria-invalid={Boolean(
+                  errores.nombre,
+                )}
                 onChange={(event) => {
                   const value = event.target.value
 
@@ -174,36 +207,32 @@ export function TipoProductoFormModal({
                     nombre: value,
                   }))
 
-                  if (
-                    errores.nombre &&
-                    value.trim().length > 0
-                  ) {
+                  if (errores.nombre) {
                     setErrores((actual) => ({
                       ...actual,
-                      nombre: false,
+                      nombre: '',
                     }))
                   }
                 }}
-                required
               />
 
               {errores.nombre && (
-                <div
-                  id="tipoProductoNombreModalError"
-                  className="maestro-field-error"
-                >
-                  Campo requerido
+                <div className="maestro-field-error">
+                  {errores.nombre}
                 </div>
               )}
             </div>
 
-            <div>
+            <div className="mb-3">
               <label
                 className="form-label maestro-label"
                 htmlFor="tipoProductoDescripcionModal"
               >
                 Descripción
-                <span className="maestro-required" aria-hidden="true">
+                <span
+                  className="maestro-required"
+                  aria-hidden="true"
+                >
                   *
                 </span>
               </label>
@@ -215,14 +244,12 @@ export function TipoProductoFormModal({
                     ? ' maestro-control--error'
                     : ''
                 }`}
+                maxLength={250}
+                rows={4}
                 value={form.descripcion}
-                readOnly={soloLectura}
-                aria-invalid={errores.descripcion}
-                aria-describedby={
-                  errores.descripcion
-                    ? 'tipoProductoDescripcionModalError'
-                    : undefined
-                }
+                aria-invalid={Boolean(
+                  errores.descripcion,
+                )}
                 onChange={(event) => {
                   const value = event.target.value
 
@@ -231,36 +258,67 @@ export function TipoProductoFormModal({
                     descripcion: value,
                   }))
 
-                  if (
-                    errores.descripcion &&
-                    value.trim().length > 0
-                  ) {
+                  if (errores.descripcion) {
                     setErrores((actual) => ({
                       ...actual,
-                      descripcion: false,
+                      descripcion: '',
                     }))
                   }
                 }}
-                rows={2}
-                required
               />
 
-              {errores.descripcion && (
-                <div
-                  id="tipoProductoDescripcionModalError"
-                  className="maestro-field-error"
-                >
-                  Campo requerido
+              <div className="d-flex justify-content-between">
+                <div>
+                  {errores.descripcion && (
+                    <span className="maestro-field-error">
+                      {errores.descripcion}
+                    </span>
+                  )}
                 </div>
-              )}
+
+                <small className="text-muted">
+                  {form.descripcion.length}/250
+                </small>
+              </div>
+            </div>
+
+            <div>
+              <label
+                className="form-label maestro-label"
+                htmlFor="tipoProductoEstadoModal"
+              >
+                Estado
+              </label>
+
+              <select
+                id="tipoProductoEstadoModal"
+                className="form-select maestro-control"
+                value={
+                  form.estado ? 'activo' : 'inactivo'
+                }
+                onChange={(event) =>
+                  setForm((actual) => ({
+                    ...actual,
+                    estado:
+                      event.target.value ===
+                      'activo',
+                  }))
+                }
+              >
+                <option value="activo">
+                  Activo
+                </option>
+                <option value="inactivo">
+                  Inactivo
+                </option>
+              </select>
             </div>
           </div>
 
-          {!soloLectura && (
-            <div className="maestro-modal-footer">
+          <div className="maestro-modal-footer">
             <button
               type="button"
-              className="btn maestro-btn-danger"
+              className="btn maestro-btn-secondary"
               onClick={onClose}
             >
               <X size={18} />
@@ -272,10 +330,11 @@ export function TipoProductoFormModal({
               className="btn maestro-btn-primary"
             >
               <Save size={18} />
-              Guardar
+              {tipoProducto
+                ? 'Guardar cambios'
+                : 'Registrar'}
             </button>
-            </div>
-          )}
+          </div>
         </form>
       </div>
     </div>

@@ -1,6 +1,13 @@
 export interface TipoProducto {
-  id: number
+  id: string
   nombre: string
   descripcion: string
-  activo: 0 | 1
+  estado: boolean
+  fechaRegistro: string
+}
+
+export interface TipoProductoFormData {
+  nombre: string
+  descripcion: string
+  estado: boolean
 }

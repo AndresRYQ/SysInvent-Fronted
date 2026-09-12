@@ -1,46 +1,55 @@
-import { useEffect, useState } from 'react'
+import {
+  useEffect,
+  useState,
+} from 'react'
+
 import { Save, X } from 'lucide-react'
 
-import type { Destino } from '../../types/destino'
+import type {
+  Destino,
+  DestinoFormData,
+} from '../../types/destino'
 
 interface DestinoFormModalProps {
   abierto: boolean
   destino: Destino | null
-  soloLectura?: boolean
+  error: string
   onClose: () => void
-  onSubmit: (destino: Pick<Destino, 'nombre' | 'descripcion'>) => void
+  onSubmit: (
+    datos: DestinoFormData,
+  ) => void
 }
 
-interface DestinoFormState {
+interface ErroresFormulario {
   nombre: string
   descripcion: string
 }
 
-interface DestinoFormErrores {
-  nombre: boolean
-  descripcion: boolean
-}
-
-const FORM_INICIAL: DestinoFormState = {
+const FORM_INICIAL: DestinoFormData = {
   nombre: '',
   descripcion: '',
+  estado: true,
 }
 
-const ERRORES_INICIALES: DestinoFormErrores = {
-  nombre: false,
-  descripcion: false,
+const ERRORES_INICIALES: ErroresFormulario = {
+  nombre: '',
+  descripcion: '',
 }
 
 export function DestinoFormModal({
   abierto,
   destino,
-  soloLectura = false,
+  error,
   onClose,
   onSubmit,
 }: DestinoFormModalProps) {
-  const [form, setForm] = useState<DestinoFormState>(FORM_INICIAL)
+  const [form, setForm] =
+    useState<DestinoFormData>(
+      FORM_INICIAL,
+    )
+
   const [errores, setErrores] =
-    useState<DestinoFormErrores>(
+    useState<ErroresFormulario>(
       ERRORES_INICIALES,
     )
 
@@ -53,12 +62,12 @@ export function DestinoFormModal({
       setForm({
         nombre: destino.nombre,
         descripcion: destino.descripcion,
+        estado: destino.estado,
       })
-      setErrores(ERRORES_INICIALES)
-      return
+    } else {
+      setForm(FORM_INICIAL)
     }
 
-    setForm(FORM_INICIAL)
     setErrores(ERRORES_INICIALES)
   }, [abierto, destino])
 
@@ -66,34 +75,79 @@ export function DestinoFormModal({
     return null
   }
 
+  function validarFormulario(): boolean {
+    const nuevosErrores: ErroresFormulario = {
+      nombre: '',
+      descripcion: '',
+    }
+
+    const nombre = form.nombre.trim()
+    const descripcion =
+      form.descripcion.trim()
+
+    if (!nombre) {
+      nuevosErrores.nombre =
+        'Campo requerido'
+    } else if (nombre.length < 2) {
+      nuevosErrores.nombre =
+        'Debe tener al menos 2 caracteres'
+    } else if (nombre.length > 100) {
+      nuevosErrores.nombre =
+        'No puede superar los 100 caracteres'
+    }
+
+    if (!descripcion) {
+      nuevosErrores.descripcion =
+        'Campo requerido'
+    } else if (descripcion.length > 250) {
+      nuevosErrores.descripcion =
+        'No puede superar los 250 caracteres'
+    }
+
+    setErrores(nuevosErrores)
+
+    return (
+      !nuevosErrores.nombre &&
+      !nuevosErrores.descripcion
+    )
+  }
+
   return (
     <div
       className="maestro-modal-backdrop"
       role="presentation"
+      onClick={onClose}
     >
       <div
         className="maestro-modal-card"
         role="dialog"
         aria-modal="true"
         aria-labelledby="destino-form-title"
-        onClick={(event) => event.stopPropagation()}
+        onClick={(event) =>
+          event.stopPropagation()
+        }
       >
         <div className="maestro-modal-header">
           <div className="maestro-modal-header__content">
-            <h3 id="destino-form-title" className="maestro-modal-title">
-              {soloLectura
-                ? 'Visualizar destino'
-                : destino
-                  ? 'Editar destino'
-                  : 'Registrar destino'}
+            <h3
+              id="destino-form-title"
+              className="maestro-modal-title"
+            >
+              {destino
+                ? 'Editar destino'
+                : 'Registrar destino'}
             </h3>
+
+            <p className="maestro-modal-copy mb-0">
+              Completa los datos solicitados.
+            </p>
           </div>
 
           <button
             type="button"
             className="btn maestro-modal-close"
             onClick={onClose}
-            aria-label="Cerrar modal"
+            aria-label="Cerrar"
           >
             <X size={18} />
           </button>
@@ -104,36 +158,35 @@ export function DestinoFormModal({
           onSubmit={(event) => {
             event.preventDefault()
 
-            const nuevosErrores = {
-              nombre:
-                form.nombre.trim().length === 0,
-              descripcion:
-                form.descripcion.trim().length === 0,
-            }
-
-            setErrores(nuevosErrores)
-
-            if (
-              nuevosErrores.nombre ||
-              nuevosErrores.descripcion
-            ) {
+            if (!validarFormulario()) {
               return
             }
 
             onSubmit({
               nombre: form.nombre.trim(),
-              descripcion: form.descripcion.trim(),
+              descripcion:
+                form.descripcion.trim(),
+              estado: form.estado,
             })
           }}
         >
           <div className="maestro-modal-body">
-            <div className="mb-2">
+            {error && (
+              <div
+                className="alert alert-danger py-2"
+                role="alert"
+              >
+                {error}
+              </div>
+            )}
+
+            <div className="mb-3">
               <label
                 className="form-label maestro-label"
                 htmlFor="destinoNombreModal"
               >
-                Nombre de destino
-                <span className="maestro-required" aria-hidden="true">
+                Nombre del destino
+                <span className="maestro-required">
                   *
                 </span>
               </label>
@@ -146,52 +199,39 @@ export function DestinoFormModal({
                     : ''
                 }`}
                 type="text"
+                maxLength={100}
+                placeholder="Ej. Almacén Central"
                 value={form.nombre}
-                readOnly={soloLectura}
-                aria-invalid={errores.nombre}
-                aria-describedby={
-                  errores.nombre
-                    ? 'destinoNombreModalError'
-                    : undefined
-                }
+                aria-invalid={Boolean(
+                  errores.nombre,
+                )}
                 onChange={(event) => {
-                  const value = event.target.value
-
                   setForm((actual) => ({
                     ...actual,
-                    nombre: value,
+                    nombre: event.target.value,
                   }))
 
-                  if (
-                    errores.nombre &&
-                    value.trim().length > 0
-                  ) {
-                    setErrores((actual) => ({
-                      ...actual,
-                      nombre: false,
-                    }))
-                  }
+                  setErrores((actual) => ({
+                    ...actual,
+                    nombre: '',
+                  }))
                 }}
-                required
               />
 
               {errores.nombre && (
-                <div
-                  id="destinoNombreModalError"
-                  className="maestro-field-error"
-                >
-                  Campo requerido
+                <div className="maestro-field-error">
+                  {errores.nombre}
                 </div>
               )}
             </div>
 
-            <div>
+            <div className="mb-3">
               <label
                 className="form-label maestro-label"
                 htmlFor="destinoDescripcionModal"
               >
                 Descripción
-                <span className="maestro-required" aria-hidden="true">
+                <span className="maestro-required">
                   *
                 </span>
               </label>
@@ -203,64 +243,98 @@ export function DestinoFormModal({
                     ? ' maestro-control--error'
                     : ''
                 }`}
+                rows={4}
+                maxLength={250}
                 value={form.descripcion}
-                readOnly={soloLectura}
-                aria-invalid={errores.descripcion}
-                aria-describedby={
-                  errores.descripcion
-                    ? 'destinoDescripcionModalError'
-                    : undefined
-                }
+                aria-invalid={Boolean(
+                  errores.descripcion,
+                )}
                 onChange={(event) => {
-                  const value = event.target.value
-
                   setForm((actual) => ({
                     ...actual,
-                    descripcion: value,
+                    descripcion:
+                      event.target.value,
                   }))
 
-                  if (
-                    errores.descripcion &&
-                    value.trim().length > 0
-                  ) {
-                    setErrores((actual) => ({
-                      ...actual,
-                      descripcion: false,
-                    }))
-                  }
+                  setErrores((actual) => ({
+                    ...actual,
+                    descripcion: '',
+                  }))
                 }}
-                rows={2}
-                required
               />
 
-              {errores.descripcion && (
-                <div
-                  id="destinoDescripcionModalError"
-                  className="maestro-field-error"
-                >
-                  Campo requerido
+              <div className="d-flex justify-content-between">
+                <div>
+                  {errores.descripcion && (
+                    <span className="maestro-field-error">
+                      {errores.descripcion}
+                    </span>
+                  )}
                 </div>
-              )}
+
+                <small className="text-muted">
+                  {form.descripcion.length}/250
+                </small>
+              </div>
+            </div>
+
+            <div>
+              <label
+                className="form-label maestro-label"
+                htmlFor="destinoEstadoModal"
+              >
+                Estado
+              </label>
+
+              <select
+                id="destinoEstadoModal"
+                className="form-select maestro-control"
+                value={
+                  form.estado
+                    ? 'activo'
+                    : 'inactivo'
+                }
+                onChange={(event) =>
+                  setForm((actual) => ({
+                    ...actual,
+                    estado:
+                      event.target.value ===
+                      'activo',
+                  }))
+                }
+              >
+                <option value="activo">
+                  Activo
+                </option>
+
+                <option value="inactivo">
+                  Inactivo
+                </option>
+              </select>
             </div>
           </div>
 
-          {!soloLectura && (
-            <div className="maestro-modal-footer">
+          <div className="maestro-modal-footer">
             <button
               type="button"
-              className="btn maestro-btn-danger"
+              className="btn maestro-btn-secondary"
               onClick={onClose}
             >
               <X size={18} />
               Cancelar
             </button>
 
-            <button type="submit" className="btn maestro-btn-primary">
+            <button
+              type="submit"
+              className="btn maestro-btn-primary"
+            >
               <Save size={18} />
-              Guardar
+
+              {destino
+                ? 'Guardar cambios'
+                : 'Registrar'}
             </button>
-            </div>
-          )}
+          </div>
         </form>
       </div>
     </div>

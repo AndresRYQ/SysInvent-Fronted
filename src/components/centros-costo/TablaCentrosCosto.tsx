@@ -1,9 +1,8 @@
 import {
   FolderKanban,
-  Eye,
   Pencil,
   Plus,
-  RotateCcw,
+  ShieldCheck,
   Store,
   Trash2,
 } from 'lucide-react'
@@ -18,9 +17,7 @@ interface TablaCentrosCostoProps {
   pageSize: number
   onAgregar: () => void
   onEditar: (centroCosto: CentroCosto) => void
-  onVisualizar: (centroCosto: CentroCosto) => void
   onEliminar: (centroCosto: CentroCosto) => void
-  onReactivar: (centroCosto: CentroCosto) => void
   onPageChange: (page: number) => void
   onPageSizeChange: (pageSize: number) => void
 }
@@ -32,9 +29,7 @@ export function TablaCentrosCosto({
   pageSize,
   onAgregar,
   onEditar,
-  onVisualizar,
   onEliminar,
-  onReactivar,
   onPageChange,
   onPageSizeChange,
 }: TablaCentrosCostoProps) {
@@ -63,9 +58,10 @@ export function TablaCentrosCosto({
           <table className="table maestro-table align-middle mb-0">
             <thead>
               <tr>
-                <th>N°</th>
-                <th>Nombre</th>
+                <th>ID</th>
+                <th>Nombre de centro de costo</th>
                 <th>Descripción</th>
+                <th>Fecha de registro</th>
                 <th>Estado</th>
                 <th className="text-center">Acciones</th>
               </tr>
@@ -80,6 +76,7 @@ export function TablaCentrosCosto({
                         {centroCosto.id}
                       </span>
                     </td>
+
                     <td>
                       <div className="maestro-cell-main">
                         <span className="maestro-cell-icon">
@@ -88,74 +85,51 @@ export function TablaCentrosCosto({
                         {centroCosto.nombre}
                       </div>
                     </td>
+
                     <td>{centroCosto.descripcion}</td>
+                    <td>{centroCosto.fechaRegistro}</td>
+
                     <td>
                       <span
                         className={
-                          centroCosto.activo === 1
+                          centroCosto.estado
                             ? 'maestro-status maestro-status--active'
                             : 'maestro-status maestro-status--inactive'
                         }
                       >
-                        <span
-                          className="maestro-status__dot"
-                          aria-hidden="true"
-                        />
-                        {centroCosto.activo === 1 ? 'Activo' : 'Inactivo'}
+                        <ShieldCheck size={14} />
+                        {centroCosto.estado ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
+
                     <td>
                       <div className="maestro-actions">
-                        {centroCosto.activo === 1 ? (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            onClick={() => onEditar(centroCosto)}
-                            title="Editar"
-                            aria-label={`Editar ${centroCosto.nombre}`}
-                          >
-                            <Pencil size={16} />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            onClick={() => onVisualizar(centroCosto)}
-                            title="Visualizar"
-                            aria-label={`Visualizar ${centroCosto.nombre}`}
-                          >
-                            <Eye size={16} />
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          className="btn maestro-action-btn"
+                          onClick={() => onEditar(centroCosto)}
+                          title="Editar"
+                          aria-label={`Editar ${centroCosto.nombre}`}
+                        >
+                          <Pencil size={16} />
+                        </button>
 
-                        {centroCosto.activo === 1 ? (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn maestro-action-btn--danger"
-                            onClick={() => onEliminar(centroCosto)}
-                            title="Eliminar"
-                            aria-label={`Eliminar ${centroCosto.nombre}`}
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            onClick={() => onReactivar(centroCosto)}
-                            title="Reactivar"
-                            aria-label={`Reactivar ${centroCosto.nombre}`}
-                          >
-                            <RotateCcw size={16} />
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          className="btn maestro-action-btn maestro-action-btn--danger"
+                          onClick={() => onEliminar(centroCosto)}
+                          title="Eliminar"
+                          aria-label={`Eliminar ${centroCosto.nombre}`}
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5}>
+                  <td colSpan={6}>
                     <div className="maestro-empty-state">
                       <FolderKanban size={28} />
                       <p className="mb-1">
@@ -183,3 +157,4 @@ export function TablaCentrosCosto({
     </section>
   )
 }
+

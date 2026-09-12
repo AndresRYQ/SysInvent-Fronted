@@ -1,24 +1,18 @@
 import { useEffect, useState } from 'react'
 import { Save, X } from 'lucide-react'
-
-import type { CentroCosto } from '../../types/centroCosto'
+import type {
+  CentroCosto,
+  CentroCostoFormData,
+} from '../../types/centroCosto'
 
 interface CentroCostoFormModalProps {
   abierto: boolean
   centroCosto: CentroCosto | null
-  soloLectura?: boolean
+  error: string
   onClose: () => void
   onSubmit: (
-    centroCosto: Pick<
-      CentroCosto,
-      'nombre' | 'descripcion'
-    >,
+    datos: CentroCostoFormData,
   ) => void
-}
-
-interface CentroCostoFormState {
-  nombre: string
-  descripcion: string
 }
 
 interface CentroCostoFormErrores {
@@ -26,9 +20,10 @@ interface CentroCostoFormErrores {
   descripcion: boolean
 }
 
-const FORM_INICIAL: CentroCostoFormState = {
+const FORM_INICIAL: CentroCostoFormData = {
   nombre: '',
   descripcion: '',
+  estado: true,
 }
 
 const ERRORES_INICIALES: CentroCostoFormErrores = {
@@ -39,12 +34,12 @@ const ERRORES_INICIALES: CentroCostoFormErrores = {
 export function CentroCostoFormModal({
   abierto,
   centroCosto,
-  soloLectura = false,
+  error,
   onClose,
   onSubmit,
 }: CentroCostoFormModalProps) {
   const [form, setForm] =
-    useState<CentroCostoFormState>(FORM_INICIAL)
+    useState<CentroCostoFormData>(FORM_INICIAL)
   const [errores, setErrores] =
     useState<CentroCostoFormErrores>(
       ERRORES_INICIALES,
@@ -59,6 +54,7 @@ export function CentroCostoFormModal({
       setForm({
         nombre: centroCosto.nombre,
         descripcion: centroCosto.descripcion,
+        estado: centroCosto.estado,
       })
       setErrores(ERRORES_INICIALES)
       return
@@ -76,6 +72,7 @@ export function CentroCostoFormModal({
     <div
       className="maestro-modal-backdrop"
       role="presentation"
+      onClick={onClose}
     >
       <div
         className="maestro-modal-card"
@@ -92,10 +89,8 @@ export function CentroCostoFormModal({
               id="centro-costo-form-title"
               className="maestro-modal-title"
             >
-              {soloLectura
-                ? 'Visualizar centro de costo'
-                : centroCosto
-                  ? 'Editar centro de costo'
+              {centroCosto
+                ? 'Editar centro de costo'
                 : 'Registrar centro de costo'}
             </h3>
           </div>
@@ -131,14 +126,23 @@ export function CentroCostoFormModal({
               return
             }
 
-            onSubmit({
+           onSubmit({
               nombre: form.nombre.trim(),
               descripcion:
                 form.descripcion.trim(),
+              estado: form.estado,
             })
           }}
         >
           <div className="maestro-modal-body">
+            {error && (
+              <div
+                className="alert alert-danger py-2"
+                role="alert"
+              >
+                {error}
+              </div>
+            )}
             <div className="mb-3">
               <label
                 className="form-label maestro-label"
@@ -159,7 +163,6 @@ export function CentroCostoFormModal({
                 }`}
                 type="text"
                 value={form.nombre}
-                readOnly={soloLectura}
                 aria-invalid={errores.nombre}
                 aria-describedby={
                   errores.nombre
@@ -216,7 +219,6 @@ export function CentroCostoFormModal({
                     : ''
                 }`}
                 value={form.descripcion}
-                readOnly={soloLectura}
                 aria-invalid={errores.descripcion}
                 aria-describedby={
                   errores.descripcion
@@ -241,7 +243,7 @@ export function CentroCostoFormModal({
                     }))
                   }
                 }}
-                rows={2}
+                rows={4}
                 required
               />
 
@@ -254,28 +256,60 @@ export function CentroCostoFormModal({
                 </div>
               )}
             </div>
+            <div>
+              <label
+                className="form-label maestro-label"
+                htmlFor="centroCostoEstadoModal"
+              >
+                Estado
+              </label>
+
+              <select
+                id="centroCostoEstadoModal"
+                className="form-select maestro-control"
+                value={
+                  form.estado
+                    ? 'activo'
+                    : 'inactivo'
+                }
+                onChange={(event) =>
+                  setForm((actual) => ({
+                    ...actual,
+                    estado:
+                      event.target.value ===
+                      'activo',
+                  }))
+                }
+              >
+                <option value="activo">
+                  Activo
+                </option>
+
+                <option value="inactivo">
+                  Inactivo
+                </option>
+              </select>
+            </div>
           </div>
 
-          {!soloLectura && (
-            <div className="maestro-modal-footer">
-              <button
-                type="button"
-                className="btn maestro-btn-danger"
-                onClick={onClose}
-              >
-                <X size={18} />
-                Cancelar
-              </button>
+          <div className="maestro-modal-footer">
+            <button
+              type="button"
+              className="btn maestro-btn-danger"
+              onClick={onClose}
+            >
+              <X size={18} />
+              Cancelar
+            </button>
 
-              <button
-                type="submit"
-                className="btn maestro-btn-primary"
-              >
-                <Save size={18} />
-                Guardar
-              </button>
-            </div>
-          )}
+            <button
+              type="submit"
+              className="btn maestro-btn-primary"
+            >
+              <Save size={18} />
+              Guardar
+            </button>
+          </div>
         </form>
       </div>
     </div>

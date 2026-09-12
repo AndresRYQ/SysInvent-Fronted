@@ -1,21 +1,21 @@
 import { AlertTriangle } from 'lucide-react'
 
-import type { Categoria } from '../../types/categoria'
+import type { Proveedor } from '../../types/proveedor'
 
-interface CategoriaDeleteModalProps {
+interface ProveedorDeleteModalProps {
   abierto: boolean
-  categoria: Categoria | null
+  proveedor: Proveedor | null
   onClose: () => void
   onConfirm: () => void
 }
 
-export function CategoriaDeleteModal({
+export function ProveedorDeleteModal({
   abierto,
-  categoria,
+  proveedor,
   onClose,
   onConfirm,
-}: CategoriaDeleteModalProps) {
-  if (!abierto || !categoria) {
+}: ProveedorDeleteModalProps) {
+  if (!abierto || !proveedor) {
     return null
   }
 
@@ -29,7 +29,7 @@ export function CategoriaDeleteModal({
         className="maestro-modal-card maestro-modal-card--sm"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="categoria-delete-title"
+        aria-labelledby="proveedor-delete-title"
         onClick={(event) =>
           event.stopPropagation()
         }
@@ -39,18 +39,18 @@ export function CategoriaDeleteModal({
         </div>
 
         <h3
-          id="categoria-delete-title"
+          id="proveedor-delete-title"
           className="maestro-modal-title text-center"
         >
           Confirmar eliminación
         </h3>
 
         <p className="maestro-modal-copy text-center mb-0">
-          ¿Seguro que quiere eliminar este registro?
+          ¿Seguro que quieres eliminar este proveedor?
         </p>
 
         <p className="maestro-delete-name">
-          {categoria.nombre}
+          {proveedor.razonSocial}
         </p>
 
         <div className="maestro-modal-footer maestro-modal-footer--center">
@@ -67,11 +67,10 @@ export function CategoriaDeleteModal({
             className="btn maestro-btn-danger"
             onClick={onConfirm}
           >
-            Aceptar
+            Eliminar
           </button>
         </div>
       </div>
     </div>
   )
 }
-

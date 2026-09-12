@@ -1,9 +1,8 @@
 import {
   FolderKanban,
-  Eye,
   Pencil,
   Plus,
-  RotateCcw,
+  ShieldCheck,
   Tag,
   Trash2,
 } from 'lucide-react'
@@ -18,9 +17,7 @@ interface TablaCategoriasProps {
   pageSize: number
   onAgregar: () => void
   onEditar: (categoria: Categoria) => void
-  onVisualizar: (categoria: Categoria) => void
   onEliminar: (categoria: Categoria) => void
-  onReactivar: (categoria: Categoria) => void
   onPageChange: (page: number) => void
   onPageSizeChange: (pageSize: number) => void
 }
@@ -32,9 +29,7 @@ export function TablaCategorias({
   pageSize,
   onAgregar,
   onEditar,
-  onVisualizar,
   onEliminar,
-  onReactivar,
   onPageChange,
   onPageSizeChange,
 }: TablaCategoriasProps) {
@@ -63,9 +58,10 @@ export function TablaCategorias({
           <table className="table maestro-table align-middle mb-0">
             <thead>
               <tr>
-                <th>N°</th>
+                <th>ID</th>
                 <th>Nombre de categoría</th>
                 <th>Descripción</th>
+                <th>Fecha de registro</th>
                 <th>Estado</th>
                 <th className="text-center">Acciones</th>
               </tr>
@@ -80,6 +76,7 @@ export function TablaCategorias({
                         {categoria.id}
                       </span>
                     </td>
+
                     <td>
                       <div className="maestro-cell-main">
                         <span className="maestro-cell-icon">
@@ -88,71 +85,51 @@ export function TablaCategorias({
                         {categoria.nombre}
                       </div>
                     </td>
+
                     <td>{categoria.descripcion}</td>
+                    <td>{categoria.fechaRegistro}</td>
+
                     <td>
                       <span
                         className={
-                          categoria.activo === 1
+                          categoria.estado
                             ? 'maestro-status maestro-status--active'
                             : 'maestro-status maestro-status--inactive'
                         }
                       >
-                        <span className="maestro-status__dot" aria-hidden="true" />
-                        {categoria.activo === 1 ? 'Activo' : 'Inactivo'}
+                        <ShieldCheck size={14} />
+                        {categoria.estado ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
+
                     <td>
                       <div className="maestro-actions">
-                        {categoria.activo === 1 ? (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            onClick={() => onEditar(categoria)}
-                            title="Editar"
-                            aria-label={`Editar ${categoria.nombre}`}
-                          >
-                            <Pencil size={16} />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            onClick={() => onVisualizar(categoria)}
-                            title="Visualizar"
-                            aria-label={`Visualizar ${categoria.nombre}`}
-                          >
-                            <Eye size={16} />
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          className="btn maestro-action-btn"
+                          onClick={() => onEditar(categoria)}
+                          title="Editar"
+                          aria-label={`Editar ${categoria.nombre}`}
+                        >
+                          <Pencil size={16} />
+                        </button>
 
-                        {categoria.activo === 1 ? (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn maestro-action-btn--danger"
-                            onClick={() => onEliminar(categoria)}
-                            title="Eliminar"
-                            aria-label={`Eliminar ${categoria.nombre}`}
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            onClick={() => onReactivar(categoria)}
-                            title="Reactivar"
-                            aria-label={`Reactivar ${categoria.nombre}`}
-                          >
-                            <RotateCcw size={16} />
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          className="btn maestro-action-btn maestro-action-btn--danger"
+                          onClick={() => onEliminar(categoria)}
+                          title="Eliminar"
+                          aria-label={`Eliminar ${categoria.nombre}`}
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5}>
+                  <td colSpan={6}>
                     <div className="maestro-empty-state">
                       <FolderKanban size={28} />
                       <p className="mb-1">

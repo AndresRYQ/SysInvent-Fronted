@@ -1,18 +1,31 @@
-import { useEffect, useMemo, useState } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
 import { CategoriaDeleteModal } from '../../components/categorias/CategoriaDeleteModal'
 import { CategoriaFormModal } from '../../components/categorias/CategoriaFormModal'
+
 import {
   FiltrosCategorias,
   type FiltrosCategoriasValores,
 } from '../../components/categorias/FiltrosCategorias'
+
 import { TablaCategorias } from '../../components/categorias/TablaCategorias'
+
 import {
-  guardarStorage,
-  obtenerStorage,
-  STORAGE_KEYS,
-} from '../../services/storageService'
-import type { Categoria } from '../../types/categoria'
+  actualizarCategoria,
+  crearCategoria,
+  eliminarCategoria,
+  obtenerCategorias,
+} from '../../services/categoriaService'
+
+import type {
+  Categoria,
+  CategoriaFormData,
+} from '../../types/categoria'
+
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
@@ -21,71 +34,87 @@ const FILTROS_INICIALES: FiltrosCategoriasValores = {
   estado: '',
 }
 
+interface MensajePagina {
+  tipo: 'success' | 'danger'
+  texto: string
+}
+
 function filtrarCategorias(
   categorias: Categoria[],
   filtros: FiltrosCategoriasValores,
-) {
+): Categoria[] {
   const nombre = filtros.nombre
     .trim()
     .toLowerCase()
 
-  return categorias
-    .filter((categoria) => {
+  return categorias.filter((categoria) => {
     const coincideNombre =
-      nombre.length === 0 ||
+      !nombre ||
       categoria.nombre
         .toLowerCase()
         .includes(nombre)
 
     const coincideEstado =
-      filtros.estado.length === 0 ||
+      !filtros.estado ||
       (filtros.estado === 'activo' &&
-        categoria.activo === 1) ||
+        categoria.estado) ||
       (filtros.estado === 'inactivo' &&
-        categoria.activo === 0)
+        !categoria.estado)
 
     return coincideNombre && coincideEstado
-    })
-    .sort((a, b) => a.id - b.id)
+  })
+}
+
+function obtenerMensajeError(error: unknown): string {
+  return error instanceof Error
+    ? error.message
+    : 'Ocurrió un error inesperado.'
 }
 
 export function CategoriasPage() {
   const [categorias, setCategorias] =
     useState<Categoria[]>(() =>
-      obtenerStorage<Categoria[]>(
-        STORAGE_KEYS.categorias,
-        [],
-      ).map((categoria) => ({
-        ...categoria,
-        id: Number(
-          String(categoria.id).replace('CAT-', ''),
-        ),
-      })),
+      obtenerCategorias(),
     )
+
   const [filtros, setFiltros] =
     useState<FiltrosCategoriasValores>(
       FILTROS_INICIALES,
     )
-  const [filtrosAplicados, setFiltrosAplicados] =
-    useState<FiltrosCategoriasValores>(
-      FILTROS_INICIALES,
-    )
+
+  const [
+    filtrosAplicados,
+    setFiltrosAplicados,
+  ] = useState<FiltrosCategoriasValores>(
+    FILTROS_INICIALES,
+  )
+
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
+
   const [modalFormOpen, setModalFormOpen] =
     useState(false)
-  const [categoriaEnEdicion, setCategoriaEnEdicion] =
-    useState<Categoria | null>(null)
-  const [modalDeleteOpen, setModalDeleteOpen] =
-    useState(false)
-  const [categoriaAEliminar, setCategoriaAEliminar] =
-    useState<Categoria | null>(null)
-  const [modalSoloLectura, setModalSoloLectura] =
-    useState(false)
-  const [modalReactivarOpen, setModalReactivarOpen] =
-    useState(false)
-  const [categoriaAReactivar, setCategoriaAReactivar] =
-    useState<Categoria | null>(null)
+
+  const [
+    categoriaEnEdicion,
+    setCategoriaEnEdicion,
+  ] = useState<Categoria | null>(null)
+
+  const [errorFormulario, setErrorFormulario] =
+    useState('')
+
+  const [
+    modalDeleteOpen,
+    setModalDeleteOpen,
+  ] = useState(false)
+
+  const [
+    categoriaAEliminar,
+    setCategoriaAEliminar,
+  ] = useState<Categoria | null>(null)
+
+  const [mensaje, setMensaje] =
+    useState<MensajePagina | null>(null)
 
   const categoriasFiltradas = useMemo(
     () =>
@@ -100,24 +129,16 @@ export function CategoriasPage() {
 
   const categoriasPaginadas = useMemo(() => {
     const startIndex = (page - 1) * pageSize
-    const endIndex = startIndex + pageSize
 
     return categoriasFiltradas.slice(
       startIndex,
-      endIndex,
+      startIndex + pageSize,
     )
   }, [
     categoriasFiltradas,
     page,
     pageSize,
   ])
-
-  useEffect(() => {
-    guardarStorage(
-      STORAGE_KEYS.categorias,
-      categorias,
-    )
-  }, [categorias])
 
   useEffect(() => {
     const totalPages = Math.max(
@@ -130,6 +151,108 @@ export function CategoriasPage() {
     }
   }, [page, pageSize, totalItems])
 
+  function recargarCategorias(): void {
+    setCategorias(obtenerCategorias())
+  }
+
+  function abrirFormularioNuevo(): void {
+    setMensaje(null)
+    setErrorFormulario('')
+    setCategoriaEnEdicion(null)
+    setModalFormOpen(true)
+  }
+
+  function abrirFormularioEdicion(
+    categoria: Categoria,
+  ): void {
+    setMensaje(null)
+    setErrorFormulario('')
+    setCategoriaEnEdicion(categoria)
+    setModalFormOpen(true)
+  }
+
+  function cerrarFormulario(): void {
+    setModalFormOpen(false)
+    setCategoriaEnEdicion(null)
+    setErrorFormulario('')
+  }
+
+  function guardarCategoria(
+    datos: CategoriaFormData,
+  ): void {
+    try {
+      if (categoriaEnEdicion) {
+        actualizarCategoria(
+          categoriaEnEdicion.id,
+          datos,
+        )
+
+        setMensaje({
+          tipo: 'success',
+          texto:
+            'Categoría actualizada correctamente.',
+        })
+      } else {
+        crearCategoria(datos)
+
+        setMensaje({
+          tipo: 'success',
+          texto:
+            'Categoría registrada correctamente.',
+        })
+      }
+
+      recargarCategorias()
+      cerrarFormulario()
+      setPage(1)
+    } catch (error) {
+      setErrorFormulario(
+        obtenerMensajeError(error),
+      )
+    }
+  }
+
+  function abrirConfirmacionEliminar(
+    categoria: Categoria,
+  ): void {
+    setMensaje(null)
+    setCategoriaAEliminar(categoria)
+    setModalDeleteOpen(true)
+  }
+
+  function cerrarConfirmacionEliminar(): void {
+    setModalDeleteOpen(false)
+    setCategoriaAEliminar(null)
+  }
+
+  function confirmarEliminacion(): void {
+    if (!categoriaAEliminar) {
+      return
+    }
+
+    try {
+      eliminarCategoria(
+        categoriaAEliminar.id,
+      )
+
+      recargarCategorias()
+      cerrarConfirmacionEliminar()
+
+      setMensaje({
+        tipo: 'success',
+        texto:
+          'Categoría eliminada correctamente.',
+      })
+    } catch (error) {
+      cerrarConfirmacionEliminar()
+
+      setMensaje({
+        tipo: 'danger',
+        texto: obtenerMensajeError(error),
+      })
+    }
+  }
+
   return (
     <>
       <main className="dashboard-shell maestro-page-shell">
@@ -137,9 +260,29 @@ export function CategoriasPage() {
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
               <h1>Categorías</h1>
-              <p>Mantenimiento de categorías</p>
+
+              <p>
+                Administración de categorías para
+                clasificar los productos del almacén.
+              </p>
             </div>
           </section>
+
+          {mensaje && (
+            <div
+              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
+              role="alert"
+            >
+              {mensaje.texto}
+
+              <button
+                type="button"
+                className="btn-close"
+                aria-label="Cerrar"
+                onClick={() => setMensaje(null)}
+              />
+            </div>
+          )}
 
           <div className="maestro-panel">
             <FiltrosCategorias
@@ -151,12 +294,16 @@ export function CategoriasPage() {
                 }))
               }
               onBuscar={() => {
-                setFiltrosAplicados(filtros)
+                setFiltrosAplicados({
+                  ...filtros,
+                })
                 setPage(1)
               }}
               onLimpiar={() => {
                 setFiltros(FILTROS_INICIALES)
-                setFiltrosAplicados(FILTROS_INICIALES)
+                setFiltrosAplicados(
+                  FILTROS_INICIALES,
+                )
                 setPage(1)
               }}
             />
@@ -168,33 +315,19 @@ export function CategoriasPage() {
               totalItems={totalItems}
               page={page}
               pageSize={pageSize}
-              onAgregar={() => {
-                setCategoriaEnEdicion(null)
-                setModalSoloLectura(false)
-                setModalFormOpen(true)
-              }}
-              onEditar={(categoria) => {
-                setCategoriaEnEdicion(categoria)
-                setModalSoloLectura(false)
-                setModalFormOpen(true)
-              }}
-              onVisualizar={(categoria) => {
-                setCategoriaEnEdicion(categoria)
-                setModalSoloLectura(true)
-                setModalFormOpen(true)
-              }}
-              onEliminar={(categoria) => {
-                setCategoriaAEliminar(categoria)
-                setModalDeleteOpen(true)
-              }}
-              onReactivar={(categoria) => {
-                setCategoriaAReactivar(categoria)
-                setModalReactivarOpen(true)
-              }}
-              onPageChange={(nextPage) =>
-                setPage(nextPage)
+              onAgregar={
+                abrirFormularioNuevo
               }
-              onPageSizeChange={(nextPageSize) => {
+              onEditar={
+                abrirFormularioEdicion
+              }
+              onEliminar={
+                abrirConfirmacionEliminar
+              }
+              onPageChange={setPage}
+              onPageSizeChange={(
+                nextPageSize,
+              ) => {
                 setPageSize(nextPageSize)
                 setPage(1)
               }}
@@ -206,99 +339,19 @@ export function CategoriasPage() {
       <CategoriaFormModal
         abierto={modalFormOpen}
         categoria={categoriaEnEdicion}
-        soloLectura={modalSoloLectura}
-        onClose={() => {
-          setModalFormOpen(false)
-          setCategoriaEnEdicion(null)
-          setModalSoloLectura(false)
-        }}
-        onSubmit={(payload) => {
-          if (categoriaEnEdicion) {
-            setCategorias((actual) =>
-              actual.map((categoria) =>
-                categoria.id ===
-                categoriaEnEdicion.id
-                  ? {
-                      ...categoria,
-                      ...payload,
-                    }
-                  : categoria,
-              ),
-            )
-          } else {
-            setCategorias((actual) => {
-              const ultimoId = actual.reduce(
-                (maximo, categoria) =>
-                  Number.isNaN(categoria.id)
-                    ? maximo
-                    : Math.max(maximo, categoria.id),
-                0,
-              )
-
-              return [
-                {
-                  id: ultimoId + 1,
-                  activo: 1,
-                  ...payload,
-                },
-                ...actual,
-              ]
-            })
-          }
-
-          setModalFormOpen(false)
-          setCategoriaEnEdicion(null)
-          setModalSoloLectura(false)
-        }}
+        error={errorFormulario}
+        onClose={cerrarFormulario}
+        onSubmit={guardarCategoria}
       />
 
       <CategoriaDeleteModal
         abierto={modalDeleteOpen}
         categoria={categoriaAEliminar}
-        onClose={() => {
-          setModalDeleteOpen(false)
-          setCategoriaAEliminar(null)
-        }}
-        onConfirm={() => {
-          if (categoriaAEliminar) {
-            setCategorias((actual) =>
-              actual.map((categoria) =>
-                categoria.id !== categoriaAEliminar.id
-                  ? categoria
-                  : { ...categoria, activo: 0 },
-              ),
-            )
-          }
-
-          setModalDeleteOpen(false)
-          setCategoriaAEliminar(null)
-        }}
-      />
-
-      <CategoriaDeleteModal
-        abierto={modalReactivarOpen}
-        categoria={categoriaAReactivar}
-        accion="reactivar"
-        onClose={() => {
-          setModalReactivarOpen(false)
-          setCategoriaAReactivar(null)
-        }}
-        onConfirm={() => {
-          if (categoriaAReactivar) {
-            setCategorias((actual) =>
-              actual.map((categoria) =>
-                categoria.id === categoriaAReactivar.id
-                  ? { ...categoria, activo: 1 }
-                  : categoria,
-              ),
-            )
-          }
-
-          setModalReactivarOpen(false)
-          setCategoriaAReactivar(null)
-        }}
+        onClose={
+          cerrarConfirmacionEliminar
+        }
+        onConfirm={confirmarEliminacion}
       />
     </>
   )
 }
-

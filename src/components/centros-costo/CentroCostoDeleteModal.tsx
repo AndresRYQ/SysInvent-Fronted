@@ -1,11 +1,10 @@
-import { AlertTriangle, Check, X } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
 
 import type { CentroCosto } from '../../types/centroCosto'
 
 interface CentroCostoDeleteModalProps {
   abierto: boolean
   centroCosto: CentroCosto | null
-  accion?: 'eliminar' | 'reactivar'
   onClose: () => void
   onConfirm: () => void
 }
@@ -13,22 +12,27 @@ interface CentroCostoDeleteModalProps {
 export function CentroCostoDeleteModal({
   abierto,
   centroCosto,
-  accion = 'eliminar',
   onClose,
   onConfirm,
 }: CentroCostoDeleteModalProps) {
-  if (!abierto || !centroCosto) return null
-
-  const esReactivacion = accion === 'reactivar'
+  if (!abierto || !centroCosto) {
+    return null
+  }
 
   return (
-    <div className="maestro-modal-backdrop" role="presentation">
+    <div
+      className="maestro-modal-backdrop"
+      role="presentation"
+      onClick={onClose}
+    >
       <div
         className="maestro-modal-card maestro-modal-card--sm"
         role="dialog"
         aria-modal="true"
         aria-labelledby="centro-costo-delete-title"
-        onClick={(event) => event.stopPropagation()}
+        onClick={(event) =>
+          event.stopPropagation()
+        }
       >
         <div className="maestro-delete-icon">
           <AlertTriangle size={24} />
@@ -38,25 +42,31 @@ export function CentroCostoDeleteModal({
           id="centro-costo-delete-title"
           className="maestro-modal-title text-center"
         >
-          {esReactivacion ? 'Confirmar reactivación' : 'Confirmar eliminación'}
+          Confirmar eliminación
         </h3>
 
         <p className="maestro-modal-copy text-center mb-0">
-          {esReactivacion
-            ? '¿Seguro que quiere reactivar este registro?'
-            : '¿Seguro que quiere eliminar este registro?'}
+          ¿Seguro que quiere eliminar este registro?
         </p>
 
-        <p className="maestro-delete-name">{centroCosto.nombre}</p>
+        <p className="maestro-delete-name">
+          {centroCosto.nombre}
+        </p>
 
         <div className="maestro-modal-footer maestro-modal-footer--center">
-          <button type="button" className="btn maestro-btn-danger" onClick={onClose}>
-            <X size={18} />
+          <button
+            type="button"
+            className="btn maestro-btn-secondary"
+            onClick={onClose}
+          >
             Cancelar
           </button>
 
-          <button type="button" className="btn maestro-btn-primary" onClick={onConfirm}>
-            <Check size={18} />
+          <button
+            type="button"
+            className="btn maestro-btn-danger"
+            onClick={onConfirm}
+          >
             Aceptar
           </button>
         </div>
@@ -64,3 +74,4 @@ export function CentroCostoDeleteModal({
     </div>
   )
 }
+

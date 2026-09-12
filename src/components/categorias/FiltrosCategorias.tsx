@@ -45,7 +45,7 @@ export function FiltrosCategorias({
               className="form-control maestro-control"
               type="text"
               value={valores.nombre}
-              placeholder="Buscar"
+              placeholder="Ej. Herramientas, Seguridad, Repuestos"
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }
@@ -57,11 +57,36 @@ export function FiltrosCategorias({
               Estado
             </label>
 
+<<<<<<< HEAD
             <MaestroEstadoSelect
               inputId="estadoCategoria"
               value={valores.estado}
               onChange={(value) => onChange('estado', value)}
             />
+=======
+            <div
+              className={`maestro-select-wrap${estadoAbierto ? ' is-open' : ''}`}
+            >
+              <select
+                id="estadoCategoria"
+                className="form-select maestro-control maestro-select-control"
+                value={valores.estado}
+                onMouseDown={() => setEstadoAbierto(true)}
+                onKeyDown={() => setEstadoAbierto(true)}
+                onFocus={() => setEstadoAbierto(true)}
+                onBlur={() => setEstadoAbierto(false)}
+                onChange={(event) => {
+                  onChange('estado', event.target.value)
+                  setEstadoAbierto(false)
+                }}
+              >
+                <option value="">Todos</option>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+              <ChevronDown size={16} />
+            </div>
+>>>>>>> 62b19fcf30321b21ea7cf9198aa091470de57ac8
           </div>
 
         </div>

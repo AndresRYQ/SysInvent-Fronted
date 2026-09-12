@@ -1,6 +1,12 @@
-import { useState, type ReactNode } from 'react'
+import {
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react'
 import { useNavigate } from 'react-router-dom'
-
+import {
+  tienePermisoModulo,
+} from '../services/rolService'
 import AnimatedContent from '../components/ui/AnimatedContent'
 import CountUp from '../components/ui/CountUp'
 import SpotlightCard from '../components/ui/SpotlightCard'
@@ -27,61 +33,139 @@ type IconName =
 type Metric = {
   label: string
   value: number
-  suffix?: string
-  trend: string
-  trendType: 'up' | 'down'
+  detail: string
+  status: 'positive' | 'alert' | 'neutral'
   icon: IconName
   tone: string
 }
 
 type Module = {
+  id: string
   title: string
   description: string
   icon: IconName
   tone: string
   category: string
+  route?: string
+}
+
+type DashboardAlert = {
+  id: number
+  title: string
+  detail: string
+  tone: 'warning' | 'danger' | 'info'
+}
+
+type RecentMovement = {
+  id: number
+  date: string
+  type: 'Ingreso' | 'Vale'
+  document: string
+  product: string
+  quantity: number
+  responsible: string
 }
 
 const metrics: Metric[] = [
   {
     label: 'Inventario total',
     value: 2450,
-    trend: '8% vs mes anterior',
-    trendType: 'up',
+    detail: 'Productos registrados',
+    status: 'neutral',
     icon: 'box',
     tone: 'green',
   },
   {
-    label: 'Entradas (mes)',
+    label: 'Stock bajo',
+    value: 8,
+    detail: 'Requieren reposición',
+    status: 'alert',
+    icon: 'clipboard',
+    tone: 'orange',
+  },
+  {
+    label: 'Ingresos del mes',
     value: 35,
-    trend: '12% vs mes anterior',
-    trendType: 'up',
+    detail: 'Movimientos registrados',
+    status: 'positive',
     icon: 'entry',
     tone: 'blue',
   },
   {
-    label: 'Salidas (mes)',
-    value: 22,
-    trend: '5% vs mes anterior',
-    trendType: 'down',
-    icon: 'exit',
-    tone: 'orange',
-  },
-  {
-    label: 'Ordenes pendientes',
-    value: 24,
-    trend: '4% vs mes anterior',
-    trendType: 'up',
-    icon: 'clipboard',
+    label: 'Vales pendientes',
+    value: 6,
+    detail: 'Pendientes de entrega',
+    status: 'alert',
+    icon: 'order',
     tone: 'violet',
   },
   {
-    label: 'Proveedores',
-    value: 40,
-    trend: '2% vs mes anterior',
-    trendType: 'up',
-    icon: 'users',
+    label: 'Movimientos de hoy',
+    value: 12,
+    detail: 'Entradas y salidas',
+    status: 'neutral',
+    icon: 'audit',
     tone: 'teal',
+  },
+]
+
+const dashboardAlerts: DashboardAlert[] = [
+  {
+    id: 1,
+    title: 'Productos con stock bajo',
+    detail: '8 productos requieren reposición.',
+    tone: 'warning',
+  },
+  {
+    id: 2,
+    title: 'Vales pendientes',
+    detail: '6 vales esperan ser entregados.',
+    tone: 'danger',
+  },
+  {
+    id: 3,
+    title: 'Inventario actualizado',
+    detail: 'Última actualización realizada hoy.',
+    tone: 'info',
+  },
+]
+
+const recentMovements: RecentMovement[] = [
+  {
+    id: 1,
+    date: '11/09/2026',
+    type: 'Ingreso',
+    document: 'IA-2026-0035',
+    product: 'Guantes de nitrilo',
+    quantity: 24,
+    responsible: 'Administrador',
+  },
+  {
+    id: 2,
+    date: '11/09/2026',
+    type: 'Vale',
+    document: 'VC-2026-0087',
+    product: 'Mascarilla descartable',
+    quantity: 12,
+    responsible: 'Almacén',
+  },
+  {
+    id: 3,
+    date: '10/09/2026',
+    type: 'Ingreso',
+    document: 'IA-2026-0034',
+    product: 'Lentes de seguridad',
+    quantity: 18,
+    responsible: 'Administrador',
+  },
+  {
+    id: 4,
+    date: '10/09/2026',
+    type: 'Vale',
+    document: 'VC-2026-0086',
+    product: 'Cinta de embalaje',
+    quantity: 8,
+    responsible: 'Almacén',
   },
 ]
 
@@ -96,41 +180,52 @@ const categories = [
 
 const modules: Module[] = [
   {
+    id: 'proveedores',
     title: 'Proveedores',
     description: 'Administración de proveedores.',
     icon: 'users',
     tone: 'green',
-    category: 'Inventario',
+    category: 'Maestros',
+    route: '/proveedores',
   },
   {
+    id: 'productos',
     title: 'Productos',
     description: 'Administración de productos.',
     icon: 'box',
     tone: 'green',
-    category: 'Inventario',
+    category: 'Maestros',
+    route: '/productos',
   },
   {
+    id: 'bitacora',
     title: 'Bitácora',
     description: 'Consulta de actividades y cambios.',
     icon: 'audit',
     tone: 'green',
-    category: 'Inventario',
+    category: 'Seguridad',
+    route: '/bitacora',
   },
   {
+    id: 'contactos',
     title: 'Contactos',
     description: 'Administración de contactos.',
     icon: 'users',
     tone: 'green',
-    category: 'Inventario',
+    category: 'Maestros',
+    route: '/contactos',
   },
   {
+    id: 'partes-equipo',
     title: 'Partes de equipo',
     description: 'Administración de partes de equipo.',
     icon: 'box',
     tone: 'green',
-    category: 'Inventario',
+    category: 'Maestros',
+    route: '/partes-equipo',
   },
   {
+    id: 'control-almacen',
     title: 'Control de almacén',
     description: 'Control de inventario y movimientos.',
     icon: 'box',
@@ -138,20 +233,25 @@ const modules: Module[] = [
     category: 'Inventario',
   },
   {
+    id: 'vales-consumo',
     title: 'Vales de consumo',
     description: 'Administración de vales de consumo.',
     icon: 'order',
     tone: 'green',
     category: 'Inventario',
+    route: '/vales-consumo',
   },
   {
+    id: 'ingresos-almacen',
     title: 'Ingresos de Almacén',
     description: 'Registro de ingresos.',
     icon: 'entry',
     tone: 'green',
     category: 'Inventario',
+    route: '/ingresos-almacen',
   },
   {
+    id: 'reporte-ingresos',
     title: 'Reporte de ingreso',
     description: 'Consulta de reportes de ingresos.',
     icon: 'report',
@@ -159,6 +259,7 @@ const modules: Module[] = [
     category: 'Reportes',
   },
   {
+    id: 'reporte-vales',
     title: 'Reporte de vale',
     description: 'Consulta de reportes de vales.',
     icon: 'report',
@@ -166,6 +267,7 @@ const modules: Module[] = [
     category: 'Reportes',
   },
   {
+    id: 'reporte-productos',
     title: 'Reporte de producto más pedido',
     description: 'Consulta de productos más solicitados.',
     icon: 'chart',
@@ -173,62 +275,79 @@ const modules: Module[] = [
     category: 'Reportes',
   },
   {
+    id: 'centros-costo',
     title: 'Centros de costo',
     description: 'Mantenimiento de centros de costo.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
+    route: '/centros-costo',
   },
   {
+    id: 'categorias',
     title: 'Categorías',
     description: 'Gestión de categorías.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
+    route: '/categorias',
   },
   {
+    id: 'tipos-producto',
     title: 'Tipos de producto',
     description: 'Administración de tipos de producto.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
+    route: '/tipos-producto',
   },
   {
+    id: 'tipos-documento',
     title: 'Tipos de documento',
     description: 'Administración de tipos de documento.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
+    route: '/tipos-documento',
   },
   {
+    id: 'unidades-medida',
     title: 'Unidades de medida',
     description: 'Administración de unidades de medida.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
+    route: '/unidades-medida',
   },
   {
+    id: 'destinos',
     title: 'Destinos',
     description: 'Administración de destinos.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
+    route: '/destinos',
   },
   {
+    id: 'usuarios',
     title: 'Usuarios',
     description: 'Administración de usuarios.',
     icon: 'users',
     tone: 'violet',
     category: 'Seguridad',
+    route: '/usuarios',
   },
   {
+    id: 'roles',
     title: 'Roles',
     description: 'Gestión de roles.',
     icon: 'users',
     tone: 'violet',
     category: 'Seguridad',
+    route: '/roles',
   },
   {
+    id: 'perfil-usuario',
     title: 'Perfil de usuario',
     description: 'Consulta y edición del perfil del usuario.',
     icon: 'users',
@@ -368,51 +487,49 @@ function DashboardPage() {
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const nombreUsuario = sesion?.nombreCompleto ?? 'Frank Arone'
   const nombreSaludo = nombreUsuario.split(' ')[0] || 'Frank'
+  const fechaActual = new Intl.DateTimeFormat('es-PE', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date())
 
-  const filteredModules =
-    selectedCategory === 'Todos'
-      ? modules
-      : modules.filter((module) => module.category === selectedCategory)
+ const modulosPermitidos = useMemo(
+  () =>
+    modules.filter((module) =>
+      tienePermisoModulo(
+        sesion?.rol,
+        module.id,
+      ),
+    ),
+  [sesion?.rol],
+)
 
-  const manejarAbrirModulo = (moduleTitle: string) => {
-    if (moduleTitle === 'Categorías') {
-      navigate('/categorias')
-    }
+const categoriasPermitidas = useMemo(
+  () =>
+    categories.filter(
+      (category) =>
+        category === 'Todos' ||
+        modulosPermitidos.some(
+          (module) =>
+            module.category === category,
+        ),
+    ),
+  [modulosPermitidos],
+)
 
-    if (moduleTitle === 'Usuarios') {
-      navigate('/usuarios')
-    }
+const filteredModules =
+  selectedCategory === 'Todos'
+    ? modulosPermitidos
+    : modulosPermitidos.filter(
+        (module) =>
+          module.category ===
+          selectedCategory,
+      )
 
-    if (moduleTitle === 'Roles') {
-      navigate('/roles')
-    }
-
-    if (moduleTitle === 'Centros de costo') {
-      navigate('/centros-costo')
-    }
-
-    if (moduleTitle === 'Tipos de producto') {
-      navigate('/tipos-producto')
-    }
-
-    if (moduleTitle === 'Tipos de documento') {
-      navigate('/tipos-comprobante')
-    }
-
-    if (moduleTitle === 'Unidades de medida') {
-      navigate('/unidades-medida')
-    }
-
-    if (moduleTitle === 'Destinos') {
-      navigate('/destinos')
-    }
-
-    if (moduleTitle === 'Ingresos de Almacén') {
-      navigate('/ingresos-almacen')
-    }
-
-    if (moduleTitle === 'Vales de Consumo') {
-      navigate('/vales-consumo')
+  const manejarAbrirModulo = (module: Module) => {
+    if (module.route) {
+      navigate(module.route)
     }
   }
 
@@ -422,34 +539,58 @@ function DashboardPage() {
       <section className="hero-panel">
         <div className="hero-copy">
           <AnimatedContent>
-            <span className="hero-line" />
-            <h1>Bienvenido, {nombreSaludo}!</h1>
-            <p className="hero-subtitle">Sistema de Control de Almacen - FFPMS</p>
+            <span className="hero-eyebrow">
+              Panel de control
+            </span>
+            <h1>Bienvenido, {nombreSaludo}</h1>
+
+            <p className="hero-subtitle">
+              Sistema de Control de Almacén
+            </p>
+
             <p className="hero-description">
-              Administra inventarios, ordenes, entradas, salidas y reportes de tu almacen.
+              Consulta y administra el inventario,
+              los ingresos, los vales de consumo
+              y los reportes del almacén.
+            </p>
+            <p className="hero-date">
+              {fechaActual}
             </p>
           </AnimatedContent>
         </div>
 
-        <AnimatedContent className="warehouse-illustration" delay={120}>
-          <div className="orb" />
-          <div className="warehouse">
-            <div className="roof" />
-            <div className="building">
-              <span className="shield" />
-              <span className="door" />
-              <span className="window left" />
-              <span className="window right" />
+        <AnimatedContent
+          className="system-status"
+          delay={120}
+        >
+          <div className="system-status__header">
+            <span
+              className="system-status__indicator"
+              aria-hidden="true"
+            />
+
+            <div>
+              <small>Estado del sistema</small>
+              <strong>Operación normal</strong>
             </div>
-            <div className="boxes">
-              <span />
-              <span />
-              <span />
+          </div>
+
+          <div className="system-status__details">
+            <div>
+              <span>Entorno</span>
+              <strong>Localhost</strong>
             </div>
-            <div className="forklift">
-              <span className="forklift-body" />
-              <span className="forklift-wheel one" />
-              <span className="forklift-wheel two" />
+
+            <div>
+              <span>Sesión</span>
+              <strong>Activa</strong>
+            </div>
+
+            <div>
+              <span>Rol</span>
+              <strong>
+                {sesion?.rol ?? 'Sin rol'}
+              </strong>
             </div>
           </div>
         </AnimatedContent>
@@ -467,8 +608,10 @@ function DashboardPage() {
                 <strong>
                   <CountUp end={metric.value} />
                 </strong>
-                <small className={metric.trendType === 'down' ? 'trend-down' : 'trend-up'}>
-                  {metric.trendType === 'down' ? '↓' : '↑'} {metric.trend}
+                <small
+                  className={`metric-detail metric-detail--${metric.status}`}
+                >
+                  {metric.detail}
                 </small>
               </div>
             </SpotlightCard>
@@ -476,8 +619,126 @@ function DashboardPage() {
         ))}
       </section>
 
+      <section
+        className="dashboard-section operational-grid"
+        aria-label="Resumen operativo"
+      >
+        <article className="operational-panel">
+          <header className="operational-panel__header">
+            <div>
+              <span className="section-eyebrow">
+                Seguimiento
+              </span>
+
+              <h2>Alertas del inventario</h2>
+            </div>
+
+            <span className="local-badge">
+              Datos locales
+            </span>
+          </header>
+
+          <div className="alerts-list">
+            {dashboardAlerts.map((alert) => (
+              <div
+                className="alert-item"
+                key={alert.id}
+              >
+                <span
+                  className={`alert-dot alert-dot--${alert.tone}`}
+                  aria-hidden="true"
+                />
+
+                <div>
+                  <strong>{alert.title}</strong>
+                  <p>{alert.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="operational-panel">
+          <header className="operational-panel__header">
+            <div>
+              <span className="section-eyebrow">
+                Actividad reciente
+              </span>
+
+              <h2>Últimos movimientos</h2>
+            </div>
+          </header>
+
+          <div className="movement-table-wrap">
+            <table className="movement-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Tipo</th>
+                  <th>Documento</th>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>Responsable</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {recentMovements.map((movement) => (
+                  <tr key={movement.id}>
+                    <td>{movement.date}</td>
+
+                    <td>
+                      <span
+                        className={
+                          movement.type === 'Ingreso'
+                            ? 'movement-badge movement-badge--entry'
+                            : 'movement-badge movement-badge--voucher'
+                        }
+                      >
+                        {movement.type}
+                      </span>
+                    </td>
+
+                    <td>
+                      <strong>{movement.document}</strong>
+                    </td>
+
+                    <td>{movement.product}</td>
+
+                    <td>{movement.quantity}</td>
+
+                    <td>{movement.responsible}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+      <section className="modules-heading">
+        <div>
+          <span className="section-eyebrow">
+            Accesos del sistema
+          </span>
+
+          <h2>Módulos del sistema</h2>
+
+          <p>
+            Selecciona una categoría para consultar
+            los módulos disponibles.
+          </p>
+        </div>
+
+        <span className="modules-count">
+          {filteredModules.length}{' '}
+          {filteredModules.length === 1
+            ? 'módulo'
+            : 'módulos'}
+        </span>
+      </section>
+
       <section className="categories-bar">
-        {categories.map((category) => (
+        {categoriasPermitidas.map((category) => (
           <button
             key={category}
             type="button"
@@ -503,17 +764,20 @@ function DashboardPage() {
               <button
                 className={`module-action tone-${module.tone}`}
                 type="button"
-                onClick={() => manejarAbrirModulo(module.title)}
+                disabled={!module.route}
+                title={!module.route ? 'Módulo en desarrollo' : undefined}
+                onClick={() => manejarAbrirModulo(module)}
               >
-                Abrir modulo
-                <span aria-hidden="true">→</span>
+                {module.route ? 'Abrir módulo' : 'En desarrollo'}
+                {module.route && <span aria-hidden="true">→</span>}
               </button>
             </SpotlightCard>
           </AnimatedContent>
         ))}
       </section>
-
-      <footer className="dashboard-footer">© 2024 Agrihuasa. Todos los derechos reservados.</footer>
+      <footer className="dashboard-footer">
+        © 2026 AGRIHUSAC. Todos los derechos reservados.
+      </footer>
     </main>
   )
 }
