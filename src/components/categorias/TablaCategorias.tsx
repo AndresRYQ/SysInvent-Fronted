@@ -75,7 +75,11 @@ export function TablaCategorias({
               {categorias.length > 0 ? (
                 categorias.map((categoria) => (
                   <tr key={categoria.id}>
-                    <td>{categoria.id}</td>
+                    <td>
+                      <span className="maestro-id-chip">
+                        {categoria.id}
+                      </span>
+                    </td>
                     <td>
                       <div className="maestro-cell-main">
                         <span className="maestro-cell-icon">

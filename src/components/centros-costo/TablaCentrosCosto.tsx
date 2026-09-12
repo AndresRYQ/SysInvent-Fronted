@@ -75,7 +75,11 @@ export function TablaCentrosCosto({
               {centrosCosto.length > 0 ? (
                 centrosCosto.map((centroCosto) => (
                   <tr key={centroCosto.id}>
-                    <td>{centroCosto.id}</td>
+                    <td>
+                      <span className="maestro-id-chip">
+                        {centroCosto.id}
+                      </span>
+                    </td>
                     <td>
                       <div className="maestro-cell-main">
                         <span className="maestro-cell-icon">

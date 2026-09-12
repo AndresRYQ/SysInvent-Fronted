@@ -6,6 +6,7 @@ import type { TipoProducto } from '../../types/tipoProducto'
 interface TipoProductoFormModalProps {
   abierto: boolean
   tipoProducto: TipoProducto | null
+  soloLectura?: boolean
   onClose: () => void
   onSubmit: (
     tipoProducto: Pick<
@@ -38,6 +39,7 @@ const ERRORES_INICIALES: TipoProductoFormErrores = {
 export function TipoProductoFormModal({
   abierto,
   tipoProducto,
+  soloLectura = false,
   onClose,
   onSubmit,
 }: TipoProductoFormModalProps) {
@@ -74,7 +76,6 @@ export function TipoProductoFormModal({
     <div
       className="maestro-modal-backdrop"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="maestro-modal-card"
@@ -91,9 +92,11 @@ export function TipoProductoFormModal({
               id="tipo-producto-form-title"
               className="maestro-modal-title"
             >
-              {tipoProducto
-                ? 'Editar tipo de producto'
-                : 'Registrar tipo de producto'}
+              {soloLectura
+                ? 'Visualizar tipo de producto'
+                : tipoProducto
+                  ? 'Editar tipo de producto'
+                  : 'Registrar tipo de producto'}
             </h3>
           </div>
 
@@ -156,6 +159,7 @@ export function TipoProductoFormModal({
                 }`}
                 type="text"
                 value={form.nombre}
+                readOnly={soloLectura}
                 aria-invalid={errores.nombre}
                 aria-describedby={
                   errores.nombre
@@ -212,6 +216,7 @@ export function TipoProductoFormModal({
                     : ''
                 }`}
                 value={form.descripcion}
+                readOnly={soloLectura}
                 aria-invalid={errores.descripcion}
                 aria-describedby={
                   errores.descripcion
@@ -236,7 +241,7 @@ export function TipoProductoFormModal({
                     }))
                   }
                 }}
-                rows={4}
+                rows={2}
                 required
               />
 
@@ -251,7 +256,8 @@ export function TipoProductoFormModal({
             </div>
           </div>
 
-          <div className="maestro-modal-footer">
+          {!soloLectura && (
+            <div className="maestro-modal-footer">
             <button
               type="button"
               className="btn maestro-btn-danger"
@@ -268,7 +274,8 @@ export function TipoProductoFormModal({
               <Save size={18} />
               Guardar
             </button>
-          </div>
+            </div>
+          )}
         </form>
       </div>
     </div>

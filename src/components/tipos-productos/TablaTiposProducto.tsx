@@ -1,8 +1,9 @@
 import {
   FolderKanban,
+  Eye,
   Pencil,
   Plus,
-  ShieldCheck,
+  RotateCcw,
   Tags,
   Trash2,
 } from 'lucide-react'
@@ -17,7 +18,9 @@ interface TablaTiposProductoProps {
   pageSize: number
   onAgregar: () => void
   onEditar: (tipoProducto: TipoProducto) => void
+  onVisualizar: (tipoProducto: TipoProducto) => void
   onEliminar: (tipoProducto: TipoProducto) => void
+  onReactivar: (tipoProducto: TipoProducto) => void
   onPageChange: (page: number) => void
   onPageSizeChange: (pageSize: number) => void
 }
@@ -29,7 +32,9 @@ export function TablaTiposProducto({
   pageSize,
   onAgregar,
   onEditar,
+  onVisualizar,
   onEliminar,
+  onReactivar,
   onPageChange,
   onPageSizeChange,
 }: TablaTiposProductoProps) {
@@ -58,10 +63,9 @@ export function TablaTiposProducto({
           <table className="table maestro-table align-middle mb-0">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>N°</th>
                 <th>Nombre de tipo de producto</th>
                 <th>Descripción</th>
-                <th>Fecha de registro</th>
                 <th>Estado</th>
                 <th className="text-center">Acciones</th>
               </tr>
@@ -87,49 +91,71 @@ export function TablaTiposProducto({
                     </td>
 
                     <td>{tipoProducto.descripcion}</td>
-                    <td>{tipoProducto.fechaRegistro}</td>
-
                     <td>
                       <span
                         className={
-                          tipoProducto.estado
+                          tipoProducto.activo === 1
                             ? 'maestro-status maestro-status--active'
                             : 'maestro-status maestro-status--inactive'
                         }
                       >
-                        <ShieldCheck size={14} />
-                        {tipoProducto.estado ? 'Activo' : 'Inactivo'}
+                        <span className="maestro-status__dot" aria-hidden="true" />
+                        {tipoProducto.activo === 1 ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
 
                     <td>
                       <div className="maestro-actions">
-                        <button
-                          type="button"
-                          className="btn maestro-action-btn"
-                          onClick={() => onEditar(tipoProducto)}
-                          title="Editar"
-                          aria-label={`Editar ${tipoProducto.nombre}`}
-                        >
-                          <Pencil size={16} />
-                        </button>
+                        {tipoProducto.activo === 1 ? (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn"
+                            onClick={() => onEditar(tipoProducto)}
+                            title="Editar"
+                            aria-label={`Editar ${tipoProducto.nombre}`}
+                          >
+                            <Pencil size={16} />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn"
+                            onClick={() => onVisualizar(tipoProducto)}
+                            title="Visualizar"
+                            aria-label={`Visualizar ${tipoProducto.nombre}`}
+                          >
+                            <Eye size={16} />
+                          </button>
+                        )}
 
-                        <button
-                          type="button"
-                          className="btn maestro-action-btn maestro-action-btn--danger"
-                          onClick={() => onEliminar(tipoProducto)}
-                          title="Eliminar"
-                          aria-label={`Eliminar ${tipoProducto.nombre}`}
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        {tipoProducto.activo === 1 ? (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn maestro-action-btn--danger"
+                            onClick={() => onEliminar(tipoProducto)}
+                            title="Eliminar"
+                            aria-label={`Eliminar ${tipoProducto.nombre}`}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn"
+                            onClick={() => onReactivar(tipoProducto)}
+                            title="Reactivar"
+                            aria-label={`Reactivar ${tipoProducto.nombre}`}
+                          >
+                            <RotateCcw size={16} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6}>
+                  <td colSpan={5}>
                     <div className="maestro-empty-state">
                       <FolderKanban size={28} />
                       <p className="mb-1">
