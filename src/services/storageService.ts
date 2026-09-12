@@ -2,12 +2,6 @@ export const STORAGE_KEYS = {
   usuarios: 'agrihusac_usuarios',
   sesion: 'agrihusac_sesion',
   intentosLogin: 'agrihusac_intentos_login',
-  centrosCosto: 'agrihusac_centros_costo',
-  categorias: 'agrihusac_categorias',
-  tiposProducto: 'agrihusac_tipos_producto',
-  tiposComprobante: 'agrihusac_tipos_comprobante',
-  unidadesMedida: 'agrihusac_unidades_medida',
-  destinos: 'agrihusac_destinos',
 } as const
 
 export function obtenerStorage<T>(

@@ -1,8 +1,8 @@
 import {
   FolderKanban,
-  Eye,
   Pencil,
   Plus,
+  Eye,
   RotateCcw,
   Tags,
   Trash2,
@@ -106,49 +106,25 @@ export function TablaTiposProducto({
 
                     <td>
                       <div className="maestro-actions">
-                        {tipoProducto.activo === 1 ? (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            onClick={() => onEditar(tipoProducto)}
-                            title="Editar"
-                            aria-label={`Editar ${tipoProducto.nombre}`}
-                          >
-                            <Pencil size={16} />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            onClick={() => onVisualizar(tipoProducto)}
-                            title="Visualizar"
-                            aria-label={`Visualizar ${tipoProducto.nombre}`}
-                          >
-                            <Eye size={16} />
-                          </button>
-                        )}
+                        {tipoProducto.activo === 1 ? <><button
+                          type="button"
+                          className="btn maestro-action-btn"
+                          onClick={() => onEditar(tipoProducto)}
+                          title="Editar"
+                          aria-label={`Editar ${tipoProducto.nombre}`}
+                        >
+                          <Pencil size={16} />
+                        </button>
 
-                        {tipoProducto.activo === 1 ? (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn maestro-action-btn--danger"
-                            onClick={() => onEliminar(tipoProducto)}
-                            title="Eliminar"
-                            aria-label={`Eliminar ${tipoProducto.nombre}`}
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            onClick={() => onReactivar(tipoProducto)}
-                            title="Reactivar"
-                            aria-label={`Reactivar ${tipoProducto.nombre}`}
-                          >
-                            <RotateCcw size={16} />
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          className="btn maestro-action-btn maestro-action-btn--danger"
+                          onClick={() => onEliminar(tipoProducto)}
+                          title="Eliminar"
+                          aria-label={`Eliminar ${tipoProducto.nombre}`}
+                        >
+                          <Trash2 size={16} />
+                        </button></> : <><button type="button" className="btn maestro-action-btn" onClick={() => onVisualizar(tipoProducto)} title="Visualizar" aria-label={`Visualizar ${tipoProducto.nombre}`}><Eye size={16} /></button><button type="button" className="btn maestro-action-btn" onClick={() => onReactivar(tipoProducto)} title="Reactivar" aria-label={`Reactivar ${tipoProducto.nombre}`}><RotateCcw size={16} /></button></>}
                       </div>
                     </td>
                   </tr>

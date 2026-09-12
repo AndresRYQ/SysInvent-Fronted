@@ -64,7 +64,7 @@ export function TablaCentrosCosto({
             <thead>
               <tr>
                 <th>N°</th>
-                <th>Nombre</th>
+                <th>Nombre de centro de costo</th>
                 <th>Descripción</th>
                 <th>Estado</th>
                 <th className="text-center">Acciones</th>
@@ -80,6 +80,7 @@ export function TablaCentrosCosto({
                         {centroCosto.id}
                       </span>
                     </td>
+
                     <td>
                       <div className="maestro-cell-main">
                         <span className="maestro-cell-icon">
@@ -88,6 +89,7 @@ export function TablaCentrosCosto({
                         {centroCosto.nombre}
                       </div>
                     </td>
+
                     <td>{centroCosto.descripcion}</td>
                     <td>
                       <span
@@ -97,57 +99,56 @@ export function TablaCentrosCosto({
                             : 'maestro-status maestro-status--inactive'
                         }
                       >
-                        <span
-                          className="maestro-status__dot"
-                          aria-hidden="true"
-                        />
+                        <span className="maestro-status__dot" aria-hidden="true" />
                         {centroCosto.activo === 1 ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
+
                     <td>
                       <div className="maestro-actions">
                         {centroCosto.activo === 1 ? (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            onClick={() => onEditar(centroCosto)}
-                            title="Editar"
-                            aria-label={`Editar ${centroCosto.nombre}`}
-                          >
-                            <Pencil size={16} />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            onClick={() => onVisualizar(centroCosto)}
-                            title="Visualizar"
-                            aria-label={`Visualizar ${centroCosto.nombre}`}
-                          >
-                            <Eye size={16} />
-                          </button>
-                        )}
+                          <>
+                            <button
+                          type="button"
+                          className="btn maestro-action-btn"
+                          onClick={() => onEditar(centroCosto)}
+                          title="Editar"
+                          aria-label={`Editar ${centroCosto.nombre}`}
+                        >
+                          <Pencil size={16} />
+                            </button>
 
-                        {centroCosto.activo === 1 ? (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn maestro-action-btn--danger"
-                            onClick={() => onEliminar(centroCosto)}
-                            title="Eliminar"
-                            aria-label={`Eliminar ${centroCosto.nombre}`}
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                            <button
+                          type="button"
+                          className="btn maestro-action-btn maestro-action-btn--danger"
+                          onClick={() => onEliminar(centroCosto)}
+                          title="Eliminar"
+                          aria-label={`Eliminar ${centroCosto.nombre}`}
+                        >
+                          <Trash2 size={16} />
+                            </button>
+                          </>
                         ) : (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            onClick={() => onReactivar(centroCosto)}
-                            title="Reactivar"
-                            aria-label={`Reactivar ${centroCosto.nombre}`}
-                          >
-                            <RotateCcw size={16} />
-                          </button>
+                          <>
+                            <button
+                              type="button"
+                              className="btn maestro-action-btn"
+                              onClick={() => onVisualizar(centroCosto)}
+                              title="Visualizar"
+                              aria-label={`Visualizar ${centroCosto.nombre}`}
+                            >
+                              <Eye size={16} />
+                            </button>
+                            <button
+                              type="button"
+                              className="btn maestro-action-btn"
+                              onClick={() => onReactivar(centroCosto)}
+                              title="Reactivar"
+                              aria-label={`Reactivar ${centroCosto.nombre}`}
+                            >
+                              <RotateCcw size={16} />
+                            </button>
+                          </>
                         )}
                       </div>
                     </td>
@@ -183,3 +184,4 @@ export function TablaCentrosCosto({
     </section>
   )
 }
+

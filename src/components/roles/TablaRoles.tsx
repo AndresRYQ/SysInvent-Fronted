@@ -5,16 +5,10 @@ import {
   Trash2,
   Users,
 } from 'lucide-react'
-
+import type { Rol } from '../../types/rol'
 import { TablePagination } from '../ui/TablePagination'
 
-export interface RolResumen {
-  id: string
-  nombre: string
-  descripcion: string
-  estado: boolean
-  usuarios: number
-}
+export type RolResumen = Rol
 
 interface TablaRolesProps {
   roles: RolResumen[]
@@ -70,6 +64,7 @@ export function TablaRoles({
                 <th>Rol</th>
                 <th>Descripción</th>
                 <th>Usuarios</th>
+                <th>Módulos</th>
                 <th>Estado</th>
                 {(onEditar || onEliminar) && (
                   <th className="text-center">Acciones</th>
@@ -98,6 +93,11 @@ export function TablaRoles({
 
                     <td>{rol.descripcion}</td>
                     <td>{rol.usuarios}</td>
+                    <td>
+                      <span className="maestro-id-chip">
+                        {rol.modulos.length}
+                      </span>
+                    </td>
 
                     <td>
                       <span
@@ -145,7 +145,7 @@ export function TablaRoles({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={(onEditar || onEliminar) ? 6 : 5}>
+                  <td colSpan={(onEditar || onEliminar) ? 7 : 6}>
                     <div className="maestro-empty-state">
                       <Users size={28} />
                       <p className="mb-1">No se encontraron roles</p>

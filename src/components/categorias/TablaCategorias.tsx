@@ -1,8 +1,8 @@
 import {
   FolderKanban,
-  Eye,
   Pencil,
   Plus,
+  Eye,
   RotateCcw,
   Tag,
   Trash2,
@@ -18,9 +18,9 @@ interface TablaCategoriasProps {
   pageSize: number
   onAgregar: () => void
   onEditar: (categoria: Categoria) => void
-  onVisualizar: (categoria: Categoria) => void
+  onVisualizar?: (categoria: Categoria) => void
   onEliminar: (categoria: Categoria) => void
-  onReactivar: (categoria: Categoria) => void
+  onReactivar?: (categoria: Categoria) => void
   onPageChange: (page: number) => void
   onPageSizeChange: (pageSize: number) => void
 }
@@ -80,6 +80,7 @@ export function TablaCategorias({
                         {categoria.id}
                       </span>
                     </td>
+
                     <td>
                       <div className="maestro-cell-main">
                         <span className="maestro-cell-icon">
@@ -88,6 +89,7 @@ export function TablaCategorias({
                         {categoria.nombre}
                       </div>
                     </td>
+
                     <td>{categoria.descripcion}</td>
                     <td>
                       <span
@@ -101,51 +103,28 @@ export function TablaCategorias({
                         {categoria.activo === 1 ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
+
                     <td>
                       <div className="maestro-actions">
-                        {categoria.activo === 1 ? (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            onClick={() => onEditar(categoria)}
-                            title="Editar"
-                            aria-label={`Editar ${categoria.nombre}`}
-                          >
-                            <Pencil size={16} />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            onClick={() => onVisualizar(categoria)}
-                            title="Visualizar"
-                            aria-label={`Visualizar ${categoria.nombre}`}
-                          >
-                            <Eye size={16} />
-                          </button>
-                        )}
+                        {categoria.activo === 1 ? <><button
+                          type="button"
+                          className="btn maestro-action-btn"
+                          onClick={() => onEditar(categoria)}
+                          title="Editar"
+                          aria-label={`Editar ${categoria.nombre}`}
+                        >
+                          <Pencil size={16} />
+                        </button>
 
-                        {categoria.activo === 1 ? (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn maestro-action-btn--danger"
-                            onClick={() => onEliminar(categoria)}
-                            title="Eliminar"
-                            aria-label={`Eliminar ${categoria.nombre}`}
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            onClick={() => onReactivar(categoria)}
-                            title="Reactivar"
-                            aria-label={`Reactivar ${categoria.nombre}`}
-                          >
-                            <RotateCcw size={16} />
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          className="btn maestro-action-btn maestro-action-btn--danger"
+                          onClick={() => onEliminar(categoria)}
+                          title="Eliminar"
+                          aria-label={`Eliminar ${categoria.nombre}`}
+                        >
+                          <Trash2 size={16} />
+                        </button></> : <><button type="button" className="btn maestro-action-btn" onClick={() => onVisualizar?.(categoria)} title="Visualizar" aria-label={`Visualizar ${categoria.nombre}`}><Eye size={16} /></button><button type="button" className="btn maestro-action-btn" onClick={() => onReactivar?.(categoria)} title="Reactivar" aria-label={`Reactivar ${categoria.nombre}`}><RotateCcw size={16} /></button></>}
                       </div>
                     </td>
                   </tr>

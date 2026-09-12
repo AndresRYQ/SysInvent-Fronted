@@ -4,3 +4,8 @@ export interface CentroCosto {
   descripcion: string
   activo: 0 | 1
 }
+
+export interface CentroCostoFormData {
+  nombre: string
+  descripcion: string
+}

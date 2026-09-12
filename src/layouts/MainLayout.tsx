@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 
 import { Header } from '../components/common/Header'
@@ -6,35 +6,24 @@ import { Sidebar } from '../components/common/Sidebar'
 import '../styles/MainLayout.css'
 
 const SIN_MENU = ['/dashboard', '/sin-permiso']
-const ABRE_CERRADO = [
-  '/categorias',
-  '/centros-costo',
-  '/tipos-producto',
-  '/tipos-comprobante',
-  '/unidades-medida',
-  '/destinos',
-  '/ingresos-almacen',
-  '/vales-consumo',
-  '/usuarios',
-  '/roles',
-]
-
 export function MainLayout() {
   const { pathname } = useLocation()
-  const [menuAbierto, setMenuAbierto] = useState<boolean>(() =>
-    ABRE_CERRADO.includes(pathname) ? false : true,
-  )
+  const [menuAbierto, setMenuAbierto] = useState<boolean>(() => {
+    const guardado = localStorage.getItem('agrihusac_menu_abierto')
+    return guardado === null ? true : guardado === 'true'
+  })
+  const pathnameAnterior = useRef(pathname)
 
   const ocultarMenu = SIN_MENU.includes(pathname)
-  const abrirCerrado = ABRE_CERRADO.includes(pathname)
 
   useEffect(() => {
-    if (abrirCerrado) {
-      setMenuAbierto(false)
-    } else if (!ocultarMenu) {
+    if (pathnameAnterior.current === '/dashboard' && pathname !== '/dashboard') {
       setMenuAbierto(true)
+      localStorage.setItem('agrihusac_menu_abierto', 'true')
     }
-  }, [ocultarMenu, abrirCerrado])
+
+    pathnameAnterior.current = pathname
+  }, [pathname])
 
   return (
     <div className="app-layout">
@@ -46,7 +35,11 @@ export function MainLayout() {
         {!ocultarMenu && (
           <Sidebar
             abierto={menuAbierto}
-            onToggle={() => setMenuAbierto((actual) => !actual)}
+            onToggle={() => setMenuAbierto((actual) => {
+              const siguiente = !actual
+              localStorage.setItem('agrihusac_menu_abierto', String(siguiente))
+              return siguiente
+            })}
           />
         )}
 

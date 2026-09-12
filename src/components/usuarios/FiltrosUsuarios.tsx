@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, Filter, RotateCcw, Search } from 'lucide-react'
+import type { Rol } from '../../types/rol'
 
 export interface FiltrosUsuariosValores {
   busqueda: string
@@ -15,6 +16,7 @@ interface FiltrosUsuariosProps {
   ) => void
   onBuscar: () => void
   onLimpiar: () => void
+  roles: Rol[]
 }
 
 export function FiltrosUsuarios({
@@ -22,6 +24,7 @@ export function FiltrosUsuarios({
   onChange,
   onBuscar,
   onLimpiar,
+  roles,
 }: FiltrosUsuariosProps) {
   const [rolAbierto, setRolAbierto] = useState(false)
   const [estadoAbierto, setEstadoAbierto] = useState(false)
@@ -78,8 +81,14 @@ export function FiltrosUsuarios({
                 }}
               >
                 <option value="">Todos</option>
-                <option value="Administrador">Administrador</option>
-                <option value="Almacenero">Almacenero</option>
+                {roles.map((rol) => (
+                  <option
+                    value={rol.nombre}
+                    key={rol.id}
+                  >
+                    {rol.nombre}
+                  </option>
+                ))}
               </select>
               <ChevronDown size={16} />
             </div>

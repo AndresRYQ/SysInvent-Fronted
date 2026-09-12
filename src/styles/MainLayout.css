@@ -83,7 +83,7 @@
   box-sizing: border-box;
   overflow-y: auto;
   cursor: grab;
-  touch-action: none;
+  touch-action: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -156,6 +156,7 @@
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
+  text-decoration: none;
   transition:
     background 180ms ease,
     color 180ms ease,

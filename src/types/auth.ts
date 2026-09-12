@@ -9,16 +9,8 @@ export interface UsuarioLogin {
 }
 
 export interface CredencialesLogin {
-    usuario: string
-    contrasena: string
-}
-
-export interface SesionUsuario {
-    id: string
-    usuario: string
-    nombreCompleto: string
-    rol: string
-    fechaInicio: string
+  usuario: string
+  contrasena: string
 }
 
 export interface SesionUsuario {
