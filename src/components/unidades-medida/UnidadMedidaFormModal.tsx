@@ -6,6 +6,7 @@ import type { UnidadMedida } from '../../types/unidadMedida'
 interface UnidadMedidaFormModalProps {
   abierto: boolean
   unidadMedida: UnidadMedida | null
+  soloLectura?: boolean
   onClose: () => void
   onSubmit: (
     unidadMedida: Pick<UnidadMedida, 'nombre' | 'descripcion'>,
@@ -35,6 +36,7 @@ const ERRORES_INICIALES: UnidadMedidaFormErrores = {
 export function UnidadMedidaFormModal({
   abierto,
   unidadMedida,
+  soloLectura = false,
   onClose,
   onSubmit,
 }: UnidadMedidaFormModalProps) {
@@ -71,7 +73,6 @@ export function UnidadMedidaFormModal({
     <div
       className="maestro-modal-backdrop"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="maestro-modal-card"
@@ -152,6 +153,7 @@ export function UnidadMedidaFormModal({
                 }`}
                 type="text"
                 value={form.nombre}
+                readOnly={soloLectura}
                 aria-invalid={errores.nombre}
                 aria-describedby={
                   errores.nombre
@@ -176,7 +178,6 @@ export function UnidadMedidaFormModal({
                     }))
                   }
                 }}
-                placeholder="Ej. Unidad, Kilogramo, Litro, Metro"
                 required
               />
 
@@ -209,6 +210,7 @@ export function UnidadMedidaFormModal({
                     : ''
                 }`}
                 value={form.descripcion}
+                readOnly={soloLectura}
                 aria-invalid={errores.descripcion}
                 aria-describedby={
                   errores.descripcion
@@ -233,7 +235,7 @@ export function UnidadMedidaFormModal({
                     }))
                   }
                 }}
-                rows={4}
+                rows={2}
                 required
               />
 
@@ -248,7 +250,8 @@ export function UnidadMedidaFormModal({
             </div>
           </div>
 
-          <div className="maestro-modal-footer">
+          {!soloLectura && (
+            <div className="maestro-modal-footer">
             <button
               type="button"
               className="btn maestro-btn-danger"
@@ -265,7 +268,8 @@ export function UnidadMedidaFormModal({
               <Save size={18} />
               Guardar
             </button>
-          </div>
+            </div>
+          )}
         </form>
       </div>
     </div>
