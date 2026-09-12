@@ -1,9 +1,10 @@
 import {
   FolderKanban,
+  Eye,
   MapPin,
   Pencil,
   Plus,
-  ShieldCheck,
+  RotateCcw,
   Trash2,
 } from 'lucide-react'
 
@@ -17,7 +18,9 @@ interface TablaDestinosProps {
   pageSize: number
   onAgregar: () => void
   onEditar: (destino: Destino) => void
+  onVisualizar: (destino: Destino) => void
   onEliminar: (destino: Destino) => void
+  onReactivar: (destino: Destino) => void
   onPageChange: (page: number) => void
   onPageSizeChange: (pageSize: number) => void
 }
@@ -29,7 +32,9 @@ export function TablaDestinos({
   pageSize,
   onAgregar,
   onEditar,
+  onVisualizar,
   onEliminar,
+  onReactivar,
   onPageChange,
   onPageSizeChange,
 }: TablaDestinosProps) {
@@ -58,10 +63,9 @@ export function TablaDestinos({
           <table className="table maestro-table align-middle mb-0">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>N°</th>
                 <th>Nombre de destino</th>
                 <th>Descripción</th>
-                <th>Fecha de registro</th>
                 <th>Estado</th>
                 <th className="text-center">Acciones</th>
               </tr>
@@ -85,49 +89,71 @@ export function TablaDestinos({
                     </td>
 
                     <td>{destino.descripcion}</td>
-                    <td>{destino.fechaRegistro}</td>
-
                     <td>
                       <span
                         className={
-                          destino.estado
+                          destino.activo === 1
                             ? 'maestro-status maestro-status--active'
                             : 'maestro-status maestro-status--inactive'
                         }
                       >
-                        <ShieldCheck size={14} />
-                        {destino.estado ? 'Activo' : 'Inactivo'}
+                        <span className="maestro-status__dot" aria-hidden="true" />
+                        {destino.activo === 1 ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
 
                     <td>
                       <div className="maestro-actions">
-                        <button
-                          type="button"
-                          className="btn maestro-action-btn"
-                          onClick={() => onEditar(destino)}
-                          title="Editar"
-                          aria-label={`Editar ${destino.nombre}`}
-                        >
-                          <Pencil size={16} />
-                        </button>
+                        {destino.activo === 1 ? (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn"
+                            onClick={() => onEditar(destino)}
+                            title="Editar"
+                            aria-label={`Editar ${destino.nombre}`}
+                          >
+                            <Pencil size={16} />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn"
+                            onClick={() => onVisualizar(destino)}
+                            title="Visualizar"
+                            aria-label={`Visualizar ${destino.nombre}`}
+                          >
+                            <Eye size={16} />
+                          </button>
+                        )}
 
-                        <button
-                          type="button"
-                          className="btn maestro-action-btn maestro-action-btn--danger"
-                          onClick={() => onEliminar(destino)}
-                          title="Eliminar"
-                          aria-label={`Eliminar ${destino.nombre}`}
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        {destino.activo === 1 ? (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn maestro-action-btn--danger"
+                            onClick={() => onEliminar(destino)}
+                            title="Eliminar"
+                            aria-label={`Eliminar ${destino.nombre}`}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn maestro-action-btn"
+                            onClick={() => onReactivar(destino)}
+                            title="Reactivar"
+                            aria-label={`Reactivar ${destino.nombre}`}
+                          >
+                            <RotateCcw size={16} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6}>
+                  <td colSpan={5}>
                     <div className="maestro-empty-state">
                       <FolderKanban size={28} />
                       <p className="mb-1">No se encontraron destinos</p>

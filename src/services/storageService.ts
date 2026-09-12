@@ -7,6 +7,7 @@ export const STORAGE_KEYS = {
   tiposProducto: 'agrihusac_tipos_producto',
   tiposComprobante: 'agrihusac_tipos_comprobante',
   unidadesMedida: 'agrihusac_unidades_medida',
+  destinos: 'agrihusac_destinos',
 } as const
 
 export function obtenerStorage<T>(

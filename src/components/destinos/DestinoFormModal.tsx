@@ -6,6 +6,7 @@ import type { Destino } from '../../types/destino'
 interface DestinoFormModalProps {
   abierto: boolean
   destino: Destino | null
+  soloLectura?: boolean
   onClose: () => void
   onSubmit: (destino: Pick<Destino, 'nombre' | 'descripcion'>) => void
 }
@@ -33,6 +34,7 @@ const ERRORES_INICIALES: DestinoFormErrores = {
 export function DestinoFormModal({
   abierto,
   destino,
+  soloLectura = false,
   onClose,
   onSubmit,
 }: DestinoFormModalProps) {
@@ -68,7 +70,6 @@ export function DestinoFormModal({
     <div
       className="maestro-modal-backdrop"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="maestro-modal-card"
@@ -80,7 +81,11 @@ export function DestinoFormModal({
         <div className="maestro-modal-header">
           <div className="maestro-modal-header__content">
             <h3 id="destino-form-title" className="maestro-modal-title">
-              {destino ? 'Editar destino' : 'Registrar destino'}
+              {soloLectura
+                ? 'Visualizar destino'
+                : destino
+                  ? 'Editar destino'
+                  : 'Registrar destino'}
             </h3>
           </div>
 
@@ -142,6 +147,7 @@ export function DestinoFormModal({
                 }`}
                 type="text"
                 value={form.nombre}
+                readOnly={soloLectura}
                 aria-invalid={errores.nombre}
                 aria-describedby={
                   errores.nombre
@@ -166,7 +172,6 @@ export function DestinoFormModal({
                     }))
                   }
                 }}
-                placeholder="Ej. Almacén Central, Planta, Sucursal"
                 required
               />
 
@@ -199,6 +204,7 @@ export function DestinoFormModal({
                     : ''
                 }`}
                 value={form.descripcion}
+                readOnly={soloLectura}
                 aria-invalid={errores.descripcion}
                 aria-describedby={
                   errores.descripcion
@@ -223,7 +229,7 @@ export function DestinoFormModal({
                     }))
                   }
                 }}
-                rows={4}
+                rows={2}
                 required
               />
 
@@ -238,7 +244,8 @@ export function DestinoFormModal({
             </div>
           </div>
 
-          <div className="maestro-modal-footer">
+          {!soloLectura && (
+            <div className="maestro-modal-footer">
             <button
               type="button"
               className="btn maestro-btn-danger"
@@ -252,7 +259,8 @@ export function DestinoFormModal({
               <Save size={18} />
               Guardar
             </button>
-          </div>
+            </div>
+          )}
         </form>
       </div>
     </div>
