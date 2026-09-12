@@ -968,3 +968,22 @@
   background-color: var(--brand-green);
   color: #fff;
 }
+
+.destinos-page .maestro-btn-primary:hover,
+.destinos-page .maestro-btn-secondary:hover,
+.destinos-page .maestro-btn-danger:hover,
+.destinos-page .maestro-toolbar-btn:hover,
+.destinos-page .maestro-action-btn:hover,
+.destinos-page .maestro-table tbody tr:hover,
+.destinos-page .maestro-pagination .maestro-page-btn:hover {
+  transform: none;
+  background-color: inherit;
+  border-color: inherit;
+  color: inherit;
+  box-shadow: none;
+}
+
+.destinos-page .maestro-pagination .maestro-page-btn--active:hover {
+  background-color: var(--brand-green);
+  color: #fff;
+}
