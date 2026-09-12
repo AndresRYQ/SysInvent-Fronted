@@ -339,6 +339,38 @@
   box-shadow: none !important;
 }
 
+.categorias-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+  transform: none !important;
+  border-color: rgb(17 24 39 / 10%) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.categorias-page .maestro-page-btn--active:hover:not(:disabled) {
+  transform: none !important;
+  border-color: var(--brand-green) !important;
+  background: var(--brand-green) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.categorias-page .maestro-btn-primary:hover,
+.categorias-page .maestro-btn-secondary:hover,
+.categorias-page .maestro-btn-danger:hover,
+.categorias-page .maestro-toolbar-btn:hover,
+.categorias-page .maestro-action-btn:hover {
+  transform: none !important;
+}
+
+.categorias-page .maestro-table tbody tr:hover {
+  transform: none !important;
+  background: transparent !important;
+}
+
+.categorias-page .maestro-table tbody tr:nth-child(even):hover {
+  background: #fbfdfc !important;
+}
+
 .maestro-actions {
   display: flex;
   align-items: center;

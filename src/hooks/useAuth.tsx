@@ -40,8 +40,8 @@ type MotivoCierre =
   | 'inactividad'
   | 'vencimiento'
 
-const TIEMPO_INACTIVIDAD_MS =
-  2 * 60 * 1000
+// const TIEMPO_INACTIVIDAD_MS =
+//   2 * 60 * 1000
 
 const MOTIVO_CIERRE_KEY =
   'agrihusac_motivo_cierre'
@@ -149,9 +149,10 @@ export function AuthProvider({
   }, [sesion, finalizarSesion])
 
   /*
+   * Cierre por inactividad desactivado temporalmente.
+   *
    * Cierra la sesión después de
    * 2 minutos sin actividad.
-   */
   useEffect(() => {
     if (!sesion) {
       return
@@ -207,6 +208,7 @@ export function AuthProvider({
       })
     }
   }, [sesion, finalizarSesion])
+  */
 
   /*
    * Sincroniza inicio y cierre de sesión

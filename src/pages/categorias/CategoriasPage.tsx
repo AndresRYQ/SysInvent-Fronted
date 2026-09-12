@@ -19,6 +19,7 @@ import {
   crearCategoria,
   eliminarCategoria,
   obtenerCategorias,
+  reactivarCategoria,
 } from '../../services/categoriaService'
 
 import type {
@@ -32,11 +33,6 @@ import '../../styles/maestros.css'
 const FILTROS_INICIALES: FiltrosCategoriasValores = {
   nombre: '',
   estado: '',
-}
-
-interface MensajePagina {
-  tipo: 'success' | 'danger'
-  texto: string
 }
 
 function filtrarCategorias(
@@ -57,9 +53,9 @@ function filtrarCategorias(
     const coincideEstado =
       !filtros.estado ||
       (filtros.estado === 'activo' &&
-        categoria.estado) ||
+        categoria.activo === 1) ||
       (filtros.estado === 'inactivo' &&
-        !categoria.estado)
+        categoria.activo === 0)
 
     return coincideNombre && coincideEstado
   })
@@ -94,6 +90,7 @@ export function CategoriasPage() {
 
   const [modalFormOpen, setModalFormOpen] =
     useState(false)
+  const [modoVisualizacion, setModoVisualizacion] = useState(false)
 
   const [
     categoriaEnEdicion,
@@ -102,6 +99,9 @@ export function CategoriasPage() {
 
   const [errorFormulario, setErrorFormulario] =
     useState('')
+
+  // Se conserva temporalmente la setter para la integración futura de notificaciones.
+  const [, setMensaje] = useState<{ tipo: string; texto: string } | null>(null)
 
   const [
     modalDeleteOpen,
@@ -113,8 +113,8 @@ export function CategoriasPage() {
     setCategoriaAEliminar,
   ] = useState<Categoria | null>(null)
 
-  const [mensaje, setMensaje] =
-    useState<MensajePagina | null>(null)
+  const [modalReactivarOpen, setModalReactivarOpen] = useState(false)
+  const [categoriaAReactivar, setCategoriaAReactivar] = useState<Categoria | null>(null)
 
   const categoriasFiltradas = useMemo(
     () =>
@@ -156,24 +156,32 @@ export function CategoriasPage() {
   }
 
   function abrirFormularioNuevo(): void {
-    setMensaje(null)
     setErrorFormulario('')
     setCategoriaEnEdicion(null)
+    setModoVisualizacion(false)
     setModalFormOpen(true)
   }
 
   function abrirFormularioEdicion(
     categoria: Categoria,
   ): void {
-    setMensaje(null)
     setErrorFormulario('')
     setCategoriaEnEdicion(categoria)
+    setModoVisualizacion(false)
+    setModalFormOpen(true)
+  }
+
+  function abrirVisualizacion(categoria: Categoria): void {
+    setErrorFormulario('')
+    setCategoriaEnEdicion(categoria)
+    setModoVisualizacion(true)
     setModalFormOpen(true)
   }
 
   function cerrarFormulario(): void {
     setModalFormOpen(false)
     setCategoriaEnEdicion(null)
+    setModoVisualizacion(false)
     setErrorFormulario('')
   }
 
@@ -215,7 +223,6 @@ export function CategoriasPage() {
   function abrirConfirmacionEliminar(
     categoria: Categoria,
   ): void {
-    setMensaje(null)
     setCategoriaAEliminar(categoria)
     setModalDeleteOpen(true)
   }
@@ -223,6 +230,19 @@ export function CategoriasPage() {
   function cerrarConfirmacionEliminar(): void {
     setModalDeleteOpen(false)
     setCategoriaAEliminar(null)
+  }
+
+  function reactivar(categoria: Categoria): void {
+    setCategoriaAReactivar(categoria)
+    setModalReactivarOpen(true)
+  }
+
+  function confirmarReactivacion(): void {
+    if (!categoriaAReactivar) return
+    reactivarCategoria(categoriaAReactivar.id)
+    recargarCategorias()
+    setModalReactivarOpen(false)
+    setCategoriaAReactivar(null)
   }
 
   function confirmarEliminacion(): void {
@@ -254,7 +274,7 @@ export function CategoriasPage() {
   }
 
   return (
-    <>
+    <div className="categorias-page">
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
@@ -267,22 +287,6 @@ export function CategoriasPage() {
               </p>
             </div>
           </section>
-
-          {mensaje && (
-            <div
-              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
-              role="alert"
-            >
-              {mensaje.texto}
-
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={() => setMensaje(null)}
-              />
-            </div>
-          )}
 
           <div className="maestro-panel">
             <FiltrosCategorias
@@ -321,9 +325,11 @@ export function CategoriasPage() {
               onEditar={
                 abrirFormularioEdicion
               }
+              onVisualizar={abrirVisualizacion}
               onEliminar={
                 abrirConfirmacionEliminar
               }
+              onReactivar={reactivar}
               onPageChange={setPage}
               onPageSizeChange={(
                 nextPageSize,
@@ -340,6 +346,7 @@ export function CategoriasPage() {
         abierto={modalFormOpen}
         categoria={categoriaEnEdicion}
         error={errorFormulario}
+        soloLectura={modoVisualizacion}
         onClose={cerrarFormulario}
         onSubmit={guardarCategoria}
       />
@@ -352,6 +359,17 @@ export function CategoriasPage() {
         }
         onConfirm={confirmarEliminacion}
       />
-    </>
+
+      <CategoriaDeleteModal
+        abierto={modalReactivarOpen}
+        categoria={categoriaAReactivar}
+        modo="reactivar"
+        onClose={() => {
+          setModalReactivarOpen(false)
+          setCategoriaAReactivar(null)
+        }}
+        onConfirm={confirmarReactivacion}
+      />
+    </div>
   )
 }

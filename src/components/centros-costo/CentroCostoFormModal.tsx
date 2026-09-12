@@ -58,8 +58,11 @@ export function CentroCostoFormModal({ abierto, centroCosto, error, soloLectura 
             </div>
             <div>
               <label className="form-label maestro-label" htmlFor="centroCostoDescripcionModal">Descripción{!soloLectura && <span className="maestro-required">*</span>}</label>
-              <textarea id="centroCostoDescripcionModal" className={`form-control maestro-control maestro-control--textarea${errores.descripcion ? ' maestro-control--error' : ''}`} value={form.descripcion} placeholder="Ingresar" disabled={soloLectura} rows={2} onChange={(event) => actualizar('descripcion', event.target.value)} />
-              {errores.descripcion && <div className="maestro-field-error">Campo requerido</div>}
+              <textarea id="centroCostoDescripcionModal" className={`form-control maestro-control maestro-control--textarea${errores.descripcion ? ' maestro-control--error' : ''}`} value={form.descripcion} placeholder="Ingresar" disabled={soloLectura} maxLength={250} rows={2} onChange={(event) => actualizar('descripcion', event.target.value)} />
+              <div className="d-flex justify-content-between">
+                <div>{errores.descripcion && <span className="maestro-field-error">Campo requerido</span>}</div>
+                <small className="text-muted">{form.descripcion.length}/250</small>
+              </div>
             </div>
           </div>
           {!soloLectura && <div className="maestro-modal-footer">
