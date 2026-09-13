@@ -31,6 +31,7 @@ import { EditarProductoPage } from '../pages/productos/EditarProductoPage'
 import { BitacoraPage } from '../pages/bitacora/BitacoraPage'
 import { ContactosPage } from '../pages/contactos/ContactosPage'
 import { PartesEquipoPage } from '../pages/partes-equipo/PartesEquipoPage'
+import { ProductosMasPedidosPage } from '../pages/reportes/ProductosMasPedidosPage'
 
 export function AppRouter() {
   return (
@@ -248,6 +249,9 @@ export function AppRouter() {
                   path="/partes-equipo"
                   element={<PartesEquipoPage />}
                 />
+              </Route>
+              <Route element={<RoleRoute modulo="reporte-productos" />}>
+                <Route path="/reportes/productos-mas-pedidos" element={<ProductosMasPedidosPage />} />
               </Route>
             </Route>
           </Route>

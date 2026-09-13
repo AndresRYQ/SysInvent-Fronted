@@ -273,6 +273,7 @@ const modules: Module[] = [
     icon: 'chart',
     tone: 'blue',
     category: 'Reportes',
+    route: '/reportes/productos-mas-pedidos',
   },
   {
     id: 'centros-costo',
