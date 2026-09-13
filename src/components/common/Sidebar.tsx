@@ -176,6 +176,7 @@ const SECCIONES: SidebarSection[] = [
         moduleId: 'roles',
       },
       {
+        to: '/perfil-usuario',
         label: 'Perfil de usuario',
         icon: UserCircle,
         moduleId: 'perfil-usuario',

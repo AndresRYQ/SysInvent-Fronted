@@ -353,6 +353,7 @@ const modules: Module[] = [
     icon: 'users',
     tone: 'teal',
     category: 'Perfil',
+    route: '/perfil-usuario',
   },
 ]
 

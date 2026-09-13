@@ -31,6 +31,7 @@ import { EditarProductoPage } from '../pages/productos/EditarProductoPage'
 import { BitacoraPage } from '../pages/bitacora/BitacoraPage'
 import { ContactosPage } from '../pages/contactos/ContactosPage'
 import { PartesEquipoPage } from '../pages/partes-equipo/PartesEquipoPage'
+import { PerfilUsuarioPage } from '../pages/perfil/PerfilUsuarioPage'
 
 export function AppRouter() {
   return (
@@ -247,6 +248,16 @@ export function AppRouter() {
                 <Route
                   path="/partes-equipo"
                   element={<PartesEquipoPage />}
+                />
+              </Route>
+              <Route
+                element={
+                  <RoleRoute modulo="perfil-usuario" />
+                }
+              >
+                <Route
+                  path="/perfil-usuario"
+                  element={<PerfilUsuarioPage />}
                 />
               </Route>
             </Route>
