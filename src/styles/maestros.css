@@ -6,6 +6,7 @@
   position: relative;
   min-height: 100vh;
   padding: 0px 24px 42px;
+  touch-action: pan-y;
 }
 
 .maestro-page {

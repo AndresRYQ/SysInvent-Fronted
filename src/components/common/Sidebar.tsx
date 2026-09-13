@@ -188,9 +188,14 @@ const SECCIONES: SidebarSection[] = [
 type SidebarProps = {
   abierto: boolean
   onToggle: () => void
+  onNavigate?: () => void
 }
 
-export function Sidebar({ abierto, onToggle }: SidebarProps) {
+export function Sidebar({
+  abierto,
+  onToggle,
+  onNavigate,
+}: SidebarProps) {
   const { pathname } = useLocation()
   const { sesion } = useAuth()
 
@@ -310,6 +315,7 @@ const seccionesPermitidas =
                     to={enlace.to}
                     className={className}
                     title={!abierto ? enlace.label : undefined}
+                    onClick={onNavigate}
                   >
                     <Icon size={18} />
                     {abierto && <span>{enlace.label}</span>}

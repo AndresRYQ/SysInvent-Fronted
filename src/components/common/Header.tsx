@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Bell, Leaf, LogOut } from 'lucide-react'
+import { Bell, Leaf, LogOut, Menu, X } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
 import { useAuth } from '../../hooks/useAuth'
@@ -16,6 +16,8 @@ type HeaderProps = {
   brandHref?: string
   brandMark?: ReactNode
   notifications?: number
+  menuAbierto?: boolean
+  onMenuToggle?: () => void
 }
 
 export function Header({
@@ -23,6 +25,8 @@ export function Header({
   brandHref = '/',
   brandMark = <Leaf size={20} />,
   notifications = 3,
+  menuAbierto = false,
+  onMenuToggle,
 }: HeaderProps) {
   const { sesion, logout } = useAuth()
   const { pathname } = useLocation()
@@ -46,6 +50,18 @@ export function Header({
 
   return (
     <nav className="topbar" aria-label="Navegacion principal">
+      {onMenuToggle && (
+        <button
+          className="mobile-menu-button"
+          type="button"
+          onClick={onMenuToggle}
+          aria-label={menuAbierto ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={menuAbierto}
+        >
+          {menuAbierto ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      )}
+
       <Link className="brand" to={brandHref}>
         <span className="brand-mark">{brandMark}</span>
         <span className="brand-name">AGRIHUSA</span>
