@@ -85,6 +85,7 @@ const SECCIONES: SidebarSection[] = [
         moduleId: 'reporte-vales',
       },
       {
+        to: '/reportes/productos-mas-pedidos',
         label:
           'Reporte de producto más pedido',
         icon: FileText,

@@ -31,13 +31,14 @@ import { EditarProductoPage } from '../pages/productos/EditarProductoPage'
 import { BitacoraPage } from '../pages/bitacora/BitacoraPage'
 import { ContactosPage } from '../pages/contactos/ContactosPage'
 import { PartesEquipoPage } from '../pages/partes-equipo/PartesEquipoPage'
-import { ReporteIngresosPage } from '../pages/reportes/ReporteIngresosPage'
 import { ControlAlmacenPage } from '../pages/control-almacen/ControlAlmacenPage'
-import { NuevoIngresoPage } from '../pages/ingresos-almacen/NuevoIngresoPage'
 import { EditarIngresoPage } from '../pages/ingresos-almacen/EditarIngresoPage'
-import { NuevoValePage } from '../pages/vales-consumo/NuevoValePage'
-import { EditarValePage } from '../pages/vales-consumo/EditarValePage'
+import { NuevoIngresoPage } from '../pages/ingresos-almacen/NuevoIngresoPage'
+import { ReporteIngresosPage } from '../pages/reportes/ReporteIngresosPage'
+import { ProductosMasPedidosPage } from '../pages/reportes/ProductosMasPedidosPage'
 import { ReporteValesPage } from '../pages/reportes/ReporteValesPage'
+import { EditarValePage } from '../pages/vales-consumo/EditarValePage'
+import { NuevoValePage } from '../pages/vales-consumo/NuevoValePage'
 
 export function AppRouter() {
   return (
@@ -301,6 +302,9 @@ export function AppRouter() {
                   path="/partes-equipo"
                   element={<PartesEquipoPage />}
                 />
+              </Route>
+              <Route element={<RoleRoute modulo="reporte-productos" />}>
+                <Route path="/reportes/productos-mas-pedidos" element={<ProductosMasPedidosPage />} />
               </Route>
             </Route>
           </Route>
