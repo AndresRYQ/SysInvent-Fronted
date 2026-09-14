@@ -8,6 +8,7 @@ import {
   X,
 } from 'lucide-react'
 import Select from 'react-select'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
 import type {
   Contacto,
@@ -53,29 +54,8 @@ const ERRORES_INICIALES:
     correo: '',
   }
 
-const estilosSelect = (tieneError: boolean) => ({
-  control: (base: any, state: any) => ({
-    ...base,
-    minHeight: 36,
-    height: 36,
-    borderRadius: 8,
-    borderColor: tieneError ? '#dc2626' : state.isFocused ? '#198754' : '#dee2e6',
-    boxShadow: tieneError
-      ? '0 0 0 3px rgb(220 38 38 / 14%)'
-      : state.isFocused
-        ? '0 0 0 3px rgb(25 135 84 / 14%)'
-        : 'none',
-    '&:hover': { borderColor: tieneError ? '#dc2626' : '#198754' },
-  }),
-  valueContainer: (base: any) => ({ ...base, fontSize: '.8rem' }),
-  menu: (base: any) => ({ ...base, zIndex: 20 }),
-  option: (base: any, state: any) => ({
-    ...base,
-    fontSize: '.8rem',
-    backgroundColor: state.isSelected ? '#198754' : state.isFocused ? '#e9f5ee' : '#fff',
-    color: state.isSelected ? '#fff' : '#212529',
-  }),
-})
+const estilosSelect = (tieneError: boolean) =>
+  crearEstilosSelect({ tieneError, zIndex: 20 })
 
 export function FormularioContacto({
   abierto,
@@ -178,7 +158,7 @@ export function FormularioContacto({
       numerosTelefono.length > 15
     ) {
       nuevosErrores.telefono =
-        'Ingresa un teléfono válido'
+        'Ingresa un telÃ©fono vÃ¡lido'
     }
 
     if (!correo) {
@@ -190,7 +170,7 @@ export function FormularioContacto({
       )
     ) {
       nuevosErrores.correo =
-        'Ingresa un correo válido'
+        'Ingresa un correo vÃ¡lido'
     }
 
     setErrores(nuevosErrores)
@@ -274,7 +254,7 @@ export function FormularioContacto({
 
             <div className="mb-3">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="contactoProveedor"
               >
                 Proveedor
@@ -323,7 +303,7 @@ export function FormularioContacto({
             <div className="row g-3">
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="contactoNombre"
                 >
                   Nombre completo
@@ -334,7 +314,7 @@ export function FormularioContacto({
 
                 <input
                   id="contactoNombre"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.nombreCompleto
                       ? ' maestro-control--error'
                       : ''
@@ -372,7 +352,7 @@ export function FormularioContacto({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="contactoCargo"
                 >
                   Cargo
@@ -383,7 +363,7 @@ export function FormularioContacto({
 
                 <input
                   id="contactoCargo"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.cargo
                       ? ' maestro-control--error'
                       : ''
@@ -417,10 +397,10 @@ export function FormularioContacto({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="contactoTelefono"
                 >
-                  Teléfono
+                  TelÃ©fono
                   <span className="maestro-required">
                     *
                   </span>
@@ -428,7 +408,7 @@ export function FormularioContacto({
 
                 <input
                   id="contactoTelefono"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.telefono
                       ? ' maestro-control--error'
                       : ''
@@ -462,7 +442,7 @@ export function FormularioContacto({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="contactoCorreo"
                 >
                   Correo
@@ -473,7 +453,7 @@ export function FormularioContacto({
 
                 <input
                   id="contactoCorreo"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.correo
                       ? ' maestro-control--error'
                       : ''

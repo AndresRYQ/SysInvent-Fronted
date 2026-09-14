@@ -36,13 +36,13 @@ export function FiltrosTiposProducto({
 
         <div className="row g-3">
           <div className="col-12 col-lg-8">
-            <label className="form-label maestro-label" htmlFor="nombreTipoProducto">
+            <label className="form-label" htmlFor="nombreTipoProducto">
               Nombre de tipo de producto
             </label>
 
             <input
               id="nombreTipoProducto"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.nombre}
               placeholder="Buscar"
@@ -53,7 +53,7 @@ export function FiltrosTiposProducto({
           </div>
 
           <div className="col-12 col-md-6 col-lg-4">
-            <label className="form-label maestro-label" htmlFor="estadoTipoProducto">
+            <label className="form-label" htmlFor="estadoTipoProducto">
               Estado
             </label>
 
@@ -65,7 +65,7 @@ export function FiltrosTiposProducto({
             {/*
               <select
                 id="estadoTipoProducto"
-                className="form-select maestro-control maestro-select-control"
+                className="form-select maestro-select-control"
                 value={valores.estado}
                 onMouseDown={() => setEstadoAbierto(true)}
                 onKeyDown={() => setEstadoAbierto(true)}

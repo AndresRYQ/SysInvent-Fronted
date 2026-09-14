@@ -64,7 +64,7 @@ function obtenerMensajeError(
 ): string {
   return error instanceof Error
     ? error.message
-    : 'OcurriÃƒÂ³ un error inesperado.'
+    : 'Ocurrió un error inesperado.'
 }
 
 export function IngresoAlmacenForm({
@@ -333,7 +333,7 @@ export function IngresoAlmacenForm({
       precioUnitario < 0
     ) {
       setError(
-        'El precio unitario no es vÃƒÂ¡lido.',
+        'El precio unitario no es válido.',
       )
       return
     }
@@ -417,7 +417,7 @@ export function IngresoAlmacenForm({
 
     if (!numeroDocumento.trim()) {
       setError(
-        'Ingresa el nÃƒÂºmero del documento.',
+        'Ingresa el número del documento.',
       )
       return
     }
@@ -464,8 +464,8 @@ export function IngresoAlmacenForm({
           </h2>
 
           <p className="text-secondary mb-0">
-            Registra la mercaderÃƒÂ­a recibida
-            en el almacÃƒÂ©n.
+            Registra la mercadería recibida
+            en el almacén.
           </p>
         </div>
 
@@ -488,7 +488,7 @@ export function IngresoAlmacenForm({
       <div className="row g-3">
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoFecha"
           >
             Fecha de ingreso *
@@ -496,7 +496,7 @@ export function IngresoAlmacenForm({
 
           <input
             id="ingresoFecha"
-            className="form-control maestro-control"
+            className="form-control"
             type="date"
             value={fechaIngreso}
             onChange={(event) =>
@@ -509,7 +509,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoProveedor"
           >
             Proveedor *
@@ -517,7 +517,7 @@ export function IngresoAlmacenForm({
 
           <select
             id="ingresoProveedor"
-            className="form-select maestro-control"
+            className="form-select"
             value={proveedorId}
             onChange={(event) =>
               cambiarProveedor(
@@ -549,7 +549,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoContacto"
           >
             Contacto *
@@ -557,7 +557,7 @@ export function IngresoAlmacenForm({
 
           <select
             id="ingresoContacto"
-            className="form-select maestro-control"
+            className="form-select"
             value={contactoId}
             disabled={!proveedorId}
             onChange={(event) =>
@@ -585,7 +585,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoTipoDocumento"
           >
             Tipo de documento *
@@ -593,7 +593,7 @@ export function IngresoAlmacenForm({
 
           <select
             id="ingresoTipoDocumento"
-            className="form-select maestro-control"
+            className="form-select"
             value={tipoDocumentoId}
             onChange={(event) =>
               setTipoComprobanteId(
@@ -625,15 +625,15 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoNumeroDocumento"
           >
-            NÃƒÂºmero de documento *
+            Número de documento *
           </label>
 
           <input
             id="ingresoNumeroDocumento"
-            className="form-control maestro-control"
+            className="form-control"
             type="text"
             maxLength={50}
             value={numeroDocumento}
@@ -647,15 +647,15 @@ export function IngresoAlmacenForm({
 
         <div className="col-12">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoObservacion"
           >
-            ObservaciÃƒÂ³n
+            Observación
           </label>
 
           <textarea
             id="ingresoObservacion"
-            className="form-control maestro-control"
+            className="form-control"
             rows={3}
             maxLength={500}
             value={observacion}
@@ -677,7 +677,7 @@ export function IngresoAlmacenForm({
       <div className="row g-3 align-items-end">
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="detalleTipoProducto"
           >
             Tipo de producto *
@@ -685,7 +685,7 @@ export function IngresoAlmacenForm({
 
           <select
             id="detalleTipoProducto"
-            className="form-select maestro-control"
+            className="form-select"
             value={detalle.tipoProductoId}
             disabled={!proveedorId}
             onChange={(event) =>
@@ -713,7 +713,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="detalleProducto"
           >
             Producto *
@@ -721,7 +721,7 @@ export function IngresoAlmacenForm({
 
           <select
             id="detalleProducto"
-            className="form-select maestro-control"
+            className="form-select"
             value={detalle.productoId}
             disabled={
               !proveedorId ||
@@ -753,7 +753,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-3">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="detalleUnidad"
           >
             Unidad
@@ -761,18 +761,18 @@ export function IngresoAlmacenForm({
 
           <input
             id="detalleUnidad"
-            className="form-control maestro-control"
+            className="form-control"
             value={
               unidadSeleccionada?.nombre ?? ''
             }
-            placeholder="AutomÃƒÂ¡tico"
+            placeholder="Automático"
             readOnly
           />
         </div>
 
         <div className="col-12 col-md-3">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="detalleCantidad"
           >
             Cantidad *
@@ -780,7 +780,7 @@ export function IngresoAlmacenForm({
 
           <input
             id="detalleCantidad"
-            className="form-control maestro-control"
+            className="form-control"
             type="number"
             min="0.001"
             step="0.001"
@@ -797,7 +797,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-3">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="detallePrecio"
           >
             Precio unitario *
@@ -805,7 +805,7 @@ export function IngresoAlmacenForm({
 
           <input
             id="detallePrecio"
-            className="form-control maestro-control"
+            className="form-control"
             type="number"
             min="0"
             step="0.01"
@@ -858,7 +858,7 @@ export function IngresoAlmacenForm({
                   colSpan={6}
                   className="text-center text-secondary py-4"
                 >
-                  TodavÃƒÂ­a no agregaste productos.
+                  Todavía no agregaste productos.
                 </td>
               </tr>
             )}
@@ -972,6 +972,7 @@ export function IngresoAlmacenForm({
     </form>
   )
 }
+
 
 
 

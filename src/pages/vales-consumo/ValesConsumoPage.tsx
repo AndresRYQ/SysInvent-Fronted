@@ -97,7 +97,7 @@ function obtenerMensajeError(
 ): string {
   return error instanceof Error
     ? error.message
-    : 'OcurriÃƒÂ³ un error inesperado.'
+    : 'Ocurrió un error inesperado.'
 }
 
 function formatearFecha(
@@ -398,7 +398,7 @@ export function ValesConsumoPage() {
               <h1>Vales de consumo</h1>
 
               <p>
-                Salidas y distribuciÃƒÂ³n de productos
+                Salidas y distribución de productos
                 hacia destinos y partes de equipo.
               </p>
             </div>
@@ -428,7 +428,7 @@ export function ValesConsumoPage() {
                 <div className="row g-3">
                   <div className="col-12 col-lg-4">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeBusqueda"
                     >
                       Buscar
@@ -436,7 +436,7 @@ export function ValesConsumoPage() {
 
                     <input
                       id="valeBusqueda"
-                      className="form-control maestro-control"
+                      className="form-control"
                       placeholder="Buscar"
                       value={filtros.busqueda}
                       onChange={(event) =>
@@ -454,7 +454,7 @@ export function ValesConsumoPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeCentroFiltro"
                     >
                       Centro de costo
@@ -484,7 +484,7 @@ export function ValesConsumoPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeEstadoFiltro"
                     >
                       Estado
@@ -515,7 +515,7 @@ export function ValesConsumoPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeDesde"
                     >
                       Desde
@@ -523,7 +523,7 @@ export function ValesConsumoPage() {
 
                     <input
                       id="valeDesde"
-                      className="form-control maestro-control"
+                      className="form-control"
                       type="date"
                       value={filtros.fechaDesde}
                       onChange={(event) =>
@@ -541,7 +541,7 @@ export function ValesConsumoPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeHasta"
                     >
                       Hasta
@@ -549,7 +549,7 @@ export function ValesConsumoPage() {
 
                     <input
                       id="valeHasta"
-                      className="form-control maestro-control"
+                      className="form-control"
                       type="date"
                       value={filtros.fechaHasta}
                       onChange={(event) =>
@@ -627,7 +627,7 @@ export function ValesConsumoPage() {
                   <table className="table maestro-table align-middle mb-0">
                     <thead>
                       <tr>
-                        <th>NÃƒÂºmero</th>
+                        <th>Número</th>
                         <th>Fecha</th>
                         <th>Centro de costo</th>
                         <th>Solicitante</th>
@@ -844,7 +844,7 @@ export function ValesConsumoPage() {
 
             <p className="maestro-modal-copy text-center">
               Las cantidades del vale se
-              devolverÃƒÂ¡n al stock:
+              devolverán al stock:
             </p>
 
             <p className="maestro-delete-name">
@@ -878,3 +878,4 @@ export function ValesConsumoPage() {
     </>
   )
 }
+

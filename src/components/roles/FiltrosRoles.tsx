@@ -35,13 +35,13 @@ export function FiltrosRoles({
 
         <div className="row g-3">
           <div className="col-12 col-lg-8">
-            <label className="form-label maestro-label" htmlFor="busquedaRol">
+            <label className="form-label" htmlFor="busquedaRol">
               Buscar rol
             </label>
 
             <input
               id="busquedaRol"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.busqueda}
               placeholder="Ej. Administrador, Almacenero"
@@ -50,7 +50,7 @@ export function FiltrosRoles({
           </div>
 
           <div className="col-12 col-md-6 col-lg-4">
-            <label className="form-label maestro-label" htmlFor="estadoRol">
+            <label className="form-label" htmlFor="estadoRol">
               Estado
             </label>
 
@@ -59,7 +59,7 @@ export function FiltrosRoles({
             >
               <select
                 id="estadoRol"
-                className="form-select maestro-control maestro-select-control"
+                className="form-select maestro-select-control"
                 value={valores.estado}
                 onMouseDown={() => setEstadoAbierto(true)}
                 onKeyDown={() => setEstadoAbierto(true)}

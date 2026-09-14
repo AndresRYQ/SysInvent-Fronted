@@ -116,7 +116,7 @@ export function ExportarProductosMasPedidosButton({
       libro.created = fechaGeneracion
       libro.modified = fechaGeneracion
       libro.title =
-        'Productos mÃ¡s pedidos'
+        'Productos más pedidos'
       libro.subject =
         'Ranking de productos consumidos'
       libro.company =
@@ -155,7 +155,7 @@ export function ExportarProductosMasPedidosButton({
       )
 
       hoja.headerFooter.oddHeader =
-        '&C&BProductos mÃ¡s pedidos'
+        '&C&BProductos más pedidos'
 
       hoja.headerFooter.oddFooter =
         '&LSistema de Inventario&C&P de &N&R&D'
@@ -186,7 +186,7 @@ export function ExportarProductosMasPedidosButton({
       hoja.mergeCells('A1:L1')
 
       hoja.getCell('A1').value =
-        'RANKING DE PRODUCTOS MÃS PEDIDOS'
+        'RANKING DE PRODUCTOS MÁS PEDIDOS'
 
       hoja.getRow(1).height = 34
 
@@ -286,17 +286,17 @@ export function ExportarProductosMasPedidosButton({
       }
 
       const encabezados = [
-        'PosiciÃ³n',
-        'CÃ³digo',
+        'Posición',
+        'Código',
         'Producto',
         'Tipo de producto',
-        'CategorÃ­a',
+        'Categoría',
         'Unidad de medida',
         'Cantidad solicitada',
         'Vales',
         'Distribuciones',
         'Destinos',
-        'ParticipaciÃ³n',
+        'Participación',
         'Total valorizado',
       ]
 
@@ -577,7 +577,7 @@ export function ExportarProductosMasPedidosButton({
       hojaResumen.mergeCells('A2:B2')
 
       hojaResumen.getCell('A2').value =
-        'Indicadores segÃºn los filtros aplicados'
+        'Indicadores según los filtros aplicados'
 
       hojaResumen.getCell('A2').font = {
         name: 'Aptos',
@@ -645,11 +645,11 @@ export function ExportarProductosMasPedidosButton({
           resumen.totalDistribuciones,
         ],
         [
-          'Producto mÃ¡s pedido',
+          'Producto más pedido',
           resumen.productoMasPedido,
         ],
         [
-          'Cantidad del producto lÃ­der',
+          'Cantidad del producto líder',
           `${resumen.cantidadProductoMasPedido} ${resumen.unidadProductoMasPedido}`,
         ],
         [
@@ -796,3 +796,4 @@ export function ExportarProductosMasPedidosButton({
     </div>
   )
 }
+

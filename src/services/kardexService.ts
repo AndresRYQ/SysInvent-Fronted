@@ -121,7 +121,7 @@ function crearMovimientosSalida():
 /**
  * Obtiene entradas y salidas.
  *
- * TambiÃƒÂ©n incluye documentos anulados
+ * También incluye documentos anulados
  * para conservar el historial.
  */
 export function obtenerMovimientosAlmacen():
@@ -263,7 +263,7 @@ export function obtenerControlProductoPorId(
 
 /**
  * Compara el saldo calculado con el
- * stock tÃƒÂ©cnico guardado en Producto.
+ * stock técnico guardado en Producto.
  */
 export function obtenerDiferenciasStock():
   Array<{
@@ -309,6 +309,7 @@ export function obtenerDiferenciasStock():
         resultado.diferencia !== 0,
     )
 }
+
 
 
 
