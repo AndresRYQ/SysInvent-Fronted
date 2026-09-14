@@ -50,6 +50,7 @@ const SECCIONES: SidebarSection[] = [
     label: 'Inventario',
     items: [
       {
+        to: '/control-almacen',
         label: 'Control de almacén',
         icon: Archive,
         moduleId: 'control-almacen',
@@ -72,11 +73,13 @@ const SECCIONES: SidebarSection[] = [
     label: 'Reportes',
     items: [
       {
+        to: '/reportes/ingresos',
         label: 'Reporte de ingreso',
         icon: FileText,
         moduleId: 'reporte-ingresos',
       },
       {
+        to: '/reportes/vales',
         label: 'Reporte de vale',
         icon: FileText,
         moduleId: 'reporte-vales',

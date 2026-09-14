@@ -257,6 +257,7 @@ const modules: Module[] = [
     icon: 'report',
     tone: 'blue',
     category: 'Reportes',
+    route: '/reportes/ingresos',
   },
   {
     id: 'reporte-vales',
