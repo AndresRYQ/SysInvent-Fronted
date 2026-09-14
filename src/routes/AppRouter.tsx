@@ -32,6 +32,11 @@ import { BitacoraPage } from '../pages/bitacora/BitacoraPage'
 import { ContactosPage } from '../pages/contactos/ContactosPage'
 import { PartesEquipoPage } from '../pages/partes-equipo/PartesEquipoPage'
 import { ReporteIngresosPage } from '../pages/reportes/ReporteIngresosPage'
+import { ControlAlmacenPage } from '../pages/control-almacen/ControlAlmacenPage'
+import { NuevoIngresoPage } from '../pages/ingresos-almacen/NuevoIngresoPage'
+import { EditarIngresoPage } from '../pages/ingresos-almacen/EditarIngresoPage'
+import { NuevoValePage } from '../pages/vales-consumo/NuevoValePage'
+import { EditarValePage } from '../pages/vales-consumo/EditarValePage'
 
 export function AppRouter() {
   return (

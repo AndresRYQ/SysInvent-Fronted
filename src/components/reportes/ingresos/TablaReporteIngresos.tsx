@@ -1,53 +1,197 @@
-import { CalendarDays, Eye, FileInput, PackageCheck } from 'lucide-react'
-import type { ReporteIngreso } from '../../../types/reporteIngreso'
+import { PackageSearch } from 'lucide-react'
+
+import type {
+  FilaReporteIngreso,
+} from '../../../types/reporteIngreso'
 
 interface TablaReporteIngresosProps {
-  registros: ReporteIngreso[]
-  totalItems: number
-  page: number
-  pageSize: number
-  onPageChange: (page: number) => void
-  onPageSizeChange: (pageSize: number) => void
-  onVerDetalle: (ingreso: ReporteIngreso) => void
+  filas: FilaReporteIngreso[]
+}
+
+function formatearFecha(
+  fecha: string,
+): string {
+  if (!fecha) {
+    return 'Sin fecha'
+  }
+
+  const [anio, mes, dia] =
+    fecha.split('-')
+
+  if (!anio || !mes || !dia) {
+    return fecha
+  }
+
+  return `${dia}/${mes}/${anio}`
+}
+
+function formatearNumero(
+  valor: number,
+): string {
+  return new Intl.NumberFormat(
+    'es-PE',
+    {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    },
+  ).format(valor)
+}
+
+function formatearMoneda(
+  valor: number,
+): string {
+  return new Intl.NumberFormat(
+    'es-PE',
+    {
+      style: 'currency',
+      currency: 'PEN',
+      minimumFractionDigits: 2,
+    },
+  ).format(valor)
 }
 
 export function TablaReporteIngresos({
-  registros,
-  totalItems,
-  page,
-  pageSize,
-  onPageChange,
-  onPageSizeChange,
-  onVerDetalle,
+  filas,
 }: TablaReporteIngresosProps) {
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
   return (
-    <section className="income-report-table-card">
-      <div className="income-report-table-card__header">
-        <div><span className="income-report-kicker"><FileInput size={16} /> Listado de ingresos</span><p>Entradas de productos registradas en el almacén.</p></div>
-        <span className="income-report-total"><PackageCheck size={16} /> {totalItems} registros</span>
-      </div>
-      <div className="table-responsive">
-        <table className="income-report-table">
-          <thead><tr><th>N° documento</th><th>Fecha</th><th>Proveedor</th><th>Comprobante</th><th className="text-center">Total de ítems</th><th className="text-center">Unidades</th><th>Usuario responsable</th><th>Estado</th><th aria-label="Acciones" /></tr></thead>
-          <tbody>
-            {registros.length > 0 ? registros.map((ingreso) => (
-              <tr key={ingreso.id}>
-                <td><strong className="income-report-code">{ingreso.numeroDocumento}</strong></td>
-                <td><span className="income-report-date"><CalendarDays size={14} />{new Intl.DateTimeFormat('es-PE', { dateStyle: 'medium' }).format(new Date(`${ingreso.fecha}T12:00:00`))}</span></td>
-                <td><strong>{ingreso.proveedor}</strong></td>
-                <td>{ingreso.tipoComprobante}</td>
-                <td className="text-center">{ingreso.totalItems}</td>
-                <td className="text-center"><strong>{ingreso.unidades}</strong></td>
-                <td>{ingreso.responsable}</td>
-                <td><span className={`income-report-status income-report-status--${ingreso.estado === 'Registrado' ? 'success' : 'danger'}`}>{ingreso.estado}</span></td>
-                <td><button type="button" className="income-report-icon-button" aria-label={`Ver detalle de ${ingreso.numeroDocumento}`} onClick={() => onVerDetalle(ingreso)}><Eye size={17} /></button></td>
+    <div className="table-responsive">
+      <table className="table maestro-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Nro. ingreso</th>
+            <th>Fecha</th>
+            <th>Proveedor</th>
+            <th>Documento</th>
+            <th>Tipo</th>
+            <th>Producto</th>
+            <th className="text-end">
+              Cantidad
+            </th>
+            <th>Unidad</th>
+            <th className="text-end">
+              Precio unitario
+            </th>
+            <th className="text-end">
+              Subtotal
+            </th>
+            <th className="text-center">
+              Estado
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {filas.length === 0 ? (
+            <tr>
+              <td colSpan={11}>
+                <div className="maestro-empty-state">
+                  <PackageSearch size={38} />
+
+                  <strong>
+                    No se encontraron ingresos
+                  </strong>
+
+                  <span>
+                    Cambia los filtros o registra
+                    un ingreso de almacÃ©n.
+                  </span>
+                </div>
+              </td>
+            </tr>
+          ) : (
+            filas.map((fila) => (
+              <tr
+                key={`${fila.ingresoId}-${fila.productoId}`}
+              >
+                <td>
+                  <span className="maestro-id-chip">
+                    {fila.numeroIngreso}
+                  </span>
+                </td>
+
+                <td>
+                  {formatearFecha(
+                    fila.fechaIngreso,
+                  )}
+                </td>
+
+                <td>
+                  <strong className="d-block">
+                    {fila.proveedor}
+                  </strong>
+
+                  <small className="text-secondary">
+                    {fila.contacto}
+                  </small>
+                </td>
+
+                <td>
+                  <span className="d-block">
+                    {fila.tipoDocumento}
+                  </span>
+
+                  <small className="text-secondary">
+                    {fila.numeroDocumento}
+                  </small>
+                </td>
+
+                <td>
+                  {fila.tipoProducto}
+                </td>
+
+                <td>
+                  <strong className="d-block">
+                    {fila.producto}
+                  </strong>
+
+                  <small className="text-secondary">
+                    {fila.codigoProducto}
+                  </small>
+                </td>
+
+                <td className="text-end fw-semibold">
+                  {formatearNumero(
+                    fila.cantidad,
+                  )}
+                </td>
+
+                <td>
+                  {fila.unidadMedida}
+                </td>
+
+                <td className="text-end">
+                  {formatearMoneda(
+                    fila.precioUnitario,
+                  )}
+                </td>
+
+                <td className="text-end fw-bold">
+                  {formatearMoneda(
+                    fila.subtotal,
+                  )}
+                </td>
+
+                <td className="text-center">
+                  <span
+                    className={
+                      fila.estado ===
+                      'REGISTRADO'
+                        ? 'maestro-status maestro-status--active'
+                        : 'maestro-status maestro-status--inactive'
+                    }
+                  >
+                    {fila.estado ===
+                    'REGISTRADO'
+                      ? 'Registrado'
+                      : 'Anulado'}
+                  </span>
+                </td>
               </tr>
-            )) : <tr><td colSpan={9}><div className="income-report-empty"><FileInput size={30} /><strong>No se encontraron ingresos</strong><span>Prueba cambiando los filtros de consulta.</span></div></td></tr>}
-          </tbody>
-        </table>
-      </div>
-      {totalItems > 0 && <div className="income-report-pagination"><label>Filas <select value={pageSize} onChange={(event) => onPageSizeChange(Number(event.target.value))}><option value={8}>8</option><option value={12}>12</option><option value={20}>20</option></select></label><span>{(page - 1) * pageSize + 1} - {Math.min(page * pageSize, totalItems)} de {totalItems}</span><div><button type="button" disabled={page === 1} onClick={() => onPageChange(page - 1)}>Anterior</button><span>Página {page} de {totalPages}</span><button type="button" disabled={page === totalPages} onClick={() => onPageChange(page + 1)}>Siguiente</button></div></div>}
-    </section>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
   )
 }
+
