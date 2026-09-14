@@ -31,6 +31,7 @@ import { EditarProductoPage } from '../pages/productos/EditarProductoPage'
 import { BitacoraPage } from '../pages/bitacora/BitacoraPage'
 import { ContactosPage } from '../pages/contactos/ContactosPage'
 import { PartesEquipoPage } from '../pages/partes-equipo/PartesEquipoPage'
+import { ReporteIngresosPage } from '../pages/reportes/ReporteIngresosPage'
 
 export function AppRouter() {
   return (
@@ -166,6 +167,16 @@ export function AppRouter() {
                   element={
                     <IngresosAlmacenPage />
                   }
+                />
+              </Route>
+              <Route
+                element={
+                  <RoleRoute modulo="reporte-ingresos" />
+                }
+              >
+                <Route
+                  path="/reportes/ingresos"
+                  element={<ReporteIngresosPage />}
                 />
               </Route>
 
