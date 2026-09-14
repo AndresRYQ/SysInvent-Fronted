@@ -1,7 +1,11 @@
 export interface CentroCosto {
-  id: string
+  id: number
   nombre: string
-  estado: boolean
   descripcion: string
-  fechaRegistro: string
+  activo: 0 | 1
+}
+
+export interface CentroCostoFormData {
+  nombre: string
+  descripcion: string
 }

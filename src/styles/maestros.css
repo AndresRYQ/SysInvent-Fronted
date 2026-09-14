@@ -6,6 +6,7 @@
   position: relative;
   min-height: 100vh;
   padding: 0px 24px 42px;
+  touch-action: pan-y;
 }
 
 .maestro-page {
@@ -101,7 +102,8 @@
 }
 
 .maestro-control {
-  min-height: 50px;
+  min-height: var(--form-control-height, 36px);
+  height: var(--form-control-height, 36px);
   border: 1px solid rgb(17 24 39 / 10%);
   border-radius: 16px;
   background: #f9fbfa;
@@ -121,16 +123,17 @@
 }
 
 .maestro-control--textarea {
-  min-height: 120px;
+  height: auto;
   resize: vertical;
 }
 
 .maestro-btn-primary,
-.maestro-btn-secondary {
+.maestro-btn-secondary,
+.maestro-btn-danger {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 5px;
   min-height: 50px;
   padding: 0 18px;
   border-radius: 16px !important;
@@ -160,21 +163,14 @@
 }
 
 .maestro-btn-danger {
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-height: 50px;
-  padding: 0 18px;
   border: 0 !important;
-  border-radius: 16px !important;
   background: #b42318 !important;
   color: #fff !important;
-  font-weight: 800 !important;
 }
 
 .maestro-btn-primary:hover,
-.maestro-btn-secondary:hover {
+.maestro-btn-secondary:hover,
+.maestro-btn-danger:hover {
   transform: translateY(-2px);
 }
 
@@ -291,7 +287,15 @@
   padding: 8px 12px;
   border-radius: 999px;
   font-size: 0.8rem;
-  font-weight: 800;
+  font-weight: 400;
+}
+
+.maestro-status__dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: currentColor;
 }
 
 .maestro-status--active {
@@ -302,6 +306,103 @@
 .maestro-status--inactive {
   background: #fef2f2;
   color: #b42318;
+}
+
+/* Centro de costos: los controles no se elevan al pasar el cursor. */
+.centro-costo-page .maestro-btn-primary:hover,
+.centro-costo-page .maestro-btn-secondary:hover,
+.centro-costo-page .maestro-btn-danger:hover,
+.centro-costo-page .maestro-toolbar-btn:hover,
+.centro-costo-page .maestro-action-btn:hover,
+.centro-costo-page .maestro-page-btn:hover:not(:disabled) {
+  transform: none !important;
+}
+
+.centro-costo-page .maestro-table tbody tr:hover {
+  transform: none !important;
+  background: transparent !important;
+}
+
+.centro-costo-page .maestro-table tbody tr:nth-child(even):hover {
+  background: #fbfdfc !important;
+}
+
+.centro-costo-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+  transform: none !important;
+  border-color: rgb(17 24 39 / 10%) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.centro-costo-page .maestro-page-btn--active:hover:not(:disabled) {
+  transform: none !important;
+  border-color: var(--brand-green) !important;
+  background: var(--brand-green) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.categorias-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+  transform: none !important;
+  border-color: rgb(17 24 39 / 10%) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.categorias-page .maestro-page-btn--active:hover:not(:disabled) {
+  transform: none !important;
+  border-color: var(--brand-green) !important;
+  background: var(--brand-green) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.categorias-page .maestro-btn-primary:hover,
+.categorias-page .maestro-btn-secondary:hover,
+.categorias-page .maestro-btn-danger:hover,
+.categorias-page .maestro-toolbar-btn:hover,
+.categorias-page .maestro-action-btn:hover {
+  transform: none !important;
+}
+
+.categorias-page .maestro-table tbody tr:hover {
+  transform: none !important;
+  background: transparent !important;
+}
+
+.categorias-page .maestro-table tbody tr:nth-child(even):hover {
+  background: #fbfdfc !important;
+}
+
+.tipos-producto-page .maestro-btn-primary:hover,
+.tipos-producto-page .maestro-btn-secondary:hover,
+.tipos-producto-page .maestro-btn-danger:hover,
+.tipos-producto-page .maestro-toolbar-btn:hover,
+.tipos-producto-page .maestro-action-btn:hover,
+.tipos-producto-page .maestro-page-btn:hover {
+  transform: none !important;
+}
+
+.tipos-producto-page .maestro-table tbody tr:hover {
+  transform: none !important;
+  background: transparent !important;
+}
+
+.tipos-producto-page .maestro-table tbody tr:nth-child(even):hover {
+  background: #fbfdfc !important;
+}
+
+.tipos-producto-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+  border-color: rgb(17 24 39 / 10%) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.tipos-producto-page .maestro-page-btn--active:hover:not(:disabled) {
+  border-color: var(--brand-green) !important;
+  background: var(--brand-green) !important;
+  color: #fff !important;
+  box-shadow: none !important;
 }
 
 .maestro-actions {
@@ -425,7 +526,6 @@
 }
 
 .maestro-modal-body .maestro-control--textarea {
-  min-height: 120px;
   height: auto;
 }
 
@@ -756,3 +856,336 @@
   font-size: 0.8rem;
 }
 
+.role-permissions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.role-permissions-header small {
+  display: block;
+  margin-top: 3px;
+  color: #667085;
+}
+
+.role-select-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #344054;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.role-permissions-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  max-height: 250px;
+  padding: 12px;
+  overflow-y: auto;
+  border: 1px solid #d7e3da;
+  border-radius: 12px;
+  background: #f9fbfa;
+}
+
+.role-permission-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #344054;
+  background: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.role-permission-item:hover {
+  border-color: rgba(51, 143, 60, 0.28);
+  background: #eef8f0;
+}
+
+.role-permission-item input,
+.role-select-all input {
+  accent-color: var(--brand-green);
+}
+
+.role-permission-item svg {
+  flex-shrink: 0;
+  color: var(--brand-green-dark);
+}
+
+@media (max-width: 640px) {
+  .role-permissions-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .role-permissions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tipos-documento-page .maestro-btn-primary:hover,
+.tipos-documento-page .maestro-btn-secondary:hover,
+.tipos-documento-page .maestro-btn-danger:hover,
+.tipos-documento-page .maestro-toolbar-btn:hover,
+.tipos-documento-page .maestro-action-btn:hover,
+.tipos-documento-page .maestro-table tbody tr:hover,
+.tipos-documento-page .maestro-pagination .maestro-page-btn:hover {
+  transform: none;
+  background-color: inherit;
+  border-color: inherit;
+  color: inherit;
+  box-shadow: none;
+}
+
+.tipos-documento-page .maestro-pagination .maestro-page-btn--active:hover {
+  background-color: var(--brand-green);
+  color: #fff;
+}
+
+.unidades-medida-page .maestro-btn-primary:hover,
+.unidades-medida-page .maestro-btn-secondary:hover,
+.unidades-medida-page .maestro-btn-danger:hover,
+.unidades-medida-page .maestro-toolbar-btn:hover,
+.unidades-medida-page .maestro-action-btn:hover,
+.unidades-medida-page .maestro-table tbody tr:hover,
+.unidades-medida-page .maestro-pagination .maestro-page-btn:hover {
+  transform: none;
+  background-color: inherit;
+  border-color: inherit;
+  color: inherit;
+  box-shadow: none;
+}
+
+.unidades-medida-page .maestro-pagination .maestro-page-btn--active:hover {
+  background-color: var(--brand-green);
+  color: #fff;
+}
+
+.destinos-page .maestro-btn-primary:hover,
+.destinos-page .maestro-btn-secondary:hover,
+.destinos-page .maestro-btn-danger:hover,
+.destinos-page .maestro-toolbar-btn:hover,
+.destinos-page .maestro-action-btn:hover,
+.destinos-page .maestro-table tbody tr:hover,
+.destinos-page .maestro-pagination .maestro-page-btn:hover {
+  transform: none;
+  background-color: inherit;
+  border-color: inherit;
+  color: inherit;
+  box-shadow: none;
+}
+
+.destinos-page .maestro-pagination .maestro-page-btn--active:hover {
+  background-color: var(--brand-green);
+  color: #fff;
+}
+
+.proveedores-page .maestro-btn-primary:hover,
+.proveedores-page .maestro-btn-secondary:hover,
+.proveedores-page .maestro-btn-danger:hover,
+.proveedores-page .maestro-toolbar-btn:hover,
+.proveedores-page .maestro-action-btn:hover,
+.proveedores-page .maestro-table tbody tr:hover,
+.proveedores-page .maestro-pagination .maestro-page-btn:hover {
+  transform: none;
+  background-color: inherit;
+  border-color: inherit;
+  color: inherit;
+  box-shadow: none;
+}
+
+.proveedores-page .maestro-pagination .maestro-page-btn--active:hover {
+  background-color: var(--brand-green);
+  color: #fff;
+}
+
+.maestro-modal-card--provider {
+  width: min(960px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+
+.maestro-modal-card--provider > form {
+  box-shadow: none;
+}
+
+.maestro-modal-card--product {
+  width: min(1040px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+
+.maestro-modal-card--product > form {
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.maestro-modal-card--product .card-header {
+  display: none;
+}
+
+.productos-page .maestro-btn-primary:hover,
+.productos-page .maestro-btn-secondary:hover,
+.productos-page .maestro-btn-danger:hover,
+.productos-page .maestro-toolbar-btn:hover,
+.productos-page .maestro-action-btn:hover,
+.productos-page .maestro-page-btn:hover:not(:disabled) {
+  transform: none !important;
+}
+
+.productos-page .maestro-btn-primary,
+.productos-page .maestro-btn-secondary,
+.productos-page .maestro-btn-danger,
+.productos-page .maestro-toolbar-btn,
+.productos-page .maestro-action-btn,
+.productos-page .maestro-page-btn {
+  transition: none !important;
+}
+
+.productos-page .maestro-table tbody tr:hover {
+  transform: none !important;
+  background: transparent !important;
+}
+
+.productos-page .maestro-table tbody tr:nth-child(even):hover {
+  background: #fbfdfc !important;
+}
+
+.productos-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+  transform: none !important;
+  border-color: rgb(17 24 39 / 10%) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.productos-page .maestro-page-btn--active:hover:not(:disabled) {
+  transform: none !important;
+  border-color: var(--brand-green) !important;
+  background: var(--brand-green) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.partes-equipo-page .maestro-btn-primary:hover,
+.partes-equipo-page .maestro-btn-secondary:hover,
+.partes-equipo-page .maestro-btn-danger:hover,
+.partes-equipo-page .maestro-toolbar-btn:hover,
+.partes-equipo-page .maestro-action-btn:hover,
+.partes-equipo-page .maestro-page-btn:hover:not(:disabled) {
+  transform: none !important;
+}
+
+.partes-equipo-page .maestro-table tbody tr:hover {
+  transform: none !important;
+  background: transparent !important;
+}
+
+.partes-equipo-page .maestro-table tbody tr:nth-child(even):hover {
+  background: #fbfdfc !important;
+}
+
+.partes-equipo-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+  transform: none !important;
+  border-color: rgb(17 24 39 / 10%) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.partes-equipo-page .maestro-page-btn--active:hover:not(:disabled) {
+  transform: none !important;
+  border-color: var(--brand-green) !important;
+  background: var(--brand-green) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.partes-equipo-page .maestro-btn-primary,
+.partes-equipo-page .maestro-btn-secondary,
+.partes-equipo-page .maestro-btn-danger,
+.partes-equipo-page .maestro-toolbar-btn,
+.partes-equipo-page .maestro-action-btn,
+.partes-equipo-page .maestro-page-btn {
+  transition: none !important;
+}
+
+.contactos-page .maestro-btn-primary:hover,
+.contactos-page .maestro-btn-secondary:hover,
+.contactos-page .maestro-btn-danger:hover {
+  transform: none !important;
+}
+
+.contactos-page .maestro-btn-primary,
+.contactos-page .maestro-btn-secondary,
+.contactos-page .maestro-btn-danger {
+  transition: none !important;
+}
+
+.contactos-page .maestro-toolbar-btn:hover,
+.contactos-page .maestro-action-btn:hover,
+.contactos-page .maestro-page-btn:hover:not(:disabled) {
+  transform: none !important;
+}
+
+.contactos-page .maestro-table tbody tr:hover {
+  transform: none !important;
+  background: transparent !important;
+}
+
+.contactos-page .maestro-table tbody tr:nth-child(even):hover {
+  background: #fbfdfc !important;
+}
+
+.contactos-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+  transform: none !important;
+  border-color: rgb(17 24 39 / 10%) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.contactos-page .maestro-page-btn--active:hover:not(:disabled) {
+  transform: none !important;
+  border-color: var(--brand-green) !important;
+  background: var(--brand-green) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.contactos-page .maestro-toolbar-btn,
+.contactos-page .maestro-action-btn,
+.contactos-page .maestro-page-btn {
+  transition: none !important;
+}
+
+.modo-visualizacion .maestro-required {
+  display: none;
+}
+
+/* Inventario: los botones no deben desplazarse ni animarse al pasar el cursor. */
+.vales-consumo-page .maestro-btn-primary:hover,
+.vales-consumo-page .maestro-btn-secondary:hover,
+.vales-consumo-page .maestro-btn-danger:hover,
+.vales-consumo-page .maestro-toolbar-btn:hover,
+.vales-consumo-page .maestro-action-btn:hover,
+.vales-consumo-page .maestro-page-btn:hover:not(:disabled) {
+  transform: none !important;
+}
+
+.vales-consumo-page .maestro-btn-primary,
+.vales-consumo-page .maestro-btn-secondary,
+.vales-consumo-page .maestro-btn-danger,
+.vales-consumo-page .maestro-toolbar-btn,
+.vales-consumo-page .maestro-action-btn,
+.vales-consumo-page .maestro-page-btn {
+  transition: none !important;
+}

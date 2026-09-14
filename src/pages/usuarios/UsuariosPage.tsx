@@ -1,112 +1,240 @@
-import { useEffect, useMemo, useState } from 'react'
-
-import { FiltrosUsuarios } from '../../components/usuarios/FiltrosUsuarios'
-import { TablaUsuarios } from '../../components/usuarios/TablaUsuarios'
-import { USUARIOS_INICIALES } from '../../data/usuarios'
 import {
-  obtenerStorage,
-  STORAGE_KEYS,
-} from '../../services/storageService'
-import type { UsuarioLogin } from '../../types/auth'
+  useMemo,
+  useState,
+} from 'react'
+
+import {
+  FiltrosUsuarios,
+  type FiltrosUsuariosValores,
+} from '../../components/usuarios/FiltrosUsuarios'
+
+import {
+  FormularioUsuario,
+} from '../../components/usuarios/FormularioUsuario'
+
+import {
+  TablaUsuarios,
+} from '../../components/usuarios/TablaUsuarios'
+
+import { useAuth } from '../../hooks/useAuth'
+
+import {
+  obtenerRoles,
+} from '../../services/rolService'
+
+import {
+  actualizarUsuario,
+  crearUsuario,
+  eliminarUsuario,
+  obtenerUsuarios,
+} from '../../services/usuarioService'
+
+import type {
+  UsuarioLogin,
+} from '../../types/auth'
+
+import type {
+  UsuarioFormData,
+} from '../../types/usuario'
+
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
-interface FiltrosUsuariosState {
-  busqueda: string
-  rol: string
-  estado: string
-}
-
-const FILTROS_INICIALES: FiltrosUsuariosState = {
-  busqueda: '',
-  rol: '',
-  estado: '',
-}
-
-function obtenerUsuarios(): UsuarioLogin[] {
-  return obtenerStorage<UsuarioLogin[]>(
-    STORAGE_KEYS.usuarios,
-    USUARIOS_INICIALES,
-  )
-}
+const FILTROS_INICIALES:
+  FiltrosUsuariosValores = {
+    busqueda: '',
+    rol: '',
+    estado: '',
+  }
 
 function filtrarUsuarios(
   usuarios: UsuarioLogin[],
-  filtros: FiltrosUsuariosState,
-) {
-  const termino = filtros.busqueda
-    .trim()
-    .toLowerCase()
+  filtros: FiltrosUsuariosValores,
+): UsuarioLogin[] {
+  const termino =
+    filtros.busqueda.trim().toLowerCase()
 
   return usuarios.filter((usuario) => {
     const coincideTexto =
-      termino.length === 0 ||
-      usuario.usuario.toLowerCase().includes(termino) ||
+      !termino ||
+      usuario.usuario
+        .toLowerCase()
+        .includes(termino) ||
       usuario.nombreCompleto
         .toLowerCase()
         .includes(termino) ||
-      usuario.id.toLowerCase().includes(termino)
+      usuario.email
+        .toLowerCase()
+        .includes(termino) ||
+      usuario.id
+        .toLowerCase()
+        .includes(termino)
 
     const coincideRol =
-      filtros.rol.length === 0 ||
+      !filtros.rol ||
       usuario.rol === filtros.rol
 
     const coincideEstado =
-      filtros.estado.length === 0 ||
-      (filtros.estado === 'activo' && usuario.estado) ||
-      (filtros.estado === 'inactivo' && !usuario.estado)
+      !filtros.estado ||
+      (filtros.estado === 'activo' &&
+        usuario.estado) ||
+      (filtros.estado === 'inactivo' &&
+        !usuario.estado)
 
-    return coincideTexto && coincideRol && coincideEstado
+    return (
+      coincideTexto &&
+      coincideRol &&
+      coincideEstado
+    )
   })
 }
 
 export function UsuariosPage() {
-  const [usuarios] = useState<UsuarioLogin[]>(
-    () => obtenerUsuarios(),
+  const { sesion } = useAuth()
+
+  const [usuarios, setUsuarios] =
+    useState<UsuarioLogin[]>(
+      () => obtenerUsuarios(),
+    )
+
+  const [roles] = useState(
+    () => obtenerRoles(),
   )
+
   const [filtros, setFiltros] =
-    useState<FiltrosUsuariosState>(
-      FILTROS_INICIALES,
-    )
-  const [filtrosAplicados, setFiltrosAplicados] =
-    useState<FiltrosUsuariosState>(
-      FILTROS_INICIALES,
-    )
+    useState(FILTROS_INICIALES)
+
+  const [
+    filtrosAplicados,
+    setFiltrosAplicados,
+  ] = useState(FILTROS_INICIALES)
+
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] =
+    useState(10)
+
+  const [modalAbierto, setModalAbierto] =
+    useState(false)
+
+  const [
+    usuarioEnEdicion,
+    setUsuarioEnEdicion,
+  ] = useState<UsuarioLogin | null>(null)
+
+  const [mensaje, setMensaje] = useState<{
+    tipo: 'success' | 'danger'
+    texto: string
+  } | null>(null)
 
   const usuariosFiltrados = useMemo(
     () =>
-      filtrarUsuarios(usuarios, filtrosAplicados),
+      filtrarUsuarios(
+        usuarios,
+        filtrosAplicados,
+      ),
     [usuarios, filtrosAplicados],
   )
 
-  const totalItems = usuariosFiltrados.length
+  const totalItems =
+    usuariosFiltrados.length
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalItems / pageSize),
+  )
+
+  const paginaActual = Math.min(
+    page,
+    totalPages,
+  )
 
   const usuariosPaginados = useMemo(() => {
-    const startIndex = (page - 1) * pageSize
-    const endIndex = startIndex + pageSize
+    const inicio =
+      (paginaActual - 1) * pageSize
 
     return usuariosFiltrados.slice(
-      startIndex,
-      endIndex,
+      inicio,
+      inicio + pageSize,
     )
   }, [
     usuariosFiltrados,
-    page,
+    paginaActual,
     pageSize,
   ])
 
-  useEffect(() => {
-    const totalPages = Math.max(
-      1,
-      Math.ceil(totalItems / pageSize),
+  const manejarGuardado = (
+    datos: UsuarioFormData,
+  ): string | null => {
+    try {
+      if (usuarioEnEdicion) {
+        actualizarUsuario(
+          usuarioEnEdicion.id,
+          datos,
+        )
+
+        setMensaje({
+          tipo: 'success',
+          texto:
+            'Usuario actualizado correctamente.',
+        })
+      } else {
+        crearUsuario(datos)
+
+        setMensaje({
+          tipo: 'success',
+          texto:
+            'Usuario registrado correctamente.',
+        })
+      }
+
+      setUsuarios(obtenerUsuarios())
+      setUsuarioEnEdicion(null)
+      setModalAbierto(false)
+      setPage(1)
+
+      return null
+    } catch (error) {
+      return error instanceof Error
+        ? error.message
+        : 'No se pudo guardar el usuario.'
+    }
+  }
+
+  const manejarEliminacion = (
+    usuario: UsuarioLogin,
+  ) => {
+    const confirmado = window.confirm(
+      `¿Deseas eliminar al usuario "${usuario.usuario}"?`,
     )
 
-    if (page > totalPages) {
-      setPage(totalPages)
+    if (!confirmado) {
+      return
     }
-  }, [page, pageSize, totalItems])
+
+    try {
+      eliminarUsuario(
+        usuario.id,
+        sesion?.id,
+      )
+
+      setUsuarios(obtenerUsuarios())
+      setPage(1)
+
+      setMensaje({
+        tipo: 'success',
+        texto:
+          'Usuario eliminado correctamente.',
+      })
+    } catch (error) {
+      setMensaje({
+        tipo: 'danger',
+        texto:
+          error instanceof Error
+            ? error.message
+            : 'No se pudo eliminar el usuario.',
+      })
+    }
+  }
 
   return (
     <>
@@ -115,13 +243,27 @@ export function UsuariosPage() {
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
               <h1>Usuarios</h1>
-              <p>Mantenimiento de usuarios del sistema</p>
+
+              <p>
+                Administración de usuarios
+                y asignación de roles
+              </p>
             </div>
           </section>
+
+          {mensaje && (
+            <div
+              className={`alert alert-${mensaje.tipo} mt-3 mb-0`}
+              role="status"
+            >
+              {mensaje.texto}
+            </div>
+          )}
 
           <div className="maestro-panel">
             <FiltrosUsuarios
               valores={filtros}
+              roles={roles}
               onChange={(campo, valor) =>
                 setFiltros((actual) => ({
                   ...actual,
@@ -134,7 +276,9 @@ export function UsuariosPage() {
               }}
               onLimpiar={() => {
                 setFiltros(FILTROS_INICIALES)
-                setFiltrosAplicados(FILTROS_INICIALES)
+                setFiltrosAplicados(
+                  FILTROS_INICIALES,
+                )
                 setPage(1)
               }}
             />
@@ -144,19 +288,46 @@ export function UsuariosPage() {
             <TablaUsuarios
               usuarios={usuariosPaginados}
               totalItems={totalItems}
-              page={page}
+              page={paginaActual}
               pageSize={pageSize}
-              onPageChange={(nextPage) =>
-                setPage(nextPage)
-              }
-              onPageSizeChange={(nextPageSize) => {
-                setPageSize(nextPageSize)
+              onAgregar={() => {
+                setUsuarioEnEdicion(null)
+                setModalAbierto(true)
+                setMensaje(null)
+              }}
+              onEditar={(usuario) => {
+                setUsuarioEnEdicion(usuario)
+                setModalAbierto(true)
+                setMensaje(null)
+              }}
+              onEliminar={manejarEliminacion}
+              onPageChange={setPage}
+              onPageSizeChange={(
+                nuevoTamano,
+              ) => {
+                setPageSize(nuevoTamano)
                 setPage(1)
               }}
             />
           </div>
         </div>
       </main>
+
+      {modalAbierto && (
+        <FormularioUsuario
+          key={
+            usuarioEnEdicion?.id ??
+            'nuevo-usuario'
+          }
+          usuario={usuarioEnEdicion}
+          roles={roles}
+          onClose={() => {
+            setModalAbierto(false)
+            setUsuarioEnEdicion(null)
+          }}
+          onGuardar={manejarGuardado}
+        />
+      )}
     </>
   )
 }

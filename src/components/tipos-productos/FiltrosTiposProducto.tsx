@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ChevronDown, Filter, RotateCcw, Search } from 'lucide-react'
+import { Filter, RotateCcw, Search } from 'lucide-react'
+import { MaestroEstadoSelect } from '../common/MaestroEstadoSelect'
 
 export interface FiltrosTiposProductoValores {
   nombre: string
@@ -22,8 +22,6 @@ export function FiltrosTiposProducto({
   onBuscar,
   onLimpiar,
 }: FiltrosTiposProductoProps) {
-  const [estadoAbierto, setEstadoAbierto] = useState(false)
-
   return (
     <section className="maestro-filter-card card border-0 shadow-sm">
       <div className="card-body p-3 p-lg-3">
@@ -47,7 +45,7 @@ export function FiltrosTiposProducto({
               className="form-control maestro-control"
               type="text"
               value={valores.nombre}
-              placeholder="Ej. Insumo, Producto terminado, Material"
+              placeholder="Buscar"
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }
@@ -59,9 +57,12 @@ export function FiltrosTiposProducto({
               Estado
             </label>
 
-            <div
-              className={`maestro-select-wrap${estadoAbierto ? ' is-open' : ''}`}
-            >
+            <MaestroEstadoSelect
+              inputId="estadoTipoProducto"
+              value={valores.estado}
+              onChange={(value) => onChange('estado', value)}
+            />
+            {/*
               <select
                 id="estadoTipoProducto"
                 className="form-select maestro-control maestro-select-control"
@@ -80,7 +81,7 @@ export function FiltrosTiposProducto({
                 <option value="inactivo">Inactivo</option>
               </select>
               <ChevronDown size={16} />
-            </div>
+            </div> */}
           </div>
 
         </div>

@@ -1,4 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
 import {
   FiltrosTiposProducto,
@@ -7,7 +11,17 @@ import {
 import { TablaTiposProducto } from '../../components/tipos-productos/TablaTiposProducto'
 import { TipoProductoDeleteModal } from '../../components/tipos-productos/TipoProductoDeleteModal'
 import { TipoProductoFormModal } from '../../components/tipos-productos/TipoProductoFormModal'
-import type { TipoProducto } from '../../types/tipoProducto'
+import {
+  actualizarTipoProducto,
+  crearTipoProducto,
+  eliminarTipoProducto,
+  obtenerTiposProducto,
+  reactivarTipoProducto,
+} from '../../services/tipoProductoService'
+import type {
+  TipoProducto,
+  TipoProductoFormData,
+} from '../../types/tipoProducto'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
@@ -16,97 +30,74 @@ const FILTROS_INICIALES: FiltrosTiposProductoValores = {
   estado: '',
 }
 
-const TIPOS_PRODUCTO_MOCK: TipoProducto[] = [
-  {
-    id: 'TP-001',
-    nombre: 'Insumo',
-    estado: true,
-    descripcion: 'Materia prima utilizada en los procesos.',
-    fechaRegistro: '10/08/2026',
-  },
-  {
-    id: 'TP-002',
-    nombre: 'Producto terminado',
-    estado: true,
-    descripcion: 'Artículos listos para su comercialización.',
-    fechaRegistro: '11/08/2026',
-  },
-  {
-    id: 'TP-003',
-    nombre: 'Material de empaque',
-    estado: true,
-    descripcion: 'Insumos para el embalaje de los productos.',
-    fechaRegistro: '12/08/2026',
-  },
-  {
-    id: 'TP-004',
-    nombre: 'Repuesto',
-    estado: true,
-    descripcion: 'Piezas de reemplazo para mantenimiento.',
-    fechaRegistro: '13/08/2026',
-  },
-  {
-    id: 'TP-005',
-    nombre: 'Material de oficina',
-    estado: false,
-    descripcion: 'Útiles y suministros para labores administrativas.',
-    fechaRegistro: '14/08/2026',
-  },
-]
-
 function filtrarTiposProducto(
   tiposProducto: TipoProducto[],
   filtros: FiltrosTiposProductoValores,
-) {
+): TipoProducto[] {
   const nombre = filtros.nombre
     .trim()
     .toLowerCase()
 
   return tiposProducto.filter((tipoProducto) => {
     const coincideNombre =
-      nombre.length === 0 ||
+      !nombre ||
       tipoProducto.nombre
         .toLowerCase()
         .includes(nombre)
 
     const coincideEstado =
-      filtros.estado.length === 0 ||
+      !filtros.estado ||
       (filtros.estado === 'activo' &&
-        tipoProducto.estado) ||
+        tipoProducto.activo === 1) ||
       (filtros.estado === 'inactivo' &&
-        !tipoProducto.estado)
+        tipoProducto.activo === 0)
 
     return coincideNombre && coincideEstado
   })
 }
 
-function crearFechaActual() {
-  return new Intl.DateTimeFormat('es-PE').format(
-    new Date(),
-  )
+function obtenerMensajeError(error: unknown): string {
+  return error instanceof Error
+    ? error.message
+    : 'Ocurrió un error inesperado.'
 }
 
 export function TiposProductoPage() {
   const [tiposProducto, setTiposProducto] =
-    useState<TipoProducto[]>(TIPOS_PRODUCTO_MOCK)
+    useState<TipoProducto[]>(() =>
+      obtenerTiposProducto(),
+    )
+
   const [filtros, setFiltros] =
     useState<FiltrosTiposProductoValores>(
       FILTROS_INICIALES,
     )
+
   const [filtrosAplicados, setFiltrosAplicados] =
     useState<FiltrosTiposProductoValores>(
       FILTROS_INICIALES,
     )
+
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
+
   const [modalFormOpen, setModalFormOpen] =
     useState(false)
+  const [modoVisualizacion, setModoVisualizacion] = useState(false)
+
   const [tipoProductoEnEdicion, setTipoProductoEnEdicion] =
     useState<TipoProducto | null>(null)
+
+  const [errorFormulario, setErrorFormulario] =
+    useState('')
+
   const [modalDeleteOpen, setModalDeleteOpen] =
     useState(false)
+
   const [tipoProductoAEliminar, setTipoProductoAEliminar] =
     useState<TipoProducto | null>(null)
+  const [modalReactivarOpen, setModalReactivarOpen] = useState(false)
+  const [tipoProductoAReactivar, setTipoProductoAReactivar] = useState<TipoProducto | null>(null)
 
   const tiposProductoFiltrados = useMemo(
     () =>
@@ -121,11 +112,10 @@ export function TiposProductoPage() {
 
   const tiposProductoPaginados = useMemo(() => {
     const startIndex = (page - 1) * pageSize
-    const endIndex = startIndex + pageSize
 
     return tiposProductoFiltrados.slice(
       startIndex,
-      endIndex,
+      startIndex + pageSize,
     )
   }, [
     tiposProductoFiltrados,
@@ -144,14 +134,117 @@ export function TiposProductoPage() {
     }
   }, [page, pageSize, totalItems])
 
+  function recargarTiposProducto(): void {
+    setTiposProducto(obtenerTiposProducto())
+  }
+
+  function abrirFormularioNuevo(): void {
+    setErrorFormulario('')
+    setTipoProductoEnEdicion(null)
+    setModoVisualizacion(false)
+    setModalFormOpen(true)
+  }
+
+  function abrirFormularioEdicion(
+    tipoProducto: TipoProducto,
+  ): void {
+    setErrorFormulario('')
+    setTipoProductoEnEdicion(tipoProducto)
+    setModoVisualizacion(false)
+    setModalFormOpen(true)
+  }
+
+  function abrirVisualizacion(tipoProducto: TipoProducto): void {
+    setErrorFormulario('')
+    setTipoProductoEnEdicion(tipoProducto)
+    setModoVisualizacion(true)
+    setModalFormOpen(true)
+  }
+
+  function cerrarFormulario(): void {
+    setModalFormOpen(false)
+    setTipoProductoEnEdicion(null)
+    setModoVisualizacion(false)
+    setErrorFormulario('')
+  }
+
+  function guardarTipoProducto(
+    datos: TipoProductoFormData,
+  ): void {
+    try {
+      if (tipoProductoEnEdicion) {
+        actualizarTipoProducto(
+          tipoProductoEnEdicion.id,
+          datos,
+        )
+      } else {
+        crearTipoProducto(datos)
+      }
+
+      recargarTiposProducto()
+      cerrarFormulario()
+      setPage(1)
+    } catch (error) {
+      setErrorFormulario(
+        obtenerMensajeError(error),
+      )
+    }
+  }
+
+  function abrirConfirmacionEliminar(
+    tipoProducto: TipoProducto,
+  ): void {
+    setTipoProductoAEliminar(tipoProducto)
+    setModalDeleteOpen(true)
+  }
+
+  function cerrarConfirmacionEliminar(): void {
+    setModalDeleteOpen(false)
+    setTipoProductoAEliminar(null)
+  }
+
+  function abrirConfirmacionReactivar(tipoProducto: TipoProducto): void {
+    setTipoProductoAReactivar(tipoProducto)
+    setModalReactivarOpen(true)
+  }
+
+  function confirmarReactivacion(): void {
+    if (!tipoProductoAReactivar) return
+    reactivarTipoProducto(tipoProductoAReactivar.id)
+    recargarTiposProducto()
+    setModalReactivarOpen(false)
+    setTipoProductoAReactivar(null)
+  }
+
+  function confirmarEliminacion(): void {
+    if (!tipoProductoAEliminar) {
+      return
+    }
+
+    try {
+      eliminarTipoProducto(
+        tipoProductoAEliminar.id,
+      )
+
+      recargarTiposProducto()
+      cerrarConfirmacionEliminar()
+    } catch (error) {
+      cerrarConfirmacionEliminar()
+      console.error(obtenerMensajeError(error))
+    }
+  }
+
   return (
-    <>
+    <div className="tipos-producto-page">
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
               <h1>Tipos de producto</h1>
-              <p>Mantenimiento de tipos de producto</p>
+              <p>
+                Administración de los tipos de producto
+                utilizados en el inventario.
+              </p>
             </div>
           </section>
 
@@ -165,12 +258,16 @@ export function TiposProductoPage() {
                 }))
               }
               onBuscar={() => {
-                setFiltrosAplicados(filtros)
+                setFiltrosAplicados({
+                  ...filtros,
+                })
                 setPage(1)
               }}
               onLimpiar={() => {
                 setFiltros(FILTROS_INICIALES)
-                setFiltrosAplicados(FILTROS_INICIALES)
+                setFiltrosAplicados(
+                  FILTROS_INICIALES,
+                )
                 setPage(1)
               }}
             />
@@ -178,26 +275,23 @@ export function TiposProductoPage() {
 
           <div className="maestro-panel">
             <TablaTiposProducto
-              tiposProducto={tiposProductoPaginados}
+              tiposProducto={
+                tiposProductoPaginados
+              }
               totalItems={totalItems}
               page={page}
               pageSize={pageSize}
-              onAgregar={() => {
-                setTipoProductoEnEdicion(null)
-                setModalFormOpen(true)
-              }}
-              onEditar={(tipoProducto) => {
-                setTipoProductoEnEdicion(tipoProducto)
-                setModalFormOpen(true)
-              }}
-              onEliminar={(tipoProducto) => {
-                setTipoProductoAEliminar(tipoProducto)
-                setModalDeleteOpen(true)
-              }}
-              onPageChange={(nextPage) =>
-                setPage(nextPage)
+              onAgregar={abrirFormularioNuevo}
+              onEditar={abrirFormularioEdicion}
+              onVisualizar={abrirVisualizacion}
+              onEliminar={
+                abrirConfirmacionEliminar
               }
-              onPageSizeChange={(nextPageSize) => {
+              onReactivar={abrirConfirmacionReactivar}
+              onPageChange={setPage}
+              onPageSizeChange={(
+                nextPageSize,
+              ) => {
                 setPageSize(nextPageSize)
                 setPage(1)
               }}
@@ -209,69 +303,29 @@ export function TiposProductoPage() {
       <TipoProductoFormModal
         abierto={modalFormOpen}
         tipoProducto={tipoProductoEnEdicion}
-        onClose={() => {
-          setModalFormOpen(false)
-          setTipoProductoEnEdicion(null)
-        }}
-        onSubmit={(payload) => {
-          if (tipoProductoEnEdicion) {
-            setTiposProducto((actual) =>
-              actual.map((tipoProducto) =>
-                tipoProducto.id ===
-                tipoProductoEnEdicion.id
-                  ? {
-                      ...tipoProducto,
-                      ...payload,
-                    }
-                  : tipoProducto,
-              ),
-            )
-          } else {
-            setTiposProducto((actual) => {
-              const nextId = String(
-                actual.length + 1,
-              ).padStart(3, '0')
-
-              return [
-                {
-                  id: `TP-${nextId}`,
-                  fechaRegistro:
-                    crearFechaActual(),
-                  estado: true,
-                  ...payload,
-                },
-                ...actual,
-              ]
-            })
-          }
-
-          setModalFormOpen(false)
-          setTipoProductoEnEdicion(null)
-        }}
+        error={errorFormulario}
+        soloLectura={modoVisualizacion}
+        onClose={cerrarFormulario}
+        onSubmit={guardarTipoProducto}
       />
 
       <TipoProductoDeleteModal
         abierto={modalDeleteOpen}
-        tipoProducto={tipoProductoAEliminar}
-        onClose={() => {
-          setModalDeleteOpen(false)
-          setTipoProductoAEliminar(null)
-        }}
-        onConfirm={() => {
-          if (tipoProductoAEliminar) {
-            setTiposProducto((actual) =>
-              actual.filter(
-                (tipoProducto) =>
-                  tipoProducto.id !==
-                  tipoProductoAEliminar.id,
-              ),
-            )
-          }
-
-          setModalDeleteOpen(false)
-          setTipoProductoAEliminar(null)
-        }}
+        tipoProducto={
+          tipoProductoAEliminar
+        }
+        onClose={
+          cerrarConfirmacionEliminar
+        }
+        onConfirm={confirmarEliminacion}
       />
-    </>
+      <TipoProductoDeleteModal
+        abierto={modalReactivarOpen}
+        tipoProducto={tipoProductoAReactivar}
+        modo="reactivar"
+        onClose={() => { setModalReactivarOpen(false); setTipoProductoAReactivar(null) }}
+        onConfirm={confirmarReactivacion}
+      />
+    </div>
   )
 }

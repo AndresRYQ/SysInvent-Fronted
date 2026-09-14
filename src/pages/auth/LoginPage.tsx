@@ -86,7 +86,13 @@ export function LoginPage() {
 
   if (motivoCierre === 'inactividad') {
     setMensajeError(
-      'Tu sesión se cerró por inactividad. Inicia sesión nuevamente.',
+      'Tu sesión se cerró después de 2 minutos de inactividad. Inicia sesión nuevamente.',
+    )
+  }
+
+  if (motivoCierre === 'vencimiento') {
+    setMensajeError(
+      'Tu sesión alcanzó el tiempo máximo de 1 hora. Inicia sesión nuevamente.',
     )
   }
 

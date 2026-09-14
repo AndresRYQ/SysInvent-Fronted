@@ -1,13 +1,32 @@
-import { useEffect, useMemo, useState } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
 import { CentroCostoDeleteModal } from '../../components/centros-costo/CentroCostoDeleteModal'
 import { CentroCostoFormModal } from '../../components/centros-costo/CentroCostoFormModal'
+
 import {
   FiltrosCentrosCosto,
   type FiltrosCentrosCostoValores,
 } from '../../components/centros-costo/FiltrosCentrosCosto'
+
 import { TablaCentrosCosto } from '../../components/centros-costo/TablaCentrosCosto'
-import type { CentroCosto } from '../../types/centroCosto'
+
+import {
+  actualizarCentroCosto,
+  crearCentroCosto,
+  eliminarCentroCosto,
+  obtenerCentrosCosto,
+  reactivarCentroCosto,
+} from '../../services/centroCostoService'
+
+import type {
+  CentroCosto,
+  CentroCostoFormData,
+} from '../../types/centroCosto'
+
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
@@ -16,97 +35,85 @@ const FILTROS_INICIALES: FiltrosCentrosCostoValores = {
   estado: '',
 }
 
-const CENTROS_COSTO_MOCK: CentroCosto[] = [
-  {
-    id: 'CC-001',
-    nombre: 'Administración',
-    estado: true,
-    descripcion: 'Gestión general y dirección de la organización.',
-    fechaRegistro: '10/08/2026',
-  },
-  {
-    id: 'CC-002',
-    nombre: 'Producción',
-    estado: true,
-    descripcion: 'Procesos de fabricación y ensamblaje.',
-    fechaRegistro: '11/08/2026',
-  },
-  {
-    id: 'CC-003',
-    nombre: 'Mantenimiento',
-    estado: true,
-    descripcion: 'Conservación de equipos e instalaciones.',
-    fechaRegistro: '12/08/2026',
-  },
-  {
-    id: 'CC-004',
-    nombre: 'Logística',
-    estado: true,
-    descripcion: 'Almacenamiento y distribución de materiales.',
-    fechaRegistro: '13/08/2026',
-  },
-  {
-    id: 'CC-005',
-    nombre: 'Ventas',
-    estado: false,
-    descripcion: 'Comercialización de productos y servicios.',
-    fechaRegistro: '14/08/2026',
-  },
-]
-
 function filtrarCentrosCosto(
   centrosCosto: CentroCosto[],
   filtros: FiltrosCentrosCostoValores,
-) {
+): CentroCosto[] {
   const nombre = filtros.nombre
     .trim()
     .toLowerCase()
 
-  return centrosCosto.filter((centroCosto) => {
-    const coincideNombre =
-      nombre.length === 0 ||
-      centroCosto.nombre
-        .toLowerCase()
-        .includes(nombre)
+  return centrosCosto.filter(
+    (centroCosto) => {
+      const coincideNombre =
+        !nombre ||
+        centroCosto.nombre
+          .toLowerCase()
+          .includes(nombre)
 
-    const coincideEstado =
-      filtros.estado.length === 0 ||
-      (filtros.estado === 'activo' &&
-        centroCosto.estado) ||
-      (filtros.estado === 'inactivo' &&
-        !centroCosto.estado)
+      const coincideEstado =
+        !filtros.estado ||
+        (filtros.estado === 'activo' &&
+          centroCosto.activo === 1) ||
+        (filtros.estado === 'inactivo' &&
+          centroCosto.activo === 0)
 
-    return coincideNombre && coincideEstado
-  })
-}
-
-function crearFechaActual() {
-  return new Intl.DateTimeFormat('es-PE').format(
-    new Date(),
+      return coincideNombre && coincideEstado
+    },
   )
 }
 
+function obtenerMensajeError(error: unknown): string {
+  return error instanceof Error
+    ? error.message
+    : 'Ocurrió un error inesperado.'
+}
+
 export function CentrosCostoPage() {
-  const [centrosCosto, setCentrosCosto] =
-    useState<CentroCosto[]>(CENTROS_COSTO_MOCK)
+  const [
+    centrosCosto,
+    setCentrosCosto,
+  ] = useState<CentroCosto[]>(() =>
+    obtenerCentrosCosto(),
+  )
+
   const [filtros, setFiltros] =
     useState<FiltrosCentrosCostoValores>(
       FILTROS_INICIALES,
     )
-  const [filtrosAplicados, setFiltrosAplicados] =
-    useState<FiltrosCentrosCostoValores>(
-      FILTROS_INICIALES,
-    )
+
+  const [
+    filtrosAplicados,
+    setFiltrosAplicados,
+  ] = useState<FiltrosCentrosCostoValores>(
+    FILTROS_INICIALES,
+  )
+
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
+
   const [modalFormOpen, setModalFormOpen] =
     useState(false)
-  const [centroCostoEnEdicion, setCentroCostoEnEdicion] =
-    useState<CentroCosto | null>(null)
-  const [modalDeleteOpen, setModalDeleteOpen] =
-    useState(false)
-  const [centroCostoAEliminar, setCentroCostoAEliminar] =
-    useState<CentroCosto | null>(null)
+  const [modoVisualizacion, setModoVisualizacion] = useState(false)
+
+  const [
+    centroCostoEnEdicion,
+    setCentroCostoEnEdicion,
+  ] = useState<CentroCosto | null>(null)
+  const [centroCostoAReactivar, setCentroCostoAReactivar] = useState<CentroCosto | null>(null)
+
+  const [errorFormulario, setErrorFormulario] =
+    useState('')
+
+  const [
+    modalDeleteOpen,
+    setModalDeleteOpen,
+  ] = useState(false)
+
+  const [
+    centroCostoAEliminar,
+    setCentroCostoAEliminar,
+  ] = useState<CentroCosto | null>(null)
 
   const centrosCostoFiltrados = useMemo(
     () =>
@@ -117,21 +124,25 @@ export function CentrosCostoPage() {
     [centrosCosto, filtrosAplicados],
   )
 
-  const totalItems = centrosCostoFiltrados.length
+  const totalItems =
+    centrosCostoFiltrados.length
 
-  const centrosCostoPaginados = useMemo(() => {
-    const startIndex = (page - 1) * pageSize
-    const endIndex = startIndex + pageSize
+  const centrosCostoPaginados = useMemo(
+    () => {
+      const startIndex =
+        (page - 1) * pageSize
 
-    return centrosCostoFiltrados.slice(
-      startIndex,
-      endIndex,
-    )
-  }, [
-    centrosCostoFiltrados,
-    page,
-    pageSize,
-  ])
+      return centrosCostoFiltrados.slice(
+        startIndex,
+        startIndex + pageSize,
+      )
+    },
+    [
+      centrosCostoFiltrados,
+      page,
+      pageSize,
+    ],
+  )
 
   useEffect(() => {
     const totalPages = Math.max(
@@ -144,14 +155,122 @@ export function CentrosCostoPage() {
     }
   }, [page, pageSize, totalItems])
 
+  function recargarCentrosCosto(): void {
+    setCentrosCosto(
+      obtenerCentrosCosto(),
+    )
+  }
+
+  function abrirFormularioNuevo(): void {
+    setErrorFormulario('')
+    setCentroCostoEnEdicion(null)
+    setModoVisualizacion(false)
+    setModalFormOpen(true)
+  }
+
+  function abrirFormularioEdicion(
+    centroCosto: CentroCosto,
+  ): void {
+    setErrorFormulario('')
+    setCentroCostoEnEdicion(centroCosto)
+    setModoVisualizacion(false)
+    setModalFormOpen(true)
+  }
+
+  function abrirVisualizacion(centroCosto: CentroCosto): void {
+    setErrorFormulario('')
+    setCentroCostoEnEdicion(centroCosto)
+    setModoVisualizacion(true)
+    setModalFormOpen(true)
+  }
+
+  function cerrarFormulario(): void {
+    setModalFormOpen(false)
+    setCentroCostoEnEdicion(null)
+    setModoVisualizacion(false)
+    setErrorFormulario('')
+  }
+
+  function guardarCentroCosto(
+    datos: CentroCostoFormData,
+  ): void {
+    try {
+      if (centroCostoEnEdicion) {
+        actualizarCentroCosto(
+          centroCostoEnEdicion.id,
+          datos,
+        )
+
+      } else {
+        crearCentroCosto(datos)
+
+      }
+
+      recargarCentrosCosto()
+      cerrarFormulario()
+      setPage(1)
+    } catch (error) {
+      setErrorFormulario(
+        obtenerMensajeError(error),
+      )
+    }
+  }
+
+  function abrirConfirmacionEliminar(
+    centroCosto: CentroCosto,
+  ): void {
+    setCentroCostoAEliminar(centroCosto)
+    setModalDeleteOpen(true)
+  }
+
+  function cerrarConfirmacionEliminar(): void {
+    setModalDeleteOpen(false)
+    setCentroCostoAEliminar(null)
+  }
+
+  function confirmarReactivacion(): void {
+    if (!centroCostoAReactivar) return
+    try {
+      reactivarCentroCosto(centroCostoAReactivar.id)
+      recargarCentrosCosto()
+    } catch (error) {
+      console.error(obtenerMensajeError(error))
+    }
+    setCentroCostoAReactivar(null)
+  }
+
+  function confirmarEliminacion(): void {
+    if (!centroCostoAEliminar) {
+      return
+    }
+
+    try {
+      eliminarCentroCosto(
+        centroCostoAEliminar.id,
+      )
+
+      recargarCentrosCosto()
+      cerrarConfirmacionEliminar()
+
+    } catch (error) {
+      cerrarConfirmacionEliminar()
+
+      console.error(obtenerMensajeError(error))
+    }
+  }
+
   return (
-    <>
+    <div className="centro-costo-page">
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
               <h1>Centros de costo</h1>
-              <p>Mantenimiento de centros de costo</p>
+
+              <p>
+                Administración de áreas responsables
+                del consumo de materiales.
+              </p>
             </div>
           </section>
 
@@ -165,12 +284,16 @@ export function CentrosCostoPage() {
                 }))
               }
               onBuscar={() => {
-                setFiltrosAplicados(filtros)
+                setFiltrosAplicados({
+                  ...filtros,
+                })
                 setPage(1)
               }}
               onLimpiar={() => {
                 setFiltros(FILTROS_INICIALES)
-                setFiltrosAplicados(FILTROS_INICIALES)
+                setFiltrosAplicados(
+                  FILTROS_INICIALES,
+                )
                 setPage(1)
               }}
             />
@@ -178,26 +301,27 @@ export function CentrosCostoPage() {
 
           <div className="maestro-panel">
             <TablaCentrosCosto
-              centrosCosto={centrosCostoPaginados}
+              centrosCosto={
+                centrosCostoPaginados
+              }
               totalItems={totalItems}
               page={page}
               pageSize={pageSize}
-              onAgregar={() => {
-                setCentroCostoEnEdicion(null)
-                setModalFormOpen(true)
-              }}
-              onEditar={(centroCosto) => {
-                setCentroCostoEnEdicion(centroCosto)
-                setModalFormOpen(true)
-              }}
-              onEliminar={(centroCosto) => {
-                setCentroCostoAEliminar(centroCosto)
-                setModalDeleteOpen(true)
-              }}
-              onPageChange={(nextPage) =>
-                setPage(nextPage)
+              onAgregar={
+                abrirFormularioNuevo
               }
-              onPageSizeChange={(nextPageSize) => {
+              onEditar={
+                abrirFormularioEdicion
+              }
+              onVisualizar={abrirVisualizacion}
+              onEliminar={
+                abrirConfirmacionEliminar
+              }
+              onReactivar={(centroCosto) => setCentroCostoAReactivar(centroCosto)}
+              onPageChange={setPage}
+              onPageSizeChange={(
+                nextPageSize,
+              ) => {
                 setPageSize(nextPageSize)
                 setPage(1)
               }}
@@ -208,71 +332,32 @@ export function CentrosCostoPage() {
 
       <CentroCostoFormModal
         abierto={modalFormOpen}
-        centroCosto={centroCostoEnEdicion}
-        onClose={() => {
-          setModalFormOpen(false)
-          setCentroCostoEnEdicion(null)
-        }}
-        onSubmit={(payload) => {
-          if (centroCostoEnEdicion) {
-            setCentrosCosto((actual) =>
-              actual.map((centroCosto) =>
-                centroCosto.id ===
-                centroCostoEnEdicion.id
-                  ? {
-                      ...centroCosto,
-                      ...payload,
-                    }
-                  : centroCosto,
-              ),
-            )
-          } else {
-            setCentrosCosto((actual) => {
-              const nextId = String(
-                actual.length + 1,
-              ).padStart(3, '0')
-
-              return [
-                {
-                  id: `CC-${nextId}`,
-                  fechaRegistro:
-                    crearFechaActual(),
-                  estado: true,
-                  ...payload,
-                },
-                ...actual,
-              ]
-            })
-          }
-
-          setModalFormOpen(false)
-          setCentroCostoEnEdicion(null)
-        }}
+        centroCosto={
+          centroCostoEnEdicion
+        }
+        error={errorFormulario}
+        soloLectura={modoVisualizacion}
+        onClose={cerrarFormulario}
+        onSubmit={guardarCentroCosto}
+      />
+      <CentroCostoDeleteModal
+        abierto={Boolean(centroCostoAReactivar)}
+        centroCosto={centroCostoAReactivar}
+        modo="reactivar"
+        onClose={() => setCentroCostoAReactivar(null)}
+        onConfirm={confirmarReactivacion}
       />
 
       <CentroCostoDeleteModal
         abierto={modalDeleteOpen}
-        centroCosto={centroCostoAEliminar}
-        onClose={() => {
-          setModalDeleteOpen(false)
-          setCentroCostoAEliminar(null)
-        }}
-        onConfirm={() => {
-          if (centroCostoAEliminar) {
-            setCentrosCosto((actual) =>
-              actual.filter(
-                (centroCosto) =>
-                  centroCosto.id !==
-                  centroCostoAEliminar.id,
-              ),
-            )
-          }
-
-          setModalDeleteOpen(false)
-          setCentroCostoAEliminar(null)
-        }}
+        centroCosto={
+          centroCostoAEliminar
+        }
+        onClose={
+          cerrarConfirmacionEliminar
+        }
+        onConfirm={confirmarEliminacion}
       />
-    </>
+    </div>
   )
 }
-
