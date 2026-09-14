@@ -1,88 +1,287 @@
-import { useMemo, useState } from 'react'
-import { BarChart3, CalendarDays, Package, ShoppingCart, TrendingUp } from 'lucide-react'
-import { obtenerProductos } from '../../services/productoService'
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
+
+import {
+  BarChart3,
+} from 'lucide-react'
+
+import { ExportarProductosMasPedidosButton } from '../../components/reportes/productos-mas-pedidos/ExportarProductosMasPedidosButton'
+import { FiltrosProductosMasPedidos } from '../../components/reportes/productos-mas-pedidos/FiltrosProductosMasPedidos'
+import { GraficoProductosMasPedidos } from '../../components/reportes/productos-mas-pedidos/GraficoProductosMasPedidos'
+import { ResumenProductosMasPedidos } from '../../components/reportes/productos-mas-pedidos/ResumenProductosMasPedidos'
+import { TablaProductosMasPedidos } from '../../components/reportes/productos-mas-pedidos/TablaProductosMasPedidos'
+import { TablePagination } from '../../components/ui/TablePagination'
+
+import { obtenerCategorias } from '../../services/categoriaService'
+import { obtenerDestinos } from '../../services/destinoService'
+
+import {
+  obtenerProductosMasPedidos,
+  obtenerResumenProductosMasPedidos,
+} from '../../services/reporteProductoMasPedidoService'
+
+import { obtenerTiposProducto } from '../../services/tipoProductoService'
+
+import type {
+  FiltrosProductosMasPedidos as Filtros,
+} from '../../types/reporteProductoMasPedido'
+
 import '../../styles/DashboardPage.css'
-import './ProductosMasPedidosPage.css'
+import '../../styles/maestros.css'
 
-type Periodo = 'semanal' | 'mensual' | 'rango'
-type RankingProducto = { id: string; nombre: string; codigo: string; categoria: string; cantidad: number; vales: number }
-
-const CATEGORIAS: Record<string, string> = {
-  'CAT-001': 'Herramientas',
-  'CAT-002': 'Seguridad Industrial',
-  'CAT-003': 'Ferretería',
-  'CAT-004': 'Repuestos',
-  'CAT-005': 'Limpieza',
-}
-
-const DEMANDA_INICIAL: Record<string, { cantidad: number; vales: number }> = {
-  'PROD-001': { cantidad: 42, vales: 16 },
-  'PROD-002': { cantidad: 68, vales: 24 },
-  'PROD-003': { cantidad: 31, vales: 12 },
-  'PROD-004': { cantidad: 24, vales: 9 },
-}
-
-function obtenerRanking(): RankingProducto[] {
-  return obtenerProductos().filter((producto) => producto.estado).map((producto) => ({
-    id: producto.id,
-    nombre: producto.nombre,
-    codigo: producto.codigo,
-    categoria: CATEGORIAS[producto.categoriaId] ?? 'Sin categoría',
-    ...(DEMANDA_INICIAL[producto.id] ?? { cantidad: 8, vales: 3 }),
-  })).sort((a, b) => b.cantidad - a.cantidad)
+const FILTROS_INICIALES: Filtros = {
+  busqueda: '',
+  fechaDesde: '',
+  fechaHasta: '',
+  tipoProductoId: '',
+  categoriaId: '',
+  destinoId: '',
 }
 
 export function ProductosMasPedidosPage() {
-  const [periodo, setPeriodo] = useState<Periodo>('mensual')
-  const [fechaInicio, setFechaInicio] = useState('')
-  const [fechaFin, setFechaFin] = useState('')
-  const ranking = useMemo(() => obtenerRanking(), [])
-  const totalSolicitado = ranking.reduce((total, item) => total + item.cantidad, 0)
-  const totalVales = ranking.reduce((total, item) => total + item.vales, 0)
-  const maxCantidad = ranking[0]?.cantidad ?? 1
+  const [filtros, setFiltros] =
+    useState<Filtros>({
+      ...FILTROS_INICIALES,
+    })
+
+  const [
+    filtrosAplicados,
+    setFiltrosAplicados,
+  ] = useState<Filtros>({
+    ...FILTROS_INICIALES,
+  })
+
+  const [page, setPage] = useState(1)
+
+  const [pageSize, setPageSize] =
+    useState(10)
+
+  const tiposProducto = useMemo(
+    () =>
+      obtenerTiposProducto()
+        .map((tipo) => ({
+          id: String(tipo.id),
+          nombre: tipo.nombre,
+        }))
+        .sort((primero, segundo) =>
+          primero.nombre.localeCompare(
+            segundo.nombre,
+            'es',
+          ),
+        ),
+    [],
+  )
+
+  const categorias = useMemo(
+    () =>
+      obtenerCategorias()
+        .map((categoria) => ({
+          id: String(categoria.id),
+          nombre: categoria.nombre,
+        }))
+        .sort((primero, segundo) =>
+          primero.nombre.localeCompare(
+            segundo.nombre,
+            'es',
+          ),
+        ),
+    [],
+  )
+
+  const destinos = useMemo(
+    () =>
+      obtenerDestinos()
+        .map((destino) => ({
+          id: String(destino.id),
+          nombre: destino.nombre,
+        }))
+        .sort((primero, segundo) =>
+          primero.nombre.localeCompare(
+            segundo.nombre,
+            'es',
+          ),
+        ),
+    [],
+  )
+
+  const filas = useMemo(
+    () =>
+      obtenerProductosMasPedidos(
+        filtrosAplicados,
+      ),
+    [filtrosAplicados],
+  )
+
+  const resumen = useMemo(
+    () =>
+      obtenerResumenProductosMasPedidos(
+        filas,
+        filtrosAplicados,
+      ),
+    [
+      filas,
+      filtrosAplicados,
+    ],
+  )
+
+  const totalItems = filas.length
+
+  const filasPaginadas = useMemo(
+    () => {
+      const inicio =
+        (page - 1) * pageSize
+
+      return filas.slice(
+        inicio,
+        inicio + pageSize,
+      )
+    },
+    [
+      filas,
+      page,
+      pageSize,
+    ],
+  )
+
+  useEffect(() => {
+    const totalPaginas = Math.max(
+      1,
+      Math.ceil(
+        totalItems / pageSize,
+      ),
+    )
+
+    if (page > totalPaginas) {
+      setPage(totalPaginas)
+    }
+  }, [
+    page,
+    pageSize,
+    totalItems,
+  ])
+
+  function cambiarFiltro(
+    campo: keyof Filtros,
+    valor: string,
+  ): void {
+    setFiltros((actual) => ({
+      ...actual,
+      [campo]: valor,
+    }))
+  }
+
+  function buscar(): void {
+    setFiltrosAplicados({
+      ...filtros,
+    })
+
+    setPage(1)
+  }
+
+  function limpiar(): void {
+    setFiltros({
+      ...FILTROS_INICIALES,
+    })
+
+    setFiltrosAplicados({
+      ...FILTROS_INICIALES,
+    })
+
+    setPage(1)
+  }
 
   return (
-    <main className="dashboard-shell reporte-productos-page">
-      <div className="reporte-productos-page__body">
-        <section className="reporte-productos-hero">
-          <div>
-            <span className="reporte-kicker">Reportes del inventario</span>
-            <h1>Productos más pedidos</h1>
-            <p>Identifica los productos con mayor rotación y demanda en los vales de consumo.</p>
+    <main className="dashboard-shell maestro-page-shell">
+      <div className="container-xl px-0 maestro-page-body">
+        <section className="maestro-topbar">
+          <div className="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+            <div className="maestro-topbar__copy">
+              <h1>
+                Productos mÃ¡s pedidos
+              </h1>
+
+              <p>
+                Ranking de productos segÃºn las
+                cantidades entregadas mediante
+                vales de consumo registrados.
+              </p>
+            </div>
+
+            <BarChart3
+              size={36}
+              className="text-success"
+            />
           </div>
-          <div className="reporte-period-status"><TrendingUp size={18} />Ranking actualizado</div>
         </section>
 
-        <section className="reporte-filter-card">
-          <div className="reporte-filter-title"><CalendarDays size={19} /><div><strong>Periodo de consulta</strong><span>Selecciona el rango que deseas analizar.</span></div></div>
-          <div className="reporte-period-options">
-            {([['semanal', 'Esta semana'], ['mensual', 'Este mes'], ['rango', 'Rango de fechas']] as const).map(([value, label]) => (
-              <button type="button" key={value} className={periodo === value ? 'is-active' : ''} onClick={() => setPeriodo(value)}>{label}</button>
-            ))}
-          </div>
-          {periodo === 'rango' && <div className="reporte-date-fields"><label>Desde<input type="date" value={fechaInicio} onChange={(event) => setFechaInicio(event.target.value)} /></label><label>Hasta<input type="date" value={fechaFin} onChange={(event) => setFechaFin(event.target.value)} /></label></div>}
-        </section>
+        <div className="maestro-panel">
+          <ResumenProductosMasPedidos
+            resumen={resumen}
+          />
+        </div>
 
-        <section className="reporte-summary-grid" aria-label="Resumen del reporte">
-          <article><span className="reporte-summary-icon reporte-summary-icon--green"><Package size={20} /></span><div><small>Productos analizados</small><strong>{ranking.length}</strong></div></article>
-          <article><span className="reporte-summary-icon reporte-summary-icon--blue"><ShoppingCart size={20} /></span><div><small>Unidades solicitadas</small><strong>{totalSolicitado}</strong></div></article>
-          <article><span className="reporte-summary-icon reporte-summary-icon--orange"><BarChart3 size={20} /></span><div><small>Vales asociados</small><strong>{totalVales}</strong></div></article>
-        </section>
+        <div className="maestro-panel">
+          <FiltrosProductosMasPedidos
+            valores={filtros}
+            tiposProducto={tiposProducto}
+            categorias={categorias}
+            destinos={destinos}
+            onChange={cambiarFiltro}
+            onBuscar={buscar}
+            onLimpiar={limpiar}
+          />
+        </div>
 
-        <section className="reporte-ranking-layout">
-          <article className="reporte-card reporte-top-card">
-            <div className="reporte-card-header"><div><span className="reporte-kicker">Mayor rotación</span><h2>Productos top</h2></div><BarChart3 size={22} /></div>
-            <div className="reporte-bars">{ranking.slice(0, 5).map((item, index) => <div className="reporte-bar-item" key={item.id}><div className="reporte-bar-label"><span className={`reporte-rank reporte-rank--${index + 1}`}>{index + 1}</span><strong>{item.nombre}</strong><b>{item.cantidad}</b></div><div className="reporte-bar-track"><span style={{ width: `${(item.cantidad / maxCantidad) * 100}%` }} /></div></div>)}</div>
-          </article>
-          <article className="reporte-card reporte-highlight-card">
-            <span className="reporte-highlight-icon"><TrendingUp size={24} /></span><span className="reporte-kicker">Producto con mayor demanda</span><h2>{ranking[0]?.nombre ?? 'Sin datos'}</h2><p>{ranking[0]?.categoria ?? 'No disponible'}</p><strong>{ranking[0]?.cantidad ?? 0} unidades solicitadas</strong><small>{ranking[0]?.vales ?? 0} vales asociados en el periodo</small>
-          </article>
-        </section>
+        <div className="maestro-panel">
+          <GraficoProductosMasPedidos
+            filas={filas}
+          />
+        </div>
 
-        <section className="reporte-card reporte-table-card">
-          <div className="reporte-card-header"><div><span className="reporte-kicker">Detalle del ranking</span><h2>Productos más solicitados</h2></div><span className="reporte-count">{ranking.length} productos</span></div>
-          <div className="reporte-table-wrap"><table className="reporte-ranking-table"><thead><tr><th>#</th><th>Producto</th><th>Categoría</th><th>Cantidad total solicitada</th><th>Vales asociados</th></tr></thead><tbody>{ranking.map((item, index) => <tr key={item.id}><td><span className={`reporte-rank reporte-rank--${index + 1}`}>{index + 1}</span></td><td><strong>{item.nombre}</strong><small>{item.codigo}</small></td><td>{item.categoria}</td><td><strong>{item.cantidad}</strong> unidades</td><td><span className="reporte-voucher-badge">{item.vales} vales</span></td></tr>)}</tbody></table></div>
-        </section>
+        <div className="maestro-panel">
+          <section className="maestro-table-card card border-0 shadow-sm">
+            <div className="card-body p-0">
+              <div className="maestro-table-header">
+                <div>
+                  <span className="maestro-kicker">
+                    <BarChart3 size={16} />
+                    Ranking completo
+                  </span>
+
+                  <p className="maestro-section-copy small mb-0 mt-1">
+                    {totalItems}{' '}
+                    producto(s) encontrado(s)
+                  </p>
+                </div>
+
+                <ExportarProductosMasPedidosButton
+                  filas={filas}
+                  resumen={resumen}
+                />
+              </div>
+
+              <TablaProductosMasPedidos
+                filas={filasPaginadas}
+              />
+
+              <TablePagination
+                totalItems={totalItems}
+                page={page}
+                pageSize={pageSize}
+                onPageChange={setPage}
+                onPageSizeChange={(
+                  nuevoTamano,
+                ) => {
+                  setPageSize(nuevoTamano)
+                  setPage(1)
+                }}
+              />
+            </div>
+          </section>
+        </div>
       </div>
     </main>
   )
