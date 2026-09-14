@@ -210,7 +210,7 @@ export function ReporteIngresosPage() {
 
               <p>
                 Consulta los productos ingresados
-                al almacÃ©n y exporta los resultados
+                al almacén y exporta los resultados
                 a Excel.
               </p>
             </div>
@@ -287,4 +287,5 @@ export function ReporteIngresosPage() {
     </main>
   )
 }
+
 

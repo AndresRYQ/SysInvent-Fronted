@@ -34,7 +34,7 @@ export function EditarIngresoPage() {
 
               <p>
                 El ingreso solicitado no existe
-                o ya no estÃ¡ disponible.
+                o ya no está disponible.
               </p>
             </div>
           </section>
@@ -43,8 +43,8 @@ export function EditarIngresoPage() {
             className="alert alert-danger"
             role="alert"
           >
-            No se encontrÃ³ el ingreso con
-            identificador â€œ{id}â€.
+            No se encontró el ingreso con
+            identificador “{id}”.
           </div>
 
           <button
@@ -112,5 +112,6 @@ export function EditarIngresoPage() {
     </main>
   )
 }
+
 
 

@@ -63,7 +63,7 @@ export interface ControlAlmacenProducto {
 
 /**
  * Filtros utilizados por la pantalla
- * de Control de almacÃ©n.
+ * de Control de almacén.
  */
 export interface FiltrosControlAlmacen {
   busqueda: string
@@ -73,5 +73,6 @@ export interface FiltrosControlAlmacen {
   fechaDesde: string
   fechaHasta: string
 }
+
 
 

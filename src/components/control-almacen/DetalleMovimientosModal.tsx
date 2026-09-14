@@ -95,7 +95,7 @@ export function DetalleMovimientosModal({
             </h3>
 
             <p className="maestro-modal-copy mb-0">
-              {producto.codigo} Ã‚Â· {unidad}
+              {producto.codigo} · {unidad}
             </p>
           </div>
 
@@ -181,7 +181,7 @@ export function DetalleMovimientosModal({
                       colSpan={9}
                       className="text-center text-secondary py-4"
                     >
-                      Este producto todavÃƒÂ­a no
+                      Este producto todavía no
                       tiene movimientos.
                     </td>
                   </tr>
@@ -323,6 +323,7 @@ export function DetalleMovimientosModal({
     </div>
   )
 }
+
 
 
 

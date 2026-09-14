@@ -45,10 +45,10 @@ export function TablaProductosMasPedidos({
         <thead>
           <tr>
             <th className="text-center">
-              PosiciÃ³n
+              Posición
             </th>
             <th>Producto</th>
-            <th>ClasificaciÃ³n</th>
+            <th>Clasificación</th>
             <th className="text-end">
               Cantidad
             </th>
@@ -63,7 +63,7 @@ export function TablaProductosMasPedidos({
               Destinos
             </th>
             <th className="text-end">
-              ParticipaciÃ³n
+              Participación
             </th>
             <th className="text-end">
               Valorizado
@@ -178,3 +178,4 @@ export function TablaProductosMasPedidos({
     </div>
   )
 }
+

@@ -264,7 +264,7 @@ export function FiltrosReporteIngresos({
                     key={producto.id}
                     value={producto.id}
                   >
-                    {producto.codigo} â€”{' '}
+                    {producto.codigo} —{' '}
                     {producto.nombre}
                   </option>
                 ),
@@ -330,4 +330,5 @@ export function FiltrosReporteIngresos({
     </section>
   )
 }
+
 

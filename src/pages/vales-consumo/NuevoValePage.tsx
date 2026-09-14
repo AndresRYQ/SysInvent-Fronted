@@ -18,8 +18,8 @@ export function NuevoValePage() {
             <h1>Nuevo vale de consumo</h1>
 
             <p>
-              Registra la salida y distribuciÃ³n
-              de productos del almacÃ©n.
+              Registra la salida y distribución
+              de productos del almacén.
             </p>
           </div>
 
@@ -56,4 +56,5 @@ export function NuevoValePage() {
     </main>
   )
 }
+
 

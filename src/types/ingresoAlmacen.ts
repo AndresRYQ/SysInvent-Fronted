@@ -5,8 +5,8 @@ export type EstadoIngresoAlmacen =
 /**
  * Producto incluido en un ingreso.
  *
- * El tipo, categorÃƒÂ­a y unidad se obtienen
- * mediante la relaciÃƒÂ³n con productoId.
+ * El tipo, categoría y unidad se obtienen
+ * mediante la relación con productoId.
  */
 export interface DetalleIngresoAlmacen {
   id: string
@@ -25,7 +25,7 @@ export type DetalleIngresoAlmacenFormData =
 /**
  * Registro definitivo de un ingreso.
  *
- * Destino y Parte de equipo se utilizarÃƒÂ¡n
+ * Destino y Parte de equipo se utilizarán
  * posteriormente en el Vale de consumo.
  */
 export interface IngresoAlmacenRegistro {
@@ -68,4 +68,5 @@ export interface IngresoAlmacen {
   observacion: string
   estado: boolean
 }
+
 

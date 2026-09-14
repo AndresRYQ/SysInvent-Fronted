@@ -115,7 +115,7 @@ export function ControlAlmacenPage() {
             (categoria) =>
               String(categoria.id) === String(
               producto.categoriaId),
-          )?.nombre ?? 'Sin categorÃƒÂ­a',
+          )?.nombre ?? 'Sin categoría',
 
         unidadNombre:
           unidadesMedida.find(
@@ -272,7 +272,7 @@ export function ControlAlmacenPage() {
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
-              <h1>Control de almacÃƒÂ©n</h1>
+              <h1>Control de almacén</h1>
 
               <p>
                 Entradas, salidas, saldo y
@@ -290,7 +290,7 @@ export function ControlAlmacenPage() {
               {diferenciasStock.length}{' '}
               producto(s) con diferencias entre
               el saldo calculado y el stock
-              tÃƒÂ©cnico.
+              técnico.
             </div>
           )}
 
@@ -371,7 +371,7 @@ export function ControlAlmacenPage() {
 
                     <input
                       className="form-control maestro-control"
-                      placeholder="CÃƒÂ³digo, producto o proveedor"
+                      placeholder="Código, producto o proveedor"
                       value={filtros.busqueda}
                       onChange={(event) =>
                         setFiltros(
@@ -426,7 +426,7 @@ export function ControlAlmacenPage() {
 
                   <div className="col-12 col-md-4 col-lg-2">
                     <label className="form-label maestro-label">
-                      CategorÃƒÂ­a
+                      Categoría
                     </label>
 
                     <select
@@ -592,9 +592,9 @@ export function ControlAlmacenPage() {
                   <table className="table maestro-table align-middle mb-0">
                     <thead>
                       <tr>
-                        <th>CÃƒÂ³digo</th>
+                        <th>Código</th>
                         <th>Producto</th>
-                        <th>ClasificaciÃƒÂ³n</th>
+                        <th>Clasificación</th>
                         <th>Proveedor</th>
                         <th>Entradas</th>
                         <th>Salidas</th>
@@ -777,6 +777,7 @@ export function ControlAlmacenPage() {
     </>
   )
 }
+
 
 
 

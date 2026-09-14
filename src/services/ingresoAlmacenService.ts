@@ -169,7 +169,7 @@ function validarDatosIngreso(
     )
   ) {
     throw new Error(
-      'Selecciona una fecha de ingreso vÃƒÂ¡lida.',
+      'Selecciona una fecha de ingreso válida.',
     )
   }
 
@@ -187,7 +187,7 @@ function validarDatosIngreso(
 
   if (proveedor.activo !== 1) {
     throw new Error(
-      'El proveedor seleccionado estÃƒÂ¡ inactivo.',
+      'El proveedor seleccionado está inactivo.',
     )
   }
 
@@ -205,7 +205,7 @@ function validarDatosIngreso(
 
   if (contacto.activo !== 1) {
     throw new Error(
-      'El contacto seleccionado estÃƒÂ¡ inactivo.',
+      'El contacto seleccionado está inactivo.',
     )
   }
 
@@ -233,7 +233,7 @@ function validarDatosIngreso(
 
   if (tipoDocumento.activo !== 1) {
     throw new Error(
-      'El tipo de documento seleccionado estÃƒÂ¡ inactivo.',
+      'El tipo de documento seleccionado está inactivo.',
     )
   }
 
@@ -242,13 +242,13 @@ function validarDatosIngreso(
 
   if (numeroDocumento.length < 3) {
     throw new Error(
-      'El nÃƒÂºmero de documento debe tener al menos 3 caracteres.',
+      'El número de documento debe tener al menos 3 caracteres.',
     )
   }
 
   if (numeroDocumento.length > 50) {
     throw new Error(
-      'El nÃƒÂºmero de documento no puede superar los 50 caracteres.',
+      'El número de documento no puede superar los 50 caracteres.',
     )
   }
 
@@ -270,7 +270,7 @@ function validarDatosIngreso(
 
   if (documentoDuplicado) {
     throw new Error(
-      'Ya existe un ingreso con ese proveedor, tipo y nÃƒÂºmero de documento.',
+      'Ya existe un ingreso con ese proveedor, tipo y número de documento.',
     )
   }
 
@@ -319,7 +319,7 @@ function validarDatosIngreso(
 
       if (!producto.estado) {
         throw new Error(
-          `El producto "${producto.nombre}" estÃƒÂ¡ inactivo.`,
+          `El producto "${producto.nombre}" está inactivo.`,
         )
       }
 
@@ -350,7 +350,7 @@ function validarDatosIngreso(
         detalle.precioUnitario < 0
       ) {
         throw new Error(
-          `El precio de la fila ${numeroFila} no es vÃƒÂ¡lido.`,
+          `El precio de la fila ${numeroFila} no es válido.`,
         )
       }
     },
@@ -360,7 +360,7 @@ function validarDatosIngreso(
     datos.observacion.trim().length > 500
   ) {
     throw new Error(
-      'La observaciÃƒÂ³n no puede superar los 500 caracteres.',
+      'La observación no puede superar los 500 caracteres.',
     )
   }
 }
@@ -479,7 +479,7 @@ function validarAjustesStock(
         0
       ) {
         throw new Error(
-          `No se puede realizar la operaciÃƒÂ³n porque "${producto.nombre}" ya tiene salidas registradas o stock insuficiente.`,
+          `No se puede realizar la operación porque "${producto.nombre}" ya tiene salidas registradas o stock insuficiente.`,
         )
       }
     },
@@ -597,10 +597,10 @@ export function crearIngresoAlmacen(
   }
 
   registrarEventoBitacora({
-    modulo: 'Ingreso de almacÃƒÂ©n',
+    modulo: 'Ingreso de almacén',
     accion: 'CREAR',
     detalle:
-      `Se registrÃƒÂ³ el ingreso ${nuevoIngreso.numeroIngreso} con ${nuevoIngreso.detalles.length} producto(s).`,
+      `Se registró el ingreso ${nuevoIngreso.numeroIngreso} con ${nuevoIngreso.detalles.length} producto(s).`,
     registroId: nuevoIngreso.id,
   })
 
@@ -681,10 +681,10 @@ export function actualizarIngresoAlmacen(
   }
 
   registrarEventoBitacora({
-    modulo: 'Ingreso de almacÃƒÂ©n',
+    modulo: 'Ingreso de almacén',
     accion: 'EDITAR',
     detalle:
-      `Se actualizÃƒÂ³ el ingreso ${ingresoActualizado.numeroIngreso}.`,
+      `Se actualizó el ingreso ${ingresoActualizado.numeroIngreso}.`,
     registroId:
       ingresoActualizado.id,
   })
@@ -747,10 +747,10 @@ export function anularIngresoAlmacen(
   }
 
   registrarEventoBitacora({
-    modulo: 'Ingreso de almacÃƒÂ©n',
+    modulo: 'Ingreso de almacén',
     accion: 'ELIMINAR',
     detalle:
-      `Se anulÃƒÂ³ el ingreso ${ingresoAnulado.numeroIngreso} y se descontaron sus productos del stock.`,
+      `Se anuló el ingreso ${ingresoAnulado.numeroIngreso} y se descontaron sus productos del stock.`,
     registroId: ingresoAnulado.id,
   })
 
@@ -770,6 +770,7 @@ export function calcularTotalIngreso(
 
   return Number(total.toFixed(2))
 }
+
 
 
 

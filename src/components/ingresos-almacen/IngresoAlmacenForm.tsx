@@ -64,7 +64,7 @@ function obtenerMensajeError(
 ): string {
   return error instanceof Error
     ? error.message
-    : 'OcurriÃƒÂ³ un error inesperado.'
+    : 'Ocurrió un error inesperado.'
 }
 
 export function IngresoAlmacenForm({
@@ -333,7 +333,7 @@ export function IngresoAlmacenForm({
       precioUnitario < 0
     ) {
       setError(
-        'El precio unitario no es vÃƒÂ¡lido.',
+        'El precio unitario no es válido.',
       )
       return
     }
@@ -417,7 +417,7 @@ export function IngresoAlmacenForm({
 
     if (!numeroDocumento.trim()) {
       setError(
-        'Ingresa el nÃƒÂºmero del documento.',
+        'Ingresa el número del documento.',
       )
       return
     }
@@ -464,8 +464,8 @@ export function IngresoAlmacenForm({
           </h2>
 
           <p className="text-secondary mb-0">
-            Registra la mercaderÃƒÂ­a recibida
-            en el almacÃƒÂ©n.
+            Registra la mercadería recibida
+            en el almacén.
           </p>
         </div>
 
@@ -628,7 +628,7 @@ export function IngresoAlmacenForm({
             className="form-label maestro-label"
             htmlFor="ingresoNumeroDocumento"
           >
-            NÃƒÂºmero de documento *
+            Número de documento *
           </label>
 
           <input
@@ -650,7 +650,7 @@ export function IngresoAlmacenForm({
             className="form-label maestro-label"
             htmlFor="ingresoObservacion"
           >
-            ObservaciÃƒÂ³n
+            Observación
           </label>
 
           <textarea
@@ -765,7 +765,7 @@ export function IngresoAlmacenForm({
             value={
               unidadSeleccionada?.nombre ?? ''
             }
-            placeholder="AutomÃƒÂ¡tico"
+            placeholder="Automático"
             readOnly
           />
         </div>
@@ -858,7 +858,7 @@ export function IngresoAlmacenForm({
                   colSpan={6}
                   className="text-center text-secondary py-4"
                 >
-                  TodavÃƒÂ­a no agregaste productos.
+                  Todavía no agregaste productos.
                 </td>
               </tr>
             )}
@@ -972,6 +972,7 @@ export function IngresoAlmacenForm({
     </form>
   )
 }
+
 
 
 
