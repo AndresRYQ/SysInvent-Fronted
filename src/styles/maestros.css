@@ -102,7 +102,8 @@
 }
 
 .maestro-control {
-  min-height: 50px;
+  min-height: var(--form-control-height, 36px);
+  height: var(--form-control-height, 36px);
   border: 1px solid rgb(17 24 39 / 10%);
   border-radius: 16px;
   background: #f9fbfa;
@@ -122,6 +123,7 @@
 }
 
 .maestro-control--textarea {
+  height: auto;
   resize: vertical;
 }
 
@@ -1167,4 +1169,23 @@
 
 .modo-visualizacion .maestro-required {
   display: none;
+}
+
+/* Inventario: los botones no deben desplazarse ni animarse al pasar el cursor. */
+.vales-consumo-page .maestro-btn-primary:hover,
+.vales-consumo-page .maestro-btn-secondary:hover,
+.vales-consumo-page .maestro-btn-danger:hover,
+.vales-consumo-page .maestro-toolbar-btn:hover,
+.vales-consumo-page .maestro-action-btn:hover,
+.vales-consumo-page .maestro-page-btn:hover:not(:disabled) {
+  transform: none !important;
+}
+
+.vales-consumo-page .maestro-btn-primary,
+.vales-consumo-page .maestro-btn-secondary,
+.vales-consumo-page .maestro-btn-danger,
+.vales-consumo-page .maestro-toolbar-btn,
+.vales-consumo-page .maestro-action-btn,
+.vales-consumo-page .maestro-page-btn {
+  transition: none !important;
 }

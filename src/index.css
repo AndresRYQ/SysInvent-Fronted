@@ -30,6 +30,7 @@
   --text-muted: #6d716e;
   --shadow-soft:
     0 16px 40px rgb(15 23 42 / 8%);
+  --form-control-height: 36px;
 }
 
 * {
@@ -59,6 +60,23 @@ body {
 button,
 input {
   font: inherit;
+}
+
+/* Altura común de los controles de formulario en todo el sistema. */
+.form-control,
+.form-select,
+input[type='date'],
+input[type='text'],
+input[type='number'],
+input[type='email'],
+input[type='password'] {
+  min-height: var(--form-control-height);
+  height: var(--form-control-height);
+}
+
+textarea.form-control {
+  height: auto;
+  min-height: var(--form-control-height);
 }
 
 button {
