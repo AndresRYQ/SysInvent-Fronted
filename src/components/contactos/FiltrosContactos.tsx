@@ -1,34 +1,12 @@
 import { Filter, RotateCcw, Search } from 'lucide-react'
 import Select from 'react-select'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 import type { Proveedor } from '../../types/proveedor'
 
 export interface FiltrosContactosValores { busqueda: string; proveedorId: string; estado: string }
 interface Props { valores: FiltrosContactosValores; proveedores: Proveedor[]; onChange: (campo: keyof FiltrosContactosValores, valor: string) => void; onBuscar: () => void; onLimpiar: () => void }
 
-const selectStyles = {
-  control: (provided: any, state: any) => ({
-    ...provided,
-    minHeight: '36px',
-    height: '36px',
-    borderRadius: '8px',
-    border: '1px solid rgb(17 24 39 / 10%)',
-    borderColor: state.isFocused ? 'rgb(51 143 60 / 55%)' : 'rgb(17 24 39 / 10%)',
-    backgroundColor: state.isFocused ? '#fff' : '#f9fbfa',
-    boxShadow: state.isFocused ? '0 0 0 0.22rem rgb(51 143 60 / 12%)' : 'none',
-    '&:hover': { borderColor: state.isFocused ? 'rgb(51 143 60 / 55%)' : 'rgb(17 24 39 / 10%)' },
-  }),
-  valueContainer: (provided: any) => ({ ...provided, padding: '0 12px', fontSize: '0.8rem' }),
-  singleValue: (provided: any) => ({ ...provided, color: '#344054', fontSize: '0.8rem' }),
-  placeholder: (provided: any) => ({ ...provided, color: '#667085', fontSize: '0.8rem' }),
-  indicatorsContainer: (provided: any) => ({ ...provided, height: '34px' }),
-  menu: (provided: any) => ({ ...provided, zIndex: 10 }),
-  option: (provided: any, state: any) => ({
-    ...provided,
-    fontSize: '0.8rem',
-    backgroundColor: state.isSelected ? '#e9f8ee' : state.isFocused ? '#f3faf5' : '#fff',
-    color: '#344054',
-  }),
-}
+const selectStyles = crearEstilosSelect({ zIndex: 10 })
 const opcionesEstado = [{ value: 'activo', label: 'Activo' }, { value: 'inactivo', label: 'Inactivo' }]
 
 export function FiltrosContactos({ valores, proveedores, onChange, onBuscar, onLimpiar }: Props) {

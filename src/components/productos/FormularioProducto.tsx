@@ -7,6 +7,7 @@ import {
 
 import { Package, Save, X } from 'lucide-react'
 import Select from 'react-select'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
 import { obtenerProveedores } from '../../services/proveedorService'
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
@@ -57,7 +58,7 @@ const CATEGORIAS_INICIALES: OpcionMaestro[] = [
   },
   {
     id: 'CAT-003',
-    nombre: 'Ferretería',
+    nombre: 'FerreterÃ­a',
     estado: true,
   },
   {
@@ -265,7 +266,7 @@ export function FormularioProducto({
       !/^[A-Z0-9-]{3,30}$/.test(codigo)
     ) {
       nuevosErrores.codigo =
-        'Utiliza entre 3 y 30 letras, números o guiones'
+        'Utiliza entre 3 y 30 letras, nÃºmeros o guiones'
     }
 
     if (nombre.length < 2) {
@@ -291,7 +292,7 @@ export function FormularioProducto({
 
     if (!form.categoriaId) {
       nuevosErrores.categoriaId =
-        'Selecciona una categoría'
+        'Selecciona una categorÃ­a'
     }
 
     if (!form.unidadMedidaId) {
@@ -309,7 +310,7 @@ export function FormularioProducto({
       form.stockMinimo < 0
     ) {
       nuevosErrores.stockMinimo =
-        'Ingresa un stock mínimo válido'
+        'Ingresa un stock mÃ­nimo vÃ¡lido'
     }
 
     if (
@@ -319,7 +320,7 @@ export function FormularioProducto({
       form.precioUnitario < 0
     ) {
       nuevosErrores.precioUnitario =
-        'Ingresa un precio válido'
+        'Ingresa un precio vÃ¡lido'
     }
 
     setErrores(nuevosErrores)
@@ -363,12 +364,12 @@ export function FormularioProducto({
 
           <div>
             <h2 className="h5 mb-1">
-              Información del producto
+              InformaciÃ³n del producto
             </h2>
 
             <p className="text-muted mb-0">
-              Registra la información general y
-              configuración de inventario.
+              Registra la informaciÃ³n general y
+              configuraciÃ³n de inventario.
             </p>
           </div>
         </div>
@@ -391,7 +392,7 @@ export function FormularioProducto({
               className="form-label maestro-label"
               htmlFor="productoCodigo"
             >
-              Código
+              CÃ³digo
               <span className="maestro-required">*</span>
             </label>
 
@@ -517,7 +518,7 @@ export function FormularioProducto({
               className="form-label maestro-label"
               htmlFor="productoCategoria"
             >
-              Categoría
+              CategorÃ­a
               <span className="maestro-required">*</span>
             </label>
 
@@ -654,7 +655,7 @@ export function FormularioProducto({
               className="form-label maestro-label"
               htmlFor="productoStockMinimo"
             >
-              Stock mínimo
+              Stock mÃ­nimo
               <span className="maestro-required">*</span>
             </label>
 
@@ -764,7 +765,7 @@ export function FormularioProducto({
               className="form-label maestro-label"
               htmlFor="productoDescripcion"
             >
-              Descripción
+              DescripciÃ³n
               <span className="maestro-required">*</span>
             </label>
 
@@ -834,48 +835,9 @@ export function FormularioProducto({
   )
 }
 
-const estilosSelect = (tieneError: boolean) => ({
-  control: (base: any, state: any) => ({
-    ...base,
-    minHeight: 38,
-    height: 38,
-    borderRadius: 8,
-    borderColor: tieneError
-      ? '#dc3545'
-      : state.isFocused
-        ? '#198754'
-        : '#dee2e6',
-    boxShadow: tieneError
-      ? '0 0 0 .15rem rgba(220, 53, 69, .15)'
-      : state.isFocused
-        ? '0 0 0 .15rem rgba(25, 135, 84, .15)'
-        : 'none',
-    '&:hover': {
-      borderColor: tieneError ? '#dc3545' : '#198754',
-    },
-  }),
-  valueContainer: (base: any) => ({
-    ...base,
-    fontSize: '.8rem',
-  }),
-  indicatorsContainer: (base: any) => ({
-    ...base,
-    height: 36,
-  }),
-  menu: (base: any) => ({
-    ...base,
+const estilosSelect = (tieneError: boolean) =>
+  crearEstilosSelect({
+    tieneError,
+    altura: 38,
     zIndex: 20,
-  }),
-  option: (base: any, state: any) => ({
-    ...base,
-    fontSize: '.8rem',
-    backgroundColor: state.isSelected
-      ? '#198754'
-      : state.isFocused
-        ? '#e9f5ee'
-        : '#fff',
-    color: state.isSelected ? '#fff' : '#212529',
-  }),
-})
-
-
+  })

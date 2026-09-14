@@ -1,0 +1,39 @@
+:root {
+  /* Colores de marca */
+  --color-green: #338f3c;
+  --color-green-dark: #087536;
+  --color-green-soft: #e8f5ea;
+  --color-green-focus: rgb(51 143 60 / 55%);
+  --color-green-outline: rgb(51 143 60 / 12%);
+  --color-red: #b42318;
+  --color-red-danger: #dc2626;
+
+  /* Colores de interfaz */
+  --color-white: #fff;
+  --color-text-primary: #1f2937;
+  --color-text-heading: #13342b;
+  --color-text-secondary: #344054;
+  --color-text-muted: #667085;
+  --color-border: #dee2e6;
+  --color-control-bg: #f9fbfa;
+  --color-select-bg: #fff;
+  --color-page-start: #eff8f0;
+  --color-page-middle: #f6f8f6;
+  --color-page-end: #eef2f7;
+
+  /* Medidas reutilizables */
+  --form-control-height: 36px;
+  --form-control-font-size: 0.8rem;
+  --form-control-radius: 16px;
+  --form-control-padding-y: 0.35rem;
+  --transition-control: 180ms ease;
+  --shadow-soft: 0 16px 40px rgb(15 23 42 / 8%);
+
+  /* Alias heredados para estilos existentes */
+  --brand-green: var(--color-green);
+  --brand-green-dark: var(--color-green-dark);
+  --brand-green-soft: var(--color-green-soft);
+  --brand-slate: #123d2e;
+  --brand-border: rgb(10 105 74 / 12%);
+  --text-muted: #6d716e;
+}
