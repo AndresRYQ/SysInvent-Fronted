@@ -31,6 +31,7 @@ import { EditarProductoPage } from '../pages/productos/EditarProductoPage'
 import { BitacoraPage } from '../pages/bitacora/BitacoraPage'
 import { ContactosPage } from '../pages/contactos/ContactosPage'
 import { PartesEquipoPage } from '../pages/partes-equipo/PartesEquipoPage'
+import { ReporteValesPage } from '../pages/reportes/ReporteValesPage'
 
 export function AppRouter() {
   return (
@@ -177,6 +178,16 @@ export function AppRouter() {
                 <Route
                   path="/vales-consumo"
                   element={<ValesConsumoPage />}
+                />
+              </Route>
+              <Route
+                element={
+                  <RoleRoute modulo="reporte-vales" />
+                }
+              >
+                <Route
+                  path="/reportes/vales"
+                  element={<ReporteValesPage />}
                 />
               </Route>
               <Route
