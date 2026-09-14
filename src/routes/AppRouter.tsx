@@ -31,6 +31,7 @@ import { EditarProductoPage } from '../pages/productos/EditarProductoPage'
 import { BitacoraPage } from '../pages/bitacora/BitacoraPage'
 import { ContactosPage } from '../pages/contactos/ContactosPage'
 import { PartesEquipoPage } from '../pages/partes-equipo/PartesEquipoPage'
+import { ReporteIngresosPage } from '../pages/reportes/ReporteIngresosPage'
 import { ControlAlmacenPage } from '../pages/control-almacen/ControlAlmacenPage'
 import { NuevoIngresoPage } from '../pages/ingresos-almacen/NuevoIngresoPage'
 import { EditarIngresoPage } from '../pages/ingresos-almacen/EditarIngresoPage'
@@ -179,6 +180,16 @@ export function AppRouter() {
                   element={
                     <IngresosAlmacenPage />
                   }
+                />
+              </Route>
+              <Route
+                element={
+                  <RoleRoute modulo="reporte-ingresos" />
+                }
+              >
+                <Route
+                  path="/reportes/ingresos"
+                  element={<ReporteIngresosPage />}
                 />
               </Route>
 

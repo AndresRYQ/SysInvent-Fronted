@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
+    "exceljs": "^4.4.0",
     "lucide-react": "^1.33.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
