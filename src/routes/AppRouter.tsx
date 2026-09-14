@@ -31,6 +31,11 @@ import { EditarProductoPage } from '../pages/productos/EditarProductoPage'
 import { BitacoraPage } from '../pages/bitacora/BitacoraPage'
 import { ContactosPage } from '../pages/contactos/ContactosPage'
 import { PartesEquipoPage } from '../pages/partes-equipo/PartesEquipoPage'
+import { ControlAlmacenPage } from '../pages/control-almacen/ControlAlmacenPage'
+import { NuevoIngresoPage } from '../pages/ingresos-almacen/NuevoIngresoPage'
+import { EditarIngresoPage } from '../pages/ingresos-almacen/EditarIngresoPage'
+import { NuevoValePage } from '../pages/vales-consumo/NuevoValePage'
+import { EditarValePage } from '../pages/vales-consumo/EditarValePage'
 
 export function AppRouter() {
   return (
@@ -130,6 +135,14 @@ export function AppRouter() {
                     <TiposDocumentoPage />
                   }
                 />
+                <Route
+                  path="/ingresos-almacen/nuevo"
+                  element={<NuevoIngresoPage />}
+                />
+                <Route
+                  path="/ingresos-almacen/:id/editar"
+                  element={<EditarIngresoPage />}
+                />
               </Route>
 
               <Route
@@ -177,6 +190,24 @@ export function AppRouter() {
                 <Route
                   path="/vales-consumo"
                   element={<ValesConsumoPage />}
+                />
+                <Route
+                  path="/vales-consumo/nuevo"
+                  element={<NuevoValePage />}
+                />
+                <Route
+                  path="/vales-consumo/:id/editar"
+                  element={<EditarValePage />}
+                />
+              </Route>
+              <Route
+                element={
+                  <RoleRoute modulo="control-almacen" />
+                }
+              >
+                <Route
+                  path="/control-almacen"
+                  element={<ControlAlmacenPage />}
                 />
               </Route>
               <Route
