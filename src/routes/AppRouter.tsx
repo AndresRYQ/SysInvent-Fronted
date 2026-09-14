@@ -37,6 +37,7 @@ import { NuevoIngresoPage } from '../pages/ingresos-almacen/NuevoIngresoPage'
 import { EditarIngresoPage } from '../pages/ingresos-almacen/EditarIngresoPage'
 import { NuevoValePage } from '../pages/vales-consumo/NuevoValePage'
 import { EditarValePage } from '../pages/vales-consumo/EditarValePage'
+import { ReporteValesPage } from '../pages/reportes/ReporteValesPage'
 
 export function AppRouter() {
   return (
@@ -136,14 +137,6 @@ export function AppRouter() {
                     <TiposDocumentoPage />
                   }
                 />
-                <Route
-                  path="/ingresos-almacen/nuevo"
-                  element={<NuevoIngresoPage />}
-                />
-                <Route
-                  path="/ingresos-almacen/:id/editar"
-                  element={<EditarIngresoPage />}
-                />
               </Route>
 
               <Route
@@ -180,6 +173,14 @@ export function AppRouter() {
                   element={
                     <IngresosAlmacenPage />
                   }
+                />
+                <Route
+                  path="/ingresos-almacen/nuevo"
+                  element={<NuevoIngresoPage />}
+                />
+                <Route
+                  path="/ingresos-almacen/:id/editar"
+                  element={<EditarIngresoPage />}
                 />
               </Route>
               <Route
@@ -219,6 +220,16 @@ export function AppRouter() {
                 <Route
                   path="/control-almacen"
                   element={<ControlAlmacenPage />}
+                />
+              </Route>
+              <Route
+                element={
+                  <RoleRoute modulo="reporte-vales" />
+                }
+              >
+                <Route
+                  path="/reportes/vales"
+                  element={<ReporteValesPage />}
                 />
               </Route>
               <Route

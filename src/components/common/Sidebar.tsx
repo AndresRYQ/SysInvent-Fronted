@@ -79,6 +79,7 @@ const SECCIONES: SidebarSection[] = [
         moduleId: 'reporte-ingresos',
       },
       {
+        to: '/reportes/vales',
         label: 'Reporte de vale',
         icon: FileText,
         moduleId: 'reporte-vales',
