@@ -1,125 +1,880 @@
-import { useState } from 'react'
 import {
-  ArrowLeft,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
+
+import {
   CalendarDays,
-  ChevronDown,
   ClipboardList,
-  Package,
+  Pencil,
   Plus,
-  Save,
+  ShieldCheck,
   Trash2,
-  UserRound,
 } from 'lucide-react'
 
-import { useAuth } from '../../hooks/useAuth'
-import './ValesConsumoPage.css'
+import {
+  useLocation,
+  useNavigate,
+} from 'react-router-dom'
+import Select from 'react-select'
 
-type ProductoVale = {
-  id: number
-  producto: string
-  stock: number
-  cantidad: number
-  unidad: string
+import { TablePagination } from '../../components/ui/TablePagination'
+
+import { obtenerCentrosCosto } from '../../services/centroCostoService'
+import { obtenerDestinos } from '../../services/destinoService'
+import { obtenerProductos } from '../../services/productoService'
+
+import {
+  anularValeConsumo,
+  calcularCantidadDetalle,
+  calcularTotalVale,
+  obtenerValesConsumo,
+} from '../../services/valeConsumoService'
+
+import type { ValeConsumo } from '../../types/valeConsumo'
+
+import '../../styles/DashboardPage.css'
+import '../../styles/maestros.css'
+
+interface FiltrosVales {
+  busqueda: string
+  centroCostoId: string
+  estado: string
+  fechaDesde: string
+  fechaHasta: string
 }
 
-const PRODUCTOS_INICIALES: ProductoVale[] = [
-  {
-    id: 1,
-    producto: 'Guantes de nitrilo reforzado',
-    stock: 240,
-    cantidad: 12,
-    unidad: 'Caja',
-  },
-]
+interface EstadoNavegacion {
+  mensaje?: string
+}
 
-const PRODUCTOS_DISPONIBLES = [
-  { nombre: 'Guantes de nitrilo reforzado', stock: 240, unidad: 'Caja' },
-  { nombre: 'Mascarilla descartable', stock: 680, unidad: 'Paquete' },
-  { nombre: 'Cinta de embalaje transparente', stock: 86, unidad: 'Rollo' },
-  { nombre: 'Lentes de seguridad', stock: 112, unidad: 'Unidad' },
-]
+interface MensajePagina {
+  tipo: 'success' | 'danger'
+  texto: string
+}
+
+const selectStyles = {
+  control: (base: any, state: any) => ({
+    ...base,
+    height: '36px',
+    minHeight: '36px',
+    borderRadius: '16px',
+    borderColor: state.isFocused
+      ? 'rgb(51 143 60 / 55%)'
+      : 'rgb(17 24 39 / 10%)',
+    backgroundColor: state.isFocused ? '#fff' : '#f9fbfa',
+    boxShadow: state.isFocused
+      ? '0 0 0 0.22rem rgb(51 143 60 / 12%)'
+      : 'none',
+    '&:hover': {
+      borderColor: 'rgb(51 143 60 / 55%)',
+    },
+  }),
+  valueContainer: (base: any) => ({ ...base, height: '34px', padding: '0 14px' }),
+  singleValue: (base: any) => ({ ...base, color: '#344054', fontSize: '0.8rem' }),
+  placeholder: (base: any) => ({ ...base, color: '#667085', fontSize: '0.8rem' }),
+  indicatorsContainer: (base: any) => ({ ...base, height: '34px' }),
+  menu: (base: any) => ({ ...base, zIndex: 20 }),
+  option: (base: any, state: any) => ({
+    ...base,
+    fontSize: '0.8rem',
+    backgroundColor: state.isSelected ? '#e9f8ee' : state.isFocused ? '#f3faf5' : '#fff',
+    color: '#344054',
+  }),
+}
+
+const FILTROS_INICIALES: FiltrosVales = {
+  busqueda: '',
+  centroCostoId: '',
+  estado: '',
+  fechaDesde: '',
+  fechaHasta: '',
+}
+
+function obtenerMensajeError(
+  error: unknown,
+): string {
+  return error instanceof Error
+    ? error.message
+    : 'OcurriÃƒÂ³ un error inesperado.'
+}
+
+function formatearFecha(
+  fecha: string,
+): string {
+  if (!fecha) {
+    return '-'
+  }
+
+  const fechaLocal = new Date(
+    `${fecha}T00:00:00`,
+  )
+
+  if (
+    Number.isNaN(fechaLocal.getTime())
+  ) {
+    return fecha
+  }
+
+  return new Intl.DateTimeFormat(
+    'es-PE',
+  ).format(fechaLocal)
+}
 
 export function ValesConsumoPage() {
-  const { sesion } = useAuth()
-  const [productos, setProductos] = useState(PRODUCTOS_INICIALES)
-  const [productoSeleccionado, setProductoSeleccionado] = useState('')
-  const [mensaje, setMensaje] = useState('')
-  const nombreCompleto = sesion?.nombreCompleto ?? 'Usuario sin sesión'
+  const navigate = useNavigate()
+  const location = useLocation()
 
-  const agregarProducto = () => {
-    const producto = PRODUCTOS_DISPONIBLES.find(
-      (item) => item.nombre === productoSeleccionado,
+  const [vales, setVales] =
+    useState<ValeConsumo[]>(
+      () => obtenerValesConsumo(),
     )
 
-    if (!producto) {
+  const [filtros, setFiltros] =
+    useState<FiltrosVales>(
+      FILTROS_INICIALES,
+    )
+
+  const [
+    filtrosAplicados,
+    setFiltrosAplicados,
+  ] = useState<FiltrosVales>(
+    FILTROS_INICIALES,
+  )
+
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] =
+    useState(10)
+
+  const [
+    valeAAnular,
+    setValeAAnular,
+  ] = useState<ValeConsumo | null>(null)
+
+  const [mensaje, setMensaje] =
+    useState<MensajePagina | null>(null)
+
+  const centrosCosto = useMemo(
+    () => obtenerCentrosCosto(),
+    [],
+  )
+
+  const destinos = useMemo(
+    () => obtenerDestinos(),
+    [],
+  )
+
+  const productos = useMemo(
+    () => obtenerProductos(),
+    [vales],
+  )
+
+  useEffect(() => {
+    const estado =
+      location.state as EstadoNavegacion | null
+
+    if (!estado?.mensaje) {
       return
     }
 
-    setProductos((actuales) => [
-      ...actuales,
-      {
-        id: Date.now(),
-        producto: producto.nombre,
-        stock: producto.stock,
-        cantidad: 1,
-        unidad: producto.unidad,
-      },
-    ])
-    setProductoSeleccionado('')
-  }
+    setMensaje({
+      tipo: 'success',
+      texto: estado.mensaje,
+    })
 
-  const actualizarCantidad = (id: number, cantidad: number) => {
-    setProductos((actuales) =>
-      actuales.map((item) =>
-        item.id === id
-          ? { ...item, cantidad: Math.max(1, Math.min(item.stock, cantidad)) }
-          : item,
-      ),
+    navigate(location.pathname, {
+      replace: true,
+      state: null,
+    })
+  }, [
+    location.pathname,
+    location.state,
+    navigate,
+  ])
+
+  const valesConDetalle = useMemo(
+    () =>
+      vales.map((vale) => {
+        const centroCosto =
+          centrosCosto.find(
+            (item) =>
+              String(item.id) === String(
+              vale.centroCostoId),
+          )
+
+        const nombresProductos =
+          vale.detalles.map(
+            (detalle) =>
+              productos.find(
+                (producto) =>
+                  String(producto.id) === String(
+                  detalle.productoId),
+              )?.nombre ??
+              'Producto no disponible',
+          )
+
+        const destinosIds = new Set(
+          vale.detalles.flatMap(
+            (detalle) =>
+              detalle.distribuciones.map(
+                (distribucion) =>
+                  distribucion.destinoId,
+              ),
+          ),
+        )
+
+        const nombresDestinos =
+          Array.from(destinosIds).map(
+            (destinoId) =>
+              destinos.find(
+                (destino) =>
+                  String(destino.id) === String(
+                  destinoId),
+              )?.nombre ??
+              'Destino no disponible',
+          )
+
+        const cantidadTotal =
+          vale.detalles.reduce(
+            (total, detalle) =>
+              total +
+              calcularCantidadDetalle(
+                detalle,
+              ),
+            0,
+          )
+
+        return {
+          ...vale,
+          centroCostoNombre:
+            centroCosto?.nombre ??
+            'Centro no disponible',
+          productosResumen:
+            nombresProductos.join(', '),
+          destinosResumen:
+            nombresDestinos.join(', '),
+          totalDestinos:
+            destinosIds.size,
+          cantidadTotal: Number(
+            cantidadTotal.toFixed(3),
+          ),
+          total: calcularTotalVale(vale),
+        }
+      }),
+    [
+      vales,
+      centrosCosto,
+      destinos,
+      productos,
+    ],
+  )
+
+  const valesFiltrados = useMemo(
+    () => {
+      const busqueda =
+        filtrosAplicados.busqueda
+          .trim()
+          .toLowerCase()
+
+      return valesConDetalle.filter(
+        (vale) => {
+          const coincideBusqueda =
+            !busqueda ||
+            vale.numeroVale
+              .toLowerCase()
+              .includes(busqueda) ||
+            vale.solicitante
+              .toLowerCase()
+              .includes(busqueda) ||
+            vale.productosResumen
+              .toLowerCase()
+              .includes(busqueda) ||
+            vale.destinosResumen
+              .toLowerCase()
+              .includes(busqueda)
+
+          const coincideCentro =
+            !filtrosAplicados.centroCostoId ||
+            vale.centroCostoId ===
+              filtrosAplicados.centroCostoId
+
+          const coincideEstado =
+            !filtrosAplicados.estado ||
+            vale.estado ===
+              filtrosAplicados.estado
+
+          const coincideDesde =
+            !filtrosAplicados.fechaDesde ||
+            vale.fechaVale >=
+              filtrosAplicados.fechaDesde
+
+          const coincideHasta =
+            !filtrosAplicados.fechaHasta ||
+            vale.fechaVale <=
+              filtrosAplicados.fechaHasta
+
+          return (
+            coincideBusqueda &&
+            coincideCentro &&
+            coincideEstado &&
+            coincideDesde &&
+            coincideHasta
+          )
+        },
+      )
+    },
+    [
+      valesConDetalle,
+      filtrosAplicados,
+    ],
+  )
+
+  const totalItems =
+    valesFiltrados.length
+
+  const valesPaginados = useMemo(
+    () => {
+      const inicio =
+        (page - 1) * pageSize
+
+      return valesFiltrados.slice(
+        inicio,
+        inicio + pageSize,
+      )
+    },
+    [
+      valesFiltrados,
+      page,
+      pageSize,
+    ],
+  )
+
+  useEffect(() => {
+    const totalPages = Math.max(
+      1,
+      Math.ceil(totalItems / pageSize),
     )
-  }
 
-  const guardarVale = () => {
-    setMensaje('Vale listo para registrar. Revisa los datos antes de confirmar.')
+    if (page > totalPages) {
+      setPage(totalPages)
+    }
+  }, [page, pageSize, totalItems])
+
+  function confirmarAnulacion(): void {
+    if (!valeAAnular) {
+      return
+    }
+
+    try {
+      const valeAnulado =
+        anularValeConsumo(
+          valeAAnular.id,
+        )
+
+      setVales(obtenerValesConsumo())
+
+      setMensaje({
+        tipo: 'success',
+        texto:
+          `Vale ${valeAnulado.numeroVale} anulado correctamente.`,
+      })
+    } catch (error) {
+      setMensaje({
+        tipo: 'danger',
+        texto: obtenerMensajeError(error),
+      })
+    } finally {
+      setValeAAnular(null)
+    }
   }
 
   return (
-    <main className="dashboard-shell voucher-shell">
-      <section className="voucher-heading">
-        <a className="back-link" href="/dashboard"><ArrowLeft size={16} /> Volver al inicio</a>
-        <div className="heading-row">
-          <div>
-            <span className="voucher-eyebrow"><ClipboardList size={15} /> Salida de almacén</span>
-            <h1>Nuevo vale de consumo</h1>
-            <p>Registra los productos que salen del almacén y asigna el costo a un centro responsable.</p>
+    <>
+      <main className="dashboard-shell maestro-page-shell vales-consumo-page">
+        <div className="container-xl px-0 maestro-page-body">
+          <section className="maestro-topbar">
+            <div className="maestro-topbar__copy">
+              <h1>Vales de consumo</h1>
+
+              <p>
+                Salidas y distribuciÃƒÂ³n de productos
+                hacia destinos y partes de equipo.
+              </p>
+            </div>
+          </section>
+
+          {mensaje && (
+            <div
+              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
+              role="alert"
+            >
+              {mensaje.texto}
+
+              <button
+                type="button"
+                className="btn-close"
+                aria-label="Cerrar"
+                onClick={() =>
+                  setMensaje(null)
+                }
+              />
+            </div>
+          )}
+
+          <div className="maestro-panel">
+            <section className="card border-0 shadow-sm">
+              <div className="card-body p-3">
+                <div className="row g-3">
+                  <div className="col-12 col-lg-4">
+                    <label
+                      className="form-label maestro-label"
+                      htmlFor="valeBusqueda"
+                    >
+                      Buscar
+                    </label>
+
+                    <input
+                      id="valeBusqueda"
+                      className="form-control maestro-control"
+                      placeholder="Buscar"
+                      value={filtros.busqueda}
+                      onChange={(event) =>
+                        setFiltros(
+                          (actual) => ({
+                            ...actual,
+                            busqueda:
+                              event.target
+                                .value,
+                          }),
+                        )
+                      }
+                    />
+                  </div>
+
+                  <div className="col-12 col-md-6 col-lg-2">
+                    <label
+                      className="form-label maestro-label"
+                      htmlFor="valeCentroFiltro"
+                    >
+                      Centro de costo
+                    </label>
+
+                    <Select
+                      inputId="valeCentroFiltro"
+                      options={centrosCosto.map((centro) => ({
+                        value: String(centro.id),
+                        label: centro.nombre,
+                      }))}
+                      value={centrosCosto
+                        .map((centro) => ({ value: String(centro.id), label: centro.nombre }))
+                        .find((option) => option.value === filtros.centroCostoId) ?? null}
+                      onChange={(option) =>
+                        setFiltros((actual) => ({
+                          ...actual,
+                          centroCostoId: option?.value ?? '',
+                        }))
+                      }
+                      placeholder="Seleccionar"
+                      isClearable
+                      isSearchable={false}
+                      styles={selectStyles}
+                    />
+                  </div>
+
+                  <div className="col-12 col-md-6 col-lg-2">
+                    <label
+                      className="form-label maestro-label"
+                      htmlFor="valeEstadoFiltro"
+                    >
+                      Estado
+                    </label>
+
+                    <Select
+                      inputId="valeEstadoFiltro"
+                      options={[
+                        { value: 'REGISTRADO', label: 'Registrado' },
+                        { value: 'ANULADO', label: 'Anulado' },
+                      ]}
+                      value={[
+                        { value: 'REGISTRADO', label: 'Registrado' },
+                        { value: 'ANULADO', label: 'Anulado' },
+                      ].find((option) => option.value === filtros.estado) ?? null}
+                      onChange={(option) =>
+                        setFiltros((actual) => ({
+                          ...actual,
+                          estado: option?.value ?? '',
+                        }))
+                      }
+                      placeholder="Seleccionar"
+                      isClearable
+                      isSearchable={false}
+                      styles={selectStyles}
+                    />
+                  </div>
+
+                  <div className="col-12 col-md-6 col-lg-2">
+                    <label
+                      className="form-label maestro-label"
+                      htmlFor="valeDesde"
+                    >
+                      Desde
+                    </label>
+
+                    <input
+                      id="valeDesde"
+                      className="form-control maestro-control"
+                      type="date"
+                      value={filtros.fechaDesde}
+                      onChange={(event) =>
+                        setFiltros(
+                          (actual) => ({
+                            ...actual,
+                            fechaDesde:
+                              event.target
+                                .value,
+                          }),
+                        )
+                      }
+                    />
+                  </div>
+
+                  <div className="col-12 col-md-6 col-lg-2">
+                    <label
+                      className="form-label maestro-label"
+                      htmlFor="valeHasta"
+                    >
+                      Hasta
+                    </label>
+
+                    <input
+                      id="valeHasta"
+                      className="form-control maestro-control"
+                      type="date"
+                      value={filtros.fechaHasta}
+                      onChange={(event) =>
+                        setFiltros(
+                          (actual) => ({
+                            ...actual,
+                            fechaHasta:
+                              event.target
+                                .value,
+                          }),
+                        )
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="d-flex justify-content-end gap-2 mt-3">
+                  <button
+                    type="button"
+                    className="btn maestro-btn-secondary"
+                    onClick={() => {
+                      setFiltros(
+                        FILTROS_INICIALES,
+                      )
+                      setFiltrosAplicados(
+                        FILTROS_INICIALES,
+                      )
+                      setPage(1)
+                    }}
+                  >
+                    Limpiar
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn maestro-btn-primary"
+                    onClick={() => {
+                      setFiltrosAplicados({
+                        ...filtros,
+                      })
+                      setPage(1)
+                    }}
+                  >
+                    Buscar
+                  </button>
+                </div>
+              </div>
+            </section>
           </div>
-          <div className="voucher-code"><span>N° de vale</span><strong>VC-2026-0087</strong><small>Borrador</small></div>
+
+          <div className="maestro-panel">
+            <section className="maestro-table-card card border-0 shadow-sm">
+              <div className="card-body p-0">
+                <div className="maestro-table-header">
+                  <span className="maestro-kicker">
+                    <ClipboardList size={16} />
+                    Listado de vales
+                  </span>
+
+                  <button
+                    type="button"
+                    className="btn maestro-toolbar-btn"
+                    onClick={() =>
+                      navigate(
+                        '/vales-consumo/nuevo',
+                      )
+                    }
+                  >
+                    <Plus size={18} />
+                    Registrar vale
+                  </button>
+                </div>
+
+                <div className="table-responsive">
+                  <table className="table maestro-table align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th>NÃƒÂºmero</th>
+                        <th>Fecha</th>
+                        <th>Centro de costo</th>
+                        <th>Solicitante</th>
+                        <th>Productos</th>
+                        <th>Destinos</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th className="text-center">
+                          Acciones
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {valesPaginados.length ===
+                      0 ? (
+                        <tr>
+                          <td colSpan={10}>
+                            <div className="maestro-empty-state">
+                              <ClipboardList
+                                size={28}
+                              />
+
+                              <p className="mb-1">
+                                No se encontraron
+                                vales
+                              </p>
+
+                              <span>
+                                Registra el primer
+                                vale de consumo.
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : (
+                        valesPaginados.map(
+                          (vale) => (
+                            <tr key={vale.id}>
+                              <td>
+                                <span className="maestro-id-chip">
+                                  {
+                                    vale.numeroVale
+                                  }
+                                </span>
+                              </td>
+
+                              <td>
+                                <CalendarDays
+                                  size={15}
+                                  className="me-1"
+                                />
+
+                                {formatearFecha(
+                                  vale.fechaVale,
+                                )}
+                              </td>
+
+                              <td>
+                                {
+                                  vale.centroCostoNombre
+                                }
+                              </td>
+
+                              <td>
+                                {vale.solicitante}
+                              </td>
+
+                              <td
+                                title={
+                                  vale.productosResumen
+                                }
+                              >
+                                {
+                                  vale.detalles
+                                    .length
+                                }{' '}
+                                producto(s)
+                              </td>
+
+                              <td
+                                title={
+                                  vale.destinosResumen
+                                }
+                              >
+                                {
+                                  vale.totalDestinos
+                                }{' '}
+                                destino(s)
+                              </td>
+
+                              <td>
+                                {
+                                  vale.cantidadTotal
+                                }
+                              </td>
+
+                              <td>
+                                S/{' '}
+                                {vale.total.toFixed(
+                                  2,
+                                )}
+                              </td>
+
+                              <td>
+                                <span
+                                  className={
+                                    vale.estado ===
+                                    'REGISTRADO'
+                                      ? 'maestro-status maestro-status--active'
+                                      : 'maestro-status maestro-status--inactive'
+                                  }
+                                >
+                                  <ShieldCheck
+                                    size={14}
+                                  />
+
+                                  {vale.estado ===
+                                  'REGISTRADO'
+                                    ? 'Registrado'
+                                    : 'Anulado'}
+                                </span>
+                              </td>
+
+                              <td>
+                                <div className="maestro-actions">
+                                  <button
+                                    type="button"
+                                    className="btn maestro-action-btn"
+                                    title="Editar"
+                                    disabled={
+                                      vale.estado ===
+                                      'ANULADO'
+                                    }
+                                    onClick={() =>
+                                      navigate(
+                                        `/vales-consumo/${vale.id}/editar`,
+                                      )
+                                    }
+                                  >
+                                    <Pencil
+                                      size={16}
+                                    />
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    className="btn maestro-action-btn maestro-action-btn--danger"
+                                    title="Anular"
+                                    disabled={
+                                      vale.estado ===
+                                      'ANULADO'
+                                    }
+                                    onClick={() =>
+                                      setValeAAnular(
+                                        vale,
+                                      )
+                                    }
+                                  >
+                                    <Trash2
+                                      size={16}
+                                    />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ),
+                        )
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                <TablePagination
+                  totalItems={totalItems}
+                  page={page}
+                  pageSize={pageSize}
+                  onPageChange={setPage}
+                  onPageSizeChange={(
+                    nuevoTamano,
+                  ) => {
+                    setPageSize(
+                      nuevoTamano,
+                    )
+                    setPage(1)
+                  }}
+                />
+              </div>
+            </section>
+          </div>
         </div>
-      </section>
+      </main>
 
-      <form className="voucher-content" onSubmit={(event) => { event.preventDefault(); guardarVale() }}>
-        <section className="voucher-card request-card">
-          <div className="card-heading"><div><span className="section-number">01</span><div><h2>Datos de la solicitud</h2><p>Información general del movimiento de almacén.</p></div></div><ClipboardList size={21} /></div>
-          <div className="field-grid">
-            <label className="field"><span>Fecha de solicitud</span><div className="input-icon"><input type="date" defaultValue="2026-08-26" required /><CalendarDays size={17} /></div></label>
-            <label className="field"><span>Solicitado por</span><div className="input-icon"><input defaultValue={nombreCompleto} required /><UserRound size={17} /></div></label>
-            <label className="field"><span>Número de guía <em>Opcional</em></span><input placeholder="Ej. G-000458" /></label>
-            <label className="field"><span>Centro de costo</span><div className="select-wrap"><select defaultValue=""><option value="" disabled>Selecciona un centro</option><option>Producción agrícola</option><option>Mantenimiento</option><option>Administración</option></select><ChevronDown size={17} /></div></label>
+      {valeAAnular && (
+        <div
+          className="maestro-modal-backdrop"
+          role="presentation"
+          onClick={() =>
+            setValeAAnular(null)
+          }
+        >
+          <div
+            className="maestro-modal-card maestro-modal-card--sm"
+            role="dialog"
+            aria-modal="true"
+            onClick={(event) =>
+              event.stopPropagation()
+            }
+          >
+            <h3 className="maestro-modal-title text-center">
+              Anular vale
+            </h3>
+
+            <p className="maestro-modal-copy text-center">
+              Las cantidades del vale se
+              devolverÃƒÂ¡n al stock:
+            </p>
+
+            <p className="maestro-delete-name">
+              {valeAAnular.numeroVale}
+            </p>
+
+            <div className="maestro-modal-footer maestro-modal-footer--center">
+              <button
+                type="button"
+                className="btn maestro-btn-secondary"
+                onClick={() =>
+                  setValeAAnular(null)
+                }
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                className="btn maestro-btn-danger"
+                onClick={
+                  confirmarAnulacion
+                }
+              >
+                Anular vale
+              </button>
+            </div>
           </div>
-          <label className="field field-full"><span>Motivo de la salida</span><textarea placeholder="Describe brevemente el uso de los productos..." rows={3} /></label>
-        </section>
-
-        <section className="voucher-card products-card">
-          <div className="card-heading"><div><span className="section-number">02</span><div><h2>Productos a retirar</h2><p>Verifica el stock disponible antes de confirmar la salida.</p></div></div><span className="stock-legend"><i /> Stock disponible</span></div>
-          <div className="product-adder">
-            <label className="field"><span>Agregar producto</span><div className="select-wrap"><select value={productoSeleccionado} onChange={(event) => setProductoSeleccionado(event.target.value)}><option value="">Busca un producto del almacén</option>{PRODUCTOS_DISPONIBLES.map((item) => <option key={item.nombre}>{item.nombre}</option>)}</select><ChevronDown size={17} /></div></label>
-            <button className="add-product" type="button" onClick={agregarProducto} disabled={!productoSeleccionado}><Plus size={17} /> Agregar producto</button>
-          </div>
-          <div className="product-table-wrap"><table className="product-table"><thead><tr><th>Producto</th><th>Stock actual</th><th>Cantidad</th><th>Unidad de medida</th><th aria-label="Acciones" /></tr></thead><tbody>{productos.map((item) => <tr key={item.id}><td><span className="product-name"><span className="product-icon"><Package size={16} /></span>{item.producto}</span></td><td><span className="stock-value">{item.stock} <small>disponibles</small></span></td><td><input className="quantity-input" type="number" min="1" max={item.stock} value={item.cantidad} onChange={(event) => actualizarCantidad(item.id, Number(event.target.value))} aria-label={`Cantidad de ${item.producto}`} /></td><td><span className="unit-chip">{item.unidad}</span></td><td><button className="remove-product" type="button" onClick={() => setProductos((actuales) => actuales.filter((producto) => producto.id !== item.id))} aria-label={`Eliminar ${item.producto}`}><Trash2 size={17} /></button></td></tr>)}</tbody></table></div>
-          <div className="table-foot"><span>{productos.length} {productos.length === 1 ? 'producto' : 'productos'} en el vale</span><strong>Total de unidades: {productos.reduce((total, item) => total + item.cantidad, 0)}</strong></div>
-        </section>
-
-        <div className="voucher-actions"><span className="form-message" role="status">{mensaje}</span><a className="cancel-button" href="/dashboard">Cancelar</a><button className="save-button" type="submit"><Save size={18} /> Guardar vale</button></div>
-      </form>
-    </main>
+        </div>
+      )}
+    </>
   )
 }

@@ -131,6 +131,14 @@ export function AppRouter() {
                     <TiposDocumentoPage />
                   }
                 />
+                <Route
+                  path="/ingresos-almacen/nuevo"
+                  element={<NuevoIngresoPage />}
+                />
+                <Route
+                  path="/ingresos-almacen/:id/editar"
+                  element={<EditarIngresoPage />}
+                />
               </Route>
 
               <Route
@@ -188,6 +196,24 @@ export function AppRouter() {
                 <Route
                   path="/vales-consumo"
                   element={<ValesConsumoPage />}
+                />
+                <Route
+                  path="/vales-consumo/nuevo"
+                  element={<NuevoValePage />}
+                />
+                <Route
+                  path="/vales-consumo/:id/editar"
+                  element={<EditarValePage />}
+                />
+              </Route>
+              <Route
+                element={
+                  <RoleRoute modulo="control-almacen" />
+                }
+              >
+                <Route
+                  path="/control-almacen"
+                  element={<ControlAlmacenPage />}
                 />
               </Route>
               <Route

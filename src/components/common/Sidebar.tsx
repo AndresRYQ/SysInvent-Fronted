@@ -50,6 +50,7 @@ const SECCIONES: SidebarSection[] = [
     label: 'Inventario',
     items: [
       {
+        to: '/control-almacen',
         label: 'Control de almacén',
         icon: Archive,
         moduleId: 'control-almacen',
