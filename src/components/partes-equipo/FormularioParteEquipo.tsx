@@ -231,7 +231,7 @@ export function FormularioParteEquipo({
 
                 <input
                   id="parteEquipoCodigo"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.codigo
                       ? ' maestro-control--error'
                       : ''
@@ -277,7 +277,7 @@ export function FormularioParteEquipo({
 
                 <input
                   id="parteEquipoNombre"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.nombre
                       ? ' maestro-control--error'
                       : ''
@@ -322,7 +322,7 @@ export function FormularioParteEquipo({
 
                 <textarea
                   id="parteEquipoDescripcion"
-                  className={`form-control maestro-control maestro-control--textarea${
+                  className={`form-control${
                     errores.descripcion
                       ? ' maestro-control--error'
                       : ''
@@ -399,3 +399,5 @@ export function FormularioParteEquipo({
     </div>
   )
 }
+
+

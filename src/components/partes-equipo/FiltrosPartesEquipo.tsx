@@ -49,7 +49,7 @@ export function FiltrosPartesEquipo({
 
             <input
               id="buscarParteEquipo"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.busqueda}
               placeholder="Buscar"
@@ -102,3 +102,5 @@ export function FiltrosPartesEquipo({
     </section>
   )
 }
+
+

@@ -10,9 +10,10 @@ export function Select({ id: providedId, label, hint, error, options, className 
   const generatedId = useId()
   const id = providedId ?? generatedId
   return <FormField id={id} label={label} hint={hint} error={error}>
-    <select {...props} id={id} className={`form-select maestro-control ${error ? 'is-invalid' : ''} ${className}`}
+    <select {...props} id={id} className={`form-select ${error ? 'is-invalid' : ''} ${className}`}
       aria-invalid={error ? true : props['aria-invalid']} aria-describedby={fieldDescription(id, hint, error, describedBy)}>
       {options.map((option) => <option key={option.value} value={option.value} disabled={option.disabled}>{option.label}</option>)}
     </select>
   </FormField>
 }
+

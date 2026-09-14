@@ -370,7 +370,7 @@ export function ControlAlmacenPage() {
                     </label>
 
                     <input
-                      className="form-control maestro-control"
+                      className="form-control"
                       placeholder="Código, producto o proveedor"
                       value={filtros.busqueda}
                       onChange={(event) =>
@@ -392,7 +392,7 @@ export function ControlAlmacenPage() {
                     </label>
 
                     <select
-                      className="form-select maestro-control"
+                      className="form-select"
                       value={
                         filtros.tipoProductoId
                       }
@@ -430,7 +430,7 @@ export function ControlAlmacenPage() {
                     </label>
 
                     <select
-                      className="form-select maestro-control"
+                      className="form-select"
                       value={
                         filtros.categoriaId
                       }
@@ -472,7 +472,7 @@ export function ControlAlmacenPage() {
                     </label>
 
                     <select
-                      className="form-select maestro-control"
+                      className="form-select"
                       value={
                         filtros.estadoStock
                       }
@@ -505,7 +505,7 @@ export function ControlAlmacenPage() {
                     </label>
 
                     <input
-                      className="form-control maestro-control"
+                      className="form-control"
                       type="date"
                       value={filtros.fechaDesde}
                       onChange={(event) =>
@@ -527,7 +527,7 @@ export function ControlAlmacenPage() {
                     </label>
 
                     <input
-                      className="form-control maestro-control"
+                      className="form-control"
                       type="date"
                       value={filtros.fechaHasta}
                       onChange={(event) =>
@@ -777,6 +777,8 @@ export function ControlAlmacenPage() {
     </>
   )
 }
+
+
 
 
 

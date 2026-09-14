@@ -631,7 +631,7 @@ export function ValeConsumoForm({
 
           <input
             id="valeFecha"
-            className="form-control maestro-control"
+            className="form-control"
             type="date"
             value={fechaVale}
             onChange={(event) =>
@@ -652,7 +652,7 @@ export function ValeConsumoForm({
 
           <select
             id="valeCentroCosto"
-            className="form-select maestro-control"
+            className="form-select"
             value={centroCostoId}
             onChange={(event) =>
               setCentroCostoId(
@@ -692,7 +692,7 @@ export function ValeConsumoForm({
 
           <input
             id="valeSolicitante"
-            className="form-control maestro-control"
+            className="form-control"
             maxLength={120}
             value={solicitante}
             onChange={(event) =>
@@ -713,7 +713,7 @@ export function ValeConsumoForm({
 
           <textarea
             id="valeMotivo"
-            className="form-control maestro-control"
+            className="form-control"
             rows={3}
             maxLength={500}
             value={motivo}
@@ -739,7 +739,7 @@ export function ValeConsumoForm({
           </label>
 
           <select
-            className="form-select maestro-control"
+            className="form-select"
             value={borrador.tipoProductoId}
             onChange={(event) =>
               cambiarTipoProducto(
@@ -770,7 +770,7 @@ export function ValeConsumoForm({
           </label>
 
           <select
-            className="form-select maestro-control"
+            className="form-select"
             value={borrador.productoId}
             disabled={
               !borrador.tipoProductoId
@@ -805,7 +805,7 @@ export function ValeConsumoForm({
           </label>
 
           <input
-            className="form-control maestro-control"
+            className="form-control"
             readOnly
             value={
               productoSeleccionado
@@ -824,7 +824,7 @@ export function ValeConsumoForm({
           </label>
 
           <select
-            className="form-select maestro-control"
+            className="form-select"
             value={borrador.destinoId}
             disabled={!borrador.productoId}
             onChange={(event) =>
@@ -861,7 +861,7 @@ export function ValeConsumoForm({
           </label>
 
           <select
-            className="form-select maestro-control"
+            className="form-select"
             value={borrador.parteEquipoId}
             disabled={!borrador.productoId}
             onChange={(event) =>
@@ -896,7 +896,7 @@ export function ValeConsumoForm({
           </label>
 
           <input
-            className="form-control maestro-control"
+            className="form-control"
             type="number"
             min="0.001"
             step="0.001"
@@ -1165,6 +1165,8 @@ export function ValeConsumoForm({
     </form>
   )
 }
+
+
 
 
 

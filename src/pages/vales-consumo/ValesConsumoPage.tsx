@@ -436,7 +436,7 @@ export function ValesConsumoPage() {
 
                     <input
                       id="valeBusqueda"
-                      className="form-control maestro-control"
+                      className="form-control"
                       placeholder="Buscar"
                       value={filtros.busqueda}
                       onChange={(event) =>
@@ -523,7 +523,7 @@ export function ValesConsumoPage() {
 
                     <input
                       id="valeDesde"
-                      className="form-control maestro-control"
+                      className="form-control"
                       type="date"
                       value={filtros.fechaDesde}
                       onChange={(event) =>
@@ -549,7 +549,7 @@ export function ValesConsumoPage() {
 
                     <input
                       id="valeHasta"
-                      className="form-control maestro-control"
+                      className="form-control"
                       type="date"
                       value={filtros.fechaHasta}
                       onChange={(event) =>
@@ -878,4 +878,6 @@ export function ValesConsumoPage() {
     </>
   )
 }
+
+
 

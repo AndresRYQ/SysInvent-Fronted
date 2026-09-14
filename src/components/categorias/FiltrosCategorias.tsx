@@ -42,7 +42,7 @@ export function FiltrosCategorias({
 
             <input
               id="nombreCategoria"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.nombre}
               placeholder="Buscar"
@@ -93,4 +93,6 @@ export function FiltrosCategorias({
     </section>
   )
 }
+
+
 

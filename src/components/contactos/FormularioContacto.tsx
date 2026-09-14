@@ -334,7 +334,7 @@ export function FormularioContacto({
 
                 <input
                   id="contactoNombre"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.nombreCompleto
                       ? ' maestro-control--error'
                       : ''
@@ -383,7 +383,7 @@ export function FormularioContacto({
 
                 <input
                   id="contactoCargo"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.cargo
                       ? ' maestro-control--error'
                       : ''
@@ -428,7 +428,7 @@ export function FormularioContacto({
 
                 <input
                   id="contactoTelefono"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.telefono
                       ? ' maestro-control--error'
                       : ''
@@ -473,7 +473,7 @@ export function FormularioContacto({
 
                 <input
                   id="contactoCorreo"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.correo
                       ? ' maestro-control--error'
                       : ''
@@ -535,3 +535,5 @@ export function FormularioContacto({
     </div>
   )
 }
+
+

@@ -9,7 +9,8 @@ export function Input({ id: providedId, label, hint, error, className = '', 'ari
   const generatedId = useId()
   const id = providedId ?? generatedId
   return <FormField id={id} label={label} hint={hint} error={error}>
-    <input {...props} id={id} className={`form-control maestro-control ${error ? 'is-invalid' : ''} ${className}`}
+    <input {...props} id={id} className={`form-control ${error ? 'is-invalid' : ''} ${className}`}
       aria-invalid={error ? true : props['aria-invalid']} aria-describedby={fieldDescription(id, hint, error, describedBy)} />
   </FormField>
 }
+

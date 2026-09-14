@@ -397,7 +397,7 @@ export function FormularioProducto({
 
             <input
               id="productoCodigo"
-              className={`form-control maestro-control${
+              className={`form-control${
                 errores.codigo
                   ? ' maestro-control--error'
                   : ''
@@ -441,7 +441,7 @@ export function FormularioProducto({
 
             <input
               id="productoNombre"
-              className={`form-control maestro-control${
+              className={`form-control${
                 errores.nombre
                   ? ' maestro-control--error'
                   : ''
@@ -660,7 +660,7 @@ export function FormularioProducto({
 
             <input
               id="productoStockMinimo"
-              className={`form-control maestro-control${
+              className={`form-control${
                 errores.stockMinimo
                   ? ' maestro-control--error'
                   : ''
@@ -707,7 +707,7 @@ export function FormularioProducto({
 
               <input
                 id="productoPrecio"
-                className={`form-control maestro-control${
+                className={`form-control${
                   errores.precioUnitario
                     ? ' maestro-control--error'
                     : ''
@@ -748,7 +748,7 @@ export function FormularioProducto({
               </label>
 
               <input
-                className="form-control maestro-control"
+                className="form-control"
                 value={producto.stockActual}
                 readOnly
               />
@@ -770,7 +770,7 @@ export function FormularioProducto({
 
             <textarea
               id="productoDescripcion"
-              className={`form-control maestro-control maestro-control--textarea${
+              className={`form-control${
                 errores.descripcion
                   ? ' maestro-control--error'
                   : ''
@@ -877,3 +877,5 @@ const estilosSelect = (tieneError: boolean) => ({
     color: state.isSelected ? '#fff' : '#212529',
   }),
 })
+
+

@@ -428,7 +428,7 @@ export function IngresosAlmacenPage() {
 
                     <input
                       id="ingresoBusqueda"
-                      className="form-control maestro-control"
+                      className="form-control"
                       placeholder="Ingreso, documento, proveedor o producto"
                       value={filtros.busqueda}
                       onChange={(event) =>
@@ -454,7 +454,7 @@ export function IngresosAlmacenPage() {
 
                     <select
                       id="ingresoProveedorFiltro"
-                      className="form-select maestro-control"
+                      className="form-select"
                       value={
                         filtros.proveedorId
                       }
@@ -502,7 +502,7 @@ export function IngresosAlmacenPage() {
 
                     <select
                       id="ingresoEstadoFiltro"
-                      className="form-select maestro-control"
+                      className="form-select"
                       value={filtros.estado}
                       onChange={(event) =>
                         setFiltros(
@@ -537,7 +537,7 @@ export function IngresosAlmacenPage() {
 
                     <input
                       id="ingresoDesde"
-                      className="form-control maestro-control"
+                      className="form-control"
                       type="date"
                       value={filtros.fechaDesde}
                       onChange={(event) =>
@@ -563,7 +563,7 @@ export function IngresosAlmacenPage() {
 
                     <input
                       id="ingresoHasta"
-                      className="form-control maestro-control"
+                      className="form-control"
                       type="date"
                       value={filtros.fechaHasta}
                       onChange={(event) =>
@@ -895,6 +895,8 @@ export function IngresosAlmacenPage() {
     </>
   )
 }
+
+
 
 
 

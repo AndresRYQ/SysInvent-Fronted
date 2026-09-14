@@ -53,7 +53,7 @@ export function FiltrosProveedores({
 
             <input
               id="buscarProveedor"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.busqueda}
               placeholder="Buscar"
@@ -106,3 +106,5 @@ export function FiltrosProveedores({
     </section>
   )
 }
+
+

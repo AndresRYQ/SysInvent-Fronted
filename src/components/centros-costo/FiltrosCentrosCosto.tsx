@@ -47,7 +47,7 @@ export function FiltrosCentrosCosto({
 
             <input
               id="nombreCentroCosto"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.nombre}
               placeholder="Buscar"
@@ -161,4 +161,5 @@ export function FiltrosCentrosCosto({
     </section>
   )
 }
+
 

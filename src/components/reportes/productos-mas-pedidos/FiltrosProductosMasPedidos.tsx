@@ -63,7 +63,7 @@ export function FiltrosProductosMasPedidos({
             <input
               id="buscarProductoPedido"
               type="search"
-              className="form-control maestro-control"
+              className="form-control"
               value={valores.busqueda}
               placeholder="Código, producto, tipo o categoría"
               onChange={(event) =>
@@ -86,7 +86,7 @@ export function FiltrosProductosMasPedidos({
             <input
               id="productoPedidoDesde"
               type="date"
-              className="form-control maestro-control"
+              className="form-control"
               value={valores.fechaDesde}
               max={
                 valores.fechaHasta ||
@@ -112,7 +112,7 @@ export function FiltrosProductosMasPedidos({
             <input
               id="productoPedidoHasta"
               type="date"
-              className="form-control maestro-control"
+              className="form-control"
               value={valores.fechaHasta}
               min={
                 valores.fechaDesde ||
@@ -137,7 +137,7 @@ export function FiltrosProductosMasPedidos({
 
             <select
               id="productoPedidoTipo"
-              className="form-select maestro-control"
+              className="form-select"
               value={
                 valores.tipoProductoId
               }
@@ -173,7 +173,7 @@ export function FiltrosProductosMasPedidos({
 
             <select
               id="productoPedidoCategoria"
-              className="form-select maestro-control"
+              className="form-select"
               value={valores.categoriaId}
               onChange={(event) =>
                 onChange(
@@ -209,7 +209,7 @@ export function FiltrosProductosMasPedidos({
 
             <select
               id="productoPedidoDestino"
-              className="form-select maestro-control"
+              className="form-select"
               value={valores.destinoId}
               onChange={(event) =>
                 onChange(
@@ -258,4 +258,6 @@ export function FiltrosProductosMasPedidos({
     </section>
   )
 }
+
+
 

@@ -49,7 +49,7 @@ export function FiltrosUsuarios({
 
             <input
               id="busquedaUsuario"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.busqueda}
               placeholder="Ej. admin o Administrador del Sistema"
@@ -69,7 +69,7 @@ export function FiltrosUsuarios({
             >
               <select
                 id="rolUsuario"
-                className="form-select maestro-control maestro-select-control"
+                className="form-select maestro-select-control"
                 value={valores.rol}
                 onMouseDown={() => setRolAbierto(true)}
                 onKeyDown={() => setRolAbierto(true)}
@@ -104,7 +104,7 @@ export function FiltrosUsuarios({
             >
               <select
                 id="estadoUsuario"
-                className="form-select maestro-control maestro-select-control"
+                className="form-select maestro-select-control"
                 value={valores.estado}
                 onMouseDown={() => setEstadoAbierto(true)}
                 onKeyDown={() => setEstadoAbierto(true)}
@@ -151,4 +151,5 @@ export function FiltrosUsuarios({
     </section>
   )
 }
+
 

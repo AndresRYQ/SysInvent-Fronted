@@ -42,7 +42,7 @@ export function FiltrosTiposProducto({
 
             <input
               id="nombreTipoProducto"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.nombre}
               placeholder="Buscar"
@@ -65,7 +65,7 @@ export function FiltrosTiposProducto({
             {/*
               <select
                 id="estadoTipoProducto"
-                className="form-select maestro-control maestro-select-control"
+                className="form-select maestro-select-control"
                 value={valores.estado}
                 onMouseDown={() => setEstadoAbierto(true)}
                 onKeyDown={() => setEstadoAbierto(true)}
@@ -113,3 +113,4 @@ export function FiltrosTiposProducto({
     </section>
   )
 }
+

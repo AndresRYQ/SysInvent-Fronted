@@ -192,7 +192,7 @@ export function FormularioProveedor({
 
             <input
               id="proveedorRuc"
-              className={`form-control maestro-control${
+              className={`form-control${
                 errores.ruc
                   ? ' maestro-control--error'
                   : ''
@@ -245,7 +245,7 @@ export function FormularioProveedor({
 
             <input
               id="proveedorRazonSocial"
-              className={`form-control maestro-control${
+              className={`form-control${
                 errores.razonSocial
                   ? ' maestro-control--error'
                   : ''
@@ -291,7 +291,7 @@ export function FormularioProveedor({
 
             <input
               id="proveedorCorreo"
-              className={`form-control maestro-control${
+              className={`form-control${
                 errores.correo
                   ? ' maestro-control--error'
                   : ''
@@ -336,7 +336,7 @@ export function FormularioProveedor({
 
             <input
               id="proveedorTelefono"
-              className={`form-control maestro-control${
+              className={`form-control${
                 errores.telefono
                   ? ' maestro-control--error'
                   : ''
@@ -385,7 +385,7 @@ export function FormularioProveedor({
 
             <textarea
               id="proveedorDireccion"
-              className={`form-control maestro-control maestro-control--textarea${
+              className={`form-control${
                 errores.direccion
                   ? ' maestro-control--error'
                   : ''
@@ -464,3 +464,5 @@ function permitirSoloNumeros(event: KeyboardEvent<HTMLInputElement>): void {
     event.preventDefault()
   }
 }
+
+

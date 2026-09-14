@@ -108,7 +108,7 @@ export function FiltrosReporteIngresos({
             <input
               id="buscarReporteIngreso"
               type="search"
-              className="form-control maestro-control"
+              className="form-control"
               value={valores.busqueda}
               placeholder="Ingreso, documento, proveedor o producto"
               onChange={(event) =>
@@ -131,7 +131,7 @@ export function FiltrosReporteIngresos({
             <input
               id="reporteIngresoDesde"
               type="date"
-              className="form-control maestro-control"
+              className="form-control"
               value={valores.fechaDesde}
               max={valores.fechaHasta || undefined}
               onChange={(event) =>
@@ -154,7 +154,7 @@ export function FiltrosReporteIngresos({
             <input
               id="reporteIngresoHasta"
               type="date"
-              className="form-control maestro-control"
+              className="form-control"
               value={valores.fechaHasta}
               min={valores.fechaDesde || undefined}
               onChange={(event) =>
@@ -176,7 +176,7 @@ export function FiltrosReporteIngresos({
 
             <select
               id="reporteIngresoProveedor"
-              className="form-select maestro-control"
+              className="form-select"
               value={valores.proveedorId}
               onChange={(event) =>
                 onChange(
@@ -212,7 +212,7 @@ export function FiltrosReporteIngresos({
 
             <select
               id="reporteIngresoTipo"
-              className="form-select maestro-control"
+              className="form-select"
               value={valores.tipoProductoId}
               onChange={(event) =>
                 cambiarTipoProducto(
@@ -245,7 +245,7 @@ export function FiltrosReporteIngresos({
 
             <select
               id="reporteIngresoProducto"
-              className="form-select maestro-control"
+              className="form-select"
               value={valores.productoId}
               onChange={(event) =>
                 onChange(
@@ -282,7 +282,7 @@ export function FiltrosReporteIngresos({
 
             <select
               id="reporteIngresoEstado"
-              className="form-select maestro-control"
+              className="form-select"
               value={valores.estado}
               onChange={(event) =>
                 onChange(
@@ -330,5 +330,7 @@ export function FiltrosReporteIngresos({
     </section>
   )
 }
+
+
 
 

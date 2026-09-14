@@ -93,7 +93,7 @@ export function FiltrosBitacora({
 
             <input
               id="buscarBitacora"
-              className="form-control maestro-control"
+              className="form-control"
               value={valores.busqueda}
               placeholder="Buscar registro"
               onChange={(event) =>
@@ -115,7 +115,7 @@ export function FiltrosBitacora({
 
             <select
               id="moduloBitacora"
-              className="form-select maestro-control"
+              className="form-select"
               value={valores.modulo}
               onChange={(event) =>
                 onChange(
@@ -147,7 +147,7 @@ export function FiltrosBitacora({
 
             <select
               id="accionBitacora"
-              className="form-select maestro-control"
+              className="form-select"
               value={valores.accion}
               onChange={(event) =>
                 onChange(
@@ -179,7 +179,7 @@ export function FiltrosBitacora({
 
             <input
               id="fechaDesdeBitacora"
-              className="form-control maestro-control"
+              className="form-control"
               type="date"
               value={valores.fechaDesde}
               onChange={(event) =>
@@ -201,7 +201,7 @@ export function FiltrosBitacora({
 
             <input
               id="fechaHastaBitacora"
-              className="form-control maestro-control"
+              className="form-control"
               type="date"
               value={valores.fechaHasta}
               onChange={(event) =>
@@ -238,3 +238,4 @@ export function FiltrosBitacora({
     </section>
   )
 }
+

@@ -496,7 +496,7 @@ export function IngresoAlmacenForm({
 
           <input
             id="ingresoFecha"
-            className="form-control maestro-control"
+            className="form-control"
             type="date"
             value={fechaIngreso}
             onChange={(event) =>
@@ -517,7 +517,7 @@ export function IngresoAlmacenForm({
 
           <select
             id="ingresoProveedor"
-            className="form-select maestro-control"
+            className="form-select"
             value={proveedorId}
             onChange={(event) =>
               cambiarProveedor(
@@ -557,7 +557,7 @@ export function IngresoAlmacenForm({
 
           <select
             id="ingresoContacto"
-            className="form-select maestro-control"
+            className="form-select"
             value={contactoId}
             disabled={!proveedorId}
             onChange={(event) =>
@@ -593,7 +593,7 @@ export function IngresoAlmacenForm({
 
           <select
             id="ingresoTipoDocumento"
-            className="form-select maestro-control"
+            className="form-select"
             value={tipoDocumentoId}
             onChange={(event) =>
               setTipoComprobanteId(
@@ -633,7 +633,7 @@ export function IngresoAlmacenForm({
 
           <input
             id="ingresoNumeroDocumento"
-            className="form-control maestro-control"
+            className="form-control"
             type="text"
             maxLength={50}
             value={numeroDocumento}
@@ -655,7 +655,7 @@ export function IngresoAlmacenForm({
 
           <textarea
             id="ingresoObservacion"
-            className="form-control maestro-control"
+            className="form-control"
             rows={3}
             maxLength={500}
             value={observacion}
@@ -685,7 +685,7 @@ export function IngresoAlmacenForm({
 
           <select
             id="detalleTipoProducto"
-            className="form-select maestro-control"
+            className="form-select"
             value={detalle.tipoProductoId}
             disabled={!proveedorId}
             onChange={(event) =>
@@ -721,7 +721,7 @@ export function IngresoAlmacenForm({
 
           <select
             id="detalleProducto"
-            className="form-select maestro-control"
+            className="form-select"
             value={detalle.productoId}
             disabled={
               !proveedorId ||
@@ -761,7 +761,7 @@ export function IngresoAlmacenForm({
 
           <input
             id="detalleUnidad"
-            className="form-control maestro-control"
+            className="form-control"
             value={
               unidadSeleccionada?.nombre ?? ''
             }
@@ -780,7 +780,7 @@ export function IngresoAlmacenForm({
 
           <input
             id="detalleCantidad"
-            className="form-control maestro-control"
+            className="form-control"
             type="number"
             min="0.001"
             step="0.001"
@@ -805,7 +805,7 @@ export function IngresoAlmacenForm({
 
           <input
             id="detallePrecio"
-            className="form-control maestro-control"
+            className="form-control"
             type="number"
             min="0"
             step="0.01"
@@ -972,6 +972,8 @@ export function IngresoAlmacenForm({
     </form>
   )
 }
+
+
 
 
 

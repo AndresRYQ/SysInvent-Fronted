@@ -63,12 +63,12 @@ export function CategoriaFormModal({ abierto, categoria, error, soloLectura = fa
             {error && <div className="alert alert-danger py-2" role="alert">{error}</div>}
             <div className="mb-3">
               <label className="form-label maestro-label" htmlFor="categoriaNombreModal">Nombre de la categoría{!soloLectura && <span className="maestro-required">*</span>}</label>
-              <input id="categoriaNombreModal" className={`form-control maestro-control${errores.nombre ? ' maestro-control--error' : ''}`} value={form.nombre} placeholder="Ingresar" disabled={soloLectura} maxLength={80} onChange={(event) => actualizar('nombre', event.target.value)} />
+              <input id="categoriaNombreModal" className={`form-control${errores.nombre ? ' maestro-control--error' : ''}`} value={form.nombre} placeholder="Ingresar" disabled={soloLectura} maxLength={80} onChange={(event) => actualizar('nombre', event.target.value)} />
               {errores.nombre && <div className="maestro-field-error">{errores.nombre}</div>}
             </div>
             <div>
               <label className="form-label maestro-label" htmlFor="categoriaDescripcionModal">Descripción{!soloLectura && <span className="maestro-required">*</span>}</label>
-              <textarea id="categoriaDescripcionModal" className={`form-control maestro-control maestro-control--textarea${errores.descripcion ? ' maestro-control--error' : ''}`} value={form.descripcion} placeholder="Ingresar" disabled={soloLectura} maxLength={200} rows={2} onChange={(event) => actualizar('descripcion', event.target.value)} />
+              <textarea id="categoriaDescripcionModal" className={`form-control${errores.descripcion ? ' maestro-control--error' : ''}`} value={form.descripcion} placeholder="Ingresar" disabled={soloLectura} maxLength={200} rows={2} onChange={(event) => actualizar('descripcion', event.target.value)} />
               <div className="d-flex justify-content-between">
                 <div>{errores.descripcion && <span className="maestro-field-error">{errores.descripcion}</span>}</div>
                 <small className="text-muted">{form.descripcion.length}/200</small>
@@ -84,3 +84,5 @@ export function CategoriaFormModal({ abierto, categoria, error, soloLectura = fa
     </div>
   )
 }
+
+

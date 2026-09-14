@@ -101,32 +101,6 @@
   font-weight: 700;
 }
 
-.maestro-control {
-  min-height: var(--form-control-height, 36px);
-  height: var(--form-control-height, 36px);
-  border: 1px solid rgb(17 24 39 / 10%);
-  border-radius: 16px;
-  background: #f9fbfa;
-  box-shadow: none !important;
-  transition:
-    border-color 180ms ease,
-    transform 180ms ease,
-    box-shadow 180ms ease;
-}
-
-.maestro-control:focus {
-  border-color: rgb(51 143 60 / 55%);
-  background: #fff;
-  box-shadow:
-    0 0 0 0.22rem rgb(51 143 60 / 12%) !important;
-  transform: translateY(-1px);
-}
-
-.maestro-control--textarea {
-  height: auto;
-  resize: vertical;
-}
-
 .maestro-btn-primary,
 .maestro-btn-secondary,
 .maestro-btn-danger {
@@ -516,19 +490,6 @@
   font-size: 0.8rem;
 }
 
-.maestro-modal-body .maestro-control {
-  min-height: 36px;
-  height: 36px;
-  padding-top: 0.35rem;
-  padding-bottom: 0.35rem;
-  font-size: 0.8rem;
-  border-radius: 8px;
-}
-
-.maestro-modal-body .maestro-control--textarea {
-  height: auto;
-}
-
 .maestro-required {
   margin-left: 2px;
   color: #b42318;
@@ -737,15 +698,6 @@
 
 .maestro-filter-card .maestro-label {
   font-size: 0.8rem;
-}
-
-.maestro-filter-card .maestro-control {
-  min-height: 36px;
-  height: 36px;
-  font-size: 0.8rem;
-  padding-top: 0.35rem;
-  padding-bottom: 0.35rem;
-  border-radius: 8px;
 }
 
 .maestro-filter-card .maestro-btn-primary,

@@ -164,7 +164,7 @@ export function FormularioRol({
 
               <input
                 id="rolNombre"
-                className="form-control maestro-control"
+                className="form-control"
                 value={datos.nombre}
                 maxLength={60}
                 onChange={(evento) =>
@@ -187,7 +187,7 @@ export function FormularioRol({
 
               <select
                 id="rolEstado"
-                className="form-select maestro-control"
+                className="form-select"
                 value={
                   datos.estado
                     ? 'activo'
@@ -224,7 +224,7 @@ export function FormularioRol({
 
               <textarea
                 id="rolDescripcion"
-                className="form-control maestro-control maestro-control--textarea"
+                className="form-control"
                 rows={3}
                 maxLength={200}
                 value={datos.descripcion}
@@ -323,3 +323,4 @@ export function FormularioRol({
     </div>
   )
 }
+

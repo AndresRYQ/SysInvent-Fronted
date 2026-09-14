@@ -144,7 +144,7 @@ export function FormularioUsuario({
 
                 <input
                   id="usuarioNombre"
-                  className="form-control maestro-control"
+                  className="form-control"
                   value={datos.usuario}
                   maxLength={50}
                   autoComplete="username"
@@ -172,7 +172,7 @@ export function FormularioUsuario({
 
               <input
                 id="usuarioNombreCompleto"
-                className="form-control maestro-control"
+                className="form-control"
                 value={datos.nombreCompleto}
                 maxLength={100}
                 onChange={(evento) =>
@@ -198,7 +198,7 @@ export function FormularioUsuario({
 
               <input
                 id="usuarioEmail"
-                className="form-control maestro-control"
+                className="form-control"
                 type="email"
                 value={datos.email}
                 maxLength={120}
@@ -226,7 +226,7 @@ export function FormularioUsuario({
 
               <select
                 id="usuarioRol"
-                className="form-select maestro-control"
+                className="form-select"
                 value={datos.rol}
                 onChange={(evento) =>
                   setDatos((actual) => ({
@@ -266,7 +266,7 @@ export function FormularioUsuario({
 
               <input
                 id="usuarioContrasena"
-                className="form-control maestro-control"
+                className="form-control"
                 type="password"
                 value={datos.contrasena}
                 minLength={6}
@@ -297,7 +297,7 @@ export function FormularioUsuario({
 
               <select
                 id="usuarioEstado"
-                className="form-select maestro-control"
+                className="form-select"
                 value={
                   datos.estado
                     ? 'activo'
@@ -344,3 +344,4 @@ export function FormularioUsuario({
     </div>
   )
 }
+
