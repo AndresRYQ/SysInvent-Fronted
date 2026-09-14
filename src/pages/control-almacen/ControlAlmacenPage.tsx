@@ -365,7 +365,7 @@ export function ControlAlmacenPage() {
 
                 <div className="row g-3">
                   <div className="col-12 col-lg-4">
-                    <label className="form-label maestro-label">
+                    <label className="form-label">
                       Producto
                     </label>
 
@@ -387,7 +387,7 @@ export function ControlAlmacenPage() {
                   </div>
 
                   <div className="col-12 col-md-4 col-lg-2">
-                    <label className="form-label maestro-label">
+                    <label className="form-label">
                       Tipo
                     </label>
 
@@ -425,7 +425,7 @@ export function ControlAlmacenPage() {
                   </div>
 
                   <div className="col-12 col-md-4 col-lg-2">
-                    <label className="form-label maestro-label">
+                    <label className="form-label">
                       Categoría
                     </label>
 
@@ -467,7 +467,7 @@ export function ControlAlmacenPage() {
                   </div>
 
                   <div className="col-12 col-md-4 col-lg-2">
-                    <label className="form-label maestro-label">
+                    <label className="form-label">
                       Estado
                     </label>
 
@@ -500,7 +500,7 @@ export function ControlAlmacenPage() {
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2">
-                    <label className="form-label maestro-label">
+                    <label className="form-label">
                       Desde
                     </label>
 
@@ -522,7 +522,7 @@ export function ControlAlmacenPage() {
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2 ms-lg-auto">
-                    <label className="form-label maestro-label">
+                    <label className="form-label">
                       Hasta
                     </label>
 
@@ -777,8 +777,6 @@ export function ControlAlmacenPage() {
     </>
   )
 }
-
-
 
 
 

@@ -54,7 +54,7 @@ export function FiltrosProductosMasPedidos({
         >
           <div className="col-12 col-xl-6">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="buscarProductoPedido"
             >
               Buscar producto
@@ -77,7 +77,7 @@ export function FiltrosProductosMasPedidos({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPedidoDesde"
             >
               Fecha desde
@@ -103,7 +103,7 @@ export function FiltrosProductosMasPedidos({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPedidoHasta"
             >
               Fecha hasta
@@ -129,7 +129,7 @@ export function FiltrosProductosMasPedidos({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPedidoTipo"
             >
               Tipo de producto
@@ -165,7 +165,7 @@ export function FiltrosProductosMasPedidos({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPedidoCategoria"
             >
               Categoría
@@ -201,7 +201,7 @@ export function FiltrosProductosMasPedidos({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPedidoDestino"
             >
               Destino
@@ -258,6 +258,4 @@ export function FiltrosProductosMasPedidos({
     </section>
   )
 }
-
-
 

@@ -41,7 +41,7 @@ export function FiltrosPartesEquipo({
         >
           <div className="col-12 col-lg-8">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="buscarParteEquipo"
             >
               Código o nombre
@@ -64,7 +64,7 @@ export function FiltrosPartesEquipo({
 
           <div className="col-12 col-lg-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="estadoParteEquipo"
             >
               Estado
@@ -102,5 +102,3 @@ export function FiltrosPartesEquipo({
     </section>
   )
 }
-
-

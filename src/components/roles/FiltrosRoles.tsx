@@ -35,7 +35,7 @@ export function FiltrosRoles({
 
         <div className="row g-3">
           <div className="col-12 col-lg-8">
-            <label className="form-label maestro-label" htmlFor="busquedaRol">
+            <label className="form-label" htmlFor="busquedaRol">
               Buscar rol
             </label>
 
@@ -50,7 +50,7 @@ export function FiltrosRoles({
           </div>
 
           <div className="col-12 col-md-6 col-lg-4">
-            <label className="form-label maestro-label" htmlFor="estadoRol">
+            <label className="form-label" htmlFor="estadoRol">
               Estado
             </label>
 
@@ -106,5 +106,4 @@ export function FiltrosRoles({
     </section>
   )
 }
-
 

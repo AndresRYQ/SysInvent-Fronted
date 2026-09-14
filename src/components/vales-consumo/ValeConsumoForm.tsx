@@ -623,7 +623,7 @@ export function ValeConsumoForm({
       <div className="row g-3">
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="valeFecha"
           >
             Fecha *
@@ -644,7 +644,7 @@ export function ValeConsumoForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="valeCentroCosto"
           >
             Centro de costo *
@@ -684,7 +684,7 @@ export function ValeConsumoForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="valeSolicitante"
           >
             Solicitante *
@@ -705,7 +705,7 @@ export function ValeConsumoForm({
 
         <div className="col-12">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="valeMotivo"
           >
             Motivo de la salida *
@@ -734,7 +734,7 @@ export function ValeConsumoForm({
 
       <div className="row g-3">
         <div className="col-12 col-md-4">
-          <label className="form-label maestro-label">
+          <label className="form-label">
             Tipo de producto *
           </label>
 
@@ -765,7 +765,7 @@ export function ValeConsumoForm({
         </div>
 
         <div className="col-12 col-md-5">
-          <label className="form-label maestro-label">
+          <label className="form-label">
             Producto *
           </label>
 
@@ -800,7 +800,7 @@ export function ValeConsumoForm({
         </div>
 
         <div className="col-12 col-md-3">
-          <label className="form-label maestro-label">
+          <label className="form-label">
             Stock disponible
           </label>
 
@@ -819,7 +819,7 @@ export function ValeConsumoForm({
 
       <div className="row g-3 align-items-end mt-1">
         <div className="col-12 col-md-4">
-          <label className="form-label maestro-label">
+          <label className="form-label">
             Destino *
           </label>
 
@@ -856,7 +856,7 @@ export function ValeConsumoForm({
         </div>
 
         <div className="col-12 col-md-4">
-          <label className="form-label maestro-label">
+          <label className="form-label">
             Parte de equipo
           </label>
 
@@ -891,7 +891,7 @@ export function ValeConsumoForm({
         </div>
 
         <div className="col-12 col-md-2">
-          <label className="form-label maestro-label">
+          <label className="form-label">
             Cantidad *
           </label>
 
@@ -1165,8 +1165,6 @@ export function ValeConsumoForm({
     </form>
   )
 }
-
-
 
 
 

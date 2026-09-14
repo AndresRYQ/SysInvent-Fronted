@@ -40,7 +40,7 @@ export function FiltrosIngreso({
         <div className="row g-3">
           <div className="col-12 col-lg-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="numeroIngresoFiltro"
             >
               Nro. de ingreso
@@ -60,7 +60,7 @@ export function FiltrosIngreso({
 
           <div className="col-12 col-lg-5">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="proveedorIngresoFiltro"
             >
               Proveedor
@@ -80,7 +80,7 @@ export function FiltrosIngreso({
 
           <div className="col-12 col-md-6 col-lg-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="estadoIngresoFiltro"
             >
               Estado
@@ -138,4 +138,3 @@ export function FiltrosIngreso({
     </section>
   )
 }
-

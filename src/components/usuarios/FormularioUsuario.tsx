@@ -128,7 +128,7 @@ export function FormularioUsuario({
           <div className="row g-3">
             <div className="col-12 col-md-6">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="usuarioNombre"
               >
                 Usuario
@@ -161,7 +161,7 @@ export function FormularioUsuario({
 
             <div className="col-12 col-md-6">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="usuarioNombreCompleto"
               >
                 Nombre completo
@@ -187,7 +187,7 @@ export function FormularioUsuario({
 
             <div className="col-12 col-md-6">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="usuarioEmail"
               >
                 Correo
@@ -215,7 +215,7 @@ export function FormularioUsuario({
 
             <div className="col-12 col-md-6">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="usuarioRol"
               >
                 Rol
@@ -253,7 +253,7 @@ export function FormularioUsuario({
 
             <div className="col-12 col-md-6">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="usuarioContrasena"
               >
                 Contraseña
@@ -289,7 +289,7 @@ export function FormularioUsuario({
 
             <div className="col-12 col-md-6">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="usuarioEstado"
               >
                 Estado
@@ -344,4 +344,3 @@ export function FormularioUsuario({
     </div>
   )
 }
-

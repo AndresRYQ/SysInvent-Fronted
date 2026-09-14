@@ -254,7 +254,7 @@ export function FormularioContacto({
 
             <div className="mb-3">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="contactoProveedor"
               >
                 Proveedor
@@ -303,7 +303,7 @@ export function FormularioContacto({
             <div className="row g-3">
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="contactoNombre"
                 >
                   Nombre completo
@@ -352,7 +352,7 @@ export function FormularioContacto({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="contactoCargo"
                 >
                   Cargo
@@ -397,7 +397,7 @@ export function FormularioContacto({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="contactoTelefono"
                 >
                   TelÃ©fono
@@ -442,7 +442,7 @@ export function FormularioContacto({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="contactoCorreo"
                 >
                   Correo
@@ -515,4 +515,3 @@ export function FormularioContacto({
     </div>
   )
 }
-

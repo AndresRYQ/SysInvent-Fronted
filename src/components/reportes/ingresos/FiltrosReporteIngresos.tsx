@@ -99,7 +99,7 @@ export function FiltrosReporteIngresos({
         >
           <div className="col-12 col-lg-6">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="buscarReporteIngreso"
             >
               Buscar
@@ -122,7 +122,7 @@ export function FiltrosReporteIngresos({
 
           <div className="col-12 col-md-6 col-lg-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteIngresoDesde"
             >
               Fecha desde
@@ -145,7 +145,7 @@ export function FiltrosReporteIngresos({
 
           <div className="col-12 col-md-6 col-lg-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteIngresoHasta"
             >
               Fecha hasta
@@ -168,7 +168,7 @@ export function FiltrosReporteIngresos({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteIngresoProveedor"
             >
               Proveedor
@@ -204,7 +204,7 @@ export function FiltrosReporteIngresos({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteIngresoTipo"
             >
               Tipo de producto
@@ -237,7 +237,7 @@ export function FiltrosReporteIngresos({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteIngresoProducto"
             >
               Producto
@@ -274,7 +274,7 @@ export function FiltrosReporteIngresos({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteIngresoEstado"
             >
               Estado
@@ -330,7 +330,5 @@ export function FiltrosReporteIngresos({
     </section>
   )
 }
-
-
 
 

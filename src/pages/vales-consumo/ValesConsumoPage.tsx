@@ -428,7 +428,7 @@ export function ValesConsumoPage() {
                 <div className="row g-3">
                   <div className="col-12 col-lg-4">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeBusqueda"
                     >
                       Buscar
@@ -454,7 +454,7 @@ export function ValesConsumoPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeCentroFiltro"
                     >
                       Centro de costo
@@ -484,7 +484,7 @@ export function ValesConsumoPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeEstadoFiltro"
                     >
                       Estado
@@ -515,7 +515,7 @@ export function ValesConsumoPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeDesde"
                     >
                       Desde
@@ -541,7 +541,7 @@ export function ValesConsumoPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeHasta"
                     >
                       Hasta
@@ -878,6 +878,4 @@ export function ValesConsumoPage() {
     </>
   )
 }
-
-
 

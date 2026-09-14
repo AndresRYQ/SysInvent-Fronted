@@ -96,11 +96,6 @@
   color: #667085;
 }
 
-.maestro-label {
-  color: #344054;
-  font-weight: 700;
-}
-
 .maestro-btn-primary,
 .maestro-btn-secondary,
 .maestro-btn-danger {
@@ -252,34 +247,6 @@
   border-radius: 10px;
   background: #edf7ef;
   color: var(--brand-green-dark);
-}
-
-.maestro-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 400;
-}
-
-.maestro-status__dot {
-  width: 7px;
-  height: 7px;
-  flex: 0 0 7px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.maestro-status--active {
-  background: #e9f8ee;
-  color: #0f7a42;
-}
-
-.maestro-status--inactive {
-  background: #fef2f2;
-  color: #b42318;
 }
 
 /* Centro de costos: los controles no se elevan al pasar el cursor. */
@@ -485,9 +452,8 @@
   padding: 18px;
 }
 
-.maestro-modal-body .maestro-label {
+.maestro-modal-body .form-label {
   margin-bottom: 0.4rem;
-  font-size: 0.8rem;
 }
 
 .maestro-required {
@@ -693,10 +659,6 @@
 }
 
 .maestro-filter-card .maestro-section-copy {
-  font-size: 0.8rem;
-}
-
-.maestro-filter-card .maestro-label {
   font-size: 0.8rem;
 }
 

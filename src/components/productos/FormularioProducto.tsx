@@ -389,7 +389,7 @@ export function FormularioProducto({
         <div className="row g-4">
           <div className="col-12 col-lg-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoCodigo"
             >
               CÃ³digo
@@ -433,7 +433,7 @@ export function FormularioProducto({
 
           <div className="col-12 col-lg-8">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoNombre"
             >
               Nombre
@@ -468,7 +468,7 @@ export function FormularioProducto({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoTipo"
             >
               Tipo de producto
@@ -515,7 +515,7 @@ export function FormularioProducto({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoCategoria"
             >
               CategorÃ­a
@@ -560,7 +560,7 @@ export function FormularioProducto({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoUnidad"
             >
               Unidad de medida
@@ -607,7 +607,7 @@ export function FormularioProducto({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoProveedor"
             >
               Proveedor
@@ -652,7 +652,7 @@ export function FormularioProducto({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoStockMinimo"
             >
               Stock mÃ­nimo
@@ -694,7 +694,7 @@ export function FormularioProducto({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPrecio"
             >
               Precio unitario
@@ -744,7 +744,7 @@ export function FormularioProducto({
 
           {producto && (
             <div className="col-12 col-lg-4">
-              <label className="form-label maestro-label">
+              <label className="form-label">
                 Stock actual
               </label>
 
@@ -762,7 +762,7 @@ export function FormularioProducto({
 
           <div className="col-12">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoDescripcion"
             >
               DescripciÃ³n

@@ -85,7 +85,7 @@ export function FiltrosBitacora({
         >
           <div className="col-12 col-xl-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="buscarBitacora"
             >
               Usuario o detalle
@@ -107,7 +107,7 @@ export function FiltrosBitacora({
 
           <div className="col-12 col-md-6 col-xl-2">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="moduloBitacora"
             >
               Módulo
@@ -139,7 +139,7 @@ export function FiltrosBitacora({
 
           <div className="col-12 col-md-6 col-xl-2">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="accionBitacora"
             >
               Acción
@@ -171,7 +171,7 @@ export function FiltrosBitacora({
 
           <div className="col-12 col-md-6 col-xl-2">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="fechaDesdeBitacora"
             >
               Desde
@@ -193,7 +193,7 @@ export function FiltrosBitacora({
 
           <div className="col-12 col-md-6 col-xl-2">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="fechaHastaBitacora"
             >
               Hasta
@@ -238,4 +238,3 @@ export function FiltrosBitacora({
     </section>
   )
 }
-

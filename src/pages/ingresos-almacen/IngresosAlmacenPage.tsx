@@ -420,7 +420,7 @@ export function IngresosAlmacenPage() {
                 <div className="row g-3">
                   <div className="col-12 col-lg-4">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="ingresoBusqueda"
                     >
                       Buscar
@@ -446,7 +446,7 @@ export function IngresosAlmacenPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="ingresoProveedorFiltro"
                     >
                       Proveedor
@@ -494,7 +494,7 @@ export function IngresosAlmacenPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="ingresoEstadoFiltro"
                     >
                       Estado
@@ -529,7 +529,7 @@ export function IngresosAlmacenPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="ingresoDesde"
                     >
                       Desde
@@ -555,7 +555,7 @@ export function IngresosAlmacenPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="ingresoHasta"
                     >
                       Hasta
@@ -895,8 +895,6 @@ export function IngresosAlmacenPage() {
     </>
   )
 }
-
-
 
 
 

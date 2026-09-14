@@ -121,7 +121,7 @@ function SelectField({
   return (
     <div>
       <label
-        className="form-label maestro-label"
+        className="form-label"
         htmlFor={id}
       >
         {label}
@@ -314,7 +314,7 @@ export function FormularioIngreso({
             <div className="row g-3">
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="ingresoFechaModal"
                 >
                   Fecha de registro
@@ -355,7 +355,7 @@ export function FormularioIngreso({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="ingresoNumeroModal"
                 >
                   Nro. de ingreso
@@ -433,7 +433,7 @@ export function FormularioIngreso({
 
               <div className="col-12 col-md-4">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="ingresoCantidadModal"
                 >
                   Cantidad
@@ -488,7 +488,7 @@ export function FormularioIngreso({
 
               <div className="col-12">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="ingresoObservacionModal"
                 >
                   Observación
@@ -530,5 +530,3 @@ export function FormularioIngreso({
     </div>
   )
 }
-
-

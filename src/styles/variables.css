@@ -26,6 +26,14 @@
   --form-control-font-size: 0.8rem;
   --form-control-radius: 16px;
   --form-control-padding-y: 0.35rem;
+  --form-label-font-size: 0.8rem;
+  --form-label-font-weight: 700;
+  --form-label-color: var(--color-text-secondary);
+  --status-font-size: 0.8rem;
+  --status-active-color: #0f7a42;
+  --status-active-bg: #e9f8ee;
+  --status-inactive-color: var(--color-red);
+  --status-inactive-bg: #fef2f2;
   --transition-control: 180ms ease;
   --shadow-soft: 0 16px 40px rgb(15 23 42 / 8%);
 

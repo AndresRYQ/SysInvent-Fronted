@@ -181,18 +181,17 @@ export function FormularioProveedor({
         <div className="row g-4">
           <div className="col-12 col-lg-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="proveedorRuc"
             >
               RUC
-              {!soloLectura && <span className="maestro-required">
-                *
-              </span>}
             </label>
 
             <input
               id="proveedorRuc"
               className={`form-control${
+                !soloLectura ? ' required' : ''
+              }${
                 errores.ruc
                   ? ' maestro-control--error'
                   : ''
@@ -234,18 +233,17 @@ export function FormularioProveedor({
 
           <div className="col-12 col-lg-8">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="proveedorRazonSocial"
             >
               Razón social
-              {!soloLectura && <span className="maestro-required">
-                *
-              </span>}
             </label>
 
             <input
               id="proveedorRazonSocial"
               className={`form-control${
+                !soloLectura ? ' required' : ''
+              }${
                 errores.razonSocial
                   ? ' maestro-control--error'
                   : ''
@@ -280,18 +278,17 @@ export function FormularioProveedor({
 
           <div className="col-12 col-lg-6">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="proveedorCorreo"
             >
               Correo electrónico
-              {!soloLectura && <span className="maestro-required">
-                *
-              </span>}
             </label>
 
             <input
               id="proveedorCorreo"
               className={`form-control${
+                !soloLectura ? ' required' : ''
+              }${
                 errores.correo
                   ? ' maestro-control--error'
                   : ''
@@ -325,18 +322,17 @@ export function FormularioProveedor({
 
           <div className="col-12 col-lg-6">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="proveedorTelefono"
             >
               Teléfono
-              {!soloLectura && <span className="maestro-required">
-                *
-              </span>}
             </label>
 
             <input
               id="proveedorTelefono"
               className={`form-control${
+                !soloLectura ? ' required' : ''
+              }${
                 errores.telefono
                   ? ' maestro-control--error'
                   : ''
@@ -374,18 +370,17 @@ export function FormularioProveedor({
 
           <div className="col-12">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="proveedorDireccion"
             >
               Dirección
-              {!soloLectura && <span className="maestro-required">
-                *
-              </span>}
             </label>
 
             <textarea
               id="proveedorDireccion"
               className={`form-control${
+                !soloLectura ? ' required' : ''
+              }${
                 errores.direccion
                   ? ' maestro-control--error'
                   : ''
@@ -464,5 +459,3 @@ function permitirSoloNumeros(event: KeyboardEvent<HTMLInputElement>): void {
     event.preventDefault()
   }
 }
-
-

@@ -43,7 +43,7 @@ export function FiltrosUsuarios({
 
         <div className="row g-3">
           <div className="col-12 col-lg-6">
-            <label className="form-label maestro-label" htmlFor="busquedaUsuario">
+            <label className="form-label" htmlFor="busquedaUsuario">
               Buscar usuario
             </label>
 
@@ -60,7 +60,7 @@ export function FiltrosUsuarios({
           </div>
 
           <div className="col-12 col-md-6 col-lg-3">
-            <label className="form-label maestro-label" htmlFor="rolUsuario">
+            <label className="form-label" htmlFor="rolUsuario">
               Rol
             </label>
 
@@ -95,7 +95,7 @@ export function FiltrosUsuarios({
           </div>
 
           <div className="col-12 col-md-6 col-lg-3">
-            <label className="form-label maestro-label" htmlFor="estadoUsuario">
+            <label className="form-label" htmlFor="estadoUsuario">
               Estado
             </label>
 
@@ -151,5 +151,4 @@ export function FiltrosUsuarios({
     </section>
   )
 }
-
 

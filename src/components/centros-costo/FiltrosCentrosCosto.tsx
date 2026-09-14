@@ -42,7 +42,7 @@ export function FiltrosCentrosCosto({
 
         <div className="row g-3">
           <div className="col-12 col-lg-8">
-            <label className="form-label maestro-label" htmlFor="nombreCentroCosto">
+            <label className="form-label" htmlFor="nombreCentroCosto">
               Nombre de centro de costo
             </label>
 
@@ -59,7 +59,7 @@ export function FiltrosCentrosCosto({
           </div>
 
           <div className="col-12 col-md-6 col-lg-4">
-            <label className="form-label maestro-label" htmlFor="estadoCentroCosto">
+            <label className="form-label" htmlFor="estadoCentroCosto">
               Estado
             </label>
 
@@ -110,4 +110,3 @@ export function FiltrosCentrosCosto({
     </section>
   )
 }
-

@@ -488,7 +488,7 @@ export function IngresoAlmacenForm({
       <div className="row g-3">
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoFecha"
           >
             Fecha de ingreso *
@@ -509,7 +509,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoProveedor"
           >
             Proveedor *
@@ -549,7 +549,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoContacto"
           >
             Contacto *
@@ -585,7 +585,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoTipoDocumento"
           >
             Tipo de documento *
@@ -625,7 +625,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoNumeroDocumento"
           >
             Número de documento *
@@ -647,7 +647,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoObservacion"
           >
             Observación
@@ -677,7 +677,7 @@ export function IngresoAlmacenForm({
       <div className="row g-3 align-items-end">
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="detalleTipoProducto"
           >
             Tipo de producto *
@@ -713,7 +713,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="detalleProducto"
           >
             Producto *
@@ -753,7 +753,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-3">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="detalleUnidad"
           >
             Unidad
@@ -772,7 +772,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-3">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="detalleCantidad"
           >
             Cantidad *
@@ -797,7 +797,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-3">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="detallePrecio"
           >
             Precio unitario *
@@ -972,8 +972,6 @@ export function IngresoAlmacenForm({
     </form>
   )
 }
-
-
 
 
 

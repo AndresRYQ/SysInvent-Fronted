@@ -220,7 +220,7 @@ export function FormularioParteEquipo({
             <div className="row g-3">
               <div className="col-12 col-md-5">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="parteEquipoCodigo"
                 >
                   Código
@@ -266,7 +266,7 @@ export function FormularioParteEquipo({
 
               <div className="col-12 col-md-7">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="parteEquipoNombre"
                 >
                   Nombre
@@ -311,7 +311,7 @@ export function FormularioParteEquipo({
 
               <div className="col-12">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="parteEquipoDescripcion"
                 >
                   Descripción
@@ -399,5 +399,3 @@ export function FormularioParteEquipo({
     </div>
   )
 }
-
-

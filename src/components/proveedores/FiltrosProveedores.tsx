@@ -45,7 +45,7 @@ export function FiltrosProveedores({
         >
           <div className="col-12 col-lg-8">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="buscarProveedor"
             >
               RUC o razón social
@@ -68,7 +68,7 @@ export function FiltrosProveedores({
 
           <div className="col-12 col-lg-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="estadoProveedor"
             >
               Estado
@@ -106,5 +106,3 @@ export function FiltrosProveedores({
     </section>
   )
 }
-
-

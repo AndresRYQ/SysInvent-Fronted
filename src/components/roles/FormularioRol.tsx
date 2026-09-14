@@ -153,7 +153,7 @@ export function FormularioRol({
           <div className="row g-3">
             <div className="col-12 col-md-7">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="rolNombre"
               >
                 Nombre del rol
@@ -179,7 +179,7 @@ export function FormularioRol({
 
             <div className="col-12 col-md-5">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="rolEstado"
               >
                 Estado
@@ -213,7 +213,7 @@ export function FormularioRol({
 
             <div className="col-12">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="rolDescripcion"
               >
                 Descripción
@@ -241,7 +241,7 @@ export function FormularioRol({
             <div className="col-12">
               <div className="role-permissions-header">
                 <div>
-                  <span className="maestro-label">
+                  <span className="form-label">
                     Módulos permitidos
                   </span>
 
@@ -323,4 +323,3 @@ export function FormularioRol({
     </div>
   )
 }
-
