@@ -7,6 +7,9 @@ import { useNavigate } from 'react-router-dom'
 import {
   tienePermisoModulo,
 } from '../services/rolService'
+import {
+  obtenerResumenDashboard,
+} from '../services/dashboardService'
 import AnimatedContent from '../components/ui/AnimatedContent'
 import CountUp from '../components/ui/CountUp'
 import SpotlightCard from '../components/ui/SpotlightCard'
@@ -49,126 +52,6 @@ type Module = {
   route?: string
 }
 
-type DashboardAlert = {
-  id: number
-  title: string
-  detail: string
-  tone: 'warning' | 'danger' | 'info'
-}
-
-type RecentMovement = {
-  id: number
-  date: string
-  type: 'Ingreso' | 'Vale'
-  document: string
-  product: string
-  quantity: number
-  responsible: string
-}
-
-const metrics: Metric[] = [
-  {
-    label: 'Inventario total',
-    value: 2450,
-    detail: 'Productos registrados',
-    status: 'neutral',
-    icon: 'box',
-    tone: 'green',
-  },
-  {
-    label: 'Stock bajo',
-    value: 8,
-    detail: 'Requieren reposición',
-    status: 'alert',
-    icon: 'clipboard',
-    tone: 'orange',
-  },
-  {
-    label: 'Ingresos del mes',
-    value: 35,
-    detail: 'Movimientos registrados',
-    status: 'positive',
-    icon: 'entry',
-    tone: 'blue',
-  },
-  {
-    label: 'Vales pendientes',
-    value: 6,
-    detail: 'Pendientes de entrega',
-    status: 'alert',
-    icon: 'order',
-    tone: 'violet',
-  },
-  {
-    label: 'Movimientos de hoy',
-    value: 12,
-    detail: 'Entradas y salidas',
-    status: 'neutral',
-    icon: 'audit',
-    tone: 'teal',
-  },
-]
-
-const dashboardAlerts: DashboardAlert[] = [
-  {
-    id: 1,
-    title: 'Productos con stock bajo',
-    detail: '8 productos requieren reposición.',
-    tone: 'warning',
-  },
-  {
-    id: 2,
-    title: 'Vales pendientes',
-    detail: '6 vales esperan ser entregados.',
-    tone: 'danger',
-  },
-  {
-    id: 3,
-    title: 'Inventario actualizado',
-    detail: 'Última actualización realizada hoy.',
-    tone: 'info',
-  },
-]
-
-const recentMovements: RecentMovement[] = [
-  {
-    id: 1,
-    date: '11/09/2026',
-    type: 'Ingreso',
-    document: 'IA-2026-0035',
-    product: 'Guantes de nitrilo',
-    quantity: 24,
-    responsible: 'Administrador',
-  },
-  {
-    id: 2,
-    date: '11/09/2026',
-    type: 'Vale',
-    document: 'VC-2026-0087',
-    product: 'Mascarilla descartable',
-    quantity: 12,
-    responsible: 'Almacén',
-  },
-  {
-    id: 3,
-    date: '10/09/2026',
-    type: 'Ingreso',
-    document: 'IA-2026-0034',
-    product: 'Lentes de seguridad',
-    quantity: 18,
-    responsible: 'Administrador',
-  },
-  {
-    id: 4,
-    date: '10/09/2026',
-    type: 'Vale',
-    document: 'VC-2026-0086',
-    product: 'Cinta de embalaje',
-    quantity: 8,
-    responsible: 'Almacén',
-  },
-]
-
 const categories = [
   'Todos',
   'Inventario',
@@ -182,7 +65,7 @@ const modules: Module[] = [
   {
     id: 'proveedores',
     title: 'Proveedores',
-    description: 'Administración de proveedores.',
+    description: 'AdministraciÃ³n de proveedores.',
     icon: 'users',
     tone: 'green',
     category: 'Maestros',
@@ -191,7 +74,7 @@ const modules: Module[] = [
   {
     id: 'productos',
     title: 'Productos',
-    description: 'Administración de productos.',
+    description: 'AdministraciÃ³n de productos.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -199,17 +82,17 @@ const modules: Module[] = [
   },
   {
     id: 'bitacora',
-    title: 'Bitácora',
+    title: 'BitÃ¡cora',
     description: 'Consulta de actividades y cambios.',
     icon: 'audit',
-    tone: 'green',
+    tone: 'violet',
     category: 'Seguridad',
     route: '/bitacora',
   },
   {
     id: 'contactos',
     title: 'Contactos',
-    description: 'Administración de contactos.',
+    description: 'AdministraciÃ³n de contactos.',
     icon: 'users',
     tone: 'green',
     category: 'Maestros',
@@ -218,7 +101,7 @@ const modules: Module[] = [
   {
     id: 'partes-equipo',
     title: 'Partes de equipo',
-    description: 'Administración de partes de equipo.',
+    description: 'AdministraciÃ³n de partes de equipo.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -226,16 +109,17 @@ const modules: Module[] = [
   },
   {
     id: 'control-almacen',
-    title: 'Control de almacén',
+    title: 'Control de almacÃ©n',
     description: 'Control de inventario y movimientos.',
     icon: 'box',
     tone: 'green',
     category: 'Inventario',
+    route: '/control-almacen',
   },
   {
     id: 'vales-consumo',
     title: 'Vales de consumo',
-    description: 'Administración de vales de consumo.',
+    description: 'AdministraciÃ³n de vales de consumo.',
     icon: 'order',
     tone: 'green',
     category: 'Inventario',
@@ -243,7 +127,7 @@ const modules: Module[] = [
   },
   {
     id: 'ingresos-almacen',
-    title: 'Ingresos de Almacén',
+    title: 'Ingresos de AlmacÃ©n',
     description: 'Registro de ingresos.',
     icon: 'entry',
     tone: 'green',
@@ -266,15 +150,17 @@ const modules: Module[] = [
     icon: 'report',
     tone: 'blue',
     category: 'Reportes',
+    route: '/reportes/vales',
   },
   {
     id: 'reporte-productos',
-    title: 'Reporte de producto más pedido',
-    description: 'Consulta de productos más solicitados.',
+    title: 'Reporte acumulado',
+    description: 'Consulta de productos mÃ¡s solicitados.',
     icon: 'chart',
     tone: 'blue',
     category: 'Reportes',
-    route: '/reportes/productos-mas-pedidos',
+     route:
+    '/reportes/productos-mas-pedidos',
   },
   {
     id: 'centros-costo',
@@ -287,8 +173,8 @@ const modules: Module[] = [
   },
   {
     id: 'categorias',
-    title: 'Categorías',
-    description: 'Gestión de categorías.',
+    title: 'CategorÃ­as',
+    description: 'GestiÃ³n de categorÃ­as.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -297,7 +183,7 @@ const modules: Module[] = [
   {
     id: 'tipos-producto',
     title: 'Tipos de producto',
-    description: 'Administración de tipos de producto.',
+    description: 'AdministraciÃ³n de tipos de producto.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -306,7 +192,7 @@ const modules: Module[] = [
   {
     id: 'tipos-documento',
     title: 'Tipos de documento',
-    description: 'Administración de tipos de documento.',
+    description: 'AdministraciÃ³n de tipos de documento.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -315,7 +201,7 @@ const modules: Module[] = [
   {
     id: 'unidades-medida',
     title: 'Unidades de medida',
-    description: 'Administración de unidades de medida.',
+    description: 'AdministraciÃ³n de unidades de medida.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -324,7 +210,7 @@ const modules: Module[] = [
   {
     id: 'destinos',
     title: 'Destinos',
-    description: 'Administración de destinos.',
+    description: 'AdministraciÃ³n de destinos.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -333,7 +219,7 @@ const modules: Module[] = [
   {
     id: 'usuarios',
     title: 'Usuarios',
-    description: 'Administración de usuarios.',
+    description: 'AdministraciÃ³n de usuarios.',
     icon: 'users',
     tone: 'violet',
     category: 'Seguridad',
@@ -342,7 +228,7 @@ const modules: Module[] = [
   {
     id: 'roles',
     title: 'Roles',
-    description: 'Gestión de roles.',
+    description: 'GestiÃ³n de roles.',
     icon: 'users',
     tone: 'violet',
     category: 'Seguridad',
@@ -351,11 +237,11 @@ const modules: Module[] = [
   {
     id: 'perfil-usuario',
     title: 'Perfil de usuario',
-    description: 'Consulta y edición del perfil del usuario.',
+    description: 'Consulta y ediciÃ³n del perfil del usuario.',
     icon: 'users',
     tone: 'teal',
     category: 'Perfil',
-    route: '/perfil-usuario',
+    route: '/perfil',
   },
 ]
 
@@ -487,15 +373,118 @@ function Icon({ name }: { name: IconName }) {
 function DashboardPage() {
   const navigate = useNavigate()
   const { sesion } = useAuth()
-  const [selectedCategory, setSelectedCategory] = useState('Todos')
-  const nombreUsuario = sesion?.nombreCompleto ?? 'Frank Arone'
-  const nombreSaludo = nombreUsuario.split(' ')[0] || 'Frank'
-  const fechaActual = new Intl.DateTimeFormat('es-PE', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date())
+
+  const [
+    selectedCategory,
+    setSelectedCategory,
+  ] = useState('Todos')
+
+  const resumenDashboard = useMemo(
+    () => obtenerResumenDashboard(),
+    [],
+  )
+
+  const metrics: Metric[] = [
+    {
+      label: 'Productos activos',
+      value:
+        resumenDashboard.productosActivos,
+      detail:
+        'Productos registrados',
+      status: 'neutral',
+      icon: 'box',
+      tone: 'green',
+    },
+    {
+      label: 'Stock crÃ­tico',
+      value:
+        resumenDashboard
+          .productosStockBajo +
+        resumenDashboard
+          .productosSinStock,
+      detail:
+        'Requieren reposiciÃ³n',
+      status: 'alert',
+      icon: 'clipboard',
+      tone: 'orange',
+    },
+    {
+      label: 'Ingresos del mes',
+      value:
+        resumenDashboard.ingresosDelMes,
+      detail:
+        'Documentos registrados',
+      status: 'positive',
+      icon: 'entry',
+      tone: 'blue',
+    },
+    {
+      label: 'Vales del mes',
+      value:
+        resumenDashboard.valesDelMes,
+      detail:
+        'Documentos registrados',
+      status: 'neutral',
+      icon: 'order',
+      tone: 'violet',
+    },
+    {
+      label: 'Movimientos de hoy',
+      value:
+        resumenDashboard.movimientosHoy,
+      detail:
+        'Entradas y salidas',
+      status: 'neutral',
+      icon: 'audit',
+      tone: 'teal',
+    },
+  ]
+
+  const dashboardAlerts =
+    resumenDashboard.alertas.map(
+      (alerta) => ({
+        id: alerta.id,
+        title: alerta.titulo,
+        detail: alerta.detalle,
+        tone: alerta.tono,
+      }),
+    )
+
+  const recentMovements =
+    resumenDashboard
+      .movimientosRecientes
+      .map((movimiento) => ({
+        id: movimiento.id,
+        date: movimiento.fecha,
+        type: movimiento.tipo,
+        document:
+          movimiento.documento,
+        product:
+          movimiento.producto,
+        quantity:
+          movimiento.cantidad,
+        responsible:
+          movimiento.responsable,
+      }))
+
+  const nombreUsuario =
+    sesion?.nombreCompleto ??
+    'Usuario'
+
+  const nombreSaludo =
+    nombreUsuario.split(' ')[0] ||
+    'Usuario'
+
+  const fechaActual =
+    new Intl.DateTimeFormat(
+      'es-PE',
+      {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      },
+    ).format(new Date())
 
  const modulosPermitidos = useMemo(
   () =>
@@ -548,13 +537,13 @@ const filteredModules =
             <h1>Bienvenido, {nombreSaludo}</h1>
 
             <p className="hero-subtitle">
-              Sistema de Control de Almacén
+              Sistema de Control de AlmacÃ©n
             </p>
 
             <p className="hero-description">
               Consulta y administra el inventario,
               los ingresos, los vales de consumo
-              y los reportes del almacén.
+              y los reportes del almacÃ©n.
             </p>
             <p className="hero-date">
               {fechaActual}
@@ -574,7 +563,7 @@ const filteredModules =
 
             <div>
               <small>Estado del sistema</small>
-              <strong>Operación normal</strong>
+              <strong>OperaciÃ³n normal</strong>
             </div>
           </div>
 
@@ -585,7 +574,7 @@ const filteredModules =
             </div>
 
             <div>
-              <span>Sesión</span>
+              <span>SesiÃ³n</span>
               <strong>Activa</strong>
             </div>
 
@@ -668,7 +657,7 @@ const filteredModules =
                 Actividad reciente
               </span>
 
-              <h2>Últimos movimientos</h2>
+              <h2>Ãšltimos movimientos</h2>
             </div>
           </header>
 
@@ -724,19 +713,19 @@ const filteredModules =
             Accesos del sistema
           </span>
 
-          <h2>Módulos del sistema</h2>
+          <h2>MÃ³dulos del sistema</h2>
 
           <p>
-            Selecciona una categoría para consultar
-            los módulos disponibles.
+            Selecciona una categorÃ­a para consultar
+            los mÃ³dulos disponibles.
           </p>
         </div>
 
         <span className="modules-count">
           {filteredModules.length}{' '}
           {filteredModules.length === 1
-            ? 'módulo'
-            : 'módulos'}
+            ? 'mÃ³dulo'
+            : 'mÃ³dulos'}
         </span>
       </section>
 
@@ -768,21 +757,23 @@ const filteredModules =
                 className={`module-action tone-${module.tone}`}
                 type="button"
                 disabled={!module.route}
-                title={!module.route ? 'Módulo en desarrollo' : undefined}
+                title={!module.route ? 'MÃ³dulo en desarrollo' : undefined}
                 onClick={() => manejarAbrirModulo(module)}
               >
-                {module.route ? 'Abrir módulo' : 'En desarrollo'}
-                {module.route && <span aria-hidden="true">→</span>}
+                {module.route ? 'Abrir mÃ³dulo' : 'En desarrollo'}
+                {module.route && <span aria-hidden="true">â†’</span>}
               </button>
             </SpotlightCard>
           </AnimatedContent>
         ))}
       </section>
       <footer className="dashboard-footer">
-        © 2026 AGRIHUSAC. Todos los derechos reservados.
+        Â© 2026 AGRIHUSAC. Todos los derechos reservados.
       </footer>
     </main>
   )
 }
 
 export default DashboardPage
+
+
