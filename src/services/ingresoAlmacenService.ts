@@ -87,7 +87,7 @@ export function obtenerIngresoAlmacenPorId(
 ): IngresoAlmacenRegistro | null {
   const ingreso =
     obtenerIngresosAlmacen().find(
-      (item) => String(item.id) === String( id),
+      (item) => item.id === id,
     )
 
   return ingreso
@@ -169,14 +169,14 @@ function validarDatosIngreso(
     )
   ) {
     throw new Error(
-      'Selecciona una fecha de ingreso válida.',
+      'Selecciona una fecha de ingreso vÃ¡lida.',
     )
   }
 
   const proveedor =
     obtenerProveedores().find(
       (item) =>
-        String(item.id) === String( datos.proveedorId),
+        String(item.id) === String(datos.proveedorId),
     )
 
   if (!proveedor) {
@@ -185,16 +185,16 @@ function validarDatosIngreso(
     )
   }
 
-  if (proveedor.activo !== 1) {
+  if (!proveedor.estado) {
     throw new Error(
-      'El proveedor seleccionado está inactivo.',
+      'El proveedor seleccionado estÃ¡ inactivo.',
     )
   }
 
   const contacto =
     obtenerContactos().find(
       (item) =>
-        String(item.id) === String( datos.contactoId),
+        String(item.id) === String(datos.contactoId),
     )
 
   if (!contacto) {
@@ -203,9 +203,9 @@ function validarDatosIngreso(
     )
   }
 
-  if (contacto.activo !== 1) {
+  if (!contacto.estado) {
     throw new Error(
-      'El contacto seleccionado está inactivo.',
+      'El contacto seleccionado estÃ¡ inactivo.',
     )
   }
 
@@ -221,8 +221,8 @@ function validarDatosIngreso(
   const tipoDocumento =
     obtenerTiposDocumento().find(
       (item) =>
-        String(item.id) === String(
-        datos.tipoDocumentoId),
+        String(item.id) ===
+        String(datos.tipoDocumentoId),
     )
 
   if (!tipoDocumento) {
@@ -231,9 +231,9 @@ function validarDatosIngreso(
     )
   }
 
-  if (tipoDocumento.activo !== 1) {
+  if (!tipoDocumento.estado) {
     throw new Error(
-      'El tipo de documento seleccionado está inactivo.',
+      'El tipo de documento seleccionado estÃ¡ inactivo.',
     )
   }
 
@@ -242,13 +242,13 @@ function validarDatosIngreso(
 
   if (numeroDocumento.length < 3) {
     throw new Error(
-      'El número de documento debe tener al menos 3 caracteres.',
+      'El nÃºmero de documento debe tener al menos 3 caracteres.',
     )
   }
 
   if (numeroDocumento.length > 50) {
     throw new Error(
-      'El número de documento no puede superar los 50 caracteres.',
+      'El nÃºmero de documento no puede superar los 50 caracteres.',
     )
   }
 
@@ -270,7 +270,7 @@ function validarDatosIngreso(
 
   if (documentoDuplicado) {
     throw new Error(
-      'Ya existe un ingreso con ese proveedor, tipo y número de documento.',
+      'Ya existe un ingreso con ese proveedor, tipo y nÃºmero de documento.',
     )
   }
 
@@ -308,7 +308,7 @@ function validarDatosIngreso(
 
       const producto = productos.find(
         (item) =>
-          String(item.id) === String( detalle.productoId),
+          item.id === detalle.productoId,
       )
 
       if (!producto) {
@@ -319,7 +319,7 @@ function validarDatosIngreso(
 
       if (!producto.estado) {
         throw new Error(
-          `El producto "${producto.nombre}" está inactivo.`,
+          `El producto "${producto.nombre}" estÃ¡ inactivo.`,
         )
       }
 
@@ -350,7 +350,7 @@ function validarDatosIngreso(
         detalle.precioUnitario < 0
       ) {
         throw new Error(
-          `El precio de la fila ${numeroFila} no es válido.`,
+          `El precio de la fila ${numeroFila} no es vÃ¡lido.`,
         )
       }
     },
@@ -360,7 +360,7 @@ function validarDatosIngreso(
     datos.observacion.trim().length > 500
   ) {
     throw new Error(
-      'La observación no puede superar los 500 caracteres.',
+      'La observaciÃ³n no puede superar los 500 caracteres.',
     )
   }
 }
@@ -465,7 +465,7 @@ function validarAjustesStock(
 
       const producto = productos.find(
         (item) =>
-          String(item.id) === String( productoId),
+          item.id === productoId,
       )
 
       if (!producto) {
@@ -479,7 +479,7 @@ function validarAjustesStock(
         0
       ) {
         throw new Error(
-          `No se puede realizar la operación porque "${producto.nombre}" ya tiene salidas registradas o stock insuficiente.`,
+          `No se puede realizar la operaciÃ³n porque "${producto.nombre}" ya tiene salidas registradas o stock insuficiente.`,
         )
       }
     },
@@ -597,10 +597,10 @@ export function crearIngresoAlmacen(
   }
 
   registrarEventoBitacora({
-    modulo: 'Ingreso de almacén',
+    modulo: 'Ingreso de almacÃ©n',
     accion: 'CREAR',
     detalle:
-      `Se registró el ingreso ${nuevoIngreso.numeroIngreso} con ${nuevoIngreso.detalles.length} producto(s).`,
+      `Se registrÃ³ el ingreso ${nuevoIngreso.numeroIngreso} con ${nuevoIngreso.detalles.length} producto(s).`,
     registroId: nuevoIngreso.id,
   })
 
@@ -616,7 +616,7 @@ export function actualizarIngresoAlmacen(
 
   const ingresoActual =
     ingresos.find(
-      (ingreso) => String(ingreso.id) === String( id),
+      (ingreso) => ingreso.id === id,
     )
 
   if (!ingresoActual) {
@@ -681,10 +681,10 @@ export function actualizarIngresoAlmacen(
   }
 
   registrarEventoBitacora({
-    modulo: 'Ingreso de almacén',
+    modulo: 'Ingreso de almacÃ©n',
     accion: 'EDITAR',
     detalle:
-      `Se actualizó el ingreso ${ingresoActualizado.numeroIngreso}.`,
+      `Se actualizÃ³ el ingreso ${ingresoActualizado.numeroIngreso}.`,
     registroId:
       ingresoActualizado.id,
   })
@@ -702,7 +702,7 @@ export function anularIngresoAlmacen(
 
   const ingresoActual =
     ingresos.find(
-      (ingreso) => String(ingreso.id) === String( id),
+      (ingreso) => ingreso.id === id,
     )
 
   if (!ingresoActual) {
@@ -747,10 +747,10 @@ export function anularIngresoAlmacen(
   }
 
   registrarEventoBitacora({
-    modulo: 'Ingreso de almacén',
+    modulo: 'Ingreso de almacÃ©n',
     accion: 'ELIMINAR',
     detalle:
-      `Se anuló el ingreso ${ingresoAnulado.numeroIngreso} y se descontaron sus productos del stock.`,
+      `Se anulÃ³ el ingreso ${ingresoAnulado.numeroIngreso} y se descontaron sus productos del stock.`,
     registroId: ingresoAnulado.id,
   })
 
@@ -770,7 +770,4 @@ export function calcularTotalIngreso(
 
   return Number(total.toFixed(2))
 }
-
-
-
 

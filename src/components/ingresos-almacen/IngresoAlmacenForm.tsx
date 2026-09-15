@@ -64,7 +64,7 @@ function obtenerMensajeError(
 ): string {
   return error instanceof Error
     ? error.message
-    : 'Ocurrió un error inesperado.'
+    : 'OcurriÃ³ un error inesperado.'
 }
 
 export function IngresoAlmacenForm({
@@ -215,8 +215,8 @@ export function IngresoAlmacenForm({
       () =>
         productos.find(
           (producto) =>
-            String(producto.id) === String(
-            detalle.productoId),
+            producto.id ===
+            detalle.productoId,
         ) ?? null,
       [productos, detalle.productoId],
     )
@@ -226,9 +226,11 @@ export function IngresoAlmacenForm({
       () =>
         unidadesMedida.find(
           (unidad) =>
-            String(unidad.id) === String(
-            productoSeleccionado
-              ?.unidadMedidaId),
+            String(unidad.id) ===
+            String(
+              productoSeleccionado
+                ?.unidadMedidaId,
+            ),
         ) ?? null,
       [
         unidadesMedida,
@@ -276,7 +278,7 @@ export function IngresoAlmacenForm({
     productoId: string,
   ): void {
     const producto = productos.find(
-      (item) => String(item.id) === String( productoId),
+      (item) => item.id === productoId,
     )
 
     setDetalle((actual) => ({
@@ -333,7 +335,7 @@ export function IngresoAlmacenForm({
       precioUnitario < 0
     ) {
       setError(
-        'El precio unitario no es válido.',
+        'El precio unitario no es vÃ¡lido.',
       )
       return
     }
@@ -417,7 +419,7 @@ export function IngresoAlmacenForm({
 
     if (!numeroDocumento.trim()) {
       setError(
-        'Ingresa el número del documento.',
+        'Ingresa el nÃºmero del documento.',
       )
       return
     }
@@ -464,8 +466,8 @@ export function IngresoAlmacenForm({
           </h2>
 
           <p className="text-secondary mb-0">
-            Registra la mercadería recibida
-            en el almacén.
+            Registra la mercaderÃ­a recibida
+            en el almacÃ©n.
           </p>
         </div>
 
@@ -488,7 +490,7 @@ export function IngresoAlmacenForm({
       <div className="row g-3">
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label maestro-label"
             htmlFor="ingresoFecha"
           >
             Fecha de ingreso *
@@ -496,7 +498,7 @@ export function IngresoAlmacenForm({
 
           <input
             id="ingresoFecha"
-            className="form-control"
+            className="form-control maestro-control"
             type="date"
             value={fechaIngreso}
             onChange={(event) =>
@@ -509,7 +511,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label maestro-label"
             htmlFor="ingresoProveedor"
           >
             Proveedor *
@@ -517,7 +519,7 @@ export function IngresoAlmacenForm({
 
           <select
             id="ingresoProveedor"
-            className="form-select"
+            className="form-select maestro-control"
             value={proveedorId}
             onChange={(event) =>
               cambiarProveedor(
@@ -533,8 +535,8 @@ export function IngresoAlmacenForm({
               .filter(
                 (proveedor) =>
                   proveedor.estado ||
-                  String(proveedor.id) === String(
-                    proveedorId),
+                  String(proveedor.id) ===
+                    String(proveedorId),
               )
               .map((proveedor) => (
                 <option
@@ -549,7 +551,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label maestro-label"
             htmlFor="ingresoContacto"
           >
             Contacto *
@@ -557,7 +559,7 @@ export function IngresoAlmacenForm({
 
           <select
             id="ingresoContacto"
-            className="form-select"
+            className="form-select maestro-control"
             value={contactoId}
             disabled={!proveedorId}
             onChange={(event) =>
@@ -585,7 +587,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label maestro-label"
             htmlFor="ingresoTipoDocumento"
           >
             Tipo de documento *
@@ -593,7 +595,7 @@ export function IngresoAlmacenForm({
 
           <select
             id="ingresoTipoDocumento"
-            className="form-select"
+            className="form-select maestro-control"
             value={tipoDocumentoId}
             onChange={(event) =>
               setTipoComprobanteId(
@@ -608,9 +610,9 @@ export function IngresoAlmacenForm({
             {tiposDocumento
               .filter(
                 (tipo) =>
-                  tipo.activo !== 1 ||
-                  String(tipo.id) === String(
-                    tipoDocumentoId),
+                  tipo.estado ||
+                  String(tipo.id) ===
+                    String(tipoDocumentoId),
               )
               .map((tipo) => (
                 <option
@@ -625,15 +627,15 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label maestro-label"
             htmlFor="ingresoNumeroDocumento"
           >
-            Número de documento *
+            NÃºmero de documento *
           </label>
 
           <input
             id="ingresoNumeroDocumento"
-            className="form-control"
+            className="form-control maestro-control"
             type="text"
             maxLength={50}
             value={numeroDocumento}
@@ -647,15 +649,15 @@ export function IngresoAlmacenForm({
 
         <div className="col-12">
           <label
-            className="form-label"
+            className="form-label maestro-label"
             htmlFor="ingresoObservacion"
           >
-            Observación
+            ObservaciÃ³n
           </label>
 
           <textarea
             id="ingresoObservacion"
-            className="form-control"
+            className="form-control maestro-control"
             rows={3}
             maxLength={500}
             value={observacion}
@@ -677,7 +679,7 @@ export function IngresoAlmacenForm({
       <div className="row g-3 align-items-end">
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label maestro-label"
             htmlFor="detalleTipoProducto"
           >
             Tipo de producto *
@@ -685,7 +687,7 @@ export function IngresoAlmacenForm({
 
           <select
             id="detalleTipoProducto"
-            className="form-select"
+            className="form-select maestro-control"
             value={detalle.tipoProductoId}
             disabled={!proveedorId}
             onChange={(event) =>
@@ -699,7 +701,7 @@ export function IngresoAlmacenForm({
             </option>
 
             {tiposProducto
-              .filter((tipo) => tipo.activo === 1)
+              .filter((tipo) => tipo.estado)
               .map((tipo) => (
                 <option
                   key={tipo.id}
@@ -713,7 +715,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label maestro-label"
             htmlFor="detalleProducto"
           >
             Producto *
@@ -721,7 +723,7 @@ export function IngresoAlmacenForm({
 
           <select
             id="detalleProducto"
-            className="form-select"
+            className="form-select maestro-control"
             value={detalle.productoId}
             disabled={
               !proveedorId ||
@@ -753,7 +755,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-3">
           <label
-            className="form-label"
+            className="form-label maestro-label"
             htmlFor="detalleUnidad"
           >
             Unidad
@@ -761,18 +763,18 @@ export function IngresoAlmacenForm({
 
           <input
             id="detalleUnidad"
-            className="form-control"
+            className="form-control maestro-control"
             value={
               unidadSeleccionada?.nombre ?? ''
             }
-            placeholder="Automático"
+            placeholder="AutomÃ¡tico"
             readOnly
           />
         </div>
 
         <div className="col-12 col-md-3">
           <label
-            className="form-label"
+            className="form-label maestro-label"
             htmlFor="detalleCantidad"
           >
             Cantidad *
@@ -780,7 +782,7 @@ export function IngresoAlmacenForm({
 
           <input
             id="detalleCantidad"
-            className="form-control"
+            className="form-control maestro-control"
             type="number"
             min="0.001"
             step="0.001"
@@ -797,7 +799,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-3">
           <label
-            className="form-label"
+            className="form-label maestro-label"
             htmlFor="detallePrecio"
           >
             Precio unitario *
@@ -805,7 +807,7 @@ export function IngresoAlmacenForm({
 
           <input
             id="detallePrecio"
-            className="form-control"
+            className="form-control maestro-control"
             type="number"
             min="0"
             step="0.01"
@@ -858,7 +860,7 @@ export function IngresoAlmacenForm({
                   colSpan={6}
                   className="text-center text-secondary py-4"
                 >
-                  Todavía no agregaste productos.
+                  TodavÃ­a no agregaste productos.
                 </td>
               </tr>
             )}
@@ -867,16 +869,16 @@ export function IngresoAlmacenForm({
               const producto =
                 productos.find(
                   (productoActual) =>
-                    String(productoActual.id) === String(
-                    item.productoId),
+                    productoActual.id ===
+                    item.productoId,
                 )
 
               const tipoProducto =
                 tiposProducto.find(
                   (tipo) =>
-                    String(tipo.id) === String(
+                    String(tipo.id) ===
                     producto
-                      ?.tipoProductoId),
+                      ?.tipoProductoId,
                 )
 
               return (
@@ -972,7 +974,3 @@ export function IngresoAlmacenForm({
     </form>
   )
 }
-
-
-
-

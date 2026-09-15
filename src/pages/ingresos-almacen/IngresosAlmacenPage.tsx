@@ -65,7 +65,7 @@ function obtenerMensajeError(
 ): string {
   return error instanceof Error
     ? error.message
-    : 'Ocurrió un error inesperado.'
+    : 'OcurriÃ³ un error inesperado.'
 }
 
 function formatearFecha(
@@ -143,7 +143,7 @@ export function IngresosAlmacenPage() {
 
   const productos = useMemo(
     () => obtenerProductos(),
-    [ingresos],
+    [],
   )
 
   const unidadesMedida = useMemo(
@@ -179,34 +179,34 @@ export function IngresosAlmacenPage() {
         const proveedor =
           proveedores.find(
             (item) =>
-              String(item.id) === String(
-              ingreso.proveedorId),
+              String(item.id) ===
+              String(ingreso.proveedorId),
           )
 
         const contacto = contactos.find(
           (item) =>
-            String(item.id) === String(
-            ingreso.contactoId),
+            String(item.id) ===
+            String(ingreso.contactoId),
         )
 
         const tipoDocumento =
           tiposDocumento.find(
             (item) =>
-              String(item.id) === String(
-              ingreso.tipoDocumentoId),
+              String(item.id) ===
+              String(ingreso.tipoDocumentoId),
           )
 
         const detallesProductos =
         ingreso.detalles.map((detalle) => {
           const producto = productos.find(
             (item) =>
-              String(item.id) === String( detalle.productoId),
+              item.id === detalle.productoId,
           )
 
           const unidad = unidadesMedida.find(
             (item) =>
-              String(item.id) === String(
-              producto?.unidadMedidaId),
+              String(item.id) ===
+              String(producto?.unidadMedidaId),
           )
 
             return {
@@ -387,11 +387,11 @@ export function IngresosAlmacenPage() {
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
-              <h1>Ingresos de almacén</h1>
+              <h1>Ingresos de almacÃ©n</h1>
 
               <p>
-                Registro de mercadería y
-                actualización de existencias.
+                Registro de mercaderÃ­a y
+                actualizaciÃ³n de existencias.
               </p>
             </div>
           </section>
@@ -420,7 +420,7 @@ export function IngresosAlmacenPage() {
                 <div className="row g-3">
                   <div className="col-12 col-lg-4">
                     <label
-                      className="form-label"
+                      className="form-label maestro-label"
                       htmlFor="ingresoBusqueda"
                     >
                       Buscar
@@ -428,7 +428,7 @@ export function IngresosAlmacenPage() {
 
                     <input
                       id="ingresoBusqueda"
-                      className="form-control"
+                      className="form-control maestro-control"
                       placeholder="Ingreso, documento, proveedor o producto"
                       value={filtros.busqueda}
                       onChange={(event) =>
@@ -446,7 +446,7 @@ export function IngresosAlmacenPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label"
+                      className="form-label maestro-label"
                       htmlFor="ingresoProveedorFiltro"
                     >
                       Proveedor
@@ -454,7 +454,7 @@ export function IngresosAlmacenPage() {
 
                     <select
                       id="ingresoProveedorFiltro"
-                      className="form-select"
+                      className="form-select maestro-control"
                       value={
                         filtros.proveedorId
                       }
@@ -494,7 +494,7 @@ export function IngresosAlmacenPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label"
+                      className="form-label maestro-label"
                       htmlFor="ingresoEstadoFiltro"
                     >
                       Estado
@@ -502,7 +502,7 @@ export function IngresosAlmacenPage() {
 
                     <select
                       id="ingresoEstadoFiltro"
-                      className="form-select"
+                      className="form-select maestro-control"
                       value={filtros.estado}
                       onChange={(event) =>
                         setFiltros(
@@ -529,7 +529,7 @@ export function IngresosAlmacenPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label"
+                      className="form-label maestro-label"
                       htmlFor="ingresoDesde"
                     >
                       Desde
@@ -537,7 +537,7 @@ export function IngresosAlmacenPage() {
 
                     <input
                       id="ingresoDesde"
-                      className="form-control"
+                      className="form-control maestro-control"
                       type="date"
                       value={filtros.fechaDesde}
                       onChange={(event) =>
@@ -555,7 +555,7 @@ export function IngresosAlmacenPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label"
+                      className="form-label maestro-label"
                       htmlFor="ingresoHasta"
                     >
                       Hasta
@@ -563,7 +563,7 @@ export function IngresosAlmacenPage() {
 
                     <input
                       id="ingresoHasta"
-                      className="form-control"
+                      className="form-control maestro-control"
                       type="date"
                       value={filtros.fechaHasta}
                       onChange={(event) =>
@@ -641,7 +641,7 @@ export function IngresosAlmacenPage() {
                   <table className="table maestro-table align-middle mb-0">
                     <thead>
                       <tr>
-                        <th>Número</th>
+                        <th>NÃºmero</th>
                         <th>Fecha</th>
                         <th>Proveedor</th>
                         <th>Contacto</th>
@@ -671,7 +671,7 @@ export function IngresosAlmacenPage() {
                               </p>
                               <span>
                                 Registra el primer
-                                ingreso de mercadería.
+                                ingreso de mercaderÃ­a.
                               </span>
                             </div>
                           </td>
@@ -858,7 +858,7 @@ export function IngresosAlmacenPage() {
             </h3>
 
             <p className="maestro-modal-copy text-center">
-              Se descontarán del stock todos
+              Se descontarÃ¡n del stock todos
               los productos registrados en:
             </p>
 
@@ -895,7 +895,3 @@ export function IngresosAlmacenPage() {
     </>
   )
 }
-
-
-
-

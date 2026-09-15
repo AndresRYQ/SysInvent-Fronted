@@ -22,8 +22,8 @@ export function NuevoIngresoPage() {
             <h1>Nuevo ingreso</h1>
 
             <p>
-              Registra la mercadería recibida
-              y actualiza el stock del almacén.
+              Registra la mercaderÃ­a recibida
+              y actualiza el stock del almacÃ©n.
             </p>
           </div>
 
@@ -60,6 +60,5 @@ export function NuevoIngresoPage() {
     </main>
   )
 }
-
 
 
