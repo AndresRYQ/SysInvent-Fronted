@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { ChevronDown, Filter, RotateCcw, Search } from 'lucide-react'
+import { Filter, RotateCcw, Search } from 'lucide-react'
+import Select from 'react-select'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
 export interface FiltrosCentrosCostoValores {
   nombre: string
@@ -22,7 +23,10 @@ export function FiltrosCentrosCosto({
   onBuscar,
   onLimpiar,
 }: FiltrosCentrosCostoProps) {
-  const [estadoAbierto, setEstadoAbierto] = useState(false)
+  const opcionesEstado = [
+    { value: 'activo', label: 'Activo' },
+    { value: 'inactivo', label: 'Inactivo' },
+  ]
 
   return (
     <section className="maestro-filter-card card border-0 shadow-sm">
@@ -38,16 +42,16 @@ export function FiltrosCentrosCosto({
 
         <div className="row g-3">
           <div className="col-12 col-lg-8">
-            <label className="form-label maestro-label" htmlFor="nombreCentroCosto">
+            <label className="form-label" htmlFor="nombreCentroCosto">
               Nombre de centro de costo
             </label>
 
             <input
               id="nombreCentroCosto"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.nombre}
-              placeholder="Ej. Producción, Mantenimiento, Administración"
+              placeholder="Buscar"
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }
@@ -55,32 +59,26 @@ export function FiltrosCentrosCosto({
           </div>
 
           <div className="col-12 col-md-6 col-lg-4">
-            <label className="form-label maestro-label" htmlFor="estadoCentroCosto">
+            <label className="form-label" htmlFor="estadoCentroCosto">
               Estado
             </label>
 
-            <div
-              className={`maestro-select-wrap${estadoAbierto ? ' is-open' : ''}`}
-            >
-              <select
-                id="estadoCentroCosto"
-                className="form-select maestro-control maestro-select-control"
-                value={valores.estado}
-                onMouseDown={() => setEstadoAbierto(true)}
-                onKeyDown={() => setEstadoAbierto(true)}
-                onFocus={() => setEstadoAbierto(true)}
-                onBlur={() => setEstadoAbierto(false)}
-                onChange={(event) => {
-                  onChange('estado', event.target.value)
-                  setEstadoAbierto(false)
-                }}
-              >
-                <option value="">Todos</option>
-                <option value="activo">Activo</option>
-                <option value="inactivo">Inactivo</option>
-              </select>
-              <ChevronDown size={16} />
-            </div>
+            <Select
+              inputId="estadoCentroCosto"
+              options={opcionesEstado}
+              value={
+                opcionesEstado.find(
+                  (opcion) => opcion.value === valores.estado,
+                ) ?? null
+              }
+              onChange={(opcion) =>
+                onChange('estado', opcion?.value ?? '')
+              }
+              placeholder="Seleccionar"
+              isClearable
+              isSearchable={false}
+              styles={crearEstilosSelect({ zIndex: 10 })}
+            />
           </div>
 
         </div>
@@ -112,4 +110,3 @@ export function FiltrosCentrosCosto({
     </section>
   )
 }
-

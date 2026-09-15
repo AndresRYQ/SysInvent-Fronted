@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, Filter, RotateCcw, Search } from 'lucide-react'
+import type { Rol } from '../../types/rol'
 
 export interface FiltrosUsuariosValores {
   busqueda: string
@@ -15,6 +16,7 @@ interface FiltrosUsuariosProps {
   ) => void
   onBuscar: () => void
   onLimpiar: () => void
+  roles: Rol[]
 }
 
 export function FiltrosUsuarios({
@@ -22,6 +24,7 @@ export function FiltrosUsuarios({
   onChange,
   onBuscar,
   onLimpiar,
+  roles,
 }: FiltrosUsuariosProps) {
   const [rolAbierto, setRolAbierto] = useState(false)
   const [estadoAbierto, setEstadoAbierto] = useState(false)
@@ -40,13 +43,13 @@ export function FiltrosUsuarios({
 
         <div className="row g-3">
           <div className="col-12 col-lg-6">
-            <label className="form-label maestro-label" htmlFor="busquedaUsuario">
+            <label className="form-label" htmlFor="busquedaUsuario">
               Buscar usuario
             </label>
 
             <input
               id="busquedaUsuario"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.busqueda}
               placeholder="Ej. admin o Administrador del Sistema"
@@ -57,7 +60,7 @@ export function FiltrosUsuarios({
           </div>
 
           <div className="col-12 col-md-6 col-lg-3">
-            <label className="form-label maestro-label" htmlFor="rolUsuario">
+            <label className="form-label" htmlFor="rolUsuario">
               Rol
             </label>
 
@@ -66,7 +69,7 @@ export function FiltrosUsuarios({
             >
               <select
                 id="rolUsuario"
-                className="form-select maestro-control maestro-select-control"
+                className="form-select maestro-select-control"
                 value={valores.rol}
                 onMouseDown={() => setRolAbierto(true)}
                 onKeyDown={() => setRolAbierto(true)}
@@ -78,15 +81,21 @@ export function FiltrosUsuarios({
                 }}
               >
                 <option value="">Todos</option>
-                <option value="Administrador">Administrador</option>
-                <option value="Almacenero">Almacenero</option>
+                {roles.map((rol) => (
+                  <option
+                    value={rol.nombre}
+                    key={rol.id}
+                  >
+                    {rol.nombre}
+                  </option>
+                ))}
               </select>
               <ChevronDown size={16} />
             </div>
           </div>
 
           <div className="col-12 col-md-6 col-lg-3">
-            <label className="form-label maestro-label" htmlFor="estadoUsuario">
+            <label className="form-label" htmlFor="estadoUsuario">
               Estado
             </label>
 
@@ -95,7 +104,7 @@ export function FiltrosUsuarios({
             >
               <select
                 id="estadoUsuario"
-                className="form-select maestro-control maestro-select-control"
+                className="form-select maestro-select-control"
                 value={valores.estado}
                 onMouseDown={() => setEstadoAbierto(true)}
                 onKeyDown={() => setEstadoAbierto(true)}

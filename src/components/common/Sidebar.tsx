@@ -16,11 +16,17 @@ import {
   UserCircle,
 } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
+import { useAuth } from '../../hooks/useAuth'
+
+import {
+  tienePermisoModulo,
+} from '../../services/rolService'
 
 type SidebarItem = {
   label: string
   icon: typeof LayoutDashboard
   to?: string
+  moduleId?: string
 }
 
 type SidebarSection = {
@@ -31,60 +37,237 @@ type SidebarSection = {
 const SECCIONES: SidebarSection[] = [
   {
     label: 'General',
-    items: [{ to: '/dashboard', label: 'Inicio', icon: LayoutDashboard }],
+    items: [
+      {
+        to: '/dashboard',
+        label: 'Inicio',
+        icon: LayoutDashboard,
+      },
+    ],
   },
   {
     label: 'Inventario',
     items: [
-      { label: 'Proveedores', icon: Users },
-      { label: 'Productos', icon: Boxes },
-      { label: 'Bitácora', icon: FileText },
-      { label: 'Contactos', icon: Users },
-      { label: 'Partes de equipo', icon: Archive },
-      { to: '/control-almacen', label: 'Control de almacén', icon: Archive },
-      { to: '/vales-consumo', label: 'Vales de consumo', icon: ClipboardList },
-      { to: '/ingresos-almacen', label: 'Ingresos de almacén', icon: PackagePlus },
+      {
+        to: '/control-almacen',
+        label: 'Control de almacén',
+        icon: Archive,
+        moduleId: 'control-almacen',
+      },
+      {
+        to: '/vales-consumo',
+        label: 'Vales de consumo',
+        icon: ClipboardList,
+        moduleId: 'vales-consumo',
+      },
+      {
+        to: '/ingresos-almacen',
+        label: 'Ingresos de almacén',
+        icon: PackagePlus,
+        moduleId: 'ingresos-almacen',
+      },
     ],
   },
   {
     label: 'Reportes',
     items: [
-      { label: 'Reporte de ingreso', icon: FileText },
-      { label: 'Reporte de vale', icon: FileText },
-      { label: 'Reporte de producto más pedido', icon: FileText },
+      {
+        to: '/reportes/ingresos',
+        label: 'Reporte de ingreso',
+        icon: FileText,
+        moduleId: 'reporte-ingresos',
+      },
+      {
+        to: '/reportes/vales',
+        label: 'Reporte de vale',
+        icon: FileText,
+        moduleId: 'reporte-vales',
+      },
+      {
+        to: '/reportes/productos-mas-pedidos',
+        label:
+          'Reporte de producto más pedido',
+        icon: FileText,
+        moduleId: 'reporte-productos',
+      },
     ],
   },
   {
     label: 'Maestros',
     items: [
-      { to: '/centros-costo', label: 'Centros de costo', icon: Coins },
-      { to: '/categorias', label: 'Categorías', icon: Boxes },
-      { to: '/tipos-producto', label: 'Tipos de producto', icon: Tags },
-      { to: '/tipos-comprobante', label: 'Tipos de documento', icon: FileText },
-      { to: '/unidades-medida', label: 'Unidades de medida', icon: Ruler },
-      { to: '/destinos', label: 'Destinos', icon: MapPin },
+      {
+        to: '/proveedores',
+        label: 'Proveedores',
+        icon: Users,
+        moduleId: 'proveedores',
+      },
+      {
+        to: '/productos',
+        label: 'Productos',
+        icon: Boxes,
+        moduleId: 'productos',
+      },
+      {
+        to: '/contactos',
+        label: 'Contactos',
+        icon: Users,
+        moduleId: 'contactos',
+      },
+      {
+        to: '/partes-equipo',
+        label: 'Partes de equipo',
+        icon: Archive,
+        moduleId: 'partes-equipo',
+      },
+      {
+        to: '/centros-costo',
+        label: 'Centros de costo',
+        icon: Coins,
+        moduleId: 'centros-costo',
+      },
+      {
+        to: '/categorias',
+        label: 'Categorías',
+        icon: Boxes,
+        moduleId: 'categorias',
+      },
+      {
+        to: '/tipos-producto',
+        label: 'Tipos de producto',
+        icon: Tags,
+        moduleId: 'tipos-producto',
+      },
+      {
+        to: '/tipos-documento',
+        label: 'Tipos de documento',
+        icon: FileText,
+        moduleId: 'tipos-documento',
+      },
+      {
+        to: '/unidades-medida',
+        label: 'Unidades de medida',
+        icon: Ruler,
+        moduleId: 'unidades-medida',
+      },
+      {
+        to: '/destinos',
+        label: 'Destinos',
+        icon: MapPin,
+        moduleId: 'destinos',
+      },
     ],
   },
   {
     label: 'Seguridad',
     items: [
-      { to: '/usuarios', label: 'Usuarios', icon: Users },
-      { to: '/roles', label: 'Roles', icon: Shield },
-      { label: 'Perfil de usuario', icon: UserCircle },
+      {
+        to: '/bitacora',
+        label: 'Bitácora',
+        icon: FileText,
+        moduleId: 'bitacora',
+      },
+      {
+        to: '/usuarios',
+        label: 'Usuarios',
+        icon: Users,
+        moduleId: 'usuarios',
+      },
+      {
+        to: '/roles',
+        label: 'Roles',
+        icon: Shield,
+        moduleId: 'roles',
+      },
+      {
+        label: 'Perfil de usuario',
+        icon: UserCircle,
+        moduleId: 'perfil-usuario',
+      },
     ],
   },
 ]
 
+
 type SidebarProps = {
   abierto: boolean
   onToggle: () => void
+  onNavigate?: () => void
 }
 
-export function Sidebar({ abierto, onToggle }: SidebarProps) {
+export function Sidebar({
+  abierto,
+  onToggle,
+  onNavigate,
+}: SidebarProps) {
   const { pathname } = useLocation()
+  const { sesion } = useAuth()
+
+const seccionesPermitidas =
+  SECCIONES.map((seccion) => ({
+    ...seccion,
+    items: seccion.items.filter(
+      (item) =>
+        !item.moduleId ||
+        tienePermisoModulo(
+          sesion?.rol,
+          item.moduleId,
+        ),
+    ),
+  })).filter(
+    (seccion) => seccion.items.length > 0,
+  )
+  const sidebarRef = useRef<HTMLDivElement>(null)
+  const dragRef = useRef({
+    active: false,
+    dragged: false,
+    startY: 0,
+    startScrollTop: 0,
+  })
 
   const activo = (to: string) =>
     to === '/dashboard' ? pathname === to : pathname.startsWith(to)
+
+  const manejarPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    void event
+    dragRef.current.active = false
+  }
+
+  const manejarPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (!dragRef.current.active || !sidebarRef.current) {
+      return
+    }
+
+    const desplazamiento = event.clientY - dragRef.current.startY
+    if (Math.abs(desplazamiento) > 5) {
+      dragRef.current.dragged = true
+    }
+
+    if (dragRef.current.dragged) {
+      sidebarRef.current.scrollTop = Math.max(
+        0,
+        Math.min(
+          sidebarRef.current.scrollHeight - sidebarRef.current.clientHeight,
+          dragRef.current.startScrollTop - desplazamiento,
+        ),
+      )
+    }
+  }
+
+  const finalizarArrastre = (event: PointerEvent<HTMLDivElement>) => {
+    if (!dragRef.current.active || !sidebarRef.current) {
+      return
+    }
+
+    dragRef.current.active = false
+    sidebarRef.current.releasePointerCapture(event.pointerId)
+  }
+
+  const evitarClickTrasArrastre = (event: React.MouseEvent<HTMLDivElement>) => {
+    // La navegación de los enlaces no debe ser cancelada por la captura
+    // del clic del contenedor desplazable.
+    void event
+    dragRef.current.dragged = false
+  }
 
   return (
     <aside
@@ -111,7 +294,7 @@ export function Sidebar({ abierto, onToggle }: SidebarProps) {
           tabIndex={0}
           aria-label="Navegación principal"
         >
-          {SECCIONES.map((seccion) => (
+         {seccionesPermitidas.map((seccion) => (
             <div className="sidebar-section" key={seccion.label}>
               {abierto && <span className="sidebar-section-label">{seccion.label}</span>}
               {seccion.items.map((enlace) => {
@@ -127,6 +310,7 @@ export function Sidebar({ abierto, onToggle }: SidebarProps) {
                     to={enlace.to}
                     className={className}
                     title={!abierto ? enlace.label : undefined}
+                    onClick={onNavigate}
                   >
                     <Icon size={18} />
                     {abierto && <span>{enlace.label}</span>}

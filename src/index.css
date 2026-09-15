@@ -1,3 +1,6 @@
+@import './styles/variables.css';
+@import './styles/labels.css';
+
 :root {
   font-family:
     'Segoe UI',
@@ -7,13 +10,13 @@
     BlinkMacSystemFont,
     sans-serif;
 
-  color: #303a33;
+  color: var(--color-text-primary);
   background:
     radial-gradient(
       circle at top,
-      #eff8f0 0%,
-      #f6f8f6 35%,
-      #eef2f7 100%
+      var(--color-page-start) 0%,
+      var(--color-page-middle) 35%,
+      var(--color-page-end) 100%
     );
 
   font-synthesis: none;
@@ -22,14 +25,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --brand-green: #338f3c;
-  --brand-green-dark: #087536;
-  --brand-green-soft: #e8f5ea;
-  --brand-slate: #123d2e;
-  --brand-border: rgb(10 105 74 / 12%);
-  --text-muted: #6d716e;
-  --shadow-soft:
-    0 16px 40px rgb(15 23 42 / 8%);
 }
 
 * {
@@ -42,9 +37,9 @@ html {
   background:
     radial-gradient(
       circle at top,
-      #eff8f0 0%,
-      #f6f8f6 35%,
-      #eef2f7 100%
+      var(--color-page-start) 0%,
+      var(--color-page-middle) 35%,
+      var(--color-page-end) 100%
     );
 }
 
@@ -52,13 +47,64 @@ body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-  color: #1f2937;
+  color: var(--color-text-primary);
   background: transparent;
 }
 
 button,
 input {
   font: inherit;
+}
+
+::placeholder {
+  color: var(--color-text-muted);
+  font-size: var(--form-control-font-size) !important;
+  opacity: 1;
+}
+
+/* Altura común de los controles de formulario en todo el sistema. */
+:where(
+  .form-control,
+  .form-select,
+  select,
+  input:not([type='checkbox']):not([type='radio']):not([type='file'])
+) {
+  min-height: var(--form-control-height);
+  height: var(--form-control-height);
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--form-control-radius);
+  background: var(--color-control-bg);
+  box-shadow: none !important;
+  font-size: var(--form-control-font-size) !important;
+  padding-top: var(--form-control-padding-y);
+  padding-bottom: var(--form-control-padding-y);
+  transition:
+    border-color var(--transition-control),
+    transform var(--transition-control),
+    box-shadow var(--transition-control);
+}
+
+:where(
+  .form-control,
+  .form-select,
+  select,
+  input:not([type='checkbox']):not([type='radio']):not([type='file'])
+):focus {
+  border-color: var(--color-green-focus) !important;
+  background: var(--color-white);
+  box-shadow:
+    0 0 0 0.22rem var(--color-green-outline) !important;
+  transform: translateY(-1px);
+}
+
+:where(.form-select, select) {
+  background: var(--color-select-bg);
+}
+
+textarea.form-control {
+  height: auto;
+  min-height: var(--form-control-height);
+  resize: vertical;
 }
 
 button {
@@ -72,7 +118,7 @@ a {
 
 button:focus-visible,
 input:focus-visible {
-  outline: 3px solid rgb(51 143 60 / 25%);
+  outline: 3px solid var(--color-green-outline);
   outline-offset: 2px;
 }
 

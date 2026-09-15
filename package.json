@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
+    "exceljs": "^4.4.0",
     "lucide-react": "^1.33.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "react-router-dom": "^7.18.2"
+    "react-router-dom": "^7.18.2",
+    "react-select": "^5.10.2"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",

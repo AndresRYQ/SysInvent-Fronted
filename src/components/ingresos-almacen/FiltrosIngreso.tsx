@@ -40,7 +40,7 @@ export function FiltrosIngreso({
         <div className="row g-3">
           <div className="col-12 col-lg-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="numeroIngresoFiltro"
             >
               Nro. de ingreso
@@ -48,7 +48,7 @@ export function FiltrosIngreso({
 
             <input
               id="numeroIngresoFiltro"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.numeroIngreso}
               placeholder="Ej. ING-2026-0001"
@@ -60,7 +60,7 @@ export function FiltrosIngreso({
 
           <div className="col-12 col-lg-5">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="proveedorIngresoFiltro"
             >
               Proveedor
@@ -68,7 +68,7 @@ export function FiltrosIngreso({
 
             <input
               id="proveedorIngresoFiltro"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.proveedor}
               placeholder="Ej. Ferreteria Industrial SAC"
@@ -80,7 +80,7 @@ export function FiltrosIngreso({
 
           <div className="col-12 col-md-6 col-lg-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="estadoIngresoFiltro"
             >
               Estado
@@ -91,7 +91,7 @@ export function FiltrosIngreso({
             >
               <select
                 id="estadoIngresoFiltro"
-                className="form-select maestro-control maestro-select-control"
+                className="form-select maestro-select-control"
                 value={valores.estado}
                 onMouseDown={() => setEstadoAbierto(true)}
                 onKeyDown={() => setEstadoAbierto(true)}

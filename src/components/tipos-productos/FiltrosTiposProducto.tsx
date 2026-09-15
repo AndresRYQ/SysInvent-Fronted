@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ChevronDown, Filter, RotateCcw, Search } from 'lucide-react'
+import { Filter, RotateCcw, Search } from 'lucide-react'
+import { MaestroEstadoSelect } from '../common/MaestroEstadoSelect'
 
 export interface FiltrosTiposProductoValores {
   nombre: string
@@ -22,8 +22,6 @@ export function FiltrosTiposProducto({
   onBuscar,
   onLimpiar,
 }: FiltrosTiposProductoProps) {
-  const [estadoAbierto, setEstadoAbierto] = useState(false)
-
   return (
     <section className="maestro-filter-card card border-0 shadow-sm">
       <div className="card-body p-3 p-lg-3">
@@ -38,16 +36,16 @@ export function FiltrosTiposProducto({
 
         <div className="row g-3">
           <div className="col-12 col-lg-8">
-            <label className="form-label maestro-label" htmlFor="nombreTipoProducto">
+            <label className="form-label" htmlFor="nombreTipoProducto">
               Nombre de tipo de producto
             </label>
 
             <input
               id="nombreTipoProducto"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.nombre}
-              placeholder="Ej. Insumo, Producto terminado, Material"
+              placeholder="Buscar"
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }
@@ -55,16 +53,19 @@ export function FiltrosTiposProducto({
           </div>
 
           <div className="col-12 col-md-6 col-lg-4">
-            <label className="form-label maestro-label" htmlFor="estadoTipoProducto">
+            <label className="form-label" htmlFor="estadoTipoProducto">
               Estado
             </label>
 
-            <div
-              className={`maestro-select-wrap${estadoAbierto ? ' is-open' : ''}`}
-            >
+            <MaestroEstadoSelect
+              inputId="estadoTipoProducto"
+              value={valores.estado}
+              onChange={(value) => onChange('estado', value)}
+            />
+            {/*
               <select
                 id="estadoTipoProducto"
-                className="form-select maestro-control maestro-select-control"
+                className="form-select maestro-select-control"
                 value={valores.estado}
                 onMouseDown={() => setEstadoAbierto(true)}
                 onKeyDown={() => setEstadoAbierto(true)}
@@ -80,7 +81,7 @@ export function FiltrosTiposProducto({
                 <option value="inactivo">Inactivo</option>
               </select>
               <ChevronDown size={16} />
-            </div>
+            </div> */}
           </div>
 
         </div>
