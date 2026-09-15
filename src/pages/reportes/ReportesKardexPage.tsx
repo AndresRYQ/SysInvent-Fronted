@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { ArrowDownToLine, ArrowUpFromLine, Boxes, Download, ListFilter } from 'lucide-react'
+import Select from 'react-select'
 import { Placeholder } from '../../constants/placeholders'
 import { TablePagination } from '../../components/ui/TablePagination'
 import { movimientosKardex, productosKardex, stockActualKardex } from '../../data/kardex'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 import './ReportesKardexPage.css'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
 const filtrosIniciales = { producto: '', tipo: '', desde: '', hasta: '' }
 const fechaVisible = (fecha: string) => fecha.split('-').reverse().join('/')
@@ -68,13 +70,8 @@ export function ReportesKardexPage() {
       <section className="maestro-filter-card kardex-panel" aria-labelledby="kardex-filtros">
         <h2 id="kardex-filtros">Filtrar movimientos</h2>
         <div className="kardex-filters">
-          <label>Producto<select className="form-select maestro-control" value={filtros.producto} onChange={(e) => cambiarFiltro('producto', e.target.value)}>
-            <option value="">{Placeholder.Seleccionar}</option>
-            {productosKardex.map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
-          </select></label>
-          <label>Tipo de movimiento<select className="form-select maestro-control" value={filtros.tipo} onChange={(e) => cambiarFiltro('tipo', e.target.value)}>
-            <option value="">{Placeholder.Seleccionar}</option><option>Entrada</option><option>Salida</option>
-          </select></label>
+          <label>Producto<Select inputId="kardexProducto" classNamePrefix="maestro-select" options={productosKardex.map((p) => ({ value: p.id, label: p.nombre }))} value={productosKardex.map((p) => ({ value: p.id, label: p.nombre })).find((option) => option.value === filtros.producto) ?? null} onChange={(option) => cambiarFiltro('producto', option?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable={false} menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} /></label>
+          <label>Tipo de movimiento<Select inputId="kardexTipoMovimiento" classNamePrefix="maestro-select" options={[{ value: 'Entrada', label: 'Entrada' }, { value: 'Salida', label: 'Salida' }]} value={[{ value: 'Entrada', label: 'Entrada' }, { value: 'Salida', label: 'Salida' }].find((option) => option.value === filtros.tipo) ?? null} onChange={(option) => cambiarFiltro('tipo', option?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable={false} menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} /></label>
           <label>Desde<input className="form-control maestro-control" type="date" placeholder={Placeholder.Fecha} value={filtros.desde} onChange={(e) => cambiarFiltro('desde', e.target.value)} aria-invalid={rangoInvalido} aria-describedby={rangoInvalido ? 'error-fechas' : undefined} /></label>
           <label>Hasta<input className="form-control maestro-control" type="date" placeholder={Placeholder.Fecha} value={filtros.hasta} onChange={(e) => cambiarFiltro('hasta', e.target.value)} aria-invalid={rangoInvalido} aria-describedby={rangoInvalido ? 'error-fechas' : undefined} /></label>
           <button className="btn btn-maestro-info" onClick={() => { setFiltros(filtrosIniciales); setPage(1) }}>Limpiar filtros</button>

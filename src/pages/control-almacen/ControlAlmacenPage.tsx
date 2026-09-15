@@ -12,6 +12,7 @@ import {
   Eye,
   Search,
 } from 'lucide-react'
+import Select from 'react-select'
 
 import { DetalleMovimientosModal } from '../../components/control-almacen/DetalleMovimientosModal'
 import { TablePagination } from '../../components/ui/TablePagination'
@@ -33,6 +34,7 @@ import type {
 } from '../../types/kardex'
 
 import '../../styles/DashboardPage.css'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 import '../../styles/maestros.css'
 
 const FILTROS_INICIALES:
@@ -392,37 +394,18 @@ export function ControlAlmacenPage() {
                       Tipo
                     </label>
 
-                    <select
-                      className="form-select maestro-control"
-                      value={
-                        filtros.tipoProductoId
-                      }
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            tipoProductoId:
-                              event.target
-                                .value,
-                          }),
-                        )
-                      }
-                    >
-                      <option value="">
-                        Todos
-                      </option>
-
-                      {tiposProducto.map(
-                        (tipo) => (
-                          <option
-                            key={tipo.id}
-                            value={tipo.id}
-                          >
-                            {tipo.nombre}
-                          </option>
-                        ),
-                      )}
-                    </select>
+                    <Select
+                      inputId="controlTipoProductoFiltro"
+                      classNamePrefix="maestro-select"
+                      options={tiposProducto.map((tipo) => ({ value: String(tipo.id), label: tipo.nombre }))}
+                      value={tiposProducto.map((tipo) => ({ value: String(tipo.id), label: tipo.nombre })).find((option) => option.value === filtros.tipoProductoId) ?? null}
+                      onChange={(option) => setFiltros((actual) => ({ ...actual, tipoProductoId: option?.value ?? '' }))}
+                      placeholder={Placeholder.Seleccionar}
+                      isClearable
+                      isSearchable={false}
+                      menuPortalTarget={document.body}
+                      styles={crearEstilosSelect({ zIndex: 20 })}
+                    />
                   </div>
 
                   <div className="col-12 col-md-4 col-lg-2">
@@ -430,41 +413,18 @@ export function ControlAlmacenPage() {
                       Categoría
                     </label>
 
-                    <select
-                      className="form-select maestro-control"
-                      value={
-                        filtros.categoriaId
-                      }
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            categoriaId:
-                              event.target
-                                .value,
-                          }),
-                        )
-                      }
-                    >
-                      <option value="">
-                        Todas
-                      </option>
-
-                      {categorias.map(
-                        (categoria) => (
-                          <option
-                            key={categoria.id}
-                            value={
-                              categoria.id
-                            }
-                          >
-                            {
-                              categoria.nombre
-                            }
-                          </option>
-                        ),
-                      )}
-                    </select>
+                    <Select
+                      inputId="controlCategoriaFiltro"
+                      classNamePrefix="maestro-select"
+                      options={categorias.map((categoria) => ({ value: String(categoria.id), label: categoria.nombre }))}
+                      value={categorias.map((categoria) => ({ value: String(categoria.id), label: categoria.nombre })).find((option) => option.value === filtros.categoriaId) ?? null}
+                      onChange={(option) => setFiltros((actual) => ({ ...actual, categoriaId: option?.value ?? '' }))}
+                      placeholder={Placeholder.Seleccionar}
+                      isClearable
+                      isSearchable={false}
+                      menuPortalTarget={document.body}
+                      styles={crearEstilosSelect({ zIndex: 20 })}
+                    />
                   </div>
 
                   <div className="col-12 col-md-4 col-lg-2">
@@ -472,32 +432,18 @@ export function ControlAlmacenPage() {
                       Estado
                     </label>
 
-                    <select
-                      className="form-select maestro-control"
-                      value={
-                        filtros.estadoStock
-                      }
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            estadoStock:
-                              event.target
-                                .value,
-                          }),
-                        )
-                      }
-                    >
-                      <option value="">
-                        Todos
-                      </option>
-                      <option value="CON_STOCK">
-                        Con stock
-                      </option>
-                      <option value="SIN_STOCK">
-                        Sin stock
-                      </option>
-                    </select>
+                    <Select
+                      inputId="controlEstadoStockFiltro"
+                      classNamePrefix="maestro-select"
+                      options={[{ value: 'CON_STOCK', label: 'Con stock' }, { value: 'SIN_STOCK', label: 'Sin stock' }]}
+                      value={[{ value: 'CON_STOCK', label: 'Con stock' }, { value: 'SIN_STOCK', label: 'Sin stock' }].find((option) => option.value === filtros.estadoStock) ?? null}
+                      onChange={(option) => setFiltros((actual) => ({ ...actual, estadoStock: option?.value ?? '' }))}
+                      placeholder={Placeholder.Seleccionar}
+                      isClearable
+                      isSearchable={false}
+                      menuPortalTarget={document.body}
+                      styles={crearEstilosSelect({ zIndex: 20 })}
+                    />
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2">

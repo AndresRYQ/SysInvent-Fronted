@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   Trash2,
 } from 'lucide-react'
+import Select from 'react-select'
 
 import {
   useLocation,
@@ -20,6 +21,7 @@ import {
 } from 'react-router-dom'
 
 import { TablePagination } from '../../components/ui/TablePagination'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
 import {
   anularIngresoAlmacen,
@@ -453,44 +455,18 @@ export function IngresosAlmacenPage() {
                       Proveedor
                     </label>
 
-                    <select
-                      id="ingresoProveedorFiltro"
-                      className="form-select maestro-control"
-                      value={
-                        filtros.proveedorId
-                      }
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            proveedorId:
-                              event.target
-                                .value,
-                          }),
-                        )
-                      }
-                    >
-                      <option value="">
-                        Todos
-                      </option>
-
-                      {proveedores.map(
-                        (proveedor) => (
-                          <option
-                            key={
-                              proveedor.id
-                            }
-                            value={
-                              proveedor.id
-                            }
-                          >
-                            {
-                              proveedor.razonSocial
-                            }
-                          </option>
-                        ),
-                      )}
-                    </select>
+                    <Select
+                      inputId="ingresoProveedorFiltro"
+                      classNamePrefix="maestro-select"
+                      options={proveedores.map((proveedor) => ({ value: String(proveedor.id), label: proveedor.razonSocial }))}
+                      value={proveedores.map((proveedor) => ({ value: String(proveedor.id), label: proveedor.razonSocial })).find((option) => option.value === filtros.proveedorId) ?? null}
+                      onChange={(option) => setFiltros((actual) => ({ ...actual, proveedorId: option?.value ?? '' }))}
+                      placeholder={Placeholder.Seleccionar}
+                      isClearable
+                      isSearchable={false}
+                      menuPortalTarget={document.body}
+                      styles={crearEstilosSelect({ zIndex: 20 })}
+                    />
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2">
@@ -501,31 +477,18 @@ export function IngresosAlmacenPage() {
                       Estado
                     </label>
 
-                    <select
-                      id="ingresoEstadoFiltro"
-                      className="form-select maestro-control"
-                      value={filtros.estado}
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            estado:
-                              event.target
-                                .value,
-                          }),
-                        )
-                      }
-                    >
-                      <option value="">
-                        Todos
-                      </option>
-                      <option value="REGISTRADO">
-                        Registrado
-                      </option>
-                      <option value="ANULADO">
-                        Anulado
-                      </option>
-                    </select>
+                    <Select
+                      inputId="ingresoEstadoFiltro"
+                      classNamePrefix="maestro-select"
+                      options={[{ value: 'REGISTRADO', label: 'Registrado' }, { value: 'ANULADO', label: 'Anulado' }]}
+                      value={[{ value: 'REGISTRADO', label: 'Registrado' }, { value: 'ANULADO', label: 'Anulado' }].find((option) => option.value === filtros.estado) ?? null}
+                      onChange={(option) => setFiltros((actual) => ({ ...actual, estado: option?.value ?? '' }))}
+                      placeholder={Placeholder.Seleccionar}
+                      isClearable
+                      isSearchable={false}
+                      menuPortalTarget={document.body}
+                      styles={crearEstilosSelect({ zIndex: 20 })}
+                    />
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2">

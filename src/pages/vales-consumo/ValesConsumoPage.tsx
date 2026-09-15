@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   Trash2,
 } from 'lucide-react'
+import Select from 'react-select'
 
 import {
   useLocation,
@@ -20,6 +21,7 @@ import {
 } from 'react-router-dom'
 
 import { TablePagination } from '../../components/ui/TablePagination'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
 import { obtenerCentrosCosto } from '../../services/centroCostoService'
 import { obtenerDestinos } from '../../services/destinoService'
@@ -430,38 +432,18 @@ export function ValesConsumoPage() {
                       Centro de costo
                     </label>
 
-                    <select
-                      id="valeCentroFiltro"
-                      className="form-select maestro-control"
-                      value={
-                        filtros.centroCostoId
-                      }
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            centroCostoId:
-                              event.target
-                                .value,
-                          }),
-                        )
-                      }
-                    >
-                      <option value="">
-                        Todos
-                      </option>
-
-                      {centrosCosto.map(
-                        (centro) => (
-                          <option
-                            key={centro.id}
-                            value={centro.id}
-                          >
-                            {centro.nombre}
-                          </option>
-                        ),
-                      )}
-                    </select>
+                    <Select
+                      inputId="valeCentroFiltro"
+                      classNamePrefix="maestro-select"
+                      options={centrosCosto.map((centro) => ({ value: String(centro.id), label: centro.nombre }))}
+                      value={centrosCosto.map((centro) => ({ value: String(centro.id), label: centro.nombre })).find((option) => option.value === filtros.centroCostoId) ?? null}
+                      onChange={(option) => setFiltros((actual) => ({ ...actual, centroCostoId: option?.value ?? '' }))}
+                      placeholder={Placeholder.Seleccionar}
+                      isClearable
+                      isSearchable={false}
+                      menuPortalTarget={document.body}
+                      styles={crearEstilosSelect({ zIndex: 20 })}
+                    />
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2">
@@ -472,31 +454,18 @@ export function ValesConsumoPage() {
                       Estado
                     </label>
 
-                    <select
-                      id="valeEstadoFiltro"
-                      className="form-select maestro-control"
-                      value={filtros.estado}
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            estado:
-                              event.target
-                                .value,
-                          }),
-                        )
-                      }
-                    >
-                      <option value="">
-                        Todos
-                      </option>
-                      <option value="REGISTRADO">
-                        Registrado
-                      </option>
-                      <option value="ANULADO">
-                        Anulado
-                      </option>
-                    </select>
+                    <Select
+                      inputId="valeEstadoFiltro"
+                      classNamePrefix="maestro-select"
+                      options={[{ value: 'REGISTRADO', label: 'Registrado' }, { value: 'ANULADO', label: 'Anulado' }]}
+                      value={[{ value: 'REGISTRADO', label: 'Registrado' }, { value: 'ANULADO', label: 'Anulado' }].find((option) => option.value === filtros.estado) ?? null}
+                      onChange={(option) => setFiltros((actual) => ({ ...actual, estado: option?.value ?? '' }))}
+                      placeholder={Placeholder.Seleccionar}
+                      isClearable
+                      isSearchable={false}
+                      menuPortalTarget={document.body}
+                      styles={crearEstilosSelect({ zIndex: 20 })}
+                    />
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2">
