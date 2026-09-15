@@ -54,7 +54,7 @@ export function NuevoProveedorPage() {
 
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn btn-maestro-info"
             onClick={() =>
               navigate('/proveedores')
             }

@@ -49,7 +49,7 @@ export function EditarIngresoPage() {
 
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn btn-maestro-info"
             onClick={() =>
               navigate('/ingresos-almacen')
             }
@@ -77,7 +77,7 @@ export function EditarIngresoPage() {
 
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn btn-maestro-info"
             onClick={() =>
               navigate('/ingresos-almacen')
             }

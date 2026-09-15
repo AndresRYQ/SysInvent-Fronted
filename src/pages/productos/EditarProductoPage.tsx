@@ -94,7 +94,7 @@ export function EditarProductoPage() {
 
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn btn-maestro-info"
             onClick={() =>
               navigate('/productos')
             }
@@ -122,7 +122,7 @@ export function EditarProductoPage() {
 
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn btn-maestro-info"
             onClick={() =>
               navigate('/productos')
             }

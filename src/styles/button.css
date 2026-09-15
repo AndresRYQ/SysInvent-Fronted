@@ -1,0 +1,57 @@
+.btn-maestro,
+.btn-maestro-primary,
+.btn-maestro-secondary,
+.btn-maestro-info,
+.btn-maestro-danger {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 50px;
+  padding: 0 18px;
+  border-radius: var(--button-radius) !important;
+  font-weight: 700 !important;
+  font-size: 0.8rem !important;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease !important;
+}
+
+.btn-maestro-primary {
+  color: #fff !important;
+  border: 0 !important;
+  background:
+    linear-gradient(
+      135deg,
+      var(--brand-green-dark) 0%,
+      var(--brand-green) 100%
+    ) !important;
+}
+
+.btn-maestro-info {
+  color: #075985 !important;
+  border: 1px solid #bae6fd !important;
+  background: #e0f2fe !important;
+}
+
+.btn-maestro-secondary {
+  color: #1f2937 !important;
+  border: 1px solid rgb(17 24 39 / 10%) !important;
+  background: #fff !important;
+}
+
+.btn-maestro-danger {
+  border: 0 !important;
+  background: #b42318 !important;
+  color: #fff !important;
+}
+
+.maestro-modal-footer .btn-maestro-primary,
+.maestro-modal-footer .btn-maestro-danger {
+  min-height: 38px;
+  height: 38px;
+  padding: 0 12px;
+  font-size: 0.8rem;
+  border-radius: var(--button-modal-radius) !important;
+}

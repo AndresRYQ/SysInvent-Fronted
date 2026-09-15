@@ -48,7 +48,7 @@ export function ReportesKardexPage() {
           <h1>Control de almacén</h1>
           <p>Consulta las entradas, salidas y existencias de tus productos.</p>
         </div>
-        <button className="btn maestro-btn-primary" onClick={exportar} disabled={!movimientos.length}>
+        <button className="btn btn-maestro-primary" onClick={exportar} disabled={!movimientos.length}>
           <Download size={18} /> Exportar CSV
         </button>
       </header>
@@ -76,7 +76,7 @@ export function ReportesKardexPage() {
           </select></label>
           <label>Desde<input className="form-control maestro-control" type="date" value={filtros.desde} onChange={(e) => cambiarFiltro('desde', e.target.value)} aria-invalid={rangoInvalido} aria-describedby={rangoInvalido ? 'error-fechas' : undefined} /></label>
           <label>Hasta<input className="form-control maestro-control" type="date" value={filtros.hasta} onChange={(e) => cambiarFiltro('hasta', e.target.value)} aria-invalid={rangoInvalido} aria-describedby={rangoInvalido ? 'error-fechas' : undefined} /></label>
-          <button className="btn maestro-btn-secondary" onClick={() => { setFiltros(filtrosIniciales); setPage(1) }}>Limpiar filtros</button>
+          <button className="btn btn-maestro-info" onClick={() => { setFiltros(filtrosIniciales); setPage(1) }}>Limpiar filtros</button>
         </div>
         {rangoInvalido && <p id="error-fechas" className="text-danger mt-3 mb-0" role="alert">La fecha desde debe ser anterior o igual a la fecha hasta.</p>}
       </section>

@@ -25,8 +25,8 @@ export function CentroCostoDeleteModal({ abierto, centroCosto, onClose, onConfir
         </p>
         <p className="maestro-delete-name">{centroCosto.nombre}</p>
         <div className="maestro-modal-footer maestro-modal-footer--center">
-          <button type="button" className="btn maestro-btn-danger" onClick={onClose}><X size={18} />Cancelar</button>
-          <button type="button" className="btn maestro-btn-primary" onClick={onConfirm}><Check size={18} />{reactivar ? 'Reactivar' : 'Aceptar'}</button>
+          <button type="button" className="btn btn-maestro-danger" onClick={onClose}><X size={18} />Cancelar</button>
+          <button type="button" className="btn btn-maestro-primary" onClick={onConfirm}><Check size={18} />{reactivar ? 'Reactivar' : 'Aceptar'}</button>
         </div>
       </div>
     </div>

@@ -88,7 +88,7 @@ export function FiltrosCentrosCosto({
             <div className="maestro-filter-actions">
               <button
                 type="button"
-                className="btn maestro-btn-secondary maestro-filter-btn"
+                className="btn btn-maestro-secondary"
                 onClick={onLimpiar}
               >
                 <RotateCcw size={18} />
@@ -97,7 +97,7 @@ export function FiltrosCentrosCosto({
               
               <button
                 type="button"
-                className="btn maestro-btn-primary maestro-filter-btn"
+                className="btn btn-maestro-primary"
                 onClick={onBuscar}
               >
                 <Search size={18} />

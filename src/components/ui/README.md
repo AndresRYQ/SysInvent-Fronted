@@ -7,7 +7,7 @@ de negocio, por lo que pueden utilizarse en cualquier módulo.
 
 | Componente | Propiedades |
 | --- | --- |
-| Button | Atributos nativos, `variant`: primary, secondary o danger; `loading` deshabilita el botón. Por defecto `type="button"`. |
+| Button | Atributos nativos, `variant`: primary, secondary, info o danger; `loading` deshabilita el botón. Por defecto `type="button"`. |
 | Input | Atributos nativos, `label` obligatorio, `hint`, `error`. ID automático y descripciones accesibles. |
 | Select | Igual que Input; `options` recibe objetos con `value`, `label` y `disabled` opcional. |
 | FormField | `id`, `label`, `hint`, `error` y contenido hijo. Para otros controles, vincular el ID, aria-describedby y aria-invalid del hijo. |

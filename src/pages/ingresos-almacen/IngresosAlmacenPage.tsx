@@ -583,7 +583,7 @@ export function IngresosAlmacenPage() {
                 <div className="d-flex justify-content-end gap-2 mt-3">
                   <button
                     type="button"
-                    className="btn maestro-btn-secondary"
+                    className="btn btn-maestro-secondary"
                     onClick={() => {
                       setFiltros(
                         FILTROS_INICIALES,
@@ -599,7 +599,7 @@ export function IngresosAlmacenPage() {
 
                   <button
                     type="button"
-                    className="btn maestro-btn-primary"
+                    className="btn btn-maestro-primary"
                     onClick={() => {
                       setFiltrosAplicados({
                         ...filtros,
@@ -871,7 +871,7 @@ export function IngresosAlmacenPage() {
             <div className="maestro-modal-footer maestro-modal-footer--center">
               <button
                 type="button"
-                className="btn maestro-btn-secondary"
+                className="btn btn-maestro-info"
                 onClick={() =>
                   setIngresoAAnular(null)
                 }
@@ -881,7 +881,7 @@ export function IngresosAlmacenPage() {
 
               <button
                 type="button"
-                className="btn maestro-btn-danger"
+                className="btn btn-maestro-danger"
                 onClick={
                   confirmarAnulacion
                 }

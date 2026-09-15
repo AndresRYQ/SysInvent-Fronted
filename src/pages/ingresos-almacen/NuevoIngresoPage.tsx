@@ -29,7 +29,7 @@ export function NuevoIngresoPage() {
 
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn btn-maestro-info"
             onClick={() =>
               navigate('/ingresos-almacen')
             }

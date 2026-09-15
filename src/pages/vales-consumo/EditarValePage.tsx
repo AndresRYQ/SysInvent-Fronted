@@ -47,7 +47,7 @@ export function EditarValePage() {
 
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn btn-maestro-info"
             onClick={() =>
               navigate('/vales-consumo')
             }
@@ -75,7 +75,7 @@ export function EditarValePage() {
 
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn btn-maestro-info"
             onClick={() =>
               navigate('/vales-consumo')
             }

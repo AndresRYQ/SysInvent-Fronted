@@ -469,7 +469,7 @@ export function PerfilUsuarioPage() {
 
                       <button
                         type="button"
-                        className="btn maestro-btn-secondary"
+                        className="btn btn-maestro-info"
                         onClick={() =>
                           setMostrarContrasenas(
                             (actual) => !actual,
@@ -586,7 +586,7 @@ export function PerfilUsuarioPage() {
                     <div className="d-flex justify-content-end mt-4">
                       <button
                         type="submit"
-                        className="btn maestro-btn-primary"
+                        className="btn btn-maestro-primary"
                         disabled={guardando}
                       >
                         <Save size={18} />

@@ -76,8 +76,8 @@ export function CategoriaFormModal({ abierto, categoria, error, soloLectura = fa
             </div>
           </div>
           {!soloLectura && <div className="maestro-modal-footer">
-            <button type="button" className="btn maestro-btn-danger" onClick={onClose}><X size={18} />Cancelar</button>
-            <button type="submit" className="btn maestro-btn-primary"><Save size={18} />{categoria ? 'Guardar cambios' : 'Registrar'}</button>
+            <button type="button" className="btn btn-maestro-danger" onClick={onClose}><X size={18} />Cancelar</button>
+            <button type="submit" className="btn btn-maestro-primary"><Save size={18} />{categoria ? 'Guardar cambios' : 'Registrar'}</button>
           </div>}
         </form>
       </div>

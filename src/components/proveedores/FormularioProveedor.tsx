@@ -428,7 +428,7 @@ export function FormularioProveedor({
       {!soloLectura && <div className="maestro-modal-footer">
           <button
             type="button"
-            className="btn maestro-btn-danger"
+            className="btn btn-maestro-danger"
             onClick={onCancelar}
           >
             <X size={18} />
@@ -437,7 +437,7 @@ export function FormularioProveedor({
 
           <button
             type="submit"
-            className="btn maestro-btn-primary"
+            className="btn btn-maestro-primary"
           >
             <Save size={18} />
             {proveedor

@@ -547,7 +547,7 @@ export function ControlAlmacenPage() {
                 <div className="d-flex justify-content-end gap-2 mt-3">
                   <button
                     type="button"
-                    className="btn maestro-btn-secondary"
+                    className="btn btn-maestro-secondary"
                     onClick={() => {
                       setFiltros(
                         FILTROS_INICIALES,
@@ -563,7 +563,7 @@ export function ControlAlmacenPage() {
 
                   <button
                     type="button"
-                    className="btn maestro-btn-primary"
+                    className="btn btn-maestro-primary"
                     onClick={() => {
                       setFiltrosAplicados({
                         ...filtros,

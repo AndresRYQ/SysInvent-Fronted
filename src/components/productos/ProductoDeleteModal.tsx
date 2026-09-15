@@ -55,7 +55,7 @@ export function ProductoDeleteModal({
         <div className="maestro-modal-footer maestro-modal-footer--center">
           <button
             type="button"
-            className="btn maestro-btn-danger"
+            className="btn btn-maestro-danger"
             onClick={onClose}
           >
             <X size={18} />
@@ -64,7 +64,7 @@ export function ProductoDeleteModal({
 
           <button
             type="button"
-            className="btn maestro-btn-primary"
+            className="btn btn-maestro-primary"
             onClick={onConfirm}
           >
             <Check size={18} />

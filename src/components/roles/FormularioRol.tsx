@@ -301,7 +301,7 @@ export function FormularioRol({
         <footer className="maestro-modal-footer">
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn btn-maestro-info"
             onClick={onClose}
           >
             Cancelar
@@ -309,7 +309,7 @@ export function FormularioRol({
 
           <button
             type="submit"
-            className="btn maestro-btn-primary"
+            className="btn btn-maestro-primary"
           >
             <Save size={17} />
             Guardar

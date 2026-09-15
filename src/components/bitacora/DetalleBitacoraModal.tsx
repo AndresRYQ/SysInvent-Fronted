@@ -137,7 +137,7 @@ export function DetalleBitacoraModal({
         <div className="maestro-modal-footer">
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn btn-maestro-info"
             onClick={onClose}
           >
             <X size={18} />

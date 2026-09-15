@@ -825,7 +825,7 @@ export function IngresoAlmacenForm({
         <div className="col-12 col-md-3">
           <button
             type="button"
-            className="btn maestro-btn-primary w-100"
+            className="btn btn-maestro-primary w-100"
             onClick={agregarDetalle}
           >
             <Plus size={18} />
@@ -956,7 +956,7 @@ export function IngresoAlmacenForm({
       <div className="d-flex justify-content-end gap-2 mt-4">
         <button
           type="button"
-          className="btn maestro-btn-danger"
+          className="btn btn-maestro-danger"
           onClick={onCancelar}
         >
           <X size={18} />
@@ -965,7 +965,7 @@ export function IngresoAlmacenForm({
 
         <button
           type="submit"
-          className="btn maestro-btn-primary"
+          className="btn btn-maestro-primary"
         >
           <Save size={18} />
           Guardar ingreso

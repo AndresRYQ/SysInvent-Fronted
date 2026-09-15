@@ -96,53 +96,6 @@
   color: #667085;
 }
 
-.maestro-btn-primary,
-.maestro-btn-secondary,
-.maestro-btn-danger {
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  min-height: 50px;
-  padding: 0 18px;
-  border-radius: 16px !important;
-  font-weight: 700 !important;
-  font-size: 0.8rem !important;
-  transition:
-    transform 180ms ease,
-    box-shadow 180ms ease,
-    background-color 180ms ease !important;
-}
-
-.maestro-btn-primary {
-  color: #fff !important;
-  border: 0 !important;
-  background:
-    linear-gradient(
-      135deg,
-      var(--brand-green-dark) 0%,
-      var(--brand-green) 100%
-    ) !important;
-}
-
-.maestro-btn-secondary {
-  color: #1f2937 !important;
-  border: 1px solid rgb(17 24 39 / 10%) !important;
-  background: #fff !important;
-}
-
-.maestro-btn-danger {
-  border: 0 !important;
-  background: #b42318 !important;
-  color: #fff !important;
-}
-
-.maestro-btn-primary:hover,
-.maestro-btn-secondary:hover,
-.maestro-btn-danger:hover {
-  transform: translateY(-2px);
-}
-
 .maestro-table-header {
   display: flex;
   align-items: center;
@@ -250,9 +203,9 @@
 }
 
 /* Centro de costos: los controles no se elevan al pasar el cursor. */
-.centro-costo-page .maestro-btn-primary:hover,
-.centro-costo-page .maestro-btn-secondary:hover,
-.centro-costo-page .maestro-btn-danger:hover,
+.centro-costo-page .btn-maestro-primary:hover,
+.centro-costo-page .btn-maestro-info:hover,
+.centro-costo-page .btn-maestro-danger:hover,
 .centro-costo-page .maestro-toolbar-btn:hover,
 .centro-costo-page .maestro-action-btn:hover,
 .centro-costo-page .maestro-page-btn:hover:not(:disabled) {
@@ -298,9 +251,9 @@
   box-shadow: none !important;
 }
 
-.categorias-page .maestro-btn-primary:hover,
-.categorias-page .maestro-btn-secondary:hover,
-.categorias-page .maestro-btn-danger:hover,
+.categorias-page .btn-maestro-primary:hover,
+.categorias-page .btn-maestro-info:hover,
+.categorias-page .btn-maestro-danger:hover,
 .categorias-page .maestro-toolbar-btn:hover,
 .categorias-page .maestro-action-btn:hover {
   transform: none !important;
@@ -315,9 +268,9 @@
   background: #fbfdfc !important;
 }
 
-.tipos-producto-page .maestro-btn-primary:hover,
-.tipos-producto-page .maestro-btn-secondary:hover,
-.tipos-producto-page .maestro-btn-danger:hover,
+.tipos-producto-page .btn-maestro-primary:hover,
+.tipos-producto-page .btn-maestro-info:hover,
+.tipos-producto-page .btn-maestro-danger:hover,
 .tipos-producto-page .maestro-toolbar-btn:hover,
 .tipos-producto-page .maestro-action-btn:hover,
 .tipos-producto-page .maestro-page-btn:hover {
@@ -479,15 +432,6 @@
   justify-content: flex-end;
   gap: 12px;
   padding: 0 18px 18px;
-}
-
-.maestro-modal-footer .maestro-btn-primary,
-.maestro-modal-footer .maestro-btn-danger {
-  min-height: 34px;
-  height: 34px;
-  padding: 0 12px;
-  font-size: 0.8rem;
-  border-radius: 8px !important;
 }
 
 .maestro-modal-footer--center {
@@ -656,8 +600,9 @@
   font-size: 0.8rem;
 }
 
-.maestro-filter-card .maestro-btn-primary,
-.maestro-filter-card .maestro-btn-secondary {
+.maestro-filter-card .btn-maestro-primary,
+.maestro-filter-card .btn-maestro-secondary,
+.maestro-filter-card .btn-maestro-info {
   min-height: 34px;
   padding: 0 12px;
   font-size: 0.8rem;
@@ -669,12 +614,6 @@
   gap: 8px;
   justify-content: flex-end;
   align-items: center;
-}
-
-.maestro-filter-btn {
-  min-height: 34px !important;
-  padding: 10px 12px !important;
-  border-radius: 12px !important;
 }
 
 .maestro-select-wrap {
@@ -759,7 +698,7 @@
   font-size: 0.8rem;
 }
 
-.maestro-table-card .maestro-btn {
+.maestro-table-card .btn-maestro {
   min-height: 38px;
   font-size: 0.8rem;
 }
@@ -842,9 +781,9 @@
   }
 }
 
-.tipos-documento-page .maestro-btn-primary:hover,
-.tipos-documento-page .maestro-btn-secondary:hover,
-.tipos-documento-page .maestro-btn-danger:hover,
+.tipos-documento-page .btn-maestro-primary:hover,
+.tipos-documento-page .btn-maestro-info:hover,
+.tipos-documento-page .btn-maestro-danger:hover,
 .tipos-documento-page .maestro-toolbar-btn:hover,
 .tipos-documento-page .maestro-action-btn:hover,
 .tipos-documento-page .maestro-table tbody tr:hover,
@@ -861,9 +800,9 @@
   color: #fff;
 }
 
-.unidades-medida-page .maestro-btn-primary:hover,
-.unidades-medida-page .maestro-btn-secondary:hover,
-.unidades-medida-page .maestro-btn-danger:hover,
+.unidades-medida-page .btn-maestro-primary:hover,
+.unidades-medida-page .btn-maestro-info:hover,
+.unidades-medida-page .btn-maestro-danger:hover,
 .unidades-medida-page .maestro-toolbar-btn:hover,
 .unidades-medida-page .maestro-action-btn:hover,
 .unidades-medida-page .maestro-table tbody tr:hover,
@@ -880,9 +819,9 @@
   color: #fff;
 }
 
-.destinos-page .maestro-btn-primary:hover,
-.destinos-page .maestro-btn-secondary:hover,
-.destinos-page .maestro-btn-danger:hover,
+.destinos-page .btn-maestro-primary:hover,
+.destinos-page .btn-maestro-info:hover,
+.destinos-page .btn-maestro-danger:hover,
 .destinos-page .maestro-toolbar-btn:hover,
 .destinos-page .maestro-action-btn:hover,
 .destinos-page .maestro-table tbody tr:hover,
@@ -899,9 +838,9 @@
   color: #fff;
 }
 
-.proveedores-page .maestro-btn-primary:hover,
-.proveedores-page .maestro-btn-secondary:hover,
-.proveedores-page .maestro-btn-danger:hover,
+.proveedores-page .btn-maestro-primary:hover,
+.proveedores-page .btn-maestro-info:hover,
+.proveedores-page .btn-maestro-danger:hover,
 .proveedores-page .maestro-toolbar-btn:hover,
 .proveedores-page .maestro-action-btn:hover,
 .proveedores-page .maestro-table tbody tr:hover,
@@ -943,18 +882,18 @@
   display: none;
 }
 
-.productos-page .maestro-btn-primary:hover,
-.productos-page .maestro-btn-secondary:hover,
-.productos-page .maestro-btn-danger:hover,
+.productos-page .btn-maestro-primary:hover,
+.productos-page .btn-maestro-info:hover,
+.productos-page .btn-maestro-danger:hover,
 .productos-page .maestro-toolbar-btn:hover,
 .productos-page .maestro-action-btn:hover,
 .productos-page .maestro-page-btn:hover:not(:disabled) {
   transform: none !important;
 }
 
-.productos-page .maestro-btn-primary,
-.productos-page .maestro-btn-secondary,
-.productos-page .maestro-btn-danger,
+.productos-page .btn-maestro-primary,
+.productos-page .btn-maestro-info,
+.productos-page .btn-maestro-danger,
 .productos-page .maestro-toolbar-btn,
 .productos-page .maestro-action-btn,
 .productos-page .maestro-page-btn {
@@ -985,9 +924,9 @@
   box-shadow: none !important;
 }
 
-.partes-equipo-page .maestro-btn-primary:hover,
-.partes-equipo-page .maestro-btn-secondary:hover,
-.partes-equipo-page .maestro-btn-danger:hover,
+.partes-equipo-page .btn-maestro-primary:hover,
+.partes-equipo-page .btn-maestro-info:hover,
+.partes-equipo-page .btn-maestro-danger:hover,
 .partes-equipo-page .maestro-toolbar-btn:hover,
 .partes-equipo-page .maestro-action-btn:hover,
 .partes-equipo-page .maestro-page-btn:hover:not(:disabled) {
@@ -1018,24 +957,24 @@
   box-shadow: none !important;
 }
 
-.partes-equipo-page .maestro-btn-primary,
-.partes-equipo-page .maestro-btn-secondary,
-.partes-equipo-page .maestro-btn-danger,
+.partes-equipo-page .btn-maestro-primary,
+.partes-equipo-page .btn-maestro-info,
+.partes-equipo-page .btn-maestro-danger,
 .partes-equipo-page .maestro-toolbar-btn,
 .partes-equipo-page .maestro-action-btn,
 .partes-equipo-page .maestro-page-btn {
   transition: none !important;
 }
 
-.contactos-page .maestro-btn-primary:hover,
-.contactos-page .maestro-btn-secondary:hover,
-.contactos-page .maestro-btn-danger:hover {
+.contactos-page .btn-maestro-primary:hover,
+.contactos-page .btn-maestro-info:hover,
+.contactos-page .btn-maestro-danger:hover {
   transform: none !important;
 }
 
-.contactos-page .maestro-btn-primary,
-.contactos-page .maestro-btn-secondary,
-.contactos-page .maestro-btn-danger {
+.contactos-page .btn-maestro-primary,
+.contactos-page .btn-maestro-info,
+.contactos-page .btn-maestro-danger {
   transition: none !important;
 }
 
@@ -1076,18 +1015,18 @@
 }
 
 /* Inventario: los botones no deben desplazarse ni animarse al pasar el cursor. */
-.vales-consumo-page .maestro-btn-primary:hover,
-.vales-consumo-page .maestro-btn-secondary:hover,
-.vales-consumo-page .maestro-btn-danger:hover,
+.vales-consumo-page .btn-maestro-primary:hover,
+.vales-consumo-page .btn-maestro-info:hover,
+.vales-consumo-page .btn-maestro-danger:hover,
 .vales-consumo-page .maestro-toolbar-btn:hover,
 .vales-consumo-page .maestro-action-btn:hover,
 .vales-consumo-page .maestro-page-btn:hover:not(:disabled) {
   transform: none !important;
 }
 
-.vales-consumo-page .maestro-btn-primary,
-.vales-consumo-page .maestro-btn-secondary,
-.vales-consumo-page .maestro-btn-danger,
+.vales-consumo-page .btn-maestro-primary,
+.vales-consumo-page .btn-maestro-info,
+.vales-consumo-page .btn-maestro-danger,
 .vales-consumo-page .maestro-toolbar-btn,
 .vales-consumo-page .maestro-action-btn,
 .vales-consumo-page .maestro-page-btn {

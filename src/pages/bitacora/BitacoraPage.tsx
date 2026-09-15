@@ -201,7 +201,7 @@ export function BitacoraPage() {
 
             <button
               type="button"
-              className="btn maestro-btn-secondary"
+              className="btn btn-maestro-info"
               onClick={recargarRegistros}
             >
               <RefreshCw size={18} />
