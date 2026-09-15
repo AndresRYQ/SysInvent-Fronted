@@ -55,7 +55,7 @@ export function ResumenProductosMasPedidos({
 
                 <div className="flex-grow-1">
                   <span className="text-secondary small">
-                    Producto más pedido
+                    Producto mÃ¡s pedido
                   </span>
 
                   <strong className="d-block fs-5 text-success mt-1">

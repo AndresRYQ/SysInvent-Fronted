@@ -116,7 +116,7 @@ export function ExportarProductosMasPedidosButton({
       libro.created = fechaGeneracion
       libro.modified = fechaGeneracion
       libro.title =
-        'Productos más pedidos'
+        'Productos mÃ¡s pedidos'
       libro.subject =
         'Ranking de productos consumidos'
       libro.company =
@@ -155,7 +155,7 @@ export function ExportarProductosMasPedidosButton({
       )
 
       hoja.headerFooter.oddHeader =
-        '&C&BProductos más pedidos'
+        '&C&BProductos mÃ¡s pedidos'
 
       hoja.headerFooter.oddFooter =
         '&LSistema de Inventario&C&P de &N&R&D'
@@ -186,7 +186,7 @@ export function ExportarProductosMasPedidosButton({
       hoja.mergeCells('A1:L1')
 
       hoja.getCell('A1').value =
-        'RANKING DE PRODUCTOS MÁS PEDIDOS'
+        'RANKING DE PRODUCTOS MÃS PEDIDOS'
 
       hoja.getRow(1).height = 34
 
@@ -286,17 +286,17 @@ export function ExportarProductosMasPedidosButton({
       }
 
       const encabezados = [
-        'Posición',
-        'Código',
+        'PosiciÃ³n',
+        'CÃ³digo',
         'Producto',
         'Tipo de producto',
-        'Categoría',
+        'CategorÃ­a',
         'Unidad de medida',
         'Cantidad solicitada',
         'Vales',
         'Distribuciones',
         'Destinos',
-        'Participación',
+        'ParticipaciÃ³n',
         'Total valorizado',
       ]
 
@@ -577,7 +577,7 @@ export function ExportarProductosMasPedidosButton({
       hojaResumen.mergeCells('A2:B2')
 
       hojaResumen.getCell('A2').value =
-        'Indicadores según los filtros aplicados'
+        'Indicadores segÃºn los filtros aplicados'
 
       hojaResumen.getCell('A2').font = {
         name: 'Aptos',
@@ -645,11 +645,11 @@ export function ExportarProductosMasPedidosButton({
           resumen.totalDistribuciones,
         ],
         [
-          'Producto más pedido',
+          'Producto mÃ¡s pedido',
           resumen.productoMasPedido,
         ],
         [
-          'Cantidad del producto líder',
+          'Cantidad del producto lÃ­der',
           `${resumen.cantidadProductoMasPedido} ${resumen.unidadProductoMasPedido}`,
         ],
         [

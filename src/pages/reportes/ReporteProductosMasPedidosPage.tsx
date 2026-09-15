@@ -41,7 +41,7 @@ const FILTROS_INICIALES: Filtros = {
   destinoId: '',
 }
 
-export function ProductosMasPedidosPage() {
+export function ReporteProductosMasPedidosPage() {
   const [filtros, setFiltros] =
     useState<Filtros>({
       ...FILTROS_INICIALES,
@@ -200,11 +200,11 @@ export function ProductosMasPedidosPage() {
           <div className="d-flex align-items-center justify-content-between gap-3 flex-wrap">
             <div className="maestro-topbar__copy">
               <h1>
-                Productos más pedidos
+                Productos mÃ¡s pedidos
               </h1>
 
               <p>
-                Ranking de productos según las
+                Ranking de productos segÃºn las
                 cantidades entregadas mediante
                 vales de consumo registrados.
               </p>
@@ -286,4 +286,3 @@ export function ProductosMasPedidosPage() {
     </main>
   )
 }
-

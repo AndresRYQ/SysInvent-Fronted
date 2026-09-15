@@ -99,7 +99,7 @@ export function GraficoProductosMasPedidos({
                           {
                             producto.codigoProducto
                           }
-                          {' · '}
+                          {' Â· '}
                           {
                             producto.tipoProducto
                           }
@@ -157,7 +157,7 @@ export function GraficoProductosMasPedidos({
                   {producto.posicion === 1 && (
                     <div className="d-flex align-items-center gap-1 mt-1 text-warning small">
                       <Trophy size={13} />
-                      Producto líder
+                      Producto lÃ­der
                     </div>
                   )}
                 </div>

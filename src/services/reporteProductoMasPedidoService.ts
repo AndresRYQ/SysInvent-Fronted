@@ -4,11 +4,15 @@ import type {
   ResumenProductosMasPedidos,
 } from '../types/reporteProductoMasPedido'
 
-import { obtenerCategorias } from './categoriaService'
+import type {
+  FilaReporteVale,
+} from '../types/reporteVale'
+
 import { obtenerProductos } from './productoService'
-import { obtenerTiposProducto } from './tipoProductoService'
-import { obtenerUnidadesMedida } from './unidadMedidaService'
-import { obtenerValesConsumo } from './valeConsumoService'
+
+import {
+  obtenerFilasReporteVales,
+} from './reporteValeService'
 
 interface ProductoAcumulado {
   productoId: string
@@ -26,135 +30,256 @@ interface ProductoAcumulado {
   totalValorizado: number
 }
 
-function normalizarTexto(valor: string): string {
-  return valor.trim().toLocaleLowerCase('es')
+function normalizarTexto(
+  valor: string,
+): string {
+  return valor
+    .trim()
+    .toLocaleLowerCase('es')
 }
 
-function coincideId(valor: string | number, id: string): boolean {
-  return String(valor) === id
-}
-
-function redondearCantidad(valor: number): number {
+function redondearCantidad(
+  valor: number,
+): number {
   return Number(valor.toFixed(3))
 }
 
-function redondearImporte(valor: number): number {
+function redondearImporte(
+  valor: number,
+): number {
   return Number(valor.toFixed(2))
+}
+
+function filtrarDistribuciones(
+  filtros: FiltrosProductosMasPedidos,
+): FilaReporteVale[] {
+  const busqueda =
+    normalizarTexto(filtros.busqueda)
+
+  const productos = obtenerProductos()
+
+  return obtenerFilasReporteVales()
+    .filter(
+      (fila) =>
+        fila.estado === 'REGISTRADO',
+    )
+    .filter((fila) => {
+      const producto =
+        productos.find(
+          (item) =>
+            item.id ===
+            fila.productoId,
+        )
+
+      const coincideBusqueda =
+        !busqueda ||
+        normalizarTexto(
+          fila.codigoProducto,
+        ).includes(busqueda) ||
+        normalizarTexto(
+          fila.producto,
+        ).includes(busqueda) ||
+        normalizarTexto(
+          fila.tipoProducto,
+        ).includes(busqueda) ||
+        normalizarTexto(
+          fila.categoria,
+        ).includes(busqueda)
+
+      const coincideDesde =
+        !filtros.fechaDesde ||
+        fila.fechaVale >=
+          filtros.fechaDesde
+
+      const coincideHasta =
+        !filtros.fechaHasta ||
+        fila.fechaVale <=
+          filtros.fechaHasta
+
+      const coincideTipo =
+        !filtros.tipoProductoId ||
+        fila.tipoProductoId ===
+          filtros.tipoProductoId
+
+      const coincideCategoria =
+        !filtros.categoriaId ||
+        producto?.categoriaId ===
+          filtros.categoriaId
+
+      const coincideDestino =
+        !filtros.destinoId ||
+        fila.destinoId ===
+          filtros.destinoId
+
+      return (
+        coincideBusqueda &&
+        coincideDesde &&
+        coincideHasta &&
+        coincideTipo &&
+        coincideCategoria &&
+        coincideDestino
+      )
+    })
 }
 
 export function obtenerProductosMasPedidos(
   filtros: FiltrosProductosMasPedidos,
 ): FilaProductoMasPedido[] {
+  const distribuciones =
+    filtrarDistribuciones(filtros)
+
   const productos = obtenerProductos()
-  const tiposProducto = obtenerTiposProducto()
-  const categorias = obtenerCategorias()
-  const unidades = obtenerUnidadesMedida()
-  const busqueda = normalizarTexto(filtros.busqueda)
-  const acumulados = new Map<string, ProductoAcumulado>()
 
-  obtenerValesConsumo()
-    .filter((vale) => vale.estado === 'REGISTRADO')
-    .filter((vale) =>
-      (!filtros.fechaDesde || vale.fechaVale >= filtros.fechaDesde) &&
-      (!filtros.fechaHasta || vale.fechaVale <= filtros.fechaHasta),
+  const acumulados = new Map<
+    string,
+    ProductoAcumulado
+  >()
+
+  distribuciones.forEach((fila) => {
+    const producto =
+      productos.find(
+        (item) =>
+          item.id ===
+          fila.productoId,
+      )
+
+    const existente =
+      acumulados.get(fila.productoId)
+
+    if (existente) {
+      existente.cantidadSolicitada +=
+        fila.cantidad
+
+      existente.totalValorizado +=
+        fila.subtotal
+
+      existente.valesIds.add(
+        fila.valeId,
+      )
+
+      existente.distribucionesIds.add(
+        fila.distribucionId,
+      )
+
+      existente.destinosIds.add(
+        fila.destinoId,
+      )
+
+      return
+    }
+
+    acumulados.set(
+      fila.productoId,
+      {
+        productoId:
+          fila.productoId,
+        codigoProducto:
+          fila.codigoProducto,
+        producto: fila.producto,
+        tipoProductoId:
+          fila.tipoProductoId,
+        tipoProducto:
+          fila.tipoProducto,
+        categoriaId:
+          producto?.categoriaId ??
+          '',
+        categoria:
+          fila.categoria,
+        unidadMedida:
+          fila.unidadMedida,
+        cantidadSolicitada:
+          fila.cantidad,
+        valesIds: new Set([
+          fila.valeId,
+        ]),
+        distribucionesIds:
+          new Set([
+            fila.distribucionId,
+          ]),
+        destinosIds: new Set([
+          fila.destinoId,
+        ]),
+        totalValorizado:
+          fila.subtotal,
+      },
     )
-    .forEach((vale) => {
-      vale.detalles.forEach((detalle) => {
-        const producto = productos.find((item) => item.id === detalle.productoId)
+  })
 
-        if (!producto) return
+  const totalCantidad =
+    Array.from(
+      acumulados.values(),
+    ).reduce(
+      (total, producto) =>
+        total +
+        producto.cantidadSolicitada,
+      0,
+    )
 
-        const tipo = tiposProducto.find((item) =>
-          coincideId(item.id, producto.tipoProductoId),
-        )
-        const categoria = categorias.find((item) =>
-          coincideId(item.id, producto.categoriaId),
-        )
-
-        const coincideBusqueda =
-          !busqueda ||
-          normalizarTexto(producto.codigo).includes(busqueda) ||
-          normalizarTexto(producto.nombre).includes(busqueda) ||
-          normalizarTexto(tipo?.nombre ?? '').includes(busqueda) ||
-          normalizarTexto(categoria?.nombre ?? '').includes(busqueda)
-
-        const coincideTipo =
-          !filtros.tipoProductoId ||
-          producto.tipoProductoId === filtros.tipoProductoId
-        const coincideCategoria =
-          !filtros.categoriaId ||
-          producto.categoriaId === filtros.categoriaId
-
-        if (!coincideBusqueda || !coincideTipo || !coincideCategoria) return
-
-        detalle.distribuciones
-          .filter((distribucion) =>
-            !filtros.destinoId || distribucion.destinoId === filtros.destinoId,
-          )
-          .forEach((distribucion) => {
-            const existente = acumulados.get(producto.id)
-            const subtotal = distribucion.cantidad * detalle.precioUnitario
-            const unidad = unidades.find((item) =>
-              coincideId(item.id, producto.unidadMedidaId),
-            )
-
-            if (existente) {
-              existente.cantidadSolicitada += distribucion.cantidad
-              existente.totalValorizado += subtotal
-              existente.valesIds.add(vale.id)
-              existente.distribucionesIds.add(distribucion.id)
-              existente.destinosIds.add(distribucion.destinoId)
-              return
-            }
-
-            acumulados.set(producto.id, {
-              productoId: producto.id,
-              codigoProducto: producto.codigo,
-              producto: producto.nombre,
-              tipoProductoId: producto.tipoProductoId,
-              tipoProducto: tipo?.nombre ?? 'Sin tipo',
-              categoriaId: producto.categoriaId,
-              categoria: categoria?.nombre ?? 'Sin categoría',
-              unidadMedida: unidad?.nombre ?? 'Unidad',
-              cantidadSolicitada: distribucion.cantidad,
-              valesIds: new Set([vale.id]),
-              distribucionesIds: new Set([distribucion.id]),
-              destinosIds: new Set([distribucion.destinoId]),
-              totalValorizado: subtotal,
-            })
-          })
-      })
-    })
-
-  const totalCantidad = Array.from(acumulados.values()).reduce(
-    (total, producto) => total + producto.cantidadSolicitada,
-    0,
+  return Array.from(
+    acumulados.values(),
   )
+    .sort((primero, segundo) => {
+      const cantidad =
+        segundo.cantidadSolicitada -
+        primero.cantidadSolicitada
 
-  return Array.from(acumulados.values())
-    .sort((primero, segundo) =>
-      segundo.cantidadSolicitada - primero.cantidadSolicitada ||
-      segundo.valesIds.size - primero.valesIds.size ||
-      primero.producto.localeCompare(segundo.producto, 'es'),
-    )
+      if (cantidad !== 0) {
+        return cantidad
+      }
+
+      const vales =
+        segundo.valesIds.size -
+        primero.valesIds.size
+
+      if (vales !== 0) {
+        return vales
+      }
+
+      return primero.producto.localeCompare(
+        segundo.producto,
+        'es',
+      )
+    })
     .map((producto, indice) => ({
       posicion: indice + 1,
-      productoId: producto.productoId,
-      codigoProducto: producto.codigoProducto,
+      productoId:
+        producto.productoId,
+      codigoProducto:
+        producto.codigoProducto,
       producto: producto.producto,
-      tipoProductoId: producto.tipoProductoId,
-      tipoProducto: producto.tipoProducto,
-      categoriaId: producto.categoriaId,
-      categoria: producto.categoria,
-      unidadMedida: producto.unidadMedida,
-      cantidadSolicitada: redondearCantidad(producto.cantidadSolicitada),
-      numeroVales: producto.valesIds.size,
-      numeroDistribuciones: producto.distribucionesIds.size,
-      destinosAtendidos: producto.destinosIds.size,
-      totalValorizado: redondearImporte(producto.totalValorizado),
-      participacion: totalCantidad > 0
-        ? redondearImporte((producto.cantidadSolicitada / totalCantidad) * 100)
-        : 0,
+      tipoProductoId:
+        producto.tipoProductoId,
+      tipoProducto:
+        producto.tipoProducto,
+      categoriaId:
+        producto.categoriaId,
+      categoria:
+        producto.categoria,
+      unidadMedida:
+        producto.unidadMedida,
+      cantidadSolicitada:
+        redondearCantidad(
+          producto.cantidadSolicitada,
+        ),
+      numeroVales:
+        producto.valesIds.size,
+      numeroDistribuciones:
+        producto.distribucionesIds
+          .size,
+      destinosAtendidos:
+        producto.destinosIds.size,
+      totalValorizado:
+        redondearImporte(
+          producto.totalValorizado,
+        ),
+      participacion:
+        totalCantidad > 0
+          ? redondearImporte(
+              (producto.cantidadSolicitada /
+                totalCantidad) *
+                100,
+            )
+          : 0,
     }))
 }
 
@@ -162,25 +287,44 @@ export function obtenerResumenProductosMasPedidos(
   filas: FilaProductoMasPedido[],
   filtros: FiltrosProductosMasPedidos,
 ): ResumenProductosMasPedidos {
-  const vales = obtenerValesConsumo().filter((vale) =>
-    vale.estado === 'REGISTRADO' &&
-    (!filtros.fechaDesde || vale.fechaVale >= filtros.fechaDesde) &&
-    (!filtros.fechaHasta || vale.fechaVale <= filtros.fechaHasta),
+  const distribuciones =
+    filtrarDistribuciones(filtros)
+
+  const valesIds = new Set(
+    distribuciones.map(
+      (fila) => fila.valeId,
+    ),
   )
-  const productoMasPedido = filas[0]
+
+  const totalValorizado =
+    filas.reduce(
+      (total, fila) =>
+        total +
+        fila.totalValorizado,
+      0,
+    )
+
+  const productoMasPedido =
+    filas[0]
 
   return {
     totalProductos: filas.length,
-    totalVales: new Set(vales.map((vale) => vale.id)).size,
-    totalDistribuciones: filas.reduce(
-      (total, fila) => total + fila.numeroDistribuciones,
-      0,
-    ),
-    totalValorizado: redondearImporte(
-      filas.reduce((total, fila) => total + fila.totalValorizado, 0),
-    ),
-    productoMasPedido: productoMasPedido?.producto ?? 'Sin registros',
-    cantidadProductoMasPedido: productoMasPedido?.cantidadSolicitada ?? 0,
-    unidadProductoMasPedido: productoMasPedido?.unidadMedida ?? '',
+    totalVales: valesIds.size,
+    totalDistribuciones:
+      distribuciones.length,
+    totalValorizado:
+      redondearImporte(
+        totalValorizado,
+      ),
+    productoMasPedido:
+      productoMasPedido?.producto ??
+      'Sin registros',
+    cantidadProductoMasPedido:
+      productoMasPedido
+        ?.cantidadSolicitada ?? 0,
+    unidadProductoMasPedido:
+      productoMasPedido
+        ?.unidadMedida ?? '',
   }
 }
+

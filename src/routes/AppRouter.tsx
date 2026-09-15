@@ -35,7 +35,7 @@ import { ControlAlmacenPage } from '../pages/control-almacen/ControlAlmacenPage'
 import { EditarIngresoPage } from '../pages/ingresos-almacen/EditarIngresoPage'
 import { NuevoIngresoPage } from '../pages/ingresos-almacen/NuevoIngresoPage'
 import { ReporteIngresosPage } from '../pages/reportes/ReporteIngresosPage'
-import { ProductosMasPedidosPage } from '../pages/reportes/ProductosMasPedidosPage'
+import { ReporteProductosMasPedidosPage } from '../pages/reportes/ReporteProductosMasPedidosPage'
 import { ReporteValesPage } from '../pages/reportes/ReporteValesPage'
 import { EditarValePage } from '../pages/vales-consumo/EditarValePage'
 import { NuevoValePage } from '../pages/vales-consumo/NuevoValePage'
@@ -309,7 +309,7 @@ export function AppRouter() {
                 />
               </Route>
               <Route element={<RoleRoute modulo="reporte-productos" />}>
-                <Route path="/reportes/productos-mas-pedidos" element={<ProductosMasPedidosPage />} />
+                <Route path="/reportes/productos-mas-pedidos" element={<ReporteProductosMasPedidosPage />} />
               </Route>
             </Route>
           </Route>

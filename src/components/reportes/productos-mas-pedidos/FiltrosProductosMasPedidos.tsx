@@ -54,7 +54,7 @@ export function FiltrosProductosMasPedidos({
         >
           <div className="col-12 col-xl-6">
             <label
-              className="form-label"
+              className="form-label maestro-label"
               htmlFor="buscarProductoPedido"
             >
               Buscar producto
@@ -63,9 +63,9 @@ export function FiltrosProductosMasPedidos({
             <input
               id="buscarProductoPedido"
               type="search"
-              className="form-control"
+              className="form-control maestro-control"
               value={valores.busqueda}
-              placeholder="Código, producto, tipo o categoría"
+              placeholder="CÃ³digo, producto, tipo o categorÃ­a"
               onChange={(event) =>
                 onChange(
                   'busqueda',
@@ -77,7 +77,7 @@ export function FiltrosProductosMasPedidos({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label"
+              className="form-label maestro-label"
               htmlFor="productoPedidoDesde"
             >
               Fecha desde
@@ -86,7 +86,7 @@ export function FiltrosProductosMasPedidos({
             <input
               id="productoPedidoDesde"
               type="date"
-              className="form-control"
+              className="form-control maestro-control"
               value={valores.fechaDesde}
               max={
                 valores.fechaHasta ||
@@ -103,7 +103,7 @@ export function FiltrosProductosMasPedidos({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label"
+              className="form-label maestro-label"
               htmlFor="productoPedidoHasta"
             >
               Fecha hasta
@@ -112,7 +112,7 @@ export function FiltrosProductosMasPedidos({
             <input
               id="productoPedidoHasta"
               type="date"
-              className="form-control"
+              className="form-control maestro-control"
               value={valores.fechaHasta}
               min={
                 valores.fechaDesde ||
@@ -129,7 +129,7 @@ export function FiltrosProductosMasPedidos({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label"
+              className="form-label maestro-label"
               htmlFor="productoPedidoTipo"
             >
               Tipo de producto
@@ -137,7 +137,7 @@ export function FiltrosProductosMasPedidos({
 
             <select
               id="productoPedidoTipo"
-              className="form-select"
+              className="form-select maestro-control"
               value={
                 valores.tipoProductoId
               }
@@ -165,15 +165,15 @@ export function FiltrosProductosMasPedidos({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label"
+              className="form-label maestro-label"
               htmlFor="productoPedidoCategoria"
             >
-              Categoría
+              CategorÃ­a
             </label>
 
             <select
               id="productoPedidoCategoria"
-              className="form-select"
+              className="form-select maestro-control"
               value={valores.categoriaId}
               onChange={(event) =>
                 onChange(
@@ -183,7 +183,7 @@ export function FiltrosProductosMasPedidos({
               }
             >
               <option value="">
-                Todas las categorías
+                Todas las categorÃ­as
               </option>
 
               {categorias.map(
@@ -201,7 +201,7 @@ export function FiltrosProductosMasPedidos({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label"
+              className="form-label maestro-label"
               htmlFor="productoPedidoDestino"
             >
               Destino
@@ -209,7 +209,7 @@ export function FiltrosProductosMasPedidos({
 
             <select
               id="productoPedidoDestino"
-              className="form-select"
+              className="form-select maestro-control"
               value={valores.destinoId}
               onChange={(event) =>
                 onChange(
