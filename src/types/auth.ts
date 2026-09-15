@@ -1,23 +1,16 @@
 export interface UsuarioLogin {
-    id: string
-    usuario: string
-    contrasena: string
-    nombreCompleto: string
-    rol: string
-    estado: boolean
+  id: string
+  usuario: string
+  contrasena: string
+  email: string
+  nombreCompleto: string
+  rol: string
+  estado: boolean
 }
 
 export interface CredencialesLogin {
-    usuario: string
-    contrasena: string
-}
-
-export interface SesionUsuario {
-    id: string
-    usuario: string
-    nombreCompleto: string
-    rol: string
-    fechaInicio: string
+  usuario: string
+  contrasena: string
 }
 
 export interface SesionUsuario {

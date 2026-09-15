@@ -12,14 +12,18 @@ import {
   cerrarSesion,
   iniciarSesion,
   obtenerSesion,
+  sincronizarSesionUsuario,
 } from '../services/authService'
 
-import { STORAGE_KEYS } from '../services/storageService'
+import {
+  STORAGE_KEYS,
+} from '../services/storageService'
 
 import type {
   CredencialesLogin,
   ResultadoLogin,
   SesionUsuario,
+  UsuarioLogin,
 } from '../types/auth'
 
 interface AuthContextType {
@@ -30,21 +34,30 @@ interface AuthContextType {
   ) => ResultadoLogin
 
   logout: () => void
+
+  actualizarSesionUsuario: (
+    usuario: UsuarioLogin,
+  ) => void
 }
 
 interface AuthProviderProps {
   children: ReactNode
 }
 
+type MotivoCierre =
+  | 'inactividad'
+  | 'vencimiento'
+
+const TIEMPO_INACTIVIDAD_MS =
+  2 * 60 * 1000
+
+const MOTIVO_CIERRE_KEY =
+  'agrihusac_motivo_cierre'
+
 const AuthContext =
-  createContext<AuthContextType | undefined>(
-    undefined,
-  )
-
-const TIEMPO_INACTIVIDAD_MS =  2 * 60 * 1000
-
-// Deshabilitado temporalmente
-const CIERRE_POR_INACTIVIDAD = false
+  createContext<
+    AuthContextType | undefined
+  >(undefined)
 
 export function AuthProvider({
   children,
@@ -54,9 +67,32 @@ export function AuthProvider({
       () => obtenerSesion(),
     )
 
+  const finalizarSesion = useCallback(
+    (motivo?: MotivoCierre) => {
+      if (motivo) {
+        sessionStorage.setItem(
+          MOTIVO_CIERRE_KEY,
+          motivo,
+        )
+      }
+
+      const detalle =
+        motivo === 'inactividad'
+          ? 'La sesiÃ³n se cerrÃ³ despuÃ©s de 2 minutos de inactividad.'
+          : motivo === 'vencimiento'
+            ? 'La sesiÃ³n se cerrÃ³ al alcanzar el tiempo mÃ¡ximo de 5 minutos.'
+            : 'El usuario cerrÃ³ la sesiÃ³n manualmente.'
+
+      cerrarSesion(detalle)
+      setSesion(null)
+    },
+    [],
+  )
+
   const login = useCallback(
     (
-      credenciales: CredencialesLogin,
+      credenciales:
+        CredencialesLogin,
     ): ResultadoLogin => {
       const resultado =
         iniciarSesion(credenciales)
@@ -65,6 +101,10 @@ export function AuthProvider({
         resultado.exitoso &&
         resultado.sesion
       ) {
+        sessionStorage.removeItem(
+          MOTIVO_CIERRE_KEY,
+        )
+
         setSesion(resultado.sesion)
       }
 
@@ -74,22 +114,39 @@ export function AuthProvider({
   )
 
   const logout = useCallback(() => {
-    cerrarSesion()
-    setSesion(null)
-  }, [])
+    sessionStorage.removeItem(
+      MOTIVO_CIERRE_KEY,
+    )
+
+    finalizarSesion()
+  }, [finalizarSesion])
+
+  const actualizarSesionUsuario =
+    useCallback(
+      (usuario: UsuarioLogin) => {
+        const sesionActualizada =
+          sincronizarSesionUsuario(
+            usuario,
+          )
+
+        setSesion(sesionActualizada)
+      },
+      [],
+    )
 
   /*
-   * Finaliza la sesión cuando llega
-   * su fecha de expiración.
+   * Cierra automÃ¡ticamente la sesiÃ³n
+   * cuando se cumplen los 5 minutos.
    */
   useEffect(() => {
     if (!sesion) {
       return
     }
 
-    const fechaExpiracion = Date.parse(
-      sesion.fechaExpiracion,
-    )
+    const fechaExpiracion =
+      Date.parse(
+        sesion.fechaExpiracion,
+      )
 
     const tiempoRestante =
       fechaExpiracion - Date.now()
@@ -98,114 +155,123 @@ export function AuthProvider({
       Number.isNaN(fechaExpiracion) ||
       tiempoRestante <= 0
     ) {
-      logout()
+      finalizarSesion('vencimiento')
       return
     }
 
-    const temporizador = window.setTimeout(
-      logout,
-      tiempoRestante,
+    const temporizador =
+      window.setTimeout(
+        () => {
+          finalizarSesion(
+            'vencimiento',
+          )
+        },
+        tiempoRestante,
+      )
+
+    return () => {
+      window.clearTimeout(
+        temporizador,
+      )
+    }
+  }, [
+    sesion,
+    finalizarSesion,
+  ])
+
+  /*
+   * Cierra la sesiÃ³n despuÃ©s de
+   * 2 minutos sin actividad.
+   */
+  useEffect(() => {
+    if (!sesion) {
+      return
+    }
+
+    let temporizador:
+      number | undefined
+
+    const cerrarPorInactividad =
+      () => {
+        finalizarSesion(
+          'inactividad',
+        )
+      }
+
+    const reiniciarTemporizador =
+      () => {
+        if (
+          temporizador !== undefined
+        ) {
+          window.clearTimeout(
+            temporizador,
+          )
+        }
+
+        temporizador =
+          window.setTimeout(
+            cerrarPorInactividad,
+            TIEMPO_INACTIVIDAD_MS,
+          )
+      }
+
+    const eventosActividad: Array<
+      keyof WindowEventMap
+    > = [
+      'pointerdown',
+      'keydown',
+      'scroll',
+      'touchstart',
+    ]
+
+    reiniciarTemporizador()
+
+    eventosActividad.forEach(
+      (evento) => {
+        window.addEventListener(
+          evento,
+          reiniciarTemporizador,
+          {
+            passive: true,
+          },
+        )
+      },
     )
 
     return () => {
-      window.clearTimeout(temporizador)
+      if (
+        temporizador !== undefined
+      ) {
+        window.clearTimeout(
+          temporizador,
+        )
+      }
+
+      eventosActividad.forEach(
+        (evento) => {
+          window.removeEventListener(
+            evento,
+            reiniciarTemporizador,
+          )
+        },
+      )
     }
-  }, [sesion, logout])
+  }, [
+    sesion,
+    finalizarSesion,
+  ])
 
   /*
- * Cierra la sesión si el usuario no
- * realiza ninguna actividad durante
- * dos minutos.
- */
-useEffect(() => {
-  if (!CIERRE_POR_INACTIVIDAD || !sesion) {
-    return
-  }
-
-  let temporizador:
-    number | undefined
-
-  const cerrarPorInactividad = () => {
-    sessionStorage.setItem(
-      'agrihusac_motivo_cierre',
-      'inactividad',
-    )
-
-    logout()
-  }
-
-  const reiniciarTemporizador = () => {
-    if (temporizador) {
-      window.clearTimeout(temporizador)
-    }
-
-    temporizador = window.setTimeout(
-      cerrarPorInactividad,
-      TIEMPO_INACTIVIDAD_MS,
-    )
-  }
-
-  reiniciarTemporizador()
-
-  window.addEventListener(
-    'pointerdown',
-    reiniciarTemporizador,
-  )
-
-  window.addEventListener(
-    'keydown',
-    reiniciarTemporizador,
-  )
-
-  window.addEventListener(
-    'scroll',
-    reiniciarTemporizador,
-    { passive: true },
-  )
-
-  window.addEventListener(
-    'touchstart',
-    reiniciarTemporizador,
-    { passive: true },
-  )
-
-  return () => {
-    if (temporizador) {
-      window.clearTimeout(temporizador)
-    }
-
-    window.removeEventListener(
-      'pointerdown',
-      reiniciarTemporizador,
-    )
-
-    window.removeEventListener(
-      'keydown',
-      reiniciarTemporizador,
-    )
-
-    window.removeEventListener(
-      'scroll',
-      reiniciarTemporizador,
-    )
-
-    window.removeEventListener(
-      'touchstart',
-      reiniciarTemporizador,
-    )
-  }
-}, [sesion, logout])
-
-  /*
-   * Sincroniza el inicio y cierre
-   * de sesión entre pestañas.
+   * Sincroniza inicio, cierre y actualizaciÃ³n
+   * de sesiÃ³n entre las pestaÃ±as.
    */
   useEffect(() => {
     const sincronizarSesion = (
       evento: StorageEvent,
     ) => {
       if (
-        evento.key === STORAGE_KEYS.sesion
+        evento.key ===
+        STORAGE_KEYS.sesion
       ) {
         setSesion(obtenerSesion())
       }
@@ -230,8 +296,14 @@ useEffect(() => {
         sesion,
         login,
         logout,
+        actualizarSesionUsuario,
       }),
-      [sesion, login, logout],
+      [
+        sesion,
+        login,
+        logout,
+        actualizarSesionUsuario,
+      ],
     )
 
   return (
@@ -241,11 +313,12 @@ useEffect(() => {
       {children}
     </AuthContext.Provider>
   )
-  
 }
 
-export function useAuth(): AuthContextType {
-  const contexto = useContext(AuthContext)
+export function useAuth():
+  AuthContextType {
+  const contexto =
+    useContext(AuthContext)
 
   if (!contexto) {
     throw new Error(
@@ -255,3 +328,4 @@ export function useAuth(): AuthContextType {
 
   return contexto
 }
+

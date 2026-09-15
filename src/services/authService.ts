@@ -1,4 +1,5 @@
 import { USUARIOS_INICIALES } from '../data/usuarios'
+import { registrarEventoBitacora } from './bitacoraService'
 
 import type {
   CredencialesLogin,
@@ -191,6 +192,12 @@ export function iniciarSesion(
 
   const usuarios = inicializarUsuarios()
 
+  const usuarioRegistrado = usuarios.find(
+    (usuario) =>
+      usuario.usuario.toLowerCase() ===
+      usuarioNormalizado,
+  )
+
   const usuarioEncontrado = usuarios.find(
     (usuario) =>
       usuario.usuario.toLowerCase() ===
@@ -219,6 +226,23 @@ export function iniciarSesion(
         bloqueadoHasta,
       })
 
+      registrarEventoBitacora({
+        modulo: 'Inicio de sesiÃ³n',
+        accion: 'BLOQUEO_LOGIN',
+        detalle:
+          'Usuario bloqueado durante 5 minutos despuÃ©s de 3 intentos fallidos.',
+        registroId:
+          usuarioRegistrado?.id ?? null,
+        usuario:
+          usuarioNormalizado || 'sin-usuario',
+        nombreCompleto:
+          usuarioRegistrado?.nombreCompleto ??
+          'Usuario no identificado',
+        rol:
+          usuarioRegistrado?.rol ??
+          'No identificado',
+      })
+
       return {
         exitoso: false,
         sesion: null,
@@ -241,7 +265,7 @@ export function iniciarSesion(
       exitoso: false,
       sesion: null,
       mensaje:
-        `Usuario o contraseña incorrectos. Te quedan ${intentosRestantes} intento(s).`,
+        `Usuario o contraseÃ±a incorrectos. Te quedan ${intentosRestantes} intento(s).`,
       bloqueadoHasta: null,
     }
   }
@@ -265,10 +289,18 @@ export function iniciarSesion(
     sesion,
   )
 
+  registrarEventoBitacora({
+    modulo: 'Inicio de sesiÃ³n',
+    accion: 'INICIO_SESION',
+    detalle:
+      'El usuario iniciÃ³ sesiÃ³n correctamente.',
+    registroId: sesion.id,
+  })
+
   return {
     exitoso: true,
     sesion,
-    mensaje: 'Inicio de sesión correcto.',
+    mensaje: 'Inicio de sesiÃ³n correcto.',
     bloqueadoHasta: null,
   }
 }
@@ -287,6 +319,7 @@ export function obtenerSesion():
 
   if (
     !sesion.token ||
+    !sesion.fechaInicio ||
     !sesion.fechaExpiracion
   ) {
     cerrarSesion()
@@ -304,17 +337,74 @@ export function obtenerSesion():
     Date.now() >= fechaExpiracion
 
   if (fechaInvalida || sesionVencida) {
-    cerrarSesion()
+    cerrarSesion(
+      'La sesiÃ³n se cerrÃ³ al alcanzar el tiempo mÃ¡ximo de 5 minutos.',
+    )
     return null
   }
 
   return sesion
 }
 
-export function cerrarSesion(): void {
+export function cerrarSesion(
+  detalle =
+    'El usuario cerrÃ³ la sesiÃ³n manualmente.',
+): void {
+  const sesionActual =
+    obtenerStorage<SesionUsuario | null>(
+      STORAGE_KEYS.sesion,
+      null,
+    )
+
+  if (sesionActual) {
+    registrarEventoBitacora({
+      modulo: 'Inicio de sesiÃ³n',
+      accion: 'CIERRE_SESION',
+      detalle,
+      registroId: sesionActual.id,
+    })
+  }
+
   eliminarStorage(STORAGE_KEYS.sesion)
 }
 
 export function estaAutenticado(): boolean {
   return obtenerSesion() !== null
 }
+
+export function sincronizarSesionUsuario(
+  usuario: UsuarioLogin,
+): SesionUsuario | null {
+  const sesionActual =
+    obtenerStorage<SesionUsuario | null>(
+      STORAGE_KEYS.sesion,
+      null,
+    )
+
+  if (!sesionActual) {
+    return null
+  }
+
+  if (
+    sesionActual.id !== usuario.id
+  ) {
+    return sesionActual
+  }
+
+  const sesionActualizada:
+    SesionUsuario = {
+      ...sesionActual,
+      usuario: usuario.usuario,
+      nombreCompleto:
+        usuario.nombreCompleto,
+      rol: usuario.rol,
+    }
+
+  guardarStorage(
+    STORAGE_KEYS.sesion,
+    sesionActualizada,
+  )
+
+  return sesionActualizada
+}
+

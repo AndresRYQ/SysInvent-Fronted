@@ -1,6 +1,15 @@
-import { useState, type ReactNode } from 'react'
+import {
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react'
 import { useNavigate } from 'react-router-dom'
-
+import {
+  tienePermisoModulo,
+} from '../services/rolService'
+import {
+  obtenerResumenDashboard,
+} from '../services/dashboardService'
 import AnimatedContent from '../components/ui/AnimatedContent'
 import CountUp from '../components/ui/CountUp'
 import SpotlightCard from '../components/ui/SpotlightCard'
@@ -24,365 +33,215 @@ type IconName =
   | 'cart'
   | 'chart'
 
-type NavItem = {
-  label: string
-  icon: IconName
-  active?: boolean
-}
-
 type Metric = {
   label: string
   value: number
-  suffix?: string
-  trend: string
-  trendType: 'up' | 'down'
+  detail: string
+  status: 'positive' | 'alert' | 'neutral'
   icon: IconName
   tone: string
 }
 
 type Module = {
+  id: string
   title: string
   description: string
   icon: IconName
   tone: string
   category: string
+  route?: string
 }
-
-const navItems: NavItem[] = [
-  { label: 'Inicio', icon: 'home', active: true },
-  { label: 'Productos', icon: 'box' },
-  { label: 'Entradas', icon: 'entry' },
-  { label: 'Salidas', icon: 'exit' },
-  { label: 'Reportes', icon: 'report' },
-  { label: 'Ordenes', icon: 'order' },
-  { label: 'Auditoria', icon: 'audit' },
-]
-
-const metrics: Metric[] = [
-  {
-    label: 'Inventario total',
-    value: 2450,
-    trend: '8% vs mes anterior',
-    trendType: 'up',
-    icon: 'box',
-    tone: 'green',
-  },
-  {
-    label: 'Entradas (mes)',
-    value: 35,
-    trend: '12% vs mes anterior',
-    trendType: 'up',
-    icon: 'entry',
-    tone: 'blue',
-  },
-  {
-    label: 'Salidas (mes)',
-    value: 22,
-    trend: '5% vs mes anterior',
-    trendType: 'down',
-    icon: 'exit',
-    tone: 'orange',
-  },
-  {
-    label: 'Ordenes pendientes',
-    value: 24,
-    trend: '4% vs mes anterior',
-    trendType: 'up',
-    icon: 'clipboard',
-    tone: 'violet',
-  },
-  {
-    label: 'Proveedores',
-    value: 40,
-    trend: '2% vs mes anterior',
-    trendType: 'up',
-    icon: 'users',
-    tone: 'teal',
-  },
-]
 
 const categories = [
   'Todos',
-  'Operaciones',
   'Inventario',
   'Reportes',
   'Maestros',
   'Seguridad',
+  'Perfil',
 ]
 
 const modules: Module[] = [
   {
-    title: 'Registro de Guías',
-    description: 'Gestionar guías de recepción.',
-    icon: 'clipboard',
+    id: 'proveedores',
+    title: 'Proveedores',
+    description: 'AdministraciÃ³n de proveedores.',
+    icon: 'users',
     tone: 'green',
-    category: 'Operaciones',
+    category: 'Maestros',
+    route: '/proveedores',
   },
   {
-    title: 'Registro de Plantillas',
-    description: 'Administrar plantillas de producción.',
-    icon: 'clipboard',
-    tone: 'green',
-    category: 'Operaciones',
-  },
-  {
-    title: 'Registro de Fucs',
-    description: 'Control de FUCs del proceso.',
-    icon: 'clipboard',
-    tone: 'green',
-    category: 'Operaciones',
-  },
-  {
-    title: 'Calidad en Recepción',
-    description: 'Control de calidad de ingreso.',
-    icon: 'audit',
-    tone: 'green',
-    category: 'Operaciones',
-  },
-  {
-    title: 'Calidad en Proceso',
-    description: 'Seguimiento de calidad.',
-    icon: 'audit',
-    tone: 'green',
-    category: 'Operaciones',
-  },
-  {
-    title: 'Control de Desverdizado',
-    description: 'Gestión del proceso de desverdizado.',
+    id: 'productos',
+    title: 'Productos',
+    description: 'AdministraciÃ³n de productos.',
     icon: 'box',
     tone: 'green',
-    category: 'Operaciones',
+    category: 'Maestros',
+    route: '/productos',
   },
   {
-    title: 'Control de Proceso',
-    description: 'Supervisión operacional.',
-    icon: 'chart',
-    tone: 'green',
-    category: 'Operaciones',
-  },
-  {
-    title: 'Túnel y Cámara de Frío',
-    description: 'Control de cámaras y túneles.',
-    icon: 'box',
-    tone: 'blue',
-    category: 'Operaciones',
-  },
-  {
-    title: 'Registro de Packing List',
-    description: 'Administración de packing list.',
-    icon: 'clipboard',
-    tone: 'blue',
-    category: 'Operaciones',
-  },
-  {
-    title: 'Mercado Local',
-    description: 'Gestión de ventas locales.',
-    icon: 'chart',
-    tone: 'blue',
-    category: 'Operaciones',
-  },
-  {
-    title: 'Req. de Mantenimiento',
-    description: 'Solicitudes de mantenimiento.',
-    icon: 'order',
-    tone: 'orange',
-    category: 'Inventario',
-  },
-  {
-    title: 'Req. de Materiales',
-    description: 'Requerimientos de materiales.',
-    icon: 'order',
-    tone: 'orange',
-    category: 'Inventario',
-  },
-  {
-    title: 'Req. de Personal',
-    description: 'Solicitudes de personal.',
-    icon: 'users',
-    tone: 'orange',
-    category: 'Inventario',
-  },
-  {
-    title: 'Compras Mantenimiento',
-    description: 'Gestión de compras de mantenimiento.',
-    icon: 'cart',
-    tone: 'red',
-    category: 'Inventario',
-  },
-  {
-    title: 'Compras Materiales',
-    description: 'Gestión de compras de materiales.',
-    icon: 'cart',
-    tone: 'red',
-    category: 'Inventario',
-  },
-  {
-    title: 'Personal',
-    description: 'Administración del personal.',
-    icon: 'users',
-    tone: 'blue',
-    category: 'Inventario',
-  },
-  {
-    title: 'Contabilidad',
-    description: 'Procesos contables.',
-    icon: 'chart',
+    id: 'bitacora',
+    title: 'BitÃ¡cora',
+    description: 'Consulta de actividades y cambios.',
+    icon: 'audit',
     tone: 'violet',
-    category: 'Inventario',
+    category: 'Seguridad',
+    route: '/bitacora',
   },
   {
-    title: 'Ingresos de Almacén',
+    id: 'contactos',
+    title: 'Contactos',
+    description: 'AdministraciÃ³n de contactos.',
+    icon: 'users',
+    tone: 'green',
+    category: 'Maestros',
+    route: '/contactos',
+  },
+  {
+    id: 'partes-equipo',
+    title: 'Partes de equipo',
+    description: 'AdministraciÃ³n de partes de equipo.',
+    icon: 'box',
+    tone: 'green',
+    category: 'Maestros',
+    route: '/partes-equipo',
+  },
+  {
+    id: 'control-almacen',
+    title: 'Control de almacÃ©n',
+    description: 'Control de inventario y movimientos.',
+    icon: 'box',
+    tone: 'green',
+    category: 'Inventario',
+    route: '/control-almacen',
+  },
+  {
+    id: 'vales-consumo',
+    title: 'Vales de consumo',
+    description: 'AdministraciÃ³n de vales de consumo.',
+    icon: 'order',
+    tone: 'green',
+    category: 'Inventario',
+    route: '/vales-consumo',
+  },
+  {
+    id: 'ingresos-almacen',
+    title: 'Ingresos de AlmacÃ©n',
     description: 'Registro de ingresos.',
     icon: 'entry',
     tone: 'green',
     category: 'Inventario',
+    route: '/ingresos-almacen',
   },
   {
-    title: 'Vales de Consumo',
-    description: 'Administrar vales.',
-    icon: 'order',
-    tone: 'amber',
-    category: 'Inventario',
-  },
-  {
-    title: 'Control de Almacén',
-    description: 'Control de inventario.',
-    icon: 'box',
-    tone: 'green',
-    category: 'Inventario',
-  },
-  {
-    title: 'Registro de Ventas',
-    description: 'Registro de ventas.',
-    icon: 'cart',
-    tone: 'orange',
-    category: 'Inventario',
-  },
-  {
-    title: 'Reporte de Recepción',
-    description: 'Reportes de recepción.',
+    id: 'reporte-ingresos',
+    title: 'Reporte de ingreso',
+    description: 'Consulta de reportes de ingresos.',
     icon: 'report',
     tone: 'blue',
     category: 'Reportes',
+    route: '/reportes/ingresos',
   },
   {
-    title: 'Reporte de Fucs',
-    description: 'Reportería FUCs.',
+    id: 'reporte-vales',
+    title: 'Reporte de vale',
+    description: 'Consulta de reportes de vales.',
     icon: 'report',
     tone: 'blue',
     category: 'Reportes',
+    route: '/reportes/vales',
   },
   {
-    title: 'Reporte de Producción',
-    description: 'Indicadores de producción.',
+    id: 'reporte-productos',
+    title: 'Reporte acumulado',
+    description: 'Consulta de productos mÃ¡s solicitados.',
     icon: 'chart',
     tone: 'blue',
     category: 'Reportes',
+     route:
+    '/reportes/productos-mas-pedidos',
   },
   {
-    title: 'Reporte de Trazabilidad',
-    description: 'Seguimiento de trazabilidad.',
-    icon: 'report',
-    tone: 'blue',
-    category: 'Reportes',
-  },
-  {
-    title: 'Reporte Stock Frío',
-    description: 'Stock en cámaras.',
-    icon: 'box',
-    tone: 'blue',
-    category: 'Reportes',
-  },
-  {
-    title: 'Reporte Stock Detallado',
-    description: 'Detalle de inventario.',
-    icon: 'box',
-    tone: 'blue',
-    category: 'Reportes',
-  },
-  {
-    title: 'Reporte de Calidad',
-    description: 'Control de calidad.',
-    icon: 'audit',
-    tone: 'blue',
-    category: 'Reportes',
-  },
-  {
-    title: 'Reporte Stock Pallets',
-    description: 'Stock de pallets.',
-    icon: 'qr',
-    tone: 'blue',
-    category: 'Reportes',
-  },
-  {
-    title: 'Reporte Kardex',
-    description: 'Movimientos de almacén.',
-    icon: 'chart',
-    tone: 'blue',
-    category: 'Reportes',
-  },
-  {
-    title: 'Especies',
-    description: 'Mantenimiento de especies.',
+    id: 'centros-costo',
+    title: 'Centros de costo',
+    description: 'Mantenimiento de centros de costo.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
+    route: '/centros-costo',
   },
   {
-    title: 'Categorías',
-    description: 'Gestión de categorías.',
+    id: 'categorias',
+    title: 'CategorÃ­as',
+    description: 'GestiÃ³n de categorÃ­as.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
+    route: '/categorias',
   },
   {
-    title: 'Marcas de Caja',
-    description: 'Administración de marcas.',
+    id: 'tipos-producto',
+    title: 'Tipos de producto',
+    description: 'AdministraciÃ³n de tipos de producto.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
+    route: '/tipos-producto',
   },
   {
-    title: 'Modelos de Caja',
-    description: 'Configuración de modelos.',
+    id: 'tipos-documento',
+    title: 'Tipos de documento',
+    description: 'AdministraciÃ³n de tipos de documento.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
+    route: '/tipos-documento',
   },
   {
-    title: 'Cámaras de Frío',
-    description: 'Administración de cámaras.',
+    id: 'unidades-medida',
+    title: 'Unidades de medida',
+    description: 'AdministraciÃ³n de unidades de medida.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
+    route: '/unidades-medida',
   },
   {
-    title: 'Acopiadores',
-    description: 'Gestión de acopiadores.',
-    icon: 'users',
+    id: 'destinos',
+    title: 'Destinos',
+    description: 'AdministraciÃ³n de destinos.',
+    icon: 'box',
     tone: 'green',
     category: 'Maestros',
+    route: '/destinos',
   },
   {
-    title: 'Clientes',
-    description: 'Administración de clientes.',
-    icon: 'users',
-    tone: 'green',
-    category: 'Maestros',
-  },
-  {
+    id: 'usuarios',
     title: 'Usuarios',
-    description: 'Administración de usuarios.',
+    description: 'AdministraciÃ³n de usuarios.',
     icon: 'users',
     tone: 'violet',
     category: 'Seguridad',
+    route: '/usuarios',
   },
   {
+    id: 'roles',
     title: 'Roles',
-    description: 'Gestión de roles.',
+    description: 'GestiÃ³n de roles.',
     icon: 'users',
     tone: 'violet',
     category: 'Seguridad',
+    route: '/roles',
+  },
+  {
+    id: 'perfil-usuario',
+    title: 'Perfil de usuario',
+    description: 'Consulta y ediciÃ³n del perfil del usuario.',
+    icon: 'users',
+    tone: 'teal',
+    category: 'Perfil',
+    route: '/perfil',
   },
 ]
 
@@ -513,93 +372,217 @@ function Icon({ name }: { name: IconName }) {
 
 function DashboardPage() {
   const navigate = useNavigate()
-  const { sesion, logout } = useAuth()
-  const [selectedCategory, setSelectedCategory] = useState('Todos')
-  const nombreUsuario = sesion?.nombreCompleto ?? 'Frank Arone'
-  const rolUsuario = sesion?.rol ?? 'Administrador'
-  const nombreSaludo = nombreUsuario.split(' ')[0] || 'Frank'
+  const { sesion } = useAuth()
 
-  const filteredModules =
-    selectedCategory === 'Todos'
-      ? modules
-      : modules.filter((module) => module.category === selectedCategory)
+  const [
+    selectedCategory,
+    setSelectedCategory,
+  ] = useState('Todos')
 
-  const manejarAbrirModulo = (moduleTitle: string) => {
-    if (moduleTitle === 'Categorías') {
-      navigate('/categorias')
-    }
+  const resumenDashboard = useMemo(
+    () => obtenerResumenDashboard(),
+    [],
+  )
 
-    if (moduleTitle === 'Vales de Consumo') {
-      navigate('/vales-consumo')
+  const metrics: Metric[] = [
+    {
+      label: 'Productos activos',
+      value:
+        resumenDashboard.productosActivos,
+      detail:
+        'Productos registrados',
+      status: 'neutral',
+      icon: 'box',
+      tone: 'green',
+    },
+    {
+      label: 'Stock crÃ­tico',
+      value:
+        resumenDashboard
+          .productosStockBajo +
+        resumenDashboard
+          .productosSinStock,
+      detail:
+        'Requieren reposiciÃ³n',
+      status: 'alert',
+      icon: 'clipboard',
+      tone: 'orange',
+    },
+    {
+      label: 'Ingresos del mes',
+      value:
+        resumenDashboard.ingresosDelMes,
+      detail:
+        'Documentos registrados',
+      status: 'positive',
+      icon: 'entry',
+      tone: 'blue',
+    },
+    {
+      label: 'Vales del mes',
+      value:
+        resumenDashboard.valesDelMes,
+      detail:
+        'Documentos registrados',
+      status: 'neutral',
+      icon: 'order',
+      tone: 'violet',
+    },
+    {
+      label: 'Movimientos de hoy',
+      value:
+        resumenDashboard.movimientosHoy,
+      detail:
+        'Entradas y salidas',
+      status: 'neutral',
+      icon: 'audit',
+      tone: 'teal',
+    },
+  ]
+
+  const dashboardAlerts =
+    resumenDashboard.alertas.map(
+      (alerta) => ({
+        id: alerta.id,
+        title: alerta.titulo,
+        detail: alerta.detalle,
+        tone: alerta.tono,
+      }),
+    )
+
+  const recentMovements =
+    resumenDashboard
+      .movimientosRecientes
+      .map((movimiento) => ({
+        id: movimiento.id,
+        date: movimiento.fecha,
+        type: movimiento.tipo,
+        document:
+          movimiento.documento,
+        product:
+          movimiento.producto,
+        quantity:
+          movimiento.cantidad,
+        responsible:
+          movimiento.responsable,
+      }))
+
+  const nombreUsuario =
+    sesion?.nombreCompleto ??
+    'Usuario'
+
+  const nombreSaludo =
+    nombreUsuario.split(' ')[0] ||
+    'Usuario'
+
+  const fechaActual =
+    new Intl.DateTimeFormat(
+      'es-PE',
+      {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      },
+    ).format(new Date())
+
+ const modulosPermitidos = useMemo(
+  () =>
+    modules.filter((module) =>
+      tienePermisoModulo(
+        sesion?.rol,
+        module.id,
+      ),
+    ),
+  [sesion?.rol],
+)
+
+const categoriasPermitidas = useMemo(
+  () =>
+    categories.filter(
+      (category) =>
+        category === 'Todos' ||
+        modulosPermitidos.some(
+          (module) =>
+            module.category === category,
+        ),
+    ),
+  [modulosPermitidos],
+)
+
+const filteredModules =
+  selectedCategory === 'Todos'
+    ? modulosPermitidos
+    : modulosPermitidos.filter(
+        (module) =>
+          module.category ===
+          selectedCategory,
+      )
+
+  const manejarAbrirModulo = (module: Module) => {
+    if (module.route) {
+      navigate(module.route)
     }
   }
 
   return (
     <main className="dashboard-shell">
-      <nav className="topbar" aria-label="Navegacion principal">
-        <a className="brand" href="/">
-          <span className="brand-mark">
-            <Icon name="leaf" />
-          </span>
-          <span className="brand-name">AGRIHUASA</span>
-          <span className="brand-system">FFPMS</span>
-        </a>
-
-        <div className="nav-links">
-          {navItems.map((item) => (
-            <a className={`nav-link ${item.active ? 'is-active' : ''}`} href="/" key={item.label}>
-              <Icon name={item.icon} />
-              <span>{item.label}</span>
-            </a>
-          ))}
-        </div>
-
-        <div className="topbar-actions">
-          <button className="notification-button" type="button" aria-label="Notificaciones">
-            <Icon name="bell" />
-            <span>3</span>
-          </button>
-          <button className="user-menu" type="button" onClick={logout}>
-            <span className="avatar">{nombreUsuario.slice(0, 2).toUpperCase()}</span>
-            <span>
-              <strong>{nombreUsuario}</strong>
-              <small>{rolUsuario}</small>
-            </span>
-          </button>
-        </div>
-      </nav>
 
       <section className="hero-panel">
         <div className="hero-copy">
           <AnimatedContent>
-            <span className="hero-line" />
-            <h1>Bienvenido, {nombreSaludo}!</h1>
-            <p className="hero-subtitle">Sistema de Control de Almacen - FFPMS</p>
+            <span className="hero-eyebrow">
+              Panel de control
+            </span>
+            <h1>Bienvenido, {nombreSaludo}</h1>
+
+            <p className="hero-subtitle">
+              Sistema de Control de AlmacÃ©n
+            </p>
+
             <p className="hero-description">
-              Administra inventarios, ordenes, entradas, salidas y reportes de tu almacen.
+              Consulta y administra el inventario,
+              los ingresos, los vales de consumo
+              y los reportes del almacÃ©n.
+            </p>
+            <p className="hero-date">
+              {fechaActual}
             </p>
           </AnimatedContent>
         </div>
 
-        <AnimatedContent className="warehouse-illustration" delay={120}>
-          <div className="orb" />
-          <div className="warehouse">
-            <div className="roof" />
-            <div className="building">
-              <span className="shield" />
-              <span className="door" />
-              <span className="window left" />
-              <span className="window right" />
+        <AnimatedContent
+          className="system-status"
+          delay={120}
+        >
+          <div className="system-status__header">
+            <span
+              className="system-status__indicator"
+              aria-hidden="true"
+            />
+
+            <div>
+              <small>Estado del sistema</small>
+              <strong>OperaciÃ³n normal</strong>
             </div>
-            <div className="boxes">
-              <span />
-              <span />
-              <span />
+          </div>
+
+          <div className="system-status__details">
+            <div>
+              <span>Entorno</span>
+              <strong>Localhost</strong>
             </div>
-            <div className="forklift">
-              <span className="forklift-body" />
-              <span className="forklift-wheel one" />
-              <span className="forklift-wheel two" />
+
+            <div>
+              <span>SesiÃ³n</span>
+              <strong>Activa</strong>
+            </div>
+
+            <div>
+              <span>Rol</span>
+              <strong>
+                {sesion?.rol ?? 'Sin rol'}
+              </strong>
             </div>
           </div>
         </AnimatedContent>
@@ -617,8 +600,10 @@ function DashboardPage() {
                 <strong>
                   <CountUp end={metric.value} />
                 </strong>
-                <small className={metric.trendType === 'down' ? 'trend-down' : 'trend-up'}>
-                  {metric.trendType === 'down' ? '↓' : '↑'} {metric.trend}
+                <small
+                  className={`metric-detail metric-detail--${metric.status}`}
+                >
+                  {metric.detail}
                 </small>
               </div>
             </SpotlightCard>
@@ -626,8 +611,126 @@ function DashboardPage() {
         ))}
       </section>
 
+      <section
+        className="dashboard-section operational-grid"
+        aria-label="Resumen operativo"
+      >
+        <article className="operational-panel">
+          <header className="operational-panel__header">
+            <div>
+              <span className="section-eyebrow">
+                Seguimiento
+              </span>
+
+              <h2>Alertas del inventario</h2>
+            </div>
+
+            <span className="local-badge">
+              Datos locales
+            </span>
+          </header>
+
+          <div className="alerts-list">
+            {dashboardAlerts.map((alert) => (
+              <div
+                className="alert-item"
+                key={alert.id}
+              >
+                <span
+                  className={`alert-dot alert-dot--${alert.tone}`}
+                  aria-hidden="true"
+                />
+
+                <div>
+                  <strong>{alert.title}</strong>
+                  <p>{alert.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="operational-panel">
+          <header className="operational-panel__header">
+            <div>
+              <span className="section-eyebrow">
+                Actividad reciente
+              </span>
+
+              <h2>Ãšltimos movimientos</h2>
+            </div>
+          </header>
+
+          <div className="movement-table-wrap">
+            <table className="movement-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Tipo</th>
+                  <th>Documento</th>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>Responsable</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {recentMovements.map((movement) => (
+                  <tr key={movement.id}>
+                    <td>{movement.date}</td>
+
+                    <td>
+                      <span
+                        className={
+                          movement.type === 'Ingreso'
+                            ? 'movement-badge movement-badge--entry'
+                            : 'movement-badge movement-badge--voucher'
+                        }
+                      >
+                        {movement.type}
+                      </span>
+                    </td>
+
+                    <td>
+                      <strong>{movement.document}</strong>
+                    </td>
+
+                    <td>{movement.product}</td>
+
+                    <td>{movement.quantity}</td>
+
+                    <td>{movement.responsible}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+      <section className="modules-heading">
+        <div>
+          <span className="section-eyebrow">
+            Accesos del sistema
+          </span>
+
+          <h2>MÃ³dulos del sistema</h2>
+
+          <p>
+            Selecciona una categorÃ­a para consultar
+            los mÃ³dulos disponibles.
+          </p>
+        </div>
+
+        <span className="modules-count">
+          {filteredModules.length}{' '}
+          {filteredModules.length === 1
+            ? 'mÃ³dulo'
+            : 'mÃ³dulos'}
+        </span>
+      </section>
+
       <section className="categories-bar">
-        {categories.map((category) => (
+        {categoriasPermitidas.map((category) => (
           <button
             key={category}
             type="button"
@@ -653,19 +756,24 @@ function DashboardPage() {
               <button
                 className={`module-action tone-${module.tone}`}
                 type="button"
-                onClick={() => manejarAbrirModulo(module.title)}
+                disabled={!module.route}
+                title={!module.route ? 'MÃ³dulo en desarrollo' : undefined}
+                onClick={() => manejarAbrirModulo(module)}
               >
-                Abrir modulo
-                <span aria-hidden="true">→</span>
+                {module.route ? 'Abrir mÃ³dulo' : 'En desarrollo'}
+                {module.route && <span aria-hidden="true">â†’</span>}
               </button>
             </SpotlightCard>
           </AnimatedContent>
         ))}
       </section>
-
-      <footer className="dashboard-footer">© 2024 Agrihuasa. Todos los derechos reservados.</footer>
+      <footer className="dashboard-footer">
+        Â© 2026 AGRIHUSAC. Todos los derechos reservados.
+      </footer>
     </main>
   )
 }
 
 export default DashboardPage
+
+
