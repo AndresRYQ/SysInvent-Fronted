@@ -17,7 +17,6 @@ import {
   useLocation,
   useNavigate,
 } from 'react-router-dom'
-import Select from 'react-select'
 
 import { TablePagination } from '../../components/ui/TablePagination'
 
@@ -54,36 +53,6 @@ interface MensajePagina {
   texto: string
 }
 
-const selectStyles = {
-  control: (base: any, state: any) => ({
-    ...base,
-    height: '36px',
-    minHeight: '36px',
-    borderRadius: '16px',
-    borderColor: state.isFocused
-      ? 'rgb(51 143 60 / 55%)'
-      : 'rgb(17 24 39 / 10%)',
-    backgroundColor: state.isFocused ? '#fff' : '#f9fbfa',
-    boxShadow: state.isFocused
-      ? '0 0 0 0.22rem rgb(51 143 60 / 12%)'
-      : 'none',
-    '&:hover': {
-      borderColor: 'rgb(51 143 60 / 55%)',
-    },
-  }),
-  valueContainer: (base: any) => ({ ...base, height: '34px', padding: '0 14px' }),
-  singleValue: (base: any) => ({ ...base, color: '#344054', fontSize: '0.8rem' }),
-  placeholder: (base: any) => ({ ...base, color: '#667085', fontSize: '0.8rem' }),
-  indicatorsContainer: (base: any) => ({ ...base, height: '34px' }),
-  menu: (base: any) => ({ ...base, zIndex: 20 }),
-  option: (base: any, state: any) => ({
-    ...base,
-    fontSize: '0.8rem',
-    backgroundColor: state.isSelected ? '#e9f8ee' : state.isFocused ? '#f3faf5' : '#fff',
-    color: '#344054',
-  }),
-}
-
 const FILTROS_INICIALES: FiltrosVales = {
   busqueda: '',
   centroCostoId: '',
@@ -97,7 +66,7 @@ function obtenerMensajeError(
 ): string {
   return error instanceof Error
     ? error.message
-    : 'Ocurrió un error inesperado.'
+    : 'OcurriÃ³ un error inesperado.'
 }
 
 function formatearFecha(
@@ -167,7 +136,7 @@ export function ValesConsumoPage() {
 
   const productos = useMemo(
     () => obtenerProductos(),
-    [vales],
+    [],
   )
 
   useEffect(() => {
@@ -199,8 +168,8 @@ export function ValesConsumoPage() {
         const centroCosto =
           centrosCosto.find(
             (item) =>
-              String(item.id) === String(
-              vale.centroCostoId),
+              String(item.id) ===
+              String(vale.centroCostoId),
           )
 
         const nombresProductos =
@@ -208,8 +177,8 @@ export function ValesConsumoPage() {
             (detalle) =>
               productos.find(
                 (producto) =>
-                  String(producto.id) === String(
-                  detalle.productoId),
+                  producto.id ===
+                  detalle.productoId,
               )?.nombre ??
               'Producto no disponible',
           )
@@ -229,8 +198,8 @@ export function ValesConsumoPage() {
             (destinoId) =>
               destinos.find(
                 (destino) =>
-                  String(destino.id) === String(
-                  destinoId),
+                  String(destino.id) ===
+                  String(destinoId),
               )?.nombre ??
               'Destino no disponible',
           )
@@ -391,14 +360,14 @@ export function ValesConsumoPage() {
 
   return (
     <>
-      <main className="dashboard-shell maestro-page-shell vales-consumo-page">
+      <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
               <h1>Vales de consumo</h1>
 
               <p>
-                Salidas y distribución de productos
+                Salidas y distribuciÃ³n de productos
                 hacia destinos y partes de equipo.
               </p>
             </div>
@@ -428,7 +397,7 @@ export function ValesConsumoPage() {
                 <div className="row g-3">
                   <div className="col-12 col-lg-4">
                     <label
-                      className="form-label"
+                      className="form-label maestro-label"
                       htmlFor="valeBusqueda"
                     >
                       Buscar
@@ -436,8 +405,8 @@ export function ValesConsumoPage() {
 
                     <input
                       id="valeBusqueda"
-                      className="form-control"
-                      placeholder="Buscar"
+                      className="form-control maestro-control"
+                      placeholder="Vale, solicitante, producto o destino"
                       value={filtros.busqueda}
                       onChange={(event) =>
                         setFiltros(
@@ -454,68 +423,84 @@ export function ValesConsumoPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label"
+                      className="form-label maestro-label"
                       htmlFor="valeCentroFiltro"
                     >
                       Centro de costo
                     </label>
 
-                    <Select
-                      inputId="valeCentroFiltro"
-                      options={centrosCosto.map((centro) => ({
-                        value: String(centro.id),
-                        label: centro.nombre,
-                      }))}
-                      value={centrosCosto
-                        .map((centro) => ({ value: String(centro.id), label: centro.nombre }))
-                        .find((option) => option.value === filtros.centroCostoId) ?? null}
-                      onChange={(option) =>
-                        setFiltros((actual) => ({
-                          ...actual,
-                          centroCostoId: option?.value ?? '',
-                        }))
+                    <select
+                      id="valeCentroFiltro"
+                      className="form-select maestro-control"
+                      value={
+                        filtros.centroCostoId
                       }
-                      placeholder="Seleccionar"
-                      isClearable
-                      isSearchable={false}
-                      styles={selectStyles}
-                    />
+                      onChange={(event) =>
+                        setFiltros(
+                          (actual) => ({
+                            ...actual,
+                            centroCostoId:
+                              event.target
+                                .value,
+                          }),
+                        )
+                      }
+                    >
+                      <option value="">
+                        Todos
+                      </option>
+
+                      {centrosCosto.map(
+                        (centro) => (
+                          <option
+                            key={centro.id}
+                            value={centro.id}
+                          >
+                            {centro.nombre}
+                          </option>
+                        ),
+                      )}
+                    </select>
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label"
+                      className="form-label maestro-label"
                       htmlFor="valeEstadoFiltro"
                     >
                       Estado
                     </label>
 
-                    <Select
-                      inputId="valeEstadoFiltro"
-                      options={[
-                        { value: 'REGISTRADO', label: 'Registrado' },
-                        { value: 'ANULADO', label: 'Anulado' },
-                      ]}
-                      value={[
-                        { value: 'REGISTRADO', label: 'Registrado' },
-                        { value: 'ANULADO', label: 'Anulado' },
-                      ].find((option) => option.value === filtros.estado) ?? null}
-                      onChange={(option) =>
-                        setFiltros((actual) => ({
-                          ...actual,
-                          estado: option?.value ?? '',
-                        }))
+                    <select
+                      id="valeEstadoFiltro"
+                      className="form-select maestro-control"
+                      value={filtros.estado}
+                      onChange={(event) =>
+                        setFiltros(
+                          (actual) => ({
+                            ...actual,
+                            estado:
+                              event.target
+                                .value,
+                          }),
+                        )
                       }
-                      placeholder="Seleccionar"
-                      isClearable
-                      isSearchable={false}
-                      styles={selectStyles}
-                    />
+                    >
+                      <option value="">
+                        Todos
+                      </option>
+                      <option value="REGISTRADO">
+                        Registrado
+                      </option>
+                      <option value="ANULADO">
+                        Anulado
+                      </option>
+                    </select>
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label"
+                      className="form-label maestro-label"
                       htmlFor="valeDesde"
                     >
                       Desde
@@ -523,7 +508,7 @@ export function ValesConsumoPage() {
 
                     <input
                       id="valeDesde"
-                      className="form-control"
+                      className="form-control maestro-control"
                       type="date"
                       value={filtros.fechaDesde}
                       onChange={(event) =>
@@ -541,7 +526,7 @@ export function ValesConsumoPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label"
+                      className="form-label maestro-label"
                       htmlFor="valeHasta"
                     >
                       Hasta
@@ -549,7 +534,7 @@ export function ValesConsumoPage() {
 
                     <input
                       id="valeHasta"
-                      className="form-control"
+                      className="form-control maestro-control"
                       type="date"
                       value={filtros.fechaHasta}
                       onChange={(event) =>
@@ -627,7 +612,7 @@ export function ValesConsumoPage() {
                   <table className="table maestro-table align-middle mb-0">
                     <thead>
                       <tr>
-                        <th>Número</th>
+                        <th>NÃºmero</th>
                         <th>Fecha</th>
                         <th>Centro de costo</th>
                         <th>Solicitante</th>
@@ -844,7 +829,7 @@ export function ValesConsumoPage() {
 
             <p className="maestro-modal-copy text-center">
               Las cantidades del vale se
-              devolverán al stock:
+              devolverÃ¡n al stock:
             </p>
 
             <p className="maestro-delete-name">
@@ -878,4 +863,3 @@ export function ValesConsumoPage() {
     </>
   )
 }
-

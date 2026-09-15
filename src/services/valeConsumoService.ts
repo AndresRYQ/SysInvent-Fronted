@@ -96,7 +96,7 @@ export function obtenerValeConsumoPorId(
 ): ValeConsumo | null {
   const vale =
     obtenerValesConsumo().find(
-      (item) => String(item.id) === String( id),
+      (item) => item.id === id,
     )
 
   return vale ? copiarVale(vale) : null
@@ -195,14 +195,14 @@ function validarDatosVale(
     )
   ) {
     throw new Error(
-      'Selecciona una fecha válida.',
+      'Selecciona una fecha vÃ¡lida.',
     )
   }
 
   const centroCosto =
     obtenerCentrosCosto().find(
       (item) =>
-        String(item.id) === String( datos.centroCostoId),
+        String(item.id) === String(datos.centroCostoId),
     )
 
   if (!centroCosto) {
@@ -213,7 +213,7 @@ function validarDatosVale(
 
   if (centroCosto.activo !== 1) {
     throw new Error(
-      'El centro de costo seleccionado está inactivo.',
+      'El centro de costo seleccionado estÃ¡ inactivo.',
     )
   }
 
@@ -273,7 +273,7 @@ function validarDatosVale(
         )
       ) {
         throw new Error(
-          `El producto de la fila ${fila} está repetido.`,
+          `El producto de la fila ${fila} estÃ¡ repetido.`,
         )
       }
 
@@ -283,7 +283,7 @@ function validarDatosVale(
 
       const producto = productos.find(
         (item) =>
-          String(item.id) === String( detalle.productoId),
+          item.id === detalle.productoId,
       )
 
       if (!producto) {
@@ -294,7 +294,7 @@ function validarDatosVale(
 
       if (!producto.estado) {
         throw new Error(
-          `El producto "${producto.nombre}" está inactivo.`,
+          `El producto "${producto.nombre}" estÃ¡ inactivo.`,
         )
       }
 
@@ -305,7 +305,7 @@ function validarDatosVale(
         detalle.precioUnitario < 0
       ) {
         throw new Error(
-          `El precio del producto "${producto.nombre}" no es válido.`,
+          `El precio del producto "${producto.nombre}" no es vÃ¡lido.`,
         )
       }
 
@@ -335,8 +335,8 @@ function validarDatosVale(
           const destino =
             destinos.find(
               (item) =>
-                String(item.id) === String(
-                distribucion.destinoId),
+                String(item.id) ===
+                String(distribucion.destinoId),
             )
 
           if (!destino) {
@@ -345,9 +345,9 @@ function validarDatosVale(
             )
           }
 
-          if (destino.activo !== 1) {
+          if (!destino.estado) {
             throw new Error(
-              `El destino "${destino.nombre}" está inactivo.`,
+              `El destino "${destino.nombre}" estÃ¡ inactivo.`,
             )
           }
 
@@ -357,8 +357,8 @@ function validarDatosVale(
             const parte =
               partesEquipo.find(
                 (item) =>
-                  String(item.id) === String(
-                  distribucion.parteEquipoId),
+                  String(item.id) ===
+                  String(distribucion.parteEquipoId),
               )
 
             if (!parte) {
@@ -369,7 +369,7 @@ function validarDatosVale(
 
             if (!parte.estado) {
               throw new Error(
-                `La parte de equipo "${parte.nombre}" está inactiva.`,
+                `La parte de equipo "${parte.nombre}" estÃ¡ inactiva.`,
               )
             }
           }
@@ -381,7 +381,7 @@ function validarDatosVale(
             distribucion.cantidad <= 0
           ) {
             throw new Error(
-              `La cantidad de la distribución ${numeroDistribucion} de "${producto.nombre}" debe ser mayor que cero.`,
+              `La cantidad de la distribuciÃ³n ${numeroDistribucion} de "${producto.nombre}" debe ser mayor que cero.`,
             )
           }
 
@@ -394,7 +394,7 @@ function validarDatosVale(
             )
           ) {
             throw new Error(
-              `El destino y la parte de equipo están repetidos para "${producto.nombre}".`,
+              `El destino y la parte de equipo estÃ¡n repetidos para "${producto.nombre}".`,
             )
           }
 
@@ -468,7 +468,7 @@ function obtenerCantidadesPorProducto(
 }
 
 /**
- * Calcula cuánto debe modificarse el stock.
+ * Calcula cuÃ¡nto debe modificarse el stock.
  *
  * Crear vale: resultado negativo.
  * Editar vale: solamente la diferencia.
@@ -528,7 +528,7 @@ function validarAjustesStock(
     (ajuste, productoId) => {
       const producto = productos.find(
         (item) =>
-          String(item.id) === String( productoId),
+          item.id === productoId,
       )
 
       if (!producto) {
@@ -654,7 +654,7 @@ export function crearValeConsumo(
     modulo: 'Vales de consumo',
     accion: 'CREAR',
     detalle:
-      `Se registró el vale ${nuevoVale.numeroVale} con ${nuevoVale.detalles.length} producto(s).`,
+      `Se registrÃ³ el vale ${nuevoVale.numeroVale} con ${nuevoVale.detalles.length} producto(s).`,
     registroId: nuevoVale.id,
   })
 
@@ -668,7 +668,7 @@ export function actualizarValeConsumo(
   const vales = obtenerValesConsumo()
 
   const valeActual = vales.find(
-    (vale) => String(vale.id) === String( id),
+    (vale) => vale.id === id,
   )
 
   if (!valeActual) {
@@ -727,7 +727,7 @@ export function actualizarValeConsumo(
     modulo: 'Vales de consumo',
     accion: 'EDITAR',
     detalle:
-      `Se actualizó el vale ${valeActualizado.numeroVale}.`,
+      `Se actualizÃ³ el vale ${valeActualizado.numeroVale}.`,
     registroId:
       valeActualizado.id,
   })
@@ -741,7 +741,7 @@ export function anularValeConsumo(
   const vales = obtenerValesConsumo()
 
   const valeActual = vales.find(
-    (vale) => String(vale.id) === String( id),
+    (vale) => vale.id === id,
   )
 
   if (!valeActual) {
@@ -787,13 +787,10 @@ export function anularValeConsumo(
     modulo: 'Vales de consumo',
     accion: 'ELIMINAR',
     detalle:
-      `Se anuló el vale ${valeAnulado.numeroVale} y se devolvieron sus productos al stock.`,
+      `Se anulÃ³ el vale ${valeAnulado.numeroVale} y se devolvieron sus productos al stock.`,
     registroId: valeAnulado.id,
   })
 
   return copiarVale(valeAnulado)
 }
-
-
-
 

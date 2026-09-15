@@ -11,15 +11,15 @@ export function NuevoValePage() {
   const navigate = useNavigate()
 
   return (
-    <main className="dashboard-shell maestro-page-shell vales-consumo-page">
+    <main className="dashboard-shell maestro-page-shell">
       <div className="container-xl px-0 maestro-page-body">
         <section className="maestro-topbar">
           <div className="maestro-topbar__copy">
             <h1>Nuevo vale de consumo</h1>
 
             <p>
-              Registra la salida y distribución
-              de productos del almacén.
+              Registra la salida y distribuciÃ³n
+              de productos del almacÃ©n.
             </p>
           </div>
 

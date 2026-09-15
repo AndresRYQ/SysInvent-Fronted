@@ -3,7 +3,7 @@ export type EstadoValeConsumo =
   | 'ANULADO'
 
 /**
- * Distribución de una cantidad del producto.
+ * DistribuciÃ³n de una cantidad del producto.
  *
  * destinoId es obligatorio.
  * parteEquipoId es opcional porque no todas
@@ -17,7 +17,7 @@ export interface DistribucionValeConsumo {
 }
 
 /**
- * Datos de distribución recibidos
+ * Datos de distribuciÃ³n recibidos
  * desde el formulario.
  */
 export type DistribucionValeConsumoFormData =
@@ -65,10 +65,10 @@ export interface ValeConsumo {
 }
 
 /**
- * Información recibida desde el formulario.
+ * InformaciÃ³n recibida desde el formulario.
  *
- * El número, estado, identificadores y fecha
- * de registro se generarán automáticamente.
+ * El nÃºmero, estado, identificadores y fecha
+ * de registro se generarÃ¡n automÃ¡ticamente.
  */
 export interface ValeConsumoFormData {
   fechaVale: string
@@ -77,6 +77,5 @@ export interface ValeConsumoFormData {
   motivo: string
   detalles: DetalleValeConsumoFormData[]
 }
-
 
 

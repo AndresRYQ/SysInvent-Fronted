@@ -69,7 +69,7 @@ function obtenerMensajeError(
 ): string {
   return error instanceof Error
     ? error.message
-    : 'Ocurrió un error inesperado.'
+    : 'OcurriÃ³ un error inesperado.'
 }
 
 function calcularCantidadDistribuida(
@@ -245,8 +245,8 @@ export function ValeConsumoForm({
       () =>
         productos.find(
           (producto) =>
-            String(producto.id) === String(
-            borrador.productoId),
+            producto.id ===
+            borrador.productoId,
         ) ?? null,
       [productos, borrador.productoId],
     )
@@ -256,9 +256,11 @@ export function ValeConsumoForm({
       () =>
         unidadesMedida.find(
           (unidad) =>
-            String(unidad.id) === String(
-            productoSeleccionado
-              ?.unidadMedidaId),
+            String(unidad.id) ===
+            String(
+              productoSeleccionado
+                ?.unidadMedidaId,
+            ),
         ) ?? null,
       [
         unidadesMedida,
@@ -442,7 +444,7 @@ export function ValeConsumoForm({
       distribucionesBorrador.length === 0
     ) {
       setError(
-        'Agrega al menos una distribución.',
+        'Agrega al menos una distribuciÃ³n.',
       )
       return
     }
@@ -456,7 +458,7 @@ export function ValeConsumoForm({
 
     if (productoRepetido) {
       setError(
-        'Este producto ya está agregado. Usa Editar para cambiar sus distribuciones.',
+        'Este producto ya estÃ¡ agregado. Usa Editar para cambiar sus distribuciones.',
       )
       return
     }
@@ -489,12 +491,12 @@ export function ValeConsumoForm({
   ): void {
     const producto = productos.find(
       (item) =>
-        String(item.id) === String( detalle.productoId),
+        item.id === detalle.productoId,
     )
 
     if (!producto) {
       setError(
-        'El producto ya no está disponible.',
+        'El producto ya no estÃ¡ disponible.',
       )
       return
     }
@@ -599,7 +601,7 @@ export function ValeConsumoForm({
           </h2>
 
           <p className="text-secondary mb-0">
-            Registra productos y distribúyelos
+            Registra productos y distribÃºyelos
             entre destinos y partes de equipo.
           </p>
         </div>
@@ -623,7 +625,7 @@ export function ValeConsumoForm({
       <div className="row g-3">
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label maestro-label"
             htmlFor="valeFecha"
           >
             Fecha *
@@ -631,7 +633,7 @@ export function ValeConsumoForm({
 
           <input
             id="valeFecha"
-            className="form-control"
+            className="form-control maestro-control"
             type="date"
             value={fechaVale}
             onChange={(event) =>
@@ -644,7 +646,7 @@ export function ValeConsumoForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label maestro-label"
             htmlFor="valeCentroCosto"
           >
             Centro de costo *
@@ -652,7 +654,7 @@ export function ValeConsumoForm({
 
           <select
             id="valeCentroCosto"
-            className="form-select"
+            className="form-select maestro-control"
             value={centroCostoId}
             onChange={(event) =>
               setCentroCostoId(
@@ -668,8 +670,8 @@ export function ValeConsumoForm({
               .filter(
                 (centro) =>
                   centro.activo === 1 ||
-                  String(centro.id) === String(
-                    centroCostoId),
+                  String(centro.id) ===
+                    String(centroCostoId),
               )
               .map((centro) => (
                 <option
@@ -684,7 +686,7 @@ export function ValeConsumoForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label maestro-label"
             htmlFor="valeSolicitante"
           >
             Solicitante *
@@ -692,7 +694,7 @@ export function ValeConsumoForm({
 
           <input
             id="valeSolicitante"
-            className="form-control"
+            className="form-control maestro-control"
             maxLength={120}
             value={solicitante}
             onChange={(event) =>
@@ -705,7 +707,7 @@ export function ValeConsumoForm({
 
         <div className="col-12">
           <label
-            className="form-label"
+            className="form-label maestro-label"
             htmlFor="valeMotivo"
           >
             Motivo de la salida *
@@ -713,7 +715,7 @@ export function ValeConsumoForm({
 
           <textarea
             id="valeMotivo"
-            className="form-control"
+            className="form-control maestro-control"
             rows={3}
             maxLength={500}
             value={motivo}
@@ -734,12 +736,12 @@ export function ValeConsumoForm({
 
       <div className="row g-3">
         <div className="col-12 col-md-4">
-          <label className="form-label">
+          <label className="form-label maestro-label">
             Tipo de producto *
           </label>
 
           <select
-            className="form-select"
+            className="form-select maestro-control"
             value={borrador.tipoProductoId}
             onChange={(event) =>
               cambiarTipoProducto(
@@ -765,12 +767,12 @@ export function ValeConsumoForm({
         </div>
 
         <div className="col-12 col-md-5">
-          <label className="form-label">
+          <label className="form-label maestro-label">
             Producto *
           </label>
 
           <select
-            className="form-select"
+            className="form-select maestro-control"
             value={borrador.productoId}
             disabled={
               !borrador.tipoProductoId
@@ -800,31 +802,31 @@ export function ValeConsumoForm({
         </div>
 
         <div className="col-12 col-md-3">
-          <label className="form-label">
+          <label className="form-label maestro-label">
             Stock disponible
           </label>
 
           <input
-            className="form-control"
+            className="form-control maestro-control"
             readOnly
             value={
               productoSeleccionado
                 ? `${stockDisponible} ${unidadSeleccionada?.nombre ?? ''}`
                 : ''
             }
-            placeholder="Automático"
+            placeholder="AutomÃ¡tico"
           />
         </div>
       </div>
 
       <div className="row g-3 align-items-end mt-1">
         <div className="col-12 col-md-4">
-          <label className="form-label">
+          <label className="form-label maestro-label">
             Destino *
           </label>
 
           <select
-            className="form-select"
+            className="form-select maestro-control"
             value={borrador.destinoId}
             disabled={!borrador.productoId}
             onChange={(event) =>
@@ -856,12 +858,12 @@ export function ValeConsumoForm({
         </div>
 
         <div className="col-12 col-md-4">
-          <label className="form-label">
+          <label className="form-label maestro-label">
             Parte de equipo
           </label>
 
           <select
-            className="form-select"
+            className="form-select maestro-control"
             value={borrador.parteEquipoId}
             disabled={!borrador.productoId}
             onChange={(event) =>
@@ -891,12 +893,12 @@ export function ValeConsumoForm({
         </div>
 
         <div className="col-12 col-md-2">
-          <label className="form-label">
+          <label className="form-label maestro-label">
             Cantidad *
           </label>
 
           <input
-            className="form-control"
+            className="form-control maestro-control"
             type="number"
             min="0.001"
             step="0.001"
@@ -945,15 +947,15 @@ export function ValeConsumoForm({
                   const destino =
                     destinos.find(
                       (item) =>
-                        String(item.id) === String(
-                        distribucion.destinoId),
+                        String(item.id) ===
+                        String(distribucion.destinoId),
                     )
 
                   const parte =
                     partesEquipo.find(
                       (item) =>
-                        String(item.id) === String(
-                        distribucion.parteEquipoId),
+                        String(item.id) ===
+                        String(distribucion.parteEquipoId),
                     )
 
                   return (
@@ -981,7 +983,7 @@ export function ValeConsumoForm({
                       <td className="text-end">
                         <button
                           type="button"
-                          className="btn maestro-action-btn maestro-action-btn--danger"
+                          className="btn btn-sm btn-outline-danger"
                           onClick={() =>
                             quitarDistribucion(
                               indice,
@@ -1047,8 +1049,8 @@ export function ValeConsumoForm({
               const producto =
                 productos.find(
                   (item) =>
-                    String(item.id) === String(
-                    detalle.productoId),
+                    item.id ===
+                    detalle.productoId,
                 )
 
               const cantidad =
@@ -1092,7 +1094,7 @@ export function ValeConsumoForm({
                     <div className="d-flex justify-content-end gap-1">
                       <button
                         type="button"
-                        className="btn maestro-action-btn"
+                        className="btn btn-sm btn-outline-secondary"
                         onClick={() =>
                           editarProducto(
                             detalle,
@@ -1104,7 +1106,7 @@ export function ValeConsumoForm({
 
                       <button
                         type="button"
-                        className="btn maestro-action-btn maestro-action-btn--danger"
+                        className="btn btn-sm btn-outline-danger"
                         onClick={() =>
                           setDetalles(
                             (actuales) =>
@@ -1165,6 +1167,3 @@ export function ValeConsumoForm({
     </form>
   )
 }
-
-
-

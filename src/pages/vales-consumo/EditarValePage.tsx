@@ -24,7 +24,7 @@ export function EditarValePage() {
 
   if (!vale) {
     return (
-      <main className="dashboard-shell maestro-page-shell vales-consumo-page">
+      <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
@@ -32,7 +32,7 @@ export function EditarValePage() {
 
               <p>
                 El vale solicitado no existe
-                o ya no está disponible.
+                o ya no estÃ¡ disponible.
               </p>
             </div>
           </section>
@@ -41,8 +41,8 @@ export function EditarValePage() {
             className="alert alert-danger"
             role="alert"
           >
-            No se encontró el vale con
-            identificador “{id}”.
+            No se encontrÃ³ el vale con
+            identificador â€œ{id}â€.
           </div>
 
           <button
@@ -61,7 +61,7 @@ export function EditarValePage() {
   }
 
   return (
-    <main className="dashboard-shell maestro-page-shell vales-consumo-page">
+    <main className="dashboard-shell maestro-page-shell">
       <div className="container-xl px-0 maestro-page-body">
         <section className="maestro-topbar">
           <div className="maestro-topbar__copy">
