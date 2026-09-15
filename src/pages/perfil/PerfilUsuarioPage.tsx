@@ -1,274 +1,609 @@
-import { useMemo, useState, type FormEvent } from 'react'
 import {
-  CheckCircle2,
+  useState,
+  type FormEvent,
+} from 'react'
+
+import {
+  Eye,
+  EyeOff,
   KeyRound,
-  LockKeyhole,
   Mail,
   Save,
   ShieldCheck,
+  UserCircle,
   UserRound,
 } from 'lucide-react'
 
 import { useAuth } from '../../hooks/useAuth'
-import { obtenerUsuarios, actualizarUsuario } from '../../services/usuarioService'
-import type { UsuarioLogin } from '../../types/auth'
-import '../../styles/DashboardPage.css'
-import './PerfilUsuarioPage.css'
 
-type Mensaje = {
-  tipo: 'success' | 'danger'
-  texto: string
+import {
+  actualizarPerfilUsuario,
+  obtenerPerfilUsuario,
+} from '../../services/perfilUsuarioService'
+
+import type {
+  UsuarioLogin,
+} from '../../types/auth'
+
+import type {
+  PerfilUsuarioFormData,
+} from '../../types/usuario'
+
+import '../../styles/DashboardPage.css'
+import '../../styles/maestros.css'
+
+function obtenerIniciales(
+  nombre: string,
+): string {
+  const partes = nombre
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+
+  if (partes.length === 0) {
+    return 'U'
+  }
+
+  return partes
+    .slice(0, 2)
+    .map((parte) =>
+      parte.charAt(0).toUpperCase(),
+    )
+    .join('')
+}
+
+function obtenerMensajeError(
+  error: unknown,
+): string {
+  return error instanceof Error
+    ? error.message
+    : 'OcurriÃ³ un error inesperado.'
+}
+
+function crearFormulario(
+  usuario: UsuarioLogin,
+): PerfilUsuarioFormData {
+  return {
+    usuario: usuario.usuario,
+    nombreCompleto:
+      usuario.nombreCompleto,
+    email: usuario.email,
+    contrasenaActual: '',
+    nuevaContrasena: '',
+    confirmarContrasena: '',
+  }
 }
 
 export function PerfilUsuarioPage() {
-  const { sesion } = useAuth()
-  const usuarioInicial = useMemo(
-    () =>
-      obtenerUsuarios().find((usuario) => usuario.id === sesion?.id) ??
-      null,
-    [sesion?.id],
-  )
-  const [usuario, setUsuario] = useState<UsuarioLogin | null>(usuarioInicial)
-  const [nombreCompleto, setNombreCompleto] = useState(
-    usuarioInicial?.nombreCompleto ?? sesion?.nombreCompleto ?? '',
-  )
-  const [email, setEmail] = useState(usuarioInicial?.email ?? '')
-  const [contrasenaActual, setContrasenaActual] = useState('')
-  const [nuevaContrasena, setNuevaContrasena] = useState('')
-  const [confirmarContrasena, setConfirmarContrasena] = useState('')
-  const [mensaje, setMensaje] = useState<Mensaje | null>(null)
+  const {
+    sesion,
+    actualizarSesionUsuario,
+  } = useAuth()
 
-  const iniciales =
-    (nombreCompleto || sesion?.nombreCompleto || 'US')
-      .split(' ')
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((parte) => parte[0]?.toUpperCase() ?? '')
-      .join('') || 'US'
+  const [perfil, setPerfil] =
+    useState<UsuarioLogin | null>(
+      () =>
+        sesion
+          ? obtenerPerfilUsuario(
+              sesion.id,
+            )
+          : null,
+    )
 
-  const guardarCambios = (event: FormEvent<HTMLFormElement>) => {
+  const [formulario, setFormulario] =
+    useState<PerfilUsuarioFormData>(
+      () =>
+        perfil
+          ? crearFormulario(perfil)
+          : {
+              usuario: '',
+              nombreCompleto: '',
+              email: '',
+              contrasenaActual: '',
+              nuevaContrasena: '',
+              confirmarContrasena: '',
+            },
+    )
+
+  const [
+    mostrarContrasenas,
+    setMostrarContrasenas,
+  ] = useState(false)
+
+  const [guardando, setGuardando] =
+    useState(false)
+
+  const [error, setError] =
+    useState<string | null>(null)
+
+  const [mensaje, setMensaje] =
+    useState<string | null>(null)
+
+  function cambiarCampo(
+    campo: keyof PerfilUsuarioFormData,
+    valor: string,
+  ): void {
+    setFormulario((actual) => ({
+      ...actual,
+      [campo]: valor,
+    }))
+
+    setError(null)
+    setMensaje(null)
+  }
+
+  function guardar(
+    event: FormEvent<HTMLFormElement>,
+  ): void {
     event.preventDefault()
+
+    if (!sesion || !perfil) {
+      setError(
+        'No se encontrÃ³ la sesiÃ³n actual.',
+      )
+      return
+    }
+
+    setGuardando(true)
+    setError(null)
     setMensaje(null)
 
-    if (!usuario) {
-      setMensaje({
-        tipo: 'danger',
-        texto: 'No se encontró la información del usuario actual.',
-      })
-      return
-    }
-
-    if (!nombreCompleto.trim() || !email.trim()) {
-      setMensaje({
-        tipo: 'danger',
-        texto: 'Completa tu nombre y correo electrónico.',
-      })
-      return
-    }
-
-    const quiereCambiarContrasena =
-      Boolean(contrasenaActual || nuevaContrasena || confirmarContrasena)
-
-    if (quiereCambiarContrasena) {
-      if (contrasenaActual !== usuario.contrasena) {
-        setMensaje({
-          tipo: 'danger',
-          texto: 'La contraseña actual no es correcta.',
-        })
-        return
-      }
-
-      if (nuevaContrasena.length < 6) {
-        setMensaje({
-          tipo: 'danger',
-          texto: 'La nueva contraseña debe tener al menos 6 caracteres.',
-        })
-        return
-      }
-
-      if (nuevaContrasena !== confirmarContrasena) {
-        setMensaje({
-          tipo: 'danger',
-          texto: 'La confirmación de contraseña no coincide.',
-        })
-        return
-      }
-    }
-
     try {
-      const actualizado = actualizarUsuario(usuario.id, {
-        usuario: usuario.usuario,
-        nombreCompleto,
-        email,
-        contrasena: quiereCambiarContrasena ? nuevaContrasena : '',
-        rol: usuario.rol,
-        estado: usuario.estado,
-      })
+      const actualizado =
+        actualizarPerfilUsuario(
+          sesion.id,
+          formulario,
+        )
 
-      setUsuario(actualizado)
-      setContrasenaActual('')
-      setNuevaContrasena('')
-      setConfirmarContrasena('')
-      setMensaje({
-        tipo: 'success',
-        texto: 'Los datos de tu perfil se actualizaron correctamente.',
-      })
-    } catch (error) {
-      setMensaje({
-        tipo: 'danger',
-        texto:
-          error instanceof Error
-            ? error.message
-            : 'No se pudieron guardar los cambios.',
-      })
+      setPerfil(actualizado)
+
+      actualizarSesionUsuario(
+        actualizado,
+      )
+
+      setFormulario(
+        crearFormulario(
+          actualizado,
+        ),
+      )
+
+      setMensaje(
+        'Tu perfil se actualizÃ³ correctamente.',
+      )
+    } catch (errorActual) {
+      setError(
+        obtenerMensajeError(
+          errorActual,
+        ),
+      )
+    } finally {
+      setGuardando(false)
     }
   }
 
-  return (
-    <main className="dashboard-shell perfil-page">
-      <div className="perfil-page__body">
-        <section className="perfil-hero">
-          <div>
-            <span className="perfil-kicker">Cuenta y seguridad</span>
-            <h1>Perfil de usuario</h1>
-            <p>
-              Consulta y administra tu información personal y las opciones de
-              seguridad de tu cuenta.
-            </p>
+  if (!sesion || !perfil) {
+    return (
+      <main className="dashboard-shell maestro-page-shell">
+        <div className="container-xl px-0 maestro-page-body">
+          <div
+            className="alert alert-danger"
+            role="alert"
+          >
+            No fue posible cargar el perfil
+            del usuario autenticado.
           </div>
-          <div className="perfil-hero__status">
-            <CheckCircle2 size={18} />
-            Sesión activa
+        </div>
+      </main>
+    )
+  }
+
+  return (
+    <main className="dashboard-shell maestro-page-shell">
+      <div className="container-xl px-0 maestro-page-body">
+        <section className="maestro-topbar">
+          <div className="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+            <div className="maestro-topbar__copy">
+              <h1>Perfil de usuario</h1>
+
+              <p>
+                Consulta y actualiza los datos
+                de tu cuenta.
+              </p>
+            </div>
+
+            <UserCircle
+              size={36}
+              className="text-success"
+            />
           </div>
         </section>
 
-        {mensaje && (
-          <div className={`perfil-alert perfil-alert--${mensaje.tipo}`} role="alert">
-            {mensaje.texto}
-          </div>
-        )}
+        <div className="maestro-panel">
+          <div className="row g-4">
+            <div className="col-12 col-lg-4">
+              <section className="card border-0 shadow-sm h-100">
+                <div className="card-body p-4">
+                  <div className="text-center">
+                    <div
+                      className="d-inline-flex align-items-center justify-content-center rounded-circle text-white fw-bold mb-3"
+                      style={{
+                        width: '92px',
+                        height: '92px',
+                        fontSize: '1.8rem',
+                        background:
+                          'linear-gradient(135deg, #0f5132, #198754)',
+                      }}
+                    >
+                      {obtenerIniciales(
+                        perfil.nombreCompleto,
+                      )}
+                    </div>
 
-        <form className="perfil-layout" onSubmit={guardarCambios} noValidate>
-          <section className="perfil-card perfil-account-card">
-            <div className="perfil-card__header">
-              <div>
-                <span className="perfil-kicker">Información personal</span>
-                <h2>Datos de la cuenta</h2>
-              </div>
-              <UserRound size={22} />
-            </div>
+                    <h2 className="h5 mb-1">
+                      {perfil.nombreCompleto}
+                    </h2>
 
-            <div className="perfil-user-summary">
-              <div className="perfil-avatar" aria-hidden="true">{iniciales}</div>
-              <div>
-                <strong>{nombreCompleto || 'Usuario'}</strong>
-                <span>@{usuario?.usuario ?? sesion?.usuario}</span>
-              </div>
-            </div>
+                    <p className="text-secondary mb-4">
+                      @{perfil.usuario}
+                    </p>
+                  </div>
 
-            <div className="perfil-form-grid">
-              <label className="perfil-field">
-                <span>Nombre completo</span>
-                <div className="perfil-input-wrap">
-                  <UserRound size={17} />
-                  <input
-                    value={nombreCompleto}
-                    onChange={(event) => setNombreCompleto(event.target.value)}
-                    maxLength={100}
-                  />
+                  <div className="d-flex flex-column gap-3">
+                    <div className="d-flex align-items-center gap-3">
+                      <Mail
+                        size={19}
+                        className="text-success"
+                      />
+
+                      <div>
+                        <small className="d-block text-secondary">
+                          Correo
+                        </small>
+
+                        <span>
+                          {perfil.email}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="d-flex align-items-center gap-3">
+                      <ShieldCheck
+                        size={19}
+                        className="text-success"
+                      />
+
+                      <div>
+                        <small className="d-block text-secondary">
+                          Rol
+                        </small>
+
+                        <span>
+                          {perfil.rol}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="d-flex align-items-center gap-3">
+                      <UserRound
+                        size={19}
+                        className="text-success"
+                      />
+
+                      <div>
+                        <small className="d-block text-secondary">
+                          Estado
+                        </small>
+
+                        <span
+                          className={
+                            perfil.estado
+                              ? 'maestro-status maestro-status--active mt-1'
+                              : 'maestro-status maestro-status--inactive mt-1'
+                          }
+                        >
+                          {perfil.estado
+                            ? 'Activo'
+                            : 'Inactivo'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="d-flex align-items-center gap-3">
+                      <KeyRound
+                        size={19}
+                        className="text-success"
+                      />
+
+                      <div>
+                        <small className="d-block text-secondary">
+                          Identificador
+                        </small>
+
+                        <span>
+                          {perfil.id}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <hr className="my-4" />
+
+                  <p className="small text-secondary mb-0">
+                    El rol y el estado solo pueden
+                    ser modificados desde el mÃ³dulo
+                    Usuarios por una persona con
+                    permisos.
+                  </p>
                 </div>
-              </label>
+              </section>
+            </div>
 
-              <label className="perfil-field">
-                <span>Correo electrónico</span>
-                <div className="perfil-input-wrap">
-                  <Mail size={17} />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                  />
+            <div className="col-12 col-lg-8">
+              <section className="maestro-table-card card border-0 shadow-sm">
+                <div className="card-body p-4">
+                  <div className="mb-4">
+                    <span className="maestro-kicker">
+                      <UserRound size={17} />
+                      InformaciÃ³n personal
+                    </span>
+
+                    <p className="text-secondary small mb-0 mt-2">
+                      Confirma tu contraseÃ±a actual
+                      para guardar cualquier cambio.
+                    </p>
+                  </div>
+
+                  {error && (
+                    <div
+                      className="alert alert-danger"
+                      role="alert"
+                    >
+                      {error}
+                    </div>
+                  )}
+
+                  {mensaje && (
+                    <div
+                      className="alert alert-success"
+                      role="status"
+                    >
+                      {mensaje}
+                    </div>
+                  )}
+
+                  <form onSubmit={guardar}>
+                    <div className="row g-3">
+                      <div className="col-12 col-md-6">
+                        <label
+                          className="form-label maestro-label"
+                          htmlFor="perfilUsuario"
+                        >
+                          Usuario
+                        </label>
+
+                        <input
+                          id="perfilUsuario"
+                          className="form-control maestro-control"
+                          value={
+                            formulario.usuario
+                          }
+                          autoComplete="username"
+                          maxLength={60}
+                          required
+                          onChange={(event) =>
+                            cambiarCampo(
+                              'usuario',
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </div>
+
+                      <div className="col-12 col-md-6">
+                        <label
+                          className="form-label maestro-label"
+                          htmlFor="perfilNombre"
+                        >
+                          Nombre completo
+                        </label>
+
+                        <input
+                          id="perfilNombre"
+                          className="form-control maestro-control"
+                          value={
+                            formulario.nombreCompleto
+                          }
+                          maxLength={120}
+                          required
+                          onChange={(event) =>
+                            cambiarCampo(
+                              'nombreCompleto',
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </div>
+
+                      <div className="col-12">
+                        <label
+                          className="form-label maestro-label"
+                          htmlFor="perfilCorreo"
+                        >
+                          Correo electrÃ³nico
+                        </label>
+
+                        <input
+                          id="perfilCorreo"
+                          type="email"
+                          className="form-control maestro-control"
+                          value={
+                            formulario.email
+                          }
+                          autoComplete="email"
+                          maxLength={150}
+                          required
+                          onChange={(event) =>
+                            cambiarCampo(
+                              'email',
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <hr className="my-4" />
+
+                    <div className="d-flex align-items-center justify-content-between gap-3 flex-wrap mb-3">
+                      <div>
+                        <span className="maestro-kicker">
+                          <KeyRound size={17} />
+                          Seguridad
+                        </span>
+
+                        <p className="text-secondary small mb-0 mt-2">
+                          Deja la nueva contraseÃ±a
+                          vacÃ­a si no deseas cambiarla.
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="btn maestro-btn-secondary"
+                        onClick={() =>
+                          setMostrarContrasenas(
+                            (actual) => !actual,
+                          )
+                        }
+                      >
+                        {mostrarContrasenas ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+
+                        {mostrarContrasenas
+                          ? 'Ocultar'
+                          : 'Mostrar'}
+                      </button>
+                    </div>
+
+                    <div className="row g-3">
+                      <div className="col-12">
+                        <label
+                          className="form-label maestro-label"
+                          htmlFor="perfilContrasenaActual"
+                        >
+                          ContraseÃ±a actual
+                        </label>
+
+                        <input
+                          id="perfilContrasenaActual"
+                          type={
+                            mostrarContrasenas
+                              ? 'text'
+                              : 'password'
+                          }
+                          className="form-control maestro-control"
+                          value={
+                            formulario
+                              .contrasenaActual
+                          }
+                          autoComplete="current-password"
+                          required
+                          onChange={(event) =>
+                            cambiarCampo(
+                              'contrasenaActual',
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </div>
+
+                      <div className="col-12 col-md-6">
+                        <label
+                          className="form-label maestro-label"
+                          htmlFor="perfilNuevaContrasena"
+                        >
+                          Nueva contraseÃ±a
+                        </label>
+
+                        <input
+                          id="perfilNuevaContrasena"
+                          type={
+                            mostrarContrasenas
+                              ? 'text'
+                              : 'password'
+                          }
+                          className="form-control maestro-control"
+                          value={
+                            formulario
+                              .nuevaContrasena
+                          }
+                          autoComplete="new-password"
+                          minLength={6}
+                          onChange={(event) =>
+                            cambiarCampo(
+                              'nuevaContrasena',
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </div>
+
+                      <div className="col-12 col-md-6">
+                        <label
+                          className="form-label maestro-label"
+                          htmlFor="perfilConfirmarContrasena"
+                        >
+                          Confirmar contraseÃ±a
+                        </label>
+
+                        <input
+                          id="perfilConfirmarContrasena"
+                          type={
+                            mostrarContrasenas
+                              ? 'text'
+                              : 'password'
+                          }
+                          className="form-control maestro-control"
+                          value={
+                            formulario
+                              .confirmarContrasena
+                          }
+                          autoComplete="new-password"
+                          minLength={6}
+                          onChange={(event) =>
+                            cambiarCampo(
+                              'confirmarContrasena',
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <div className="d-flex justify-content-end mt-4">
+                      <button
+                        type="submit"
+                        className="btn maestro-btn-primary"
+                        disabled={guardando}
+                      >
+                        <Save size={18} />
+
+                        {guardando
+                          ? 'Guardando...'
+                          : 'Guardar cambios'}
+                      </button>
+                    </div>
+                  </form>
                 </div>
-              </label>
-
-              <div className="perfil-readonly-field">
-                <span>Usuario</span>
-                <strong>{usuario?.usuario ?? sesion?.usuario ?? '—'}</strong>
-              </div>
-
-              <div className="perfil-readonly-field">
-                <span>Rol asignado</span>
-                <strong><ShieldCheck size={16} />{usuario?.rol ?? sesion?.rol ?? '—'}</strong>
-              </div>
+              </section>
             </div>
-          </section>
-
-          <section className="perfil-card perfil-security-card">
-            <div className="perfil-card__header">
-              <div>
-                <span className="perfil-kicker">Protección de cuenta</span>
-                <h2>Cambiar contraseña</h2>
-              </div>
-              <LockKeyhole size={22} />
-            </div>
-            <p className="perfil-card__description">
-              Actualiza tu contraseña periódicamente para mantener segura tu
-              cuenta.
-            </p>
-
-            <label className="perfil-field">
-              <span>Contraseña actual</span>
-              <div className="perfil-input-wrap">
-                <KeyRound size={17} />
-                <input
-                  type="password"
-                  value={contrasenaActual}
-                  onChange={(event) => setContrasenaActual(event.target.value)}
-                  placeholder="Ingresa tu contraseña actual"
-                />
-              </div>
-            </label>
-
-            <label className="perfil-field">
-              <span>Nueva contraseña</span>
-              <div className="perfil-input-wrap">
-                <LockKeyhole size={17} />
-                <input
-                  type="password"
-                  value={nuevaContrasena}
-                  onChange={(event) => setNuevaContrasena(event.target.value)}
-                  placeholder="Mínimo 6 caracteres"
-                />
-              </div>
-            </label>
-
-            <label className="perfil-field">
-              <span>Confirmar nueva contraseña</span>
-              <div className="perfil-input-wrap">
-                <LockKeyhole size={17} />
-                <input
-                  type="password"
-                  value={confirmarContrasena}
-                  onChange={(event) => setConfirmarContrasena(event.target.value)}
-                  placeholder="Repite la nueva contraseña"
-                />
-              </div>
-            </label>
-
-            <div className="perfil-security-note">
-              <ShieldCheck size={17} />
-              <span>Usa una contraseña personal y evita compartirla.</span>
-            </div>
-          </section>
-
-          <div className="perfil-actions">
-            <button type="submit" className="perfil-save-button">
-              <Save size={18} />
-              Guardar cambios
-            </button>
           </div>
-        </form>
+        </div>
       </div>
     </main>
   )
 }
+

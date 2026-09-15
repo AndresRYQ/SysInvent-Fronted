@@ -6,3 +6,13 @@ export interface UsuarioFormData {
   rol: string
   estado: boolean
 }
+
+export interface PerfilUsuarioFormData {
+  usuario: string
+  nombreCompleto: string
+  email: string
+  contrasenaActual: string
+  nuevaContrasena: string
+  confirmarContrasena: string
+}
+

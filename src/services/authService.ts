@@ -16,7 +16,7 @@ import {
   STORAGE_KEYS,
 } from './storageService'
 
-const DURACION_SESION_MINUTOS = 60
+const DURACION_SESION_MINUTOS = 5
 const MAXIMO_INTENTOS = 3
 const DURACION_BLOQUEO_MINUTOS = 5
 
@@ -227,10 +227,10 @@ export function iniciarSesion(
       })
 
       registrarEventoBitacora({
-        modulo: 'Inicio de sesión',
+        modulo: 'Inicio de sesiÃ³n',
         accion: 'BLOQUEO_LOGIN',
         detalle:
-          'Usuario bloqueado durante 5 minutos después de 3 intentos fallidos.',
+          'Usuario bloqueado durante 5 minutos despuÃ©s de 3 intentos fallidos.',
         registroId:
           usuarioRegistrado?.id ?? null,
         usuario:
@@ -265,7 +265,7 @@ export function iniciarSesion(
       exitoso: false,
       sesion: null,
       mensaje:
-        `Usuario o contraseña incorrectos. Te quedan ${intentosRestantes} intento(s).`,
+        `Usuario o contraseÃ±a incorrectos. Te quedan ${intentosRestantes} intento(s).`,
       bloqueadoHasta: null,
     }
   }
@@ -290,17 +290,17 @@ export function iniciarSesion(
   )
 
   registrarEventoBitacora({
-    modulo: 'Inicio de sesión',
+    modulo: 'Inicio de sesiÃ³n',
     accion: 'INICIO_SESION',
     detalle:
-      'El usuario inició sesión correctamente.',
+      'El usuario iniciÃ³ sesiÃ³n correctamente.',
     registroId: sesion.id,
   })
 
   return {
     exitoso: true,
     sesion,
-    mensaje: 'Inicio de sesión correcto.',
+    mensaje: 'Inicio de sesiÃ³n correcto.',
     bloqueadoHasta: null,
   }
 }
@@ -338,7 +338,7 @@ export function obtenerSesion():
 
   if (fechaInvalida || sesionVencida) {
     cerrarSesion(
-      'La sesión se cerró al alcanzar el tiempo máximo de 5 minutos.',
+      'La sesiÃ³n se cerrÃ³ al alcanzar el tiempo mÃ¡ximo de 5 minutos.',
     )
     return null
   }
@@ -348,7 +348,7 @@ export function obtenerSesion():
 
 export function cerrarSesion(
   detalle =
-    'El usuario cerró la sesión manualmente.',
+    'El usuario cerrÃ³ la sesiÃ³n manualmente.',
 ): void {
   const sesionActual =
     obtenerStorage<SesionUsuario | null>(
@@ -358,7 +358,7 @@ export function cerrarSesion(
 
   if (sesionActual) {
     registrarEventoBitacora({
-      modulo: 'Inicio de sesión',
+      modulo: 'Inicio de sesiÃ³n',
       accion: 'CIERRE_SESION',
       detalle,
       registroId: sesionActual.id,
@@ -371,3 +371,40 @@ export function cerrarSesion(
 export function estaAutenticado(): boolean {
   return obtenerSesion() !== null
 }
+
+export function sincronizarSesionUsuario(
+  usuario: UsuarioLogin,
+): SesionUsuario | null {
+  const sesionActual =
+    obtenerStorage<SesionUsuario | null>(
+      STORAGE_KEYS.sesion,
+      null,
+    )
+
+  if (!sesionActual) {
+    return null
+  }
+
+  if (
+    sesionActual.id !== usuario.id
+  ) {
+    return sesionActual
+  }
+
+  const sesionActualizada:
+    SesionUsuario = {
+      ...sesionActual,
+      usuario: usuario.usuario,
+      nombreCompleto:
+        usuario.nombreCompleto,
+      rol: usuario.rol,
+    }
+
+  guardarStorage(
+    STORAGE_KEYS.sesion,
+    sesionActualizada,
+  )
+
+  return sesionActualizada
+}
+
