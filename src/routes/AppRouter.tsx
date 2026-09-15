@@ -31,6 +31,7 @@ import { EditarProductoPage } from '../pages/productos/EditarProductoPage'
 import { BitacoraPage } from '../pages/bitacora/BitacoraPage'
 import { ContactosPage } from '../pages/contactos/ContactosPage'
 import { PartesEquipoPage } from '../pages/partes-equipo/PartesEquipoPage'
+import { PerfilUsuarioPage } from '../pages/perfil/PerfilUsuarioPage'
 import { ControlAlmacenPage } from '../pages/control-almacen/ControlAlmacenPage'
 import { EditarIngresoPage } from '../pages/ingresos-almacen/EditarIngresoPage'
 import { NuevoIngresoPage } from '../pages/ingresos-almacen/NuevoIngresoPage'
@@ -65,6 +66,11 @@ export function AppRouter() {
               <Route
                 path="/dashboard"
                 element={<DashboardPage />}
+              />
+
+              <Route
+                path="/perfil"
+                element={<PerfilUsuarioPage />}
               />
 
               <Route

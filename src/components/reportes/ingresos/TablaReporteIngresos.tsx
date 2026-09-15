@@ -1,5 +1,7 @@
 import { PackageSearch } from 'lucide-react'
 
+import { EmptyState } from '../../common/EmptyState'
+
 import type {
   FilaReporteIngreso,
 } from '../../../types/reporteIngreso'
@@ -84,18 +86,7 @@ export function TablaReporteIngresos({
           {filas.length === 0 ? (
             <tr>
               <td colSpan={11}>
-                <div className="maestro-empty-state">
-                  <PackageSearch size={38} />
-
-                  <strong>
-                    No se encontraron ingresos
-                  </strong>
-
-                  <span>
-                    Cambia los filtros o registra
-                    un ingreso de almacén.
-                  </span>
-                </div>
+                <EmptyState icon={PackageSearch} title="No se encontraron ingresos" description="Cambia los filtros o registra un ingreso de almacén." />
               </td>
             </tr>
           ) : (

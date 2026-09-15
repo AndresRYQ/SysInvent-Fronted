@@ -1,5 +1,7 @@
 import { PackageSearch } from 'lucide-react'
 
+import { EmptyState } from '../../common/EmptyState'
+
 import type {
   FilaReporteVale,
 } from '../../../types/reporteVale'
@@ -84,18 +86,7 @@ export function TablaReporteVales({
           {filas.length === 0 ? (
             <tr>
               <td colSpan={11}>
-                <div className="maestro-empty-state">
-                  <PackageSearch size={38} />
-
-                  <strong>
-                    No se encontraron vales
-                  </strong>
-
-                  <span>
-                    Cambia los filtros o registra
-                    un vale de consumo.
-                  </span>
-                </div>
+                <EmptyState icon={PackageSearch} title="No se encontraron vales" description="Cambia los filtros o registra un vale de consumo." />
               </td>
             </tr>
           ) : (

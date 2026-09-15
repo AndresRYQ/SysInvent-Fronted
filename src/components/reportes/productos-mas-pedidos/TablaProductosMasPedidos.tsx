@@ -3,6 +3,8 @@ import {
   PackageSearch,
 } from 'lucide-react'
 
+import { EmptyState } from '../../common/EmptyState'
+
 import type {
   FilaProductoMasPedido,
 } from '../../../types/reporteProductoMasPedido'
@@ -75,19 +77,11 @@ export function TablaProductosMasPedidos({
           {filas.length === 0 ? (
             <tr>
               <td colSpan={10}>
-                <div className="maestro-empty-state">
-                  <PackageSearch size={38} />
-
-                  <strong>
-                    No existen productos
-                    solicitados
-                  </strong>
-
-                  <span>
-                    Cambia los filtros o registra
-                    vales de consumo.
-                  </span>
-                </div>
+                <EmptyState
+                  icon={PackageSearch}
+                  title="No existen productos solicitados"
+                  description="Cambia los filtros o registra vales de consumo."
+                />
               </td>
             </tr>
           ) : (
