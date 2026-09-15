@@ -919,7 +919,7 @@ export function IngresoAlmacenForm({
                   <td className="text-end">
                     <button
                       type="button"
-                      className="btn btn-sm btn-outline-danger"
+                      className="btn btn-maestro-danger"
                       aria-label="Quitar producto"
                       onClick={() =>
                         eliminarDetalle(

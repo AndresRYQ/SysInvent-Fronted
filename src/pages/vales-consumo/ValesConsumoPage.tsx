@@ -10,8 +10,11 @@ import {
   ClipboardList,
   Pencil,
   Plus,
+  RotateCcw,
+  Search,
   ShieldCheck,
   Trash2,
+  X,
 } from 'lucide-react'
 import Select from 'react-select'
 
@@ -396,7 +399,7 @@ export function ValesConsumoPage() {
           )}
 
           <div className="maestro-panel">
-            <section className="card border-0 shadow-sm">
+            <section className="maestro-filter-card card border-0 shadow-sm">
               <div className="card-body p-3">
                 <div className="row g-3">
                   <div className="col-12 col-lg-4">
@@ -522,7 +525,7 @@ export function ValesConsumoPage() {
                   </div>
                 </div>
 
-                <div className="d-flex justify-content-end gap-2 mt-3">
+                <div className="maestro-filter-actions mt-3">
                   <button
                     type="button"
                     className="btn btn-maestro-secondary"
@@ -536,6 +539,7 @@ export function ValesConsumoPage() {
                       setPage(1)
                     }}
                   >
+                    <RotateCcw size={18} />
                     Limpiar
                   </button>
 
@@ -549,6 +553,7 @@ export function ValesConsumoPage() {
                       setPage(1)
                     }}
                   >
+                    <Search size={18} />
                     Buscar
                   </button>
                 </div>
@@ -567,7 +572,7 @@ export function ValesConsumoPage() {
 
                   <button
                     type="button"
-                    className="btn table-toolbar-btn"
+                    className="btn btn-maestro-primary"
                     onClick={() =>
                       navigate(
                         '/vales-consumo/nuevo',
@@ -768,9 +773,6 @@ export function ValesConsumoPage() {
         <div
           className="maestro-modal-backdrop"
           role="presentation"
-          onClick={() =>
-            setValeAAnular(null)
-          }
         >
           <div
             className="maestro-modal-card maestro-modal-card--sm"
@@ -801,6 +803,7 @@ export function ValesConsumoPage() {
                   setValeAAnular(null)
                 }
               >
+                <X size={18} />
                 Cancelar
               </button>
 

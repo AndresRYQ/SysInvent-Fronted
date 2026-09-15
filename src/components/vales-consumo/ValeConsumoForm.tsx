@@ -984,7 +984,7 @@ export function ValeConsumoForm({
                       <td className="text-end">
                         <button
                           type="button"
-                          className="btn btn-sm btn-outline-danger"
+                          className="btn btn-maestro-danger"
                           onClick={() =>
                             quitarDistribucion(
                               indice,
@@ -1107,7 +1107,7 @@ export function ValeConsumoForm({
 
                       <button
                         type="button"
-                        className="btn btn-sm btn-outline-danger"
+                        className="btn btn-maestro-danger"
                         onClick={() =>
                           setDetalles(
                             (actuales) =>

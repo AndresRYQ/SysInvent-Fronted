@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
-  min-height: 50px;
+  min-height: 38px;
   padding: 0 18px;
   border-radius: var(--button-radius) !important;
   font-weight: 700 !important;
