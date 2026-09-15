@@ -365,12 +365,12 @@ export function ControlAlmacenPage() {
 
                 <div className="row g-3">
                   <div className="col-12 col-lg-4">
-                    <label className="form-label">
+                    <label className="form-label maestro-label">
                       Producto
                     </label>
 
                     <input
-                      className="form-control"
+                      className="form-control maestro-control"
                       placeholder="Código, producto o proveedor"
                       value={filtros.busqueda}
                       onChange={(event) =>
@@ -387,12 +387,12 @@ export function ControlAlmacenPage() {
                   </div>
 
                   <div className="col-12 col-md-4 col-lg-2">
-                    <label className="form-label">
+                    <label className="form-label maestro-label">
                       Tipo
                     </label>
 
                     <select
-                      className="form-select"
+                      className="form-select maestro-control"
                       value={
                         filtros.tipoProductoId
                       }
@@ -425,12 +425,12 @@ export function ControlAlmacenPage() {
                   </div>
 
                   <div className="col-12 col-md-4 col-lg-2">
-                    <label className="form-label">
+                    <label className="form-label maestro-label">
                       Categoría
                     </label>
 
                     <select
-                      className="form-select"
+                      className="form-select maestro-control"
                       value={
                         filtros.categoriaId
                       }
@@ -467,12 +467,12 @@ export function ControlAlmacenPage() {
                   </div>
 
                   <div className="col-12 col-md-4 col-lg-2">
-                    <label className="form-label">
+                    <label className="form-label maestro-label">
                       Estado
                     </label>
 
                     <select
-                      className="form-select"
+                      className="form-select maestro-control"
                       value={
                         filtros.estadoStock
                       }
@@ -500,12 +500,12 @@ export function ControlAlmacenPage() {
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2">
-                    <label className="form-label">
+                    <label className="form-label maestro-label">
                       Desde
                     </label>
 
                     <input
-                      className="form-control"
+                      className="form-control maestro-control"
                       type="date"
                       value={filtros.fechaDesde}
                       onChange={(event) =>
@@ -522,12 +522,12 @@ export function ControlAlmacenPage() {
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2 ms-lg-auto">
-                    <label className="form-label">
+                    <label className="form-label maestro-label">
                       Hasta
                     </label>
 
                     <input
-                      className="form-control"
+                      className="form-control maestro-control"
                       type="date"
                       value={filtros.fechaHasta}
                       onChange={(event) =>
