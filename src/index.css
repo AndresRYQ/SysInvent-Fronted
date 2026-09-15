@@ -1,0 +1,170 @@
+@import './styles/variables.css';
+@import './styles/labels.css';
+
+:root {
+  font-family:
+    'Segoe UI',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+
+  color: var(--color-text-primary);
+  background:
+    radial-gradient(
+      circle at top,
+      var(--color-page-start) 0%,
+      var(--color-page-middle) 35%,
+      var(--color-page-end) 100%
+    );
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background:
+    radial-gradient(
+      circle at top,
+      var(--color-page-start) 0%,
+      var(--color-page-middle) 35%,
+      var(--color-page-end) 100%
+    );
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--color-text-primary);
+  background: transparent;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+::placeholder {
+  color: var(--color-text-muted);
+  font-size: var(--form-control-font-size) !important;
+  opacity: 1;
+}
+
+/* Altura común de los controles de formulario en todo el sistema. */
+:where(
+  .form-control,
+  .form-select,
+  select,
+  input:not([type='checkbox']):not([type='radio']):not([type='file'])
+) {
+  min-height: var(--form-control-height);
+  height: var(--form-control-height);
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--form-control-radius);
+  background: var(--color-control-bg);
+  box-shadow: none !important;
+  font-size: var(--form-control-font-size) !important;
+  padding-top: var(--form-control-padding-y);
+  padding-bottom: var(--form-control-padding-y);
+  transition:
+    border-color var(--transition-control),
+    transform var(--transition-control),
+    box-shadow var(--transition-control);
+}
+
+:where(
+  .form-control,
+  .form-select,
+  select,
+  input:not([type='checkbox']):not([type='radio']):not([type='file'])
+):focus {
+  border-color: var(--color-green-focus) !important;
+  background: var(--color-white);
+  box-shadow:
+    0 0 0 0.22rem var(--color-green-outline) !important;
+  transform: translateY(-1px);
+}
+
+:where(.form-select, select) {
+  background: var(--color-select-bg);
+}
+
+textarea.form-control {
+  height: auto;
+  min-height: var(--form-control-height);
+  resize: vertical;
+}
+
+button {
+  border: 0;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--color-green-outline);
+  outline-offset: 2px;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.app-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.app-shell::before,
+.app-shell::after {
+  position: fixed;
+  z-index: -1;
+  content: '';
+  border-radius: 999px;
+  filter: blur(24px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.app-shell::before {
+  top: -80px;
+  right: -40px;
+  width: 240px;
+  height: 240px;
+  background:
+    radial-gradient(
+      circle,
+      rgb(51 143 60 / 22%) 0%,
+      transparent 68%
+    );
+}
+
+.app-shell::after {
+  bottom: 10%;
+  left: -60px;
+  width: 200px;
+  height: 200px;
+  background:
+    radial-gradient(
+      circle,
+      rgb(8 117 54 / 18%) 0%,
+      transparent 70%
+    );
+}

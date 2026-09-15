@@ -1,0 +1,41 @@
+.form-label {
+  color: var(--form-label-color);
+  font-size: var(--form-label-font-size);
+  font-weight: var(--form-label-font-weight);
+  margin-bottom: 0.3rem;
+}
+
+.form-label.required::after,
+.form-label:has(+ .form-control.required)::after {
+  margin-left: 0.25rem;
+  color: var(--color-red);
+  content: '*';
+}
+
+.maestro-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: var(--status-font-size);
+  font-weight: 400;
+}
+
+.maestro-status__dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.maestro-status--active {
+  color: var(--status-active-color);
+  background: var(--status-active-bg);
+}
+
+.maestro-status--inactive {
+  color: var(--status-inactive-color);
+  background: var(--status-inactive-bg);
+}
