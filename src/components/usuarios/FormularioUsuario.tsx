@@ -310,7 +310,7 @@ export function FormularioUsuario({
         <footer className="maestro-modal-footer">
           <button
             type="button"
-            className="btn btn-maestro-info"
+            className="btn btn-maestro-danger"
             onClick={onClose}
           >
             Cancelar
