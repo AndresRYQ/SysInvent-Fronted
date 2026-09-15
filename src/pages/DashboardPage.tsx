@@ -257,6 +257,7 @@ const modules: Module[] = [
     icon: 'report',
     tone: 'blue',
     category: 'Reportes',
+    route: '/reportes/ingresos',
   },
   {
     id: 'reporte-vales',
@@ -273,6 +274,7 @@ const modules: Module[] = [
     icon: 'chart',
     tone: 'blue',
     category: 'Reportes',
+    route: '/reportes/productos-mas-pedidos',
   },
   {
     id: 'centros-costo',

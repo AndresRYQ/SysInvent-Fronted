@@ -85,7 +85,7 @@ export function FiltrosBitacora({
         >
           <div className="col-12 col-xl-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="buscarBitacora"
             >
               Usuario o detalle
@@ -93,7 +93,7 @@ export function FiltrosBitacora({
 
             <input
               id="buscarBitacora"
-              className="form-control maestro-control"
+              className="form-control"
               value={valores.busqueda}
               placeholder="Buscar registro"
               onChange={(event) =>
@@ -107,7 +107,7 @@ export function FiltrosBitacora({
 
           <div className="col-12 col-md-6 col-xl-2">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="moduloBitacora"
             >
               Módulo
@@ -115,7 +115,7 @@ export function FiltrosBitacora({
 
             <select
               id="moduloBitacora"
-              className="form-select maestro-control"
+              className="form-select"
               value={valores.modulo}
               onChange={(event) =>
                 onChange(
@@ -139,7 +139,7 @@ export function FiltrosBitacora({
 
           <div className="col-12 col-md-6 col-xl-2">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="accionBitacora"
             >
               Acción
@@ -147,7 +147,7 @@ export function FiltrosBitacora({
 
             <select
               id="accionBitacora"
-              className="form-select maestro-control"
+              className="form-select"
               value={valores.accion}
               onChange={(event) =>
                 onChange(
@@ -171,7 +171,7 @@ export function FiltrosBitacora({
 
           <div className="col-12 col-md-6 col-xl-2">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="fechaDesdeBitacora"
             >
               Desde
@@ -179,7 +179,7 @@ export function FiltrosBitacora({
 
             <input
               id="fechaDesdeBitacora"
-              className="form-control maestro-control"
+              className="form-control"
               type="date"
               value={valores.fechaDesde}
               onChange={(event) =>
@@ -193,7 +193,7 @@ export function FiltrosBitacora({
 
           <div className="col-12 col-md-6 col-xl-2">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="fechaHastaBitacora"
             >
               Hasta
@@ -201,7 +201,7 @@ export function FiltrosBitacora({
 
             <input
               id="fechaHastaBitacora"
-              className="form-control maestro-control"
+              className="form-control"
               type="date"
               value={valores.fechaHasta}
               onChange={(event) =>

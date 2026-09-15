@@ -41,7 +41,7 @@ export function FiltrosPartesEquipo({
         >
           <div className="col-12 col-lg-8">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="buscarParteEquipo"
             >
               Código o nombre
@@ -49,7 +49,7 @@ export function FiltrosPartesEquipo({
 
             <input
               id="buscarParteEquipo"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.busqueda}
               placeholder="Buscar"
@@ -64,7 +64,7 @@ export function FiltrosPartesEquipo({
 
           <div className="col-12 col-lg-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="estadoParteEquipo"
             >
               Estado

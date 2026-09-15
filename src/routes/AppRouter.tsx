@@ -31,7 +31,14 @@ import { EditarProductoPage } from '../pages/productos/EditarProductoPage'
 import { BitacoraPage } from '../pages/bitacora/BitacoraPage'
 import { ContactosPage } from '../pages/contactos/ContactosPage'
 import { PartesEquipoPage } from '../pages/partes-equipo/PartesEquipoPage'
-import { PerfilUsuarioPage } from '../pages/perfil/PerfilUsuarioPage'
+import { ControlAlmacenPage } from '../pages/control-almacen/ControlAlmacenPage'
+import { EditarIngresoPage } from '../pages/ingresos-almacen/EditarIngresoPage'
+import { NuevoIngresoPage } from '../pages/ingresos-almacen/NuevoIngresoPage'
+import { ReporteIngresosPage } from '../pages/reportes/ReporteIngresosPage'
+import { ReporteProductosMasPedidosPage } from '../pages/reportes/ReporteProductosMasPedidosPage'
+import { ReporteValesPage } from '../pages/reportes/ReporteValesPage'
+import { EditarValePage } from '../pages/vales-consumo/EditarValePage'
+import { NuevoValePage } from '../pages/vales-consumo/NuevoValePage'
 
 export function AppRouter() {
   return (
@@ -55,6 +62,11 @@ export function AppRouter() {
 
           <Route element={<ProtectedRoute />}>
             <Route element={<MainLayout />}>
+              <Route path="/control-almacen" element={<ReportesKardexPage />} />
+              <Route element={<RoleRoute rolesPermitidos={['Administrador', 'Almacenero']} />}>
+                <Route path="/reportes" element={<Navigate to="/control-almacen" replace />} />
+                <Route path="/reportes/kardex" element={<Navigate to="/control-almacen" replace />} />
+              </Route>
               <Route
                 path="/dashboard"
                 element={<DashboardPage />}
@@ -168,6 +180,24 @@ export function AppRouter() {
                     <IngresosAlmacenPage />
                   }
                 />
+                <Route
+                  path="/ingresos-almacen/nuevo"
+                  element={<NuevoIngresoPage />}
+                />
+                <Route
+                  path="/ingresos-almacen/:id/editar"
+                  element={<EditarIngresoPage />}
+                />
+              </Route>
+              <Route
+                element={
+                  <RoleRoute modulo="reporte-ingresos" />
+                }
+              >
+                <Route
+                  path="/reportes/ingresos"
+                  element={<ReporteIngresosPage />}
+                />
               </Route>
 
               <Route
@@ -178,6 +208,34 @@ export function AppRouter() {
                 <Route
                   path="/vales-consumo"
                   element={<ValesConsumoPage />}
+                />
+                <Route
+                  path="/vales-consumo/nuevo"
+                  element={<NuevoValePage />}
+                />
+                <Route
+                  path="/vales-consumo/:id/editar"
+                  element={<EditarValePage />}
+                />
+              </Route>
+              <Route
+                element={
+                  <RoleRoute modulo="control-almacen" />
+                }
+              >
+                <Route
+                  path="/control-almacen"
+                  element={<ControlAlmacenPage />}
+                />
+              </Route>
+              <Route
+                element={
+                  <RoleRoute modulo="reporte-vales" />
+                }
+              >
+                <Route
+                  path="/reportes/vales"
+                  element={<ReporteValesPage />}
                 />
               </Route>
               <Route
@@ -250,15 +308,8 @@ export function AppRouter() {
                   element={<PartesEquipoPage />}
                 />
               </Route>
-              <Route
-                element={
-                  <RoleRoute modulo="perfil-usuario" />
-                }
-              >
-                <Route
-                  path="/perfil-usuario"
-                  element={<PerfilUsuarioPage />}
-                />
+              <Route element={<RoleRoute modulo="reporte-productos" />}>
+                <Route path="/reportes/productos-mas-pedidos" element={<ReporteProductosMasPedidosPage />} />
               </Route>
             </Route>
           </Route>

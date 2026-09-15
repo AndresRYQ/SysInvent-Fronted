@@ -36,13 +36,13 @@ export function FiltrosCategorias({
 
         <div className="row g-3">
           <div className="col-12 col-lg-8">
-            <label className="form-label maestro-label" htmlFor="nombreCategoria">
+            <label className="form-label" htmlFor="nombreCategoria">
               Nombre de categoría
             </label>
 
             <input
               id="nombreCategoria"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.nombre}
               placeholder="Buscar"
@@ -53,7 +53,7 @@ export function FiltrosCategorias({
           </div>
 
           <div className="col-12 col-md-6 col-lg-4">
-            <label className="form-label maestro-label" htmlFor="estadoCategoria">
+            <label className="form-label" htmlFor="estadoCategoria">
               Estado
             </label>
 
@@ -93,4 +93,5 @@ export function FiltrosCategorias({
     </section>
   )
 }
+
 

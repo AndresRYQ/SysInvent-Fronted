@@ -121,7 +121,7 @@ function SelectField({
   return (
     <div>
       <label
-        className="form-label maestro-label"
+        className="form-label"
         htmlFor={id}
       >
         {label}
@@ -133,7 +133,7 @@ function SelectField({
       <div className={`maestro-select-wrap${abierto ? ' is-open' : ''}`}>
         <select
           id={id}
-          className={`form-select maestro-control maestro-select-control${error ? ' maestro-control--error' : ''
+          className={`form-select maestro-select-control${error ? ' maestro-control--error' : ''
             }`}
           value={value}
           aria-invalid={error}
@@ -314,7 +314,7 @@ export function FormularioIngreso({
             <div className="row g-3">
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="ingresoFechaModal"
                 >
                   Fecha de registro
@@ -325,7 +325,7 @@ export function FormularioIngreso({
 
                 <input
                   id="ingresoFechaModal"
-                  className={`form-control maestro-control${errores.fechaRegistro
+                  className={`form-control${errores.fechaRegistro
                       ? ' maestro-control--error'
                       : ''
                     }`}
@@ -355,7 +355,7 @@ export function FormularioIngreso({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="ingresoNumeroModal"
                 >
                   Nro. de ingreso
@@ -366,7 +366,7 @@ export function FormularioIngreso({
 
                 <input
                   id="ingresoNumeroModal"
-                  className={`form-control maestro-control${errores.numeroIngreso
+                  className={`form-control${errores.numeroIngreso
                       ? ' maestro-control--error'
                       : ''
                     }`}
@@ -433,7 +433,7 @@ export function FormularioIngreso({
 
               <div className="col-12 col-md-4">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="ingresoCantidadModal"
                 >
                   Cantidad
@@ -444,7 +444,7 @@ export function FormularioIngreso({
 
                 <input
                   id="ingresoCantidadModal"
-                  className={`form-control maestro-control${errores.cantidad
+                  className={`form-control${errores.cantidad
                       ? ' maestro-control--error'
                       : ''
                     }`}
@@ -488,7 +488,7 @@ export function FormularioIngreso({
 
               <div className="col-12">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="ingresoObservacionModal"
                 >
                   Observación
@@ -496,7 +496,7 @@ export function FormularioIngreso({
 
                 <textarea
                   id="ingresoObservacionModal"
-                  className="form-control maestro-control maestro-control--textarea"
+                  className="form-control"
                   value={form.observacion}
                   onChange={(event) =>
                     actualizarCampo('observacion', event.target.value)

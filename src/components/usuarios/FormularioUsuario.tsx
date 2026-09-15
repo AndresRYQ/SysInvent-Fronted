@@ -128,7 +128,7 @@ export function FormularioUsuario({
           <div className="row g-3">
             <div className="col-12 col-md-6">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="usuarioNombre"
               >
                 Usuario
@@ -144,7 +144,7 @@ export function FormularioUsuario({
 
                 <input
                   id="usuarioNombre"
-                  className="form-control maestro-control"
+                  className="form-control"
                   value={datos.usuario}
                   maxLength={50}
                   autoComplete="username"
@@ -161,7 +161,7 @@ export function FormularioUsuario({
 
             <div className="col-12 col-md-6">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="usuarioNombreCompleto"
               >
                 Nombre completo
@@ -172,7 +172,7 @@ export function FormularioUsuario({
 
               <input
                 id="usuarioNombreCompleto"
-                className="form-control maestro-control"
+                className="form-control"
                 value={datos.nombreCompleto}
                 maxLength={100}
                 onChange={(evento) =>
@@ -187,7 +187,7 @@ export function FormularioUsuario({
 
             <div className="col-12 col-md-6">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="usuarioEmail"
               >
                 Correo
@@ -198,7 +198,7 @@ export function FormularioUsuario({
 
               <input
                 id="usuarioEmail"
-                className="form-control maestro-control"
+                className="form-control"
                 type="email"
                 value={datos.email}
                 maxLength={120}
@@ -215,7 +215,7 @@ export function FormularioUsuario({
 
             <div className="col-12 col-md-6">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="usuarioRol"
               >
                 Rol
@@ -226,7 +226,7 @@ export function FormularioUsuario({
 
               <select
                 id="usuarioRol"
-                className="form-select maestro-control"
+                className="form-select"
                 value={datos.rol}
                 onChange={(evento) =>
                   setDatos((actual) => ({
@@ -253,7 +253,7 @@ export function FormularioUsuario({
 
             <div className="col-12 col-md-6">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="usuarioContrasena"
               >
                 Contraseña
@@ -266,7 +266,7 @@ export function FormularioUsuario({
 
               <input
                 id="usuarioContrasena"
-                className="form-control maestro-control"
+                className="form-control"
                 type="password"
                 value={datos.contrasena}
                 minLength={6}
@@ -289,7 +289,7 @@ export function FormularioUsuario({
 
             <div className="col-12 col-md-6">
               <label
-                className="form-label maestro-label"
+                className="form-label"
                 htmlFor="usuarioEstado"
               >
                 Estado
@@ -297,7 +297,7 @@ export function FormularioUsuario({
 
               <select
                 id="usuarioEstado"
-                className="form-select maestro-control"
+                className="form-select"
                 value={
                   datos.estado
                     ? 'activo'

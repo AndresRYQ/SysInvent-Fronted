@@ -15,7 +15,6 @@ import {
   Shield,
   UserCircle,
 } from 'lucide-react'
-import { useRef, type PointerEvent } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 
@@ -50,6 +49,7 @@ const SECCIONES: SidebarSection[] = [
     label: 'Inventario',
     items: [
       {
+        to: '/control-almacen',
         label: 'Control de almacén',
         icon: Archive,
         moduleId: 'control-almacen',
@@ -72,16 +72,19 @@ const SECCIONES: SidebarSection[] = [
     label: 'Reportes',
     items: [
       {
+        to: '/reportes/ingresos',
         label: 'Reporte de ingreso',
         icon: FileText,
         moduleId: 'reporte-ingresos',
       },
       {
+        to: '/reportes/vales',
         label: 'Reporte de vale',
         icon: FileText,
         moduleId: 'reporte-vales',
       },
       {
+        to: '/reportes/productos-mas-pedidos',
         label:
           'Reporte de producto más pedido',
         icon: FileText,
@@ -282,15 +285,7 @@ const seccionesPermitidas =
         {abierto ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
       </button>
 
-      <div
-        ref={sidebarRef}
-        className="sidebar-inner"
-        onPointerDown={manejarPointerDown}
-        onPointerMove={manejarPointerMove}
-        onPointerUp={finalizarArrastre}
-        onPointerCancel={finalizarArrastre}
-        onClickCapture={evitarClickTrasArrastre}
-      >
+      <div className="sidebar-inner">
         <div className={`sidebar-head ${abierto ? '' : 'sidebar-head--cerrado'}`}>
           <span className="sidebar-title">Menú</span>
         </div>

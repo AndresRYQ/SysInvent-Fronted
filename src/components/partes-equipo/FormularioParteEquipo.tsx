@@ -220,7 +220,7 @@ export function FormularioParteEquipo({
             <div className="row g-3">
               <div className="col-12 col-md-5">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="parteEquipoCodigo"
                 >
                   Código
@@ -231,7 +231,7 @@ export function FormularioParteEquipo({
 
                 <input
                   id="parteEquipoCodigo"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.codigo
                       ? ' maestro-control--error'
                       : ''
@@ -266,7 +266,7 @@ export function FormularioParteEquipo({
 
               <div className="col-12 col-md-7">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="parteEquipoNombre"
                 >
                   Nombre
@@ -277,7 +277,7 @@ export function FormularioParteEquipo({
 
                 <input
                   id="parteEquipoNombre"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.nombre
                       ? ' maestro-control--error'
                       : ''
@@ -311,7 +311,7 @@ export function FormularioParteEquipo({
 
               <div className="col-12">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label"
                   htmlFor="parteEquipoDescripcion"
                 >
                   Descripción
@@ -322,7 +322,7 @@ export function FormularioParteEquipo({
 
                 <textarea
                   id="parteEquipoDescripcion"
-                  className={`form-control maestro-control maestro-control--textarea${
+                  className={`form-control${
                     errores.descripcion
                       ? ' maestro-control--error'
                       : ''
