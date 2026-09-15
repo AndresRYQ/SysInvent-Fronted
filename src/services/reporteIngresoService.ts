@@ -54,21 +54,21 @@ export function obtenerFilasReporteIngresos():
       const proveedor =
         proveedores.find(
           (item) =>
-            String(item.id) === String(
-            ingreso.proveedorId),
+            String(item.id) ===
+            String(ingreso.proveedorId),
         )
 
       const contacto = contactos.find(
         (item) =>
-          String(item.id) === String(
-          ingreso.contactoId),
+            String(item.id) ===
+            String(ingreso.contactoId),
       )
 
       const tipoDocumento =
         tiposDocumento.find(
           (item) =>
-            String(item.id) === String(
-            ingreso.tipoDocumentoId),
+            String(item.id) ===
+            String(ingreso.tipoDocumentoId),
         )
 
       return ingreso.detalles.map(
@@ -76,29 +76,29 @@ export function obtenerFilasReporteIngresos():
           const producto =
             productos.find(
               (item) =>
-                String(item.id) === String(
-                detalle.productoId),
+                String(item.id) ===
+                String(detalle.productoId),
             )
 
           const tipoProducto =
             tiposProducto.find(
               (item) =>
-                String(item.id) === String(
-                producto?.tipoProductoId),
+                String(item.id) ===
+                String(producto?.tipoProductoId),
             )
 
           const categoria =
             categorias.find(
               (item) =>
-                String(item.id) === String(
-                producto?.categoriaId),
+                String(item.id) ===
+                String(producto?.categoriaId),
             )
 
           const unidad =
             unidadesMedida.find(
               (item) =>
-                String(item.id) === String(
-                producto?.unidadMedidaId),
+                String(item.id) ===
+                String(producto?.unidadMedidaId),
             )
 
           const subtotal =
@@ -300,4 +300,3 @@ export function obtenerResumenReporteIngresos(
       ),
   }
 }
-

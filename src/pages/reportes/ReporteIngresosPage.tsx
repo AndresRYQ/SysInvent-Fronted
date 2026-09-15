@@ -101,11 +101,12 @@ export function ReporteIngresosPage() {
     () =>
       obtenerProductos()
         .map((producto) => ({
-          id: producto.id,
+          id: String(producto.id),
           codigo: producto.codigo,
           nombre: producto.nombre,
-          tipoProductoId:
+          tipoProductoId: String(
             producto.tipoProductoId,
+          ),
         }))
         .sort((primero, segundo) =>
           primero.nombre.localeCompare(
@@ -210,7 +211,7 @@ export function ReporteIngresosPage() {
 
               <p>
                 Consulta los productos ingresados
-                al almacén y exporta los resultados
+                al almacÃ©n y exporta los resultados
                 a Excel.
               </p>
             </div>
@@ -287,5 +288,3 @@ export function ReporteIngresosPage() {
     </main>
   )
 }
-
-

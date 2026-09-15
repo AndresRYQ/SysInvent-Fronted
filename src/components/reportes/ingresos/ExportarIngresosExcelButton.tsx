@@ -99,9 +99,9 @@ export function ExportarIngresosExcelButton({
       libro.modified = fechaGeneracion
 
       libro.title =
-        'Reporte de ingresos de almacén'
+        'Reporte de ingresos de almacÃ©n'
       libro.subject =
-        'Ingresos registrados en almacén'
+        'Ingresos registrados en almacÃ©n'
       libro.company =
         'Sistema de Inventario'
 
@@ -138,7 +138,7 @@ export function ExportarIngresosExcelButton({
       )
 
       hoja.headerFooter.oddHeader =
-        '&C&BReporte de ingresos de almacén'
+        '&C&BReporte de ingresos de almacÃ©n'
 
       hoja.headerFooter.oddFooter =
         '&LGenerado por Sistema de Inventario&C&P de &N&R&D'
@@ -172,7 +172,7 @@ export function ExportarIngresosExcelButton({
 
       hoja.mergeCells('A1:P1')
       hoja.getCell('A1').value =
-        'REPORTE DE INGRESOS DE ALMACÉN'
+        'REPORTE DE INGRESOS DE ALMACÃ‰N'
 
       hoja.getRow(1).height = 34
 
@@ -212,7 +212,7 @@ export function ExportarIngresosExcelButton({
       hoja.mergeCells('A2:P2')
 
       hoja.getCell('A2').value =
-        'Detalle de productos recibidos, proveedores y valorización'
+        'Detalle de productos recibidos, proveedores y valorizaciÃ³n'
 
       hoja.getRow(2).height = 25
 
@@ -282,14 +282,14 @@ export function ExportarIngresosExcelButton({
         'Proveedor',
         'Contacto',
         'Tipo de producto',
-        'Código de producto',
+        'CÃ³digo de producto',
         'Producto',
-        'Categoría',
+        'CategorÃ­a',
         'Unidad de medida',
         'Cantidad',
         'Precio unitario',
         'Subtotal',
-        'Observación',
+        'ObservaciÃ³n',
       ]
 
       const filaEncabezados =
@@ -609,7 +609,7 @@ export function ExportarIngresosExcelButton({
       hojaResumen.mergeCells('A2:B2')
 
       hojaResumen.getCell('A2').value =
-        'Indicadores según los filtros aplicados'
+        'Indicadores segÃºn los filtros aplicados'
 
       hojaResumen.getCell('A2').font = {
         name: 'Aptos',
@@ -677,7 +677,7 @@ export function ExportarIngresosExcelButton({
           resumen.ingresosAnulados,
         ],
         [
-          'Líneas de productos',
+          'LÃ­neas de productos',
           resumen.lineasProductos,
         ],
         [
@@ -854,5 +854,4 @@ export function ExportarIngresosExcelButton({
     </div>
   )
 }
-
 

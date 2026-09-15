@@ -93,7 +93,7 @@ export function TablaReporteIngresos({
 
                   <span>
                     Cambia los filtros o registra
-                    un ingreso de almacén.
+                    un ingreso de almacÃ©n.
                   </span>
                 </div>
               </td>
@@ -194,5 +194,4 @@ export function TablaReporteIngresos({
     </div>
   )
 }
-
 
