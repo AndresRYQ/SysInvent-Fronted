@@ -37,7 +37,6 @@ export function DetalleBitacoraModal({
     <div
       className="maestro-modal-backdrop"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="maestro-modal-card"

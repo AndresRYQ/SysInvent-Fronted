@@ -16,7 +16,7 @@ export interface ModalProps {
 }
 
 /** dialog nativo contiene el foco, maneja Escape y desactiva el fondo. */
-export function Modal({ open, title, onClose, children, footer, size = 'md', closeOnBackdrop = true }: ModalProps) {
+export function Modal({ open, title, onClose, children, footer, size = 'md' }: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const titleId = useId()
   useEffect(() => {
@@ -33,11 +33,7 @@ export function Modal({ open, title, onClose, children, footer, size = 'md', clo
   if (!open) return null
   return createPortal(<dialog ref={dialogRef} className={`ui-modal ui-modal--${size}`} aria-labelledby={titleId}
     onCancel={(event) => { event.preventDefault(); onClose() }}
-    onClick={(event) => {
-      if (!closeOnBackdrop || event.target !== event.currentTarget) return
-      const bounds = event.currentTarget.getBoundingClientRect()
-      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onClose()
-    }}>
+    >
     <div className="ui-modal-header">
       <h2 id={titleId} className="maestro-modal-title">{title}</h2>
       <button type="button" className="btn table-action-btn" onClick={onClose} aria-label="Cerrar ventana"><X size={20} /></button>

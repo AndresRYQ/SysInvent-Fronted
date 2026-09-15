@@ -6,6 +6,7 @@ import {
 
 import { CategoriaDeleteModal } from '../../components/categorias/CategoriaDeleteModal'
 import { CategoriaFormModal } from '../../components/categorias/CategoriaFormModal'
+import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
 
 import {
   FiltrosCategorias,
@@ -101,7 +102,7 @@ export function CategoriasPage() {
     useState('')
 
   // Se conserva temporalmente la setter para la integración futura de notificaciones.
-  const [, setMensaje] = useState<{ tipo: string; texto: string } | null>(null)
+  const { mensaje, abierta, mostrarAlerta, cerrarAlerta, limpiarAlerta } = useSnackbar()
 
   const [
     modalDeleteOpen,
@@ -195,19 +196,11 @@ export function CategoriasPage() {
           datos,
         )
 
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Categoría actualizada correctamente.',
-        })
+        mostrarAlerta('success', 'Categoría actualizada correctamente.')
       } else {
         crearCategoria(datos)
 
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Categoría registrada correctamente.',
-        })
+        mostrarAlerta('success', 'Categoría registrada correctamente.')
       }
 
       recargarCategorias()
@@ -239,10 +232,16 @@ export function CategoriasPage() {
 
   function confirmarReactivacion(): void {
     if (!categoriaAReactivar) return
-    reactivarCategoria(categoriaAReactivar.id)
-    recargarCategorias()
-    setModalReactivarOpen(false)
-    setCategoriaAReactivar(null)
+    try {
+      reactivarCategoria(categoriaAReactivar.id)
+      recargarCategorias()
+      mostrarAlerta('success', 'Categoría reactivada correctamente.')
+    } catch (error) {
+      mostrarAlerta('error', obtenerMensajeError(error))
+    } finally {
+      setModalReactivarOpen(false)
+      setCategoriaAReactivar(null)
+    }
   }
 
   function confirmarEliminacion(): void {
@@ -258,18 +257,11 @@ export function CategoriasPage() {
       recargarCategorias()
       cerrarConfirmacionEliminar()
 
-      setMensaje({
-        tipo: 'success',
-        texto:
-          'Categoría eliminada correctamente.',
-      })
+      mostrarAlerta('success', 'Categoría eliminada correctamente.')
     } catch (error) {
       cerrarConfirmacionEliminar()
 
-      setMensaje({
-        tipo: 'danger',
-        texto: obtenerMensajeError(error),
-      })
+      mostrarAlerta('error', obtenerMensajeError(error))
     }
   }
 
@@ -349,6 +341,13 @@ export function CategoriasPage() {
         soloLectura={modoVisualizacion}
         onClose={cerrarFormulario}
         onSubmit={guardarCategoria}
+      />
+
+      <SnackbarAlert
+        mensaje={mensaje}
+        abierta={abierta}
+        onClose={cerrarAlerta}
+        onExited={limpiarAlerta}
       />
 
       <CategoriaDeleteModal

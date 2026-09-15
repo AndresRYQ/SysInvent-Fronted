@@ -6,6 +6,7 @@ import {
 
 import { CentroCostoDeleteModal } from '../../components/centros-costo/CentroCostoDeleteModal'
 import { CentroCostoFormModal } from '../../components/centros-costo/CentroCostoFormModal'
+import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
 
 import {
   FiltrosCentrosCosto,
@@ -104,6 +105,7 @@ export function CentrosCostoPage() {
 
   const [errorFormulario, setErrorFormulario] =
     useState('')
+  const { mensaje, abierta, mostrarAlerta, cerrarAlerta, limpiarAlerta } = useSnackbar()
 
   const [
     modalDeleteOpen,
@@ -209,6 +211,7 @@ export function CentrosCostoPage() {
       recargarCentrosCosto()
       cerrarFormulario()
       setPage(1)
+      mostrarAlerta('success', centroCostoEnEdicion ? 'Centro de costo actualizado correctamente.' : 'Centro de costo registrado correctamente.')
     } catch (error) {
       setErrorFormulario(
         obtenerMensajeError(error),
@@ -233,8 +236,9 @@ export function CentrosCostoPage() {
     try {
       reactivarCentroCosto(centroCostoAReactivar.id)
       recargarCentrosCosto()
+      mostrarAlerta('success', 'Centro de costo reactivado correctamente.')
     } catch (error) {
-      console.error(obtenerMensajeError(error))
+      mostrarAlerta('error', obtenerMensajeError(error))
     }
     setCentroCostoAReactivar(null)
   }
@@ -251,11 +255,11 @@ export function CentrosCostoPage() {
 
       recargarCentrosCosto()
       cerrarConfirmacionEliminar()
+      mostrarAlerta('success', 'Centro de costo eliminado correctamente.')
 
     } catch (error) {
       cerrarConfirmacionEliminar()
-
-      console.error(obtenerMensajeError(error))
+      mostrarAlerta('error', obtenerMensajeError(error))
     }
   }
 
@@ -339,6 +343,12 @@ export function CentrosCostoPage() {
         soloLectura={modoVisualizacion}
         onClose={cerrarFormulario}
         onSubmit={guardarCentroCosto}
+      />
+      <SnackbarAlert
+        mensaje={mensaje}
+        abierta={abierta}
+        onClose={cerrarAlerta}
+        onExited={limpiarAlerta}
       />
       <CentroCostoDeleteModal
         abierto={Boolean(centroCostoAReactivar)}

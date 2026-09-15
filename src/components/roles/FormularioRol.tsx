@@ -1,3 +1,5 @@
+import { Placeholder } from '../../constants/placeholders'
+import Alert from '@mui/material/Alert'
 import {
   Save,
   ShieldCheck,
@@ -39,6 +41,8 @@ export function FormularioRol({
     }))
 
   const [error, setError] = useState('')
+  const [tipoAlerta, setTipoAlerta] = useState<'warning' | 'error'>('warning')
+  const [errores, setErrores] = useState({ nombre: '', descripcion: '' })
 
   const todosSeleccionados =
     MODULOS_SISTEMA.every((modulo) =>
@@ -65,22 +69,22 @@ export function FormularioRol({
   ) => {
     evento.preventDefault()
     setError('')
+    const nuevosErrores = { nombre: '', descripcion: '' }
+    const nombre = datos.nombre.trim()
+    const descripcion = datos.descripcion.trim()
 
-    if (!datos.nombre.trim()) {
-      setError(
-        'El nombre del rol es obligatorio.',
-      )
-      return
-    }
-
-    if (!datos.descripcion.trim()) {
-      setError(
-        'La descripción es obligatoria.',
-      )
+    if (!nombre) nuevosErrores.nombre = 'Campo requerido'
+    else if (nombre.length < 2) nuevosErrores.nombre = 'Debe tener al menos 2 caracteres'
+    if (!descripcion) nuevosErrores.descripcion = 'Campo requerido'
+    setErrores(nuevosErrores)
+    if (nuevosErrores.nombre || nuevosErrores.descripcion) {
+      setTipoAlerta('warning')
+      setError('Completa correctamente los campos requeridos.')
       return
     }
 
     if (datos.modulos.length === 0) {
+      setTipoAlerta('warning')
       setError(
         'Selecciona al menos un módulo.',
       )
@@ -90,6 +94,7 @@ export function FormularioRol({
     const mensaje = onGuardar(datos)
 
     if (mensaje) {
+      setTipoAlerta('error')
       setError(mensaje)
     }
   }
@@ -98,14 +103,6 @@ export function FormularioRol({
     <div
       className="maestro-modal-backdrop"
       role="presentation"
-      onMouseDown={(evento) => {
-        if (
-          evento.target ===
-          evento.currentTarget
-        ) {
-          onClose()
-        }
-      }}
     >
       <form
         className="maestro-modal-card"
@@ -142,12 +139,11 @@ export function FormularioRol({
 
         <div className="maestro-modal-body">
           {error && (
-            <div
-              className="alert alert-danger py-2"
-              role="alert"
+            <Alert
+              severity={tipoAlerta}
             >
               {error}
-            </div>
+            </Alert>
           )}
 
           <div className="row g-3">
@@ -162,51 +158,20 @@ export function FormularioRol({
 
               <input
                 id="rolNombre"
-                className="form-control"
+                className={`form-control${errores.nombre ? ' maestro-control--error' : ''}`}
                 value={datos.nombre}
+                placeholder={Placeholder.Ingresar}
                 maxLength={60}
-                onChange={(evento) =>
+                onChange={(evento) => {
                   setDatos((actual) => ({
                     ...actual,
                     nombre:
                       evento.target.value,
                   }))
-                }
+                  setErrores((actual) => ({ ...actual, nombre: '' }))
+                }}
               />
-            </div>
-
-            <div className="col-12 col-md-5">
-              <label
-                className="form-label"
-                htmlFor="rolEstado"
-              >
-                Estado
-              </label>
-
-              <select
-                id="rolEstado"
-                className="form-select"
-                value={
-                  datos.estado
-                    ? 'activo'
-                    : 'inactivo'
-                }
-                onChange={(evento) =>
-                  setDatos((actual) => ({
-                    ...actual,
-                    estado:
-                      evento.target.value ===
-                      'activo',
-                  }))
-                }
-              >
-                <option value="activo">
-                  Activo
-                </option>
-                <option value="inactivo">
-                  Inactivo
-                </option>
-              </select>
+              {errores.nombre && <div className="maestro-field-error">{errores.nombre}</div>}
             </div>
 
             <div className="col-12">
@@ -220,18 +185,21 @@ export function FormularioRol({
 
               <textarea
                 id="rolDescripcion"
-                className="form-control"
+                className={`form-control${errores.descripcion ? ' maestro-control--error' : ''}`}
                 rows={3}
                 maxLength={200}
                 value={datos.descripcion}
-                onChange={(evento) =>
+                placeholder={Placeholder.Ingresar}
+                onChange={(evento) => {
                   setDatos((actual) => ({
                     ...actual,
                     descripcion:
                       evento.target.value,
                   }))
-                }
+                  setErrores((actual) => ({ ...actual, descripcion: '' }))
+                }}
               />
+              {errores.descripcion && <div className="maestro-field-error">{errores.descripcion}</div>}
             </div>
 
             <div className="col-12">
@@ -304,6 +272,7 @@ export function FormularioRol({
             className="btn btn-maestro-danger"
             onClick={onClose}
           >
+            <X size={17} />
             Cancelar
           </button>
 

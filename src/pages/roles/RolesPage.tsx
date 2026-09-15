@@ -7,10 +7,15 @@ import {
   FiltrosRoles,
   type FiltrosRolesValores,
 } from '../../components/roles/FiltrosRoles'
+import Alert from '@mui/material/Alert'
+import Snackbar from '@mui/material/Snackbar'
+import { CheckCircle2, XCircle } from 'lucide-react'
 
 import {
   FormularioRol,
 } from '../../components/roles/FormularioRol'
+
+import { RolDeleteModal } from '../../components/roles/RolDeleteModal'
 
 import {
   TablaRoles,
@@ -87,10 +92,14 @@ export function RolesPage() {
   const [rolEnEdicion, setRolEnEdicion] =
     useState<Rol | null>(null)
 
+  const [rolAEliminar, setRolAEliminar] =
+    useState<Rol | null>(null)
+
   const [mensaje, setMensaje] = useState<{
-    tipo: 'success' | 'danger'
+    tipo: 'success' | 'error'
     texto: string
   } | null>(null)
+  const [alertaAbierta, setAlertaAbierta] = useState(false)
 
   const rolesFiltrados = useMemo(
     () =>
@@ -130,12 +139,14 @@ export function RolesPage() {
   const abrirNuevo = () => {
     setRolEnEdicion(null)
     setModalAbierto(true)
+    setAlertaAbierta(false)
     setMensaje(null)
   }
 
   const abrirEdicion = (rol: Rol) => {
     setRolEnEdicion(rol)
     setModalAbierto(true)
+    setAlertaAbierta(false)
     setMensaje(null)
   }
 
@@ -151,17 +162,18 @@ export function RolesPage() {
 
         setMensaje({
           tipo: 'success',
-          texto:
-            'Rol actualizado correctamente.',
+          texto: 'Rol actualizado correctamente.',
         })
+        setAlertaAbierta(true)
+
       } else {
         crearRol(datos)
 
         setMensaje({
           tipo: 'success',
-          texto:
-            'Rol registrado correctamente.',
+          texto: 'Rol registrado correctamente.',
         })
+        setAlertaAbierta(true)
       }
 
       setRoles(obtenerRoles())
@@ -180,32 +192,31 @@ export function RolesPage() {
   const manejarEliminacion = (
     rol: Rol,
   ) => {
-    const confirmado = window.confirm(
-      `¿Deseas eliminar el rol "${rol.nombre}"?`,
-    )
+    setRolAEliminar(rol)
+  }
 
-    if (!confirmado) {
-      return
-    }
+  const confirmarEliminacion = () => {
+    if (!rolAEliminar) return
 
     try {
-      eliminarRol(rol.id)
+      eliminarRol(rolAEliminar.id)
       setRoles(obtenerRoles())
       setPage(1)
-
+      setRolAEliminar(null)
       setMensaje({
         tipo: 'success',
-        texto:
-          'Rol eliminado correctamente.',
+        texto: 'Rol eliminado correctamente.',
       })
+      setAlertaAbierta(true)
     } catch (error) {
+      setRolAEliminar(null)
       setMensaje({
-        tipo: 'danger',
-        texto:
-          error instanceof Error
-            ? error.message
-            : 'No se pudo eliminar el rol.',
+        tipo: 'error',
+        texto: error instanceof Error
+          ? error.message
+          : 'No se pudo eliminar el rol.',
       })
+      setAlertaAbierta(true)
     }
   }
 
@@ -224,14 +235,23 @@ export function RolesPage() {
             </div>
           </section>
 
-          {mensaje && (
-            <div
-              className={`alert alert-${mensaje.tipo} mt-3 mb-0`}
-              role="status"
+          <Snackbar
+            open={alertaAbierta && Boolean(mensaje)}
+            autoHideDuration={3000}
+            onClose={() => setAlertaAbierta(false)}
+            slotProps={{ transition: { onExited: () => setMensaje(null) } }}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          >
+            <Alert
+              severity={mensaje?.tipo ?? 'success'}
+              icon={mensaje?.tipo === 'success' ? <CheckCircle2 fontSize="inherit" /> : <XCircle fontSize="inherit" />}
+              onClose={() => setAlertaAbierta(false)}
+              variant="filled"
+              sx={{ width: '100%', minWidth: 320, boxShadow: 4 }}
             >
-              {mensaje.texto}
-            </div>
-          )}
+              {mensaje?.texto}
+            </Alert>
+          </Snackbar>
 
           <div className="maestro-panel">
             <FiltrosRoles
@@ -291,6 +311,13 @@ export function RolesPage() {
           onGuardar={manejarGuardado}
         />
       )}
+
+      <RolDeleteModal
+        abierto={Boolean(rolAEliminar)}
+        rol={rolAEliminar}
+        onClose={() => setRolAEliminar(null)}
+        onConfirm={confirmarEliminacion}
+      />
     </>
   )
 }

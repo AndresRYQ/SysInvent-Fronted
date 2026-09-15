@@ -8,6 +8,7 @@ import {
   FiltrosTiposProducto,
   type FiltrosTiposProductoValores,
 } from '../../components/tipos-productos/FiltrosTiposProducto'
+import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
 import { TablaTiposProducto } from '../../components/tipos-productos/TablaTiposProducto'
 import { TipoProductoDeleteModal } from '../../components/tipos-productos/TipoProductoDeleteModal'
 import { TipoProductoFormModal } from '../../components/tipos-productos/TipoProductoFormModal'
@@ -90,6 +91,7 @@ export function TiposProductoPage() {
 
   const [errorFormulario, setErrorFormulario] =
     useState('')
+  const { mensaje, abierta, mostrarAlerta, cerrarAlerta, limpiarAlerta } = useSnackbar()
 
   const [modalDeleteOpen, setModalDeleteOpen] =
     useState(false)
@@ -184,6 +186,7 @@ export function TiposProductoPage() {
       recargarTiposProducto()
       cerrarFormulario()
       setPage(1)
+      mostrarAlerta('success', tipoProductoEnEdicion ? 'Tipo de producto actualizado correctamente.' : 'Tipo de producto registrado correctamente.')
     } catch (error) {
       setErrorFormulario(
         obtenerMensajeError(error),
@@ -210,10 +213,16 @@ export function TiposProductoPage() {
 
   function confirmarReactivacion(): void {
     if (!tipoProductoAReactivar) return
-    reactivarTipoProducto(tipoProductoAReactivar.id)
-    recargarTiposProducto()
-    setModalReactivarOpen(false)
-    setTipoProductoAReactivar(null)
+    try {
+      reactivarTipoProducto(tipoProductoAReactivar.id)
+      recargarTiposProducto()
+      mostrarAlerta('success', 'Tipo de producto reactivado correctamente.')
+    } catch (error) {
+      mostrarAlerta('error', obtenerMensajeError(error))
+    } finally {
+      setModalReactivarOpen(false)
+      setTipoProductoAReactivar(null)
+    }
   }
 
   function confirmarEliminacion(): void {
@@ -228,9 +237,10 @@ export function TiposProductoPage() {
 
       recargarTiposProducto()
       cerrarConfirmacionEliminar()
+      mostrarAlerta('success', 'Tipo de producto eliminado correctamente.')
     } catch (error) {
       cerrarConfirmacionEliminar()
-      console.error(obtenerMensajeError(error))
+      mostrarAlerta('error', obtenerMensajeError(error))
     }
   }
 
@@ -307,6 +317,13 @@ export function TiposProductoPage() {
         soloLectura={modoVisualizacion}
         onClose={cerrarFormulario}
         onSubmit={guardarTipoProducto}
+      />
+
+      <SnackbarAlert
+        mensaje={mensaje}
+        abierta={abierta}
+        onClose={cerrarAlerta}
+        onExited={limpiarAlerta}
       />
 
       <TipoProductoDeleteModal

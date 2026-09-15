@@ -22,6 +22,7 @@ import {
 
 import { ProductoDeleteModal } from '../../components/productos/ProductoDeleteModal'
 import { FormularioProducto } from '../../components/productos/FormularioProducto'
+import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
 
 import {
   actualizarProducto,
@@ -64,11 +65,6 @@ const UNIDADES_INICIALES: OpcionFiltroProducto[] = [
   { id: 'UM-004', nombre: 'Metro' },
   { id: 'UM-005', nombre: 'Caja' },
 ]
-
-interface MensajePagina {
-  tipo: 'success' | 'danger'
-  texto: string
-}
 
 interface EstadoNavegacion {
   mensaje?: string
@@ -161,8 +157,7 @@ export function ProductosPage() {
   const [modoVisualizacion, setModoVisualizacion] = useState(false)
   const [errorFormulario, setErrorFormulario] = useState('')
 
-  const [mensaje, setMensaje] =
-    useState<MensajePagina | null>(null)
+  const { mensaje, abierta, mostrarAlerta, cerrarAlerta, limpiarAlerta } = useSnackbar()
 
   useEffect(() => {
     const estado =
@@ -172,10 +167,7 @@ export function ProductosPage() {
       return
     }
 
-    setMensaje({
-      tipo: 'success',
-      texto: estado.mensaje,
-    })
+    mostrarAlerta('success', estado.mensaje)
 
     navigate(location.pathname, {
       replace: true,
@@ -185,6 +177,7 @@ export function ProductosPage() {
     location.pathname,
     location.state,
     navigate,
+    mostrarAlerta,
   ])
 
   const productosConDetalle = useMemo<
@@ -335,19 +328,12 @@ export function ProductosPage() {
       setModalDeleteOpen(false)
       setProductoAEliminar(null)
 
-      setMensaje({
-        tipo: 'success',
-        texto:
-          'Producto eliminado correctamente.',
-      })
+      mostrarAlerta('success', 'Producto eliminado correctamente.')
     } catch (error) {
       setModalDeleteOpen(false)
       setProductoAEliminar(null)
 
-      setMensaje({
-        tipo: 'danger',
-        texto: obtenerMensajeError(error),
-      })
+      mostrarAlerta('error', obtenerMensajeError(error))
     }
   }
 
@@ -360,9 +346,11 @@ export function ProductosPage() {
 
   function guardarProducto(datos: import('../../types/producto').ProductoFormData): void {
     try {
-      productoEnEdicion ? actualizarProducto(productoEnEdicion.id, datos) : crearProducto(datos)
+      const editando = Boolean(productoEnEdicion)
+      editando ? actualizarProducto(productoEnEdicion!.id, datos) : crearProducto(datos)
       setProductos(obtenerProductos())
       cerrarFormulario()
+      mostrarAlerta('success', editando ? 'Producto actualizado correctamente.' : 'Producto registrado correctamente.')
     } catch (error) {
       setErrorFormulario(obtenerMensajeError(error))
     }
@@ -383,22 +371,6 @@ export function ProductosPage() {
               </p>
             </div>
           </section>
-
-          {mensaje && (
-            <div
-              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
-              role="alert"
-            >
-              {mensaje.texto}
-
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={() => setMensaje(null)}
-              />
-            </div>
-          )}
 
           <div className="maestro-panel">
             <FiltrosProductos
@@ -437,7 +409,6 @@ export function ProductosPage() {
               onEditar={(producto) => { setProductoEnEdicion(producto); setModoVisualizacion(false); setErrorFormulario(''); setModalFormOpen(true) }}
               onVisualizar={(producto) => { setProductoEnEdicion(producto); setModoVisualizacion(true); setErrorFormulario(''); setModalFormOpen(true) }}
               onEliminar={(producto) => {
-                setMensaje(null)
                 setProductoAEliminar(producto)
                 setModalDeleteOpen(true)
               }}
@@ -462,6 +433,12 @@ export function ProductosPage() {
           setProductoAEliminar(null)
         }}
         onConfirm={confirmarEliminacion}
+      />
+      <SnackbarAlert
+        mensaje={mensaje}
+        abierta={abierta}
+        onClose={cerrarAlerta}
+        onExited={limpiarAlerta}
       />
       {modalFormOpen && <div className="maestro-modal-backdrop productos-page" role="presentation"><div className="maestro-modal-card maestro-modal-card--product" role="dialog" aria-modal="true"><div className="maestro-modal-header"><h3 className="maestro-modal-title">{modoVisualizacion ? 'Visualizar producto' : productoEnEdicion ? 'Editar producto' : 'Registrar producto'}</h3><button type="button" className="btn maestro-modal-close" onClick={cerrarFormulario} aria-label="Cerrar modal">×</button></div><FormularioProducto producto={productoEnEdicion} soloLectura={modoVisualizacion} error={errorFormulario} onSubmit={guardarProducto} onCancelar={cerrarFormulario} /></div></div>}
     </>

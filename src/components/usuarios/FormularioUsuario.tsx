@@ -1,4 +1,5 @@
 import { Placeholder } from '../../constants/placeholders'
+import Select from 'react-select'
 import {
   Save,
   UserRound,
@@ -21,6 +22,15 @@ import type {
 import type {
   UsuarioFormData,
 } from '../../types/usuario'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
+
+interface ErroresFormulario {
+  usuario: string
+  nombreCompleto: string
+  email: string
+  contrasena: string
+  rol: string
+}
 
 interface FormularioUsuarioProps {
   usuario: UsuarioLogin | null
@@ -49,6 +59,13 @@ export function FormularioUsuario({
     }))
 
   const [error, setError] = useState('')
+  const [errores, setErrores] = useState<ErroresFormulario>({
+    usuario: '',
+    nombreCompleto: '',
+    email: '',
+    contrasena: '',
+    rol: '',
+  })
 
   const rolesDisponibles = roles.filter(
     (rol) =>
@@ -61,6 +78,26 @@ export function FormularioUsuario({
   ) => {
     evento.preventDefault()
     setError('')
+    const nuevosErrores: ErroresFormulario = {
+      usuario: '',
+      nombreCompleto: '',
+      email: '',
+      contrasena: '',
+      rol: '',
+    }
+
+    if (!datos.usuario.trim()) nuevosErrores.usuario = 'Campo requerido'
+    if (!datos.nombreCompleto.trim()) nuevosErrores.nombreCompleto = 'Campo requerido'
+    if (!datos.email.trim()) nuevosErrores.email = 'Campo requerido'
+    else if (!/^\S+@\S+\.\S+$/.test(datos.email.trim())) nuevosErrores.email = 'Ingresa un correo válido'
+    if (!datos.rol) nuevosErrores.rol = 'Campo requerido'
+    if (!usuario && !datos.contrasena) nuevosErrores.contrasena = 'Campo requerido'
+    else if (datos.contrasena && datos.contrasena.length < 6) nuevosErrores.contrasena = 'Debe tener al menos 6 caracteres'
+
+    setErrores(nuevosErrores)
+    if (Object.values(nuevosErrores).some(Boolean)) {
+      return
+    }
 
     const mensaje = onGuardar(datos)
 
@@ -73,14 +110,6 @@ export function FormularioUsuario({
     <div
       className="maestro-modal-backdrop"
       role="presentation"
-      onMouseDown={(evento) => {
-        if (
-          evento.target ===
-          evento.currentTarget
-        ) {
-          onClose()
-        }
-      }}
     >
       <form
         className="maestro-modal-card"
@@ -143,19 +172,22 @@ export function FormularioUsuario({
 
                 <input
                   id="usuarioNombre"
-                  className="form-control"
+                  className={`form-control${errores.usuario ? ' maestro-control--error' : ''}`}
                   value={datos.usuario}
+                  placeholder={Placeholder.Ingresar}
                   maxLength={50}
                   autoComplete="username"
-                  onChange={(evento) =>
+                  onChange={(evento) => {
                     setDatos((actual) => ({
                       ...actual,
                       usuario:
                         evento.target.value,
                     }))
-                  }
+                    setErrores((actual) => ({ ...actual, usuario: '' }))
+                  }}
                 />
               </div>
+              {errores.usuario && <div className="maestro-field-error">{errores.usuario}</div>}
             </div>
 
             <div className="col-12 col-md-6">
@@ -169,17 +201,20 @@ export function FormularioUsuario({
 
               <input
                 id="usuarioNombreCompleto"
-                className="form-control"
+                className={`form-control${errores.nombreCompleto ? ' maestro-control--error' : ''}`}
                 value={datos.nombreCompleto}
+                placeholder={Placeholder.Ingresar}
                 maxLength={100}
-                onChange={(evento) =>
+                onChange={(evento) => {
                   setDatos((actual) => ({
                     ...actual,
                     nombreCompleto:
                       evento.target.value,
                   }))
-                }
+                  setErrores((actual) => ({ ...actual, nombreCompleto: '' }))
+                }}
               />
+              {errores.nombreCompleto && <div className="maestro-field-error">{errores.nombreCompleto}</div>}
             </div>
 
             <div className="col-12 col-md-6">
@@ -193,19 +228,22 @@ export function FormularioUsuario({
 
               <input
                 id="usuarioEmail"
-                className="form-control"
+                className={`form-control${errores.email ? ' maestro-control--error' : ''}`}
                 type="email"
                 value={datos.email}
+                placeholder={Placeholder.Ingresar}
                 maxLength={120}
                 autoComplete="email"
-                onChange={(evento) =>
+                onChange={(evento) => {
                   setDatos((actual) => ({
                     ...actual,
                     email:
                       evento.target.value,
                   }))
-                }
+                  setErrores((actual) => ({ ...actual, email: '' }))
+                }}
               />
+              {errores.email && <div className="maestro-field-error">{errores.email}</div>}
             </div>
 
             <div className="col-12 col-md-6">
@@ -217,36 +255,26 @@ export function FormularioUsuario({
 
               </label>
 
-              <select
-                id="usuarioRol"
-                className="form-select"
-                value={datos.rol}
-                onChange={(evento) =>
-                  setDatos((actual) => ({
-                    ...actual,
-                    rol:
-                      evento.target.value,
-                  }))
-                }
-              >
-                <option value="">
-                  Selecciona un rol
-                </option>
-
-                {rolesDisponibles.map((rol) => (
-                  <option
-                    value={rol.nombre}
-                    key={rol.id}
-                  >
-                    {rol.nombre}
-                  </option>
-                ))}
-              </select>
+              <Select
+                inputId="usuarioRol"
+                classNamePrefix="maestro-select"
+                options={rolesDisponibles.map((rol) => ({ value: rol.nombre, label: rol.nombre }))}
+                value={rolesDisponibles.map((rol) => ({ value: rol.nombre, label: rol.nombre })).find((opcion) => opcion.value === datos.rol) ?? null}
+                onChange={(opcion) => {
+                  setDatos((actual) => ({ ...actual, rol: opcion?.value ?? '' }))
+                  setErrores((actual) => ({ ...actual, rol: '' }))
+                }}
+                placeholder={Placeholder.Seleccionar}
+                isSearchable={false}
+                menuPortalTarget={document.body}
+                styles={crearEstilosSelect({ tieneError: Boolean(errores.rol), zIndex: 1300 })}
+              />
+              {errores.rol && <div className="maestro-field-error">{errores.rol}</div>}
             </div>
 
             <div className="col-12 col-md-6">
               <label
-                className="form-label required"
+                className={usuario ? 'form-label' : 'form-label required'}
                 htmlFor="usuarioContrasena"
               >
                 Contraseña
@@ -254,55 +282,23 @@ export function FormularioUsuario({
 
               <input
                 id="usuarioContrasena"
-                className="form-control"
+                className={`form-control${errores.contrasena ? ' maestro-control--error' : ''}`}
                 type="password"
                 value={datos.contrasena}
                 minLength={6}
                 maxLength={80}
                 autoComplete="new-password"
                 placeholder={Placeholder.Ingresar}
-                onChange={(evento) =>
+                onChange={(evento) => {
                   setDatos((actual) => ({
                     ...actual,
                     contrasena:
                       evento.target.value,
                   }))
-                }
+                  setErrores((actual) => ({ ...actual, contrasena: '' }))
+                }}
               />
-            </div>
-
-            <div className="col-12 col-md-6">
-              <label
-                className="form-label"
-                htmlFor="usuarioEstado"
-              >
-                Estado
-              </label>
-
-              <select
-                id="usuarioEstado"
-                className="form-select"
-                value={
-                  datos.estado
-                    ? 'activo'
-                    : 'inactivo'
-                }
-                onChange={(evento) =>
-                  setDatos((actual) => ({
-                    ...actual,
-                    estado:
-                      evento.target.value ===
-                      'activo',
-                  }))
-                }
-              >
-                <option value="activo">
-                  Activo
-                </option>
-                <option value="inactivo">
-                  Inactivo
-                </option>
-              </select>
+              {errores.contrasena && <div className="maestro-field-error">{errores.contrasena}</div>}
             </div>
           </div>
         </div>
@@ -313,6 +309,7 @@ export function FormularioUsuario({
             className="btn btn-maestro-danger"
             onClick={onClose}
           >
+            <X size={17} />
             Cancelar
           </button>
 

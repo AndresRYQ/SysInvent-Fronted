@@ -8,6 +8,7 @@ import {
   FiltrosPartesEquipo,
   type FiltrosPartesEquipoValores,
 } from '../../components/partes-equipo/FiltrosPartesEquipo'
+import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
 
 import { FormularioParteEquipo } from '../../components/partes-equipo/FormularioParteEquipo'
 import { ParteEquipoDeleteModal } from '../../components/partes-equipo/ParteEquipoDeleteModal'
@@ -129,6 +130,7 @@ export function PartesEquipoPage() {
     errorFormulario,
     setErrorFormulario,
   ] = useState('')
+  const { mensaje, abierta, mostrarAlerta, cerrarAlerta, limpiarAlerta } = useSnackbar()
 
   const [
     eliminarAbierto,
@@ -243,6 +245,7 @@ export function PartesEquipoPage() {
       recargarPartes()
       cerrarFormulario()
       setPage(1)
+      mostrarAlerta('success', parteEnEdicion ? 'Parte de equipo actualizada correctamente.' : 'Parte de equipo registrada correctamente.')
     } catch (error) {
       setErrorFormulario(
         obtenerMensajeError(error),
@@ -284,10 +287,11 @@ export function PartesEquipoPage() {
 
       recargarPartes()
       cerrarConfirmacionEliminar()
+      mostrarAlerta('success', modoConfirmacion === 'reactivar' ? 'Parte de equipo reactivada correctamente.' : 'Parte de equipo eliminada correctamente.')
 
     } catch (error) {
       cerrarConfirmacionEliminar()
-      console.error(obtenerMensajeError(error))
+      mostrarAlerta('error', obtenerMensajeError(error))
     }
   }
 
@@ -385,6 +389,13 @@ export function PartesEquipoPage() {
         soloLectura={soloLectura}
         onClose={cerrarFormulario}
         onSubmit={guardarParte}
+      />
+
+      <SnackbarAlert
+        mensaje={mensaje}
+        abierta={abierta}
+        onClose={cerrarAlerta}
+        onExited={limpiarAlerta}
       />
 
       <ParteEquipoDeleteModal

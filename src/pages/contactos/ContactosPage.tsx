@@ -5,6 +5,7 @@ import {
 } from 'react'
 
 import { ContactoDeleteModal } from '../../components/contactos/ContactoDeleteModal'
+import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
 import {
   FiltrosContactos,
   type FiltrosContactosValores,
@@ -155,6 +156,7 @@ export function ContactosPage() {
     errorFormulario,
     setErrorFormulario,
   ] = useState('')
+  const { mensaje, abierta, mostrarAlerta, cerrarAlerta, limpiarAlerta } = useSnackbar()
 
   const [
     modalEliminarAbierto,
@@ -271,6 +273,7 @@ export function ContactosPage() {
       recargarContactos()
       cerrarFormulario()
       setPage(1)
+      mostrarAlerta('success', contactoEnEdicion ? 'Contacto actualizado correctamente.' : 'Contacto registrado correctamente.')
     } catch (error) {
       setErrorFormulario(
         obtenerMensajeError(error),
@@ -314,10 +317,11 @@ export function ContactosPage() {
 
       recargarContactos()
       cerrarConfirmacionEliminar()
+      mostrarAlerta('success', modoConfirmacion === 'reactivar' ? 'Contacto reactivado correctamente.' : 'Contacto eliminado correctamente.')
 
     } catch (error) {
       cerrarConfirmacionEliminar()
-      console.error(obtenerMensajeError(error))
+      mostrarAlerta('error', obtenerMensajeError(error))
     }
   }
 
@@ -422,6 +426,13 @@ export function ContactosPage() {
         soloLectura={soloLectura}
         onClose={cerrarFormulario}
         onSubmit={guardarContacto}
+      />
+
+      <SnackbarAlert
+        mensaje={mensaje}
+        abierta={abierta}
+        onClose={cerrarAlerta}
+        onExited={limpiarAlerta}
       />
 
       <ContactoDeleteModal
