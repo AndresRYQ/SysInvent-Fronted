@@ -84,7 +84,8 @@ const SECCIONES: SidebarSection[] = [
         moduleId: 'reporte-vales',
       },
       {
-        to: '/reportes/productos-mas-pedidos',
+        to:
+        '/reportes/productos-mas-pedidos',
         label:
           'Reporte de producto más pedido',
         icon: FileText,
@@ -179,7 +180,7 @@ const SECCIONES: SidebarSection[] = [
         moduleId: 'roles',
       },
       {
-        to: '/perfil-usuario',
+        to: '/perfil',
         label: 'Perfil de usuario',
         icon: UserCircle,
         moduleId: 'perfil-usuario',
@@ -191,14 +192,14 @@ const SECCIONES: SidebarSection[] = [
 
 type SidebarProps = {
   abierto: boolean
-  onToggle: () => void
   onNavigate?: () => void
+  onToggle: () => void
 }
 
 export function Sidebar({
   abierto,
-  onToggle,
   onNavigate,
+  onToggle,
 }: SidebarProps) {
   const { pathname } = useLocation()
   const { sesion } = useAuth()
@@ -217,64 +218,22 @@ const seccionesPermitidas =
   })).filter(
     (seccion) => seccion.items.length > 0,
   )
-  const sidebarRef = useRef<HTMLDivElement>(null)
-  const dragRef = useRef({
-    active: false,
-    dragged: false,
-    startY: 0,
-    startScrollTop: 0,
-  })
-
+ 
   const activo = (to: string) =>
     to === '/dashboard' ? pathname === to : pathname.startsWith(to)
 
-  const manejarPointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    void event
-    dragRef.current.active = false
-  }
-
-  const manejarPointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current.active || !sidebarRef.current) {
-      return
-    }
-
-    const desplazamiento = event.clientY - dragRef.current.startY
-    if (Math.abs(desplazamiento) > 5) {
-      dragRef.current.dragged = true
-    }
-
-    if (dragRef.current.dragged) {
-      sidebarRef.current.scrollTop = Math.max(
-        0,
-        Math.min(
-          sidebarRef.current.scrollHeight - sidebarRef.current.clientHeight,
-          dragRef.current.startScrollTop - desplazamiento,
-        ),
-      )
-    }
-  }
-
-  const finalizarArrastre = (event: PointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current.active || !sidebarRef.current) {
-      return
-    }
-
-    dragRef.current.active = false
-    sidebarRef.current.releasePointerCapture(event.pointerId)
-  }
-
-  const evitarClickTrasArrastre = (event: React.MouseEvent<HTMLDivElement>) => {
-    // La navegación de los enlaces no debe ser cancelada por la captura
-    // del clic del contenedor desplazable.
-    void event
-    dragRef.current.dragged = false
-  }
+  
 
   return (
     <aside
-      className={`sidebar ${abierto ? 'sidebar--abierto' : ''}`}
-      aria-hidden={!abierto}
-    >
+        className={
+          `sidebar ${
+            abierto
+              ? 'sidebar--abierto'
+              : ''
+          }`
+        }
+      >
       <button
         type="button"
         className="sidebar-toggle"
@@ -285,7 +244,7 @@ const seccionesPermitidas =
         {abierto ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
       </button>
 
-      <div className="sidebar-inner">
+     <div className="sidebar-inner">
         <div className={`sidebar-head ${abierto ? '' : 'sidebar-head--cerrado'}`}>
           <span className="sidebar-title">Menú</span>
         </div>
@@ -335,3 +294,4 @@ const seccionesPermitidas =
     </aside>
   )
 }
+

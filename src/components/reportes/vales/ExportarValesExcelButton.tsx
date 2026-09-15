@@ -315,12 +315,12 @@ export function ExportarValesExcelButton({
         'Centro de costo',
         'Solicitante',
         'Tipo de producto',
-        'CÃ³digo de producto',
+        'Código de producto',
         'Producto',
-        'CategorÃ­a',
+        'Categoría',
         'Unidad de medida',
         'Destino',
-        'CÃ³digo de parte',
+        'Código de parte',
         'Parte de equipo',
         'Cantidad',
         'Precio unitario',
@@ -619,7 +619,7 @@ export function ExportarValesExcelButton({
       hojaResumen.mergeCells('A2:B2')
 
       hojaResumen.getCell('A2').value =
-        'Indicadores segÃºn los filtros aplicados'
+        'Indicadores según los filtros aplicados'
 
       hojaResumen.getCell('A2').font = {
         name: 'Aptos',

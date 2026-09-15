@@ -69,7 +69,7 @@ function obtenerMensajeError(
 ): string {
   return error instanceof Error
     ? error.message
-    : 'OcurriÃ³ un error inesperado.'
+    : 'Ocurrió un error inesperado.'
 }
 
 function calcularCantidadDistribuida(
@@ -444,7 +444,7 @@ export function ValeConsumoForm({
       distribucionesBorrador.length === 0
     ) {
       setError(
-        'Agrega al menos una distribuciÃ³n.',
+        'Agrega al menos una distribución.',
       )
       return
     }
@@ -458,7 +458,7 @@ export function ValeConsumoForm({
 
     if (productoRepetido) {
       setError(
-        'Este producto ya estÃ¡ agregado. Usa Editar para cambiar sus distribuciones.',
+        'Este producto ya está agregado. Usa Editar para cambiar sus distribuciones.',
       )
       return
     }
@@ -496,7 +496,7 @@ export function ValeConsumoForm({
 
     if (!producto) {
       setError(
-        'El producto ya no estÃ¡ disponible.',
+        'El producto ya no está disponible.',
       )
       return
     }
@@ -601,7 +601,7 @@ export function ValeConsumoForm({
           </h2>
 
           <p className="text-secondary mb-0">
-            Registra productos y distribÃºyelos
+            Registra productos y distribúyelos
             entre destinos y partes de equipo.
           </p>
         </div>
@@ -814,7 +814,7 @@ export function ValeConsumoForm({
                 ? `${stockDisponible} ${unidadSeleccionada?.nombre ?? ''}`
                 : ''
             }
-            placeholder="AutomÃ¡tico"
+            placeholder="Automático"
           />
         </div>
       </div>

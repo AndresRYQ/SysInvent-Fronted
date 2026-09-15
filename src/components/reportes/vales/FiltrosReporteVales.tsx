@@ -281,7 +281,7 @@ export function FiltrosReporteVales({
                     key={parte.id}
                     value={parte.id}
                   >
-                    {parte.codigo} â€”{' '}
+                    {parte.codigo} —{' '}
                     {parte.nombre}
                   </option>
                 ),
@@ -386,7 +386,7 @@ export function FiltrosReporteVales({
                     key={producto.id}
                     value={producto.id}
                   >
-                    {producto.codigo} â€”{' '}
+                    {producto.codigo} —{' '}
                     {producto.nombre}
                   </option>
                 ),

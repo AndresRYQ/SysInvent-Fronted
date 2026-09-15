@@ -134,7 +134,7 @@ export function TablaReporteVales({
 
                   <small className="text-secondary">
                     {fila.codigoProducto}
-                    {' Â· '}
+                    {' · '}
                     {fila.tipoProducto}
                   </small>
                 </td>

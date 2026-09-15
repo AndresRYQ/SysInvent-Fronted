@@ -64,7 +64,7 @@ function obtenerMensajeError(
 ): string {
   return error instanceof Error
     ? error.message
-    : 'OcurriÃ³ un error inesperado.'
+    : 'Ocurrió un error inesperado.'
 }
 
 export function IngresoAlmacenForm({
@@ -335,7 +335,7 @@ export function IngresoAlmacenForm({
       precioUnitario < 0
     ) {
       setError(
-        'El precio unitario no es vÃ¡lido.',
+        'El precio unitario no es válido.',
       )
       return
     }
@@ -419,7 +419,7 @@ export function IngresoAlmacenForm({
 
     if (!numeroDocumento.trim()) {
       setError(
-        'Ingresa el nÃºmero del documento.',
+        'Ingresa el número del documento.',
       )
       return
     }
@@ -466,8 +466,8 @@ export function IngresoAlmacenForm({
           </h2>
 
           <p className="text-secondary mb-0">
-            Registra la mercaderÃ­a recibida
-            en el almacÃ©n.
+            Registra la mercadería recibida
+            en el almacén.
           </p>
         </div>
 
@@ -630,7 +630,7 @@ export function IngresoAlmacenForm({
             className="form-label maestro-label"
             htmlFor="ingresoNumeroDocumento"
           >
-            NÃºmero de documento *
+            Número de documento *
           </label>
 
           <input
@@ -652,7 +652,7 @@ export function IngresoAlmacenForm({
             className="form-label maestro-label"
             htmlFor="ingresoObservacion"
           >
-            ObservaciÃ³n
+            Observación
           </label>
 
           <textarea
@@ -767,7 +767,7 @@ export function IngresoAlmacenForm({
             value={
               unidadSeleccionada?.nombre ?? ''
             }
-            placeholder="AutomÃ¡tico"
+            placeholder="Automático"
             readOnly
           />
         </div>
@@ -860,7 +860,7 @@ export function IngresoAlmacenForm({
                   colSpan={6}
                   className="text-center text-secondary py-4"
                 >
-                  TodavÃ­a no agregaste productos.
+                  Todavía no agregaste productos.
                 </td>
               </tr>
             )}

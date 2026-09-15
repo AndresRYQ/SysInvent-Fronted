@@ -295,7 +295,7 @@ export function ReporteValesPage() {
 
                   <p className="maestro-section-copy small mb-0 mt-1">
                     {totalItems}{' '}
-                    distribuciÃ³n(es)
+                    distribución(es)
                     encontrada(s)
                   </p>
                 </div>

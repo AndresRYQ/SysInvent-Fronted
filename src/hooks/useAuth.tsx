@@ -78,10 +78,10 @@ export function AuthProvider({
 
       const detalle =
         motivo === 'inactividad'
-          ? 'La sesiÃ³n se cerrÃ³ despuÃ©s de 2 minutos de inactividad.'
+          ? 'La sesión se cerró después de 2 minutos de inactividad.'
           : motivo === 'vencimiento'
-            ? 'La sesiÃ³n se cerrÃ³ al alcanzar el tiempo mÃ¡ximo de 5 minutos.'
-            : 'El usuario cerrÃ³ la sesiÃ³n manualmente.'
+            ? 'La sesión se cerró al alcanzar el tiempo máximo de 5 minutos.'
+            : 'El usuario cerró la sesión manualmente.'
 
       cerrarSesion(detalle)
       setSesion(null)
@@ -135,7 +135,7 @@ export function AuthProvider({
     )
 
   /*
-   * Cierra automÃ¡ticamente la sesiÃ³n
+   * Cierra automáticamente la sesión
    * cuando se cumplen los 5 minutos.
    */
   useEffect(() => {
@@ -180,7 +180,7 @@ export function AuthProvider({
   ])
 
   /*
-   * Cierra la sesiÃ³n despuÃ©s de
+   * Cierra la sesión después de
    * 2 minutos sin actividad.
    */
   useEffect(() => {
@@ -262,8 +262,8 @@ export function AuthProvider({
   ])
 
   /*
-   * Sincroniza inicio, cierre y actualizaciÃ³n
-   * de sesiÃ³n entre las pestaÃ±as.
+   * Sincroniza inicio, cierre y actualización
+   * de sesión entre las pestañas.
    */
   useEffect(() => {
     const sincronizarSesion = (

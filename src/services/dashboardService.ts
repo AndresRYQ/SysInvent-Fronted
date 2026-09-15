@@ -237,7 +237,7 @@ export function obtenerResumenDashboard():
       titulo:
         'Productos con stock bajo',
       detalle:
-        `${productosStockBajo.length} producto(s) requieren reposiciÃ³n.`,
+        `${productosStockBajo.length} producto(s) requieren reposición.`,
       tono: 'warning',
     })
   }
@@ -252,7 +252,7 @@ export function obtenerResumenDashboard():
     alertas.push({
       id: 'ultima-actualizacion',
       titulo:
-        'Ãšltimo movimiento',
+        'Último movimiento',
       detalle:
         `${ultimoMovimiento.numeroDocumento} registrado el ${formatearFecha(
           ultimoMovimiento.fecha,

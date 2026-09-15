@@ -158,7 +158,7 @@ export function FormularioContacto({
       numerosTelefono.length > 15
     ) {
       nuevosErrores.telefono =
-        'Ingresa un telÃ©fono vÃ¡lido'
+        'Ingresa un teléfono válido'
     }
 
     if (!correo) {
@@ -170,7 +170,7 @@ export function FormularioContacto({
       )
     ) {
       nuevosErrores.correo =
-        'Ingresa un correo vÃ¡lido'
+        'Ingresa un correo válido'
     }
 
     setErrores(nuevosErrores)
@@ -400,7 +400,7 @@ export function FormularioContacto({
                   className="form-label"
                   htmlFor="contactoTelefono"
                 >
-                  TelÃ©fono
+                  Teléfono
                   <span className="maestro-required">
                     *
                   </span>

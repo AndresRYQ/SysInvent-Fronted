@@ -66,7 +66,7 @@ function obtenerMensajeError(
 ): string {
   return error instanceof Error
     ? error.message
-    : 'OcurriÃ³ un error inesperado.'
+    : 'Ocurrió un error inesperado.'
 }
 
 function formatearFecha(
@@ -367,7 +367,7 @@ export function ValesConsumoPage() {
               <h1>Vales de consumo</h1>
 
               <p>
-                Salidas y distribuciÃ³n de productos
+                Salidas y distribución de productos
                 hacia destinos y partes de equipo.
               </p>
             </div>
@@ -612,7 +612,7 @@ export function ValesConsumoPage() {
                   <table className="table maestro-table align-middle mb-0">
                     <thead>
                       <tr>
-                        <th>NÃºmero</th>
+                        <th>Número</th>
                         <th>Fecha</th>
                         <th>Centro de costo</th>
                         <th>Solicitante</th>
@@ -829,7 +829,7 @@ export function ValesConsumoPage() {
 
             <p className="maestro-modal-copy text-center">
               Las cantidades del vale se
-              devolverÃ¡n al stock:
+              devolverán al stock:
             </p>
 
             <p className="maestro-delete-name">

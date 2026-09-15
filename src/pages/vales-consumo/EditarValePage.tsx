@@ -32,7 +32,7 @@ export function EditarValePage() {
 
               <p>
                 El vale solicitado no existe
-                o ya no estÃ¡ disponible.
+                o ya no está disponible.
               </p>
             </div>
           </section>
@@ -41,8 +41,8 @@ export function EditarValePage() {
             className="alert alert-danger"
             role="alert"
           >
-            No se encontrÃ³ el vale con
-            identificador â€œ{id}â€.
+            No se encontró el vale con
+            identificador “{id}”.
           </div>
 
           <button

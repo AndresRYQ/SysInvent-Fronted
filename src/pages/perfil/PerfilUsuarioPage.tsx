@@ -57,7 +57,7 @@ function obtenerMensajeError(
 ): string {
   return error instanceof Error
     ? error.message
-    : 'OcurriÃ³ un error inesperado.'
+    : 'Ocurrió un error inesperado.'
 }
 
 function crearFormulario(
@@ -139,7 +139,7 @@ export function PerfilUsuarioPage() {
 
     if (!sesion || !perfil) {
       setError(
-        'No se encontrÃ³ la sesiÃ³n actual.',
+        'No se encontró la sesión actual.',
       )
       return
     }
@@ -168,7 +168,7 @@ export function PerfilUsuarioPage() {
       )
 
       setMensaje(
-        'Tu perfil se actualizÃ³ correctamente.',
+        'Tu perfil se actualizó correctamente.',
       )
     } catch (errorActual) {
       setError(
@@ -330,7 +330,7 @@ export function PerfilUsuarioPage() {
 
                   <p className="small text-secondary mb-0">
                     El rol y el estado solo pueden
-                    ser modificados desde el mÃ³dulo
+                    ser modificados desde el módulo
                     Usuarios por una persona con
                     permisos.
                   </p>
@@ -344,11 +344,11 @@ export function PerfilUsuarioPage() {
                   <div className="mb-4">
                     <span className="maestro-kicker">
                       <UserRound size={17} />
-                      InformaciÃ³n personal
+                      Información personal
                     </span>
 
                     <p className="text-secondary small mb-0 mt-2">
-                      Confirma tu contraseÃ±a actual
+                      Confirma tu contraseña actual
                       para guardar cualquier cambio.
                     </p>
                   </div>
@@ -429,7 +429,7 @@ export function PerfilUsuarioPage() {
                           className="form-label maestro-label"
                           htmlFor="perfilCorreo"
                         >
-                          Correo electrÃ³nico
+                          Correo electrónico
                         </label>
 
                         <input
@@ -462,8 +462,8 @@ export function PerfilUsuarioPage() {
                         </span>
 
                         <p className="text-secondary small mb-0 mt-2">
-                          Deja la nueva contraseÃ±a
-                          vacÃ­a si no deseas cambiarla.
+                          Deja la nueva contraseña
+                          vacía si no deseas cambiarla.
                         </p>
                       </div>
 
@@ -494,7 +494,7 @@ export function PerfilUsuarioPage() {
                           className="form-label maestro-label"
                           htmlFor="perfilContrasenaActual"
                         >
-                          ContraseÃ±a actual
+                          Contraseña actual
                         </label>
 
                         <input
@@ -525,7 +525,7 @@ export function PerfilUsuarioPage() {
                           className="form-label maestro-label"
                           htmlFor="perfilNuevaContrasena"
                         >
-                          Nueva contraseÃ±a
+                          Nueva contraseña
                         </label>
 
                         <input
@@ -556,7 +556,7 @@ export function PerfilUsuarioPage() {
                           className="form-label maestro-label"
                           htmlFor="perfilConfirmarContrasena"
                         >
-                          Confirmar contraseÃ±a
+                          Confirmar contraseña
                         </label>
 
                         <input

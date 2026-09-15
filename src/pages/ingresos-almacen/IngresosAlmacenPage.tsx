@@ -65,7 +65,7 @@ function obtenerMensajeError(
 ): string {
   return error instanceof Error
     ? error.message
-    : 'OcurriÃ³ un error inesperado.'
+    : 'Ocurrió un error inesperado.'
 }
 
 function formatearFecha(
@@ -387,11 +387,11 @@ export function IngresosAlmacenPage() {
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
-              <h1>Ingresos de almacÃ©n</h1>
+              <h1>Ingresos de almacén</h1>
 
               <p>
-                Registro de mercaderÃ­a y
-                actualizaciÃ³n de existencias.
+                Registro de mercadería y
+                actualización de existencias.
               </p>
             </div>
           </section>
@@ -641,7 +641,7 @@ export function IngresosAlmacenPage() {
                   <table className="table maestro-table align-middle mb-0">
                     <thead>
                       <tr>
-                        <th>NÃºmero</th>
+                        <th>Número</th>
                         <th>Fecha</th>
                         <th>Proveedor</th>
                         <th>Contacto</th>
@@ -671,7 +671,7 @@ export function IngresosAlmacenPage() {
                               </p>
                               <span>
                                 Registra el primer
-                                ingreso de mercaderÃ­a.
+                                ingreso de mercadería.
                               </span>
                             </div>
                           </td>
@@ -858,7 +858,7 @@ export function IngresosAlmacenPage() {
             </h3>
 
             <p className="maestro-modal-copy text-center">
-              Se descontarÃ¡n del stock todos
+              Se descontarán del stock todos
               los productos registrados en:
             </p>
 

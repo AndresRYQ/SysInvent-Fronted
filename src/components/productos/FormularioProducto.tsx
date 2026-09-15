@@ -58,7 +58,7 @@ const CATEGORIAS_INICIALES: OpcionMaestro[] = [
   },
   {
     id: 'CAT-003',
-    nombre: 'FerreterÃ­a',
+    nombre: 'Ferretería',
     estado: true,
   },
   {
@@ -266,7 +266,7 @@ export function FormularioProducto({
       !/^[A-Z0-9-]{3,30}$/.test(codigo)
     ) {
       nuevosErrores.codigo =
-        'Utiliza entre 3 y 30 letras, nÃºmeros o guiones'
+        'Utiliza entre 3 y 30 letras, números o guiones'
     }
 
     if (nombre.length < 2) {
@@ -292,7 +292,7 @@ export function FormularioProducto({
 
     if (!form.categoriaId) {
       nuevosErrores.categoriaId =
-        'Selecciona una categorÃ­a'
+        'Selecciona una categoría'
     }
 
     if (!form.unidadMedidaId) {
@@ -310,7 +310,7 @@ export function FormularioProducto({
       form.stockMinimo < 0
     ) {
       nuevosErrores.stockMinimo =
-        'Ingresa un stock mÃ­nimo vÃ¡lido'
+        'Ingresa un stock mínimo válido'
     }
 
     if (
@@ -320,7 +320,7 @@ export function FormularioProducto({
       form.precioUnitario < 0
     ) {
       nuevosErrores.precioUnitario =
-        'Ingresa un precio vÃ¡lido'
+        'Ingresa un precio válido'
     }
 
     setErrores(nuevosErrores)
@@ -364,12 +364,12 @@ export function FormularioProducto({
 
           <div>
             <h2 className="h5 mb-1">
-              InformaciÃ³n del producto
+              Información del producto
             </h2>
 
             <p className="text-muted mb-0">
-              Registra la informaciÃ³n general y
-              configuraciÃ³n de inventario.
+              Registra la información general y
+              configuración de inventario.
             </p>
           </div>
         </div>
@@ -392,7 +392,7 @@ export function FormularioProducto({
               className="form-label"
               htmlFor="productoCodigo"
             >
-              CÃ³digo
+              Código
               <span className="maestro-required">*</span>
             </label>
 
@@ -518,7 +518,7 @@ export function FormularioProducto({
               className="form-label"
               htmlFor="productoCategoria"
             >
-              CategorÃ­a
+              Categoría
               <span className="maestro-required">*</span>
             </label>
 
@@ -655,7 +655,7 @@ export function FormularioProducto({
               className="form-label"
               htmlFor="productoStockMinimo"
             >
-              Stock mÃ­nimo
+              Stock mínimo
               <span className="maestro-required">*</span>
             </label>
 
@@ -765,7 +765,7 @@ export function FormularioProducto({
               className="form-label"
               htmlFor="productoDescripcion"
             >
-              DescripciÃ³n
+              Descripción
               <span className="maestro-required">*</span>
             </label>
 

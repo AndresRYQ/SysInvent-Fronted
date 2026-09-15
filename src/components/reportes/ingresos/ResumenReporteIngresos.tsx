@@ -109,7 +109,7 @@ export function ResumenReporteIngresos({
 
                 <div>
                   <span className="text-secondary small">
-                    LÃ­neas de productos
+                    Líneas de productos
                   </span>
 
                   <strong className="d-block fs-3 mt-1">

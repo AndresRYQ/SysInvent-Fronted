@@ -195,7 +195,7 @@ function validarDatosVale(
     )
   ) {
     throw new Error(
-      'Selecciona una fecha vÃ¡lida.',
+      'Selecciona una fecha válida.',
     )
   }
 
@@ -213,7 +213,7 @@ function validarDatosVale(
 
   if (centroCosto.activo !== 1) {
     throw new Error(
-      'El centro de costo seleccionado estÃ¡ inactivo.',
+      'El centro de costo seleccionado está inactivo.',
     )
   }
 
@@ -273,7 +273,7 @@ function validarDatosVale(
         )
       ) {
         throw new Error(
-          `El producto de la fila ${fila} estÃ¡ repetido.`,
+          `El producto de la fila ${fila} está repetido.`,
         )
       }
 
@@ -294,7 +294,7 @@ function validarDatosVale(
 
       if (!producto.estado) {
         throw new Error(
-          `El producto "${producto.nombre}" estÃ¡ inactivo.`,
+          `El producto "${producto.nombre}" está inactivo.`,
         )
       }
 
@@ -305,7 +305,7 @@ function validarDatosVale(
         detalle.precioUnitario < 0
       ) {
         throw new Error(
-          `El precio del producto "${producto.nombre}" no es vÃ¡lido.`,
+          `El precio del producto "${producto.nombre}" no es válido.`,
         )
       }
 
@@ -347,7 +347,7 @@ function validarDatosVale(
 
           if (!destino.estado) {
             throw new Error(
-              `El destino "${destino.nombre}" estÃ¡ inactivo.`,
+              `El destino "${destino.nombre}" está inactivo.`,
             )
           }
 
@@ -369,7 +369,7 @@ function validarDatosVale(
 
             if (!parte.estado) {
               throw new Error(
-                `La parte de equipo "${parte.nombre}" estÃ¡ inactiva.`,
+                `La parte de equipo "${parte.nombre}" está inactiva.`,
               )
             }
           }
@@ -381,7 +381,7 @@ function validarDatosVale(
             distribucion.cantidad <= 0
           ) {
             throw new Error(
-              `La cantidad de la distribuciÃ³n ${numeroDistribucion} de "${producto.nombre}" debe ser mayor que cero.`,
+              `La cantidad de la distribución ${numeroDistribucion} de "${producto.nombre}" debe ser mayor que cero.`,
             )
           }
 
@@ -394,7 +394,7 @@ function validarDatosVale(
             )
           ) {
             throw new Error(
-              `El destino y la parte de equipo estÃ¡n repetidos para "${producto.nombre}".`,
+              `El destino y la parte de equipo están repetidos para "${producto.nombre}".`,
             )
           }
 
@@ -468,7 +468,7 @@ function obtenerCantidadesPorProducto(
 }
 
 /**
- * Calcula cuÃ¡nto debe modificarse el stock.
+ * Calcula cuánto debe modificarse el stock.
  *
  * Crear vale: resultado negativo.
  * Editar vale: solamente la diferencia.
@@ -654,7 +654,7 @@ export function crearValeConsumo(
     modulo: 'Vales de consumo',
     accion: 'CREAR',
     detalle:
-      `Se registrÃ³ el vale ${nuevoVale.numeroVale} con ${nuevoVale.detalles.length} producto(s).`,
+      `Se registró el vale ${nuevoVale.numeroVale} con ${nuevoVale.detalles.length} producto(s).`,
     registroId: nuevoVale.id,
   })
 
@@ -727,7 +727,7 @@ export function actualizarValeConsumo(
     modulo: 'Vales de consumo',
     accion: 'EDITAR',
     detalle:
-      `Se actualizÃ³ el vale ${valeActualizado.numeroVale}.`,
+      `Se actualizó el vale ${valeActualizado.numeroVale}.`,
     registroId:
       valeActualizado.id,
   })
@@ -787,7 +787,7 @@ export function anularValeConsumo(
     modulo: 'Vales de consumo',
     accion: 'ELIMINAR',
     detalle:
-      `Se anulÃ³ el vale ${valeAnulado.numeroVale} y se devolvieron sus productos al stock.`,
+      `Se anuló el vale ${valeAnulado.numeroVale} y se devolvieron sus productos al stock.`,
     registroId: valeAnulado.id,
   })
 

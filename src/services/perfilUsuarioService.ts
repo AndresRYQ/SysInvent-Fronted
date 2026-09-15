@@ -39,13 +39,13 @@ export function actualizarPerfilUsuario(
 
   if (!usuarioActual) {
     throw new Error(
-      'No se encontrÃ³ el usuario de la sesiÃ³n actual.',
+      'No se encontró el usuario de la sesión actual.',
     )
   }
 
   if (!datos.contrasenaActual) {
     throw new Error(
-      'Ingresa tu contraseÃ±a actual para guardar los cambios.',
+      'Ingresa tu contraseña actual para guardar los cambios.',
     )
   }
 
@@ -54,7 +54,7 @@ export function actualizarPerfilUsuario(
     usuarioActual.contrasena
   ) {
     throw new Error(
-      'La contraseÃ±a actual es incorrecta.',
+      'La contraseña actual es incorrecta.',
     )
   }
 
@@ -67,7 +67,7 @@ export function actualizarPerfilUsuario(
       datos.nuevaContrasena.length < 6
     ) {
       throw new Error(
-        'La nueva contraseÃ±a debe tener al menos 6 caracteres.',
+        'La nueva contraseña debe tener al menos 6 caracteres.',
       )
     }
 
@@ -76,7 +76,7 @@ export function actualizarPerfilUsuario(
       datos.confirmarContrasena
     ) {
       throw new Error(
-        'La confirmaciÃ³n no coincide con la nueva contraseÃ±a.',
+        'La confirmación no coincide con la nueva contraseña.',
       )
     }
 
@@ -85,7 +85,7 @@ export function actualizarPerfilUsuario(
       datos.contrasenaActual
     ) {
       throw new Error(
-        'La nueva contraseÃ±a debe ser diferente de la contraseÃ±a actual.',
+        'La nueva contraseña debe ser diferente de la contraseña actual.',
       )
     }
   }

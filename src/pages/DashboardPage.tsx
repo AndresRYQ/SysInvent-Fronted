@@ -65,7 +65,7 @@ const modules: Module[] = [
   {
     id: 'proveedores',
     title: 'Proveedores',
-    description: 'AdministraciÃ³n de proveedores.',
+    description: 'Administración de proveedores.',
     icon: 'users',
     tone: 'green',
     category: 'Maestros',
@@ -74,7 +74,7 @@ const modules: Module[] = [
   {
     id: 'productos',
     title: 'Productos',
-    description: 'AdministraciÃ³n de productos.',
+    description: 'Administración de productos.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -82,7 +82,7 @@ const modules: Module[] = [
   },
   {
     id: 'bitacora',
-    title: 'BitÃ¡cora',
+    title: 'Bitácora',
     description: 'Consulta de actividades y cambios.',
     icon: 'audit',
     tone: 'violet',
@@ -92,7 +92,7 @@ const modules: Module[] = [
   {
     id: 'contactos',
     title: 'Contactos',
-    description: 'AdministraciÃ³n de contactos.',
+    description: 'Administración de contactos.',
     icon: 'users',
     tone: 'green',
     category: 'Maestros',
@@ -101,7 +101,7 @@ const modules: Module[] = [
   {
     id: 'partes-equipo',
     title: 'Partes de equipo',
-    description: 'AdministraciÃ³n de partes de equipo.',
+    description: 'Administración de partes de equipo.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -109,7 +109,7 @@ const modules: Module[] = [
   },
   {
     id: 'control-almacen',
-    title: 'Control de almacÃ©n',
+    title: 'Control de almacén',
     description: 'Control de inventario y movimientos.',
     icon: 'box',
     tone: 'green',
@@ -119,7 +119,7 @@ const modules: Module[] = [
   {
     id: 'vales-consumo',
     title: 'Vales de consumo',
-    description: 'AdministraciÃ³n de vales de consumo.',
+    description: 'Administración de vales de consumo.',
     icon: 'order',
     tone: 'green',
     category: 'Inventario',
@@ -127,7 +127,7 @@ const modules: Module[] = [
   },
   {
     id: 'ingresos-almacen',
-    title: 'Ingresos de AlmacÃ©n',
+    title: 'Ingresos de Almacén',
     description: 'Registro de ingresos.',
     icon: 'entry',
     tone: 'green',
@@ -155,7 +155,7 @@ const modules: Module[] = [
   {
     id: 'reporte-productos',
     title: 'Reporte acumulado',
-    description: 'Consulta de productos mÃ¡s solicitados.',
+    description: 'Consulta de productos más solicitados.',
     icon: 'chart',
     tone: 'blue',
     category: 'Reportes',
@@ -173,8 +173,8 @@ const modules: Module[] = [
   },
   {
     id: 'categorias',
-    title: 'CategorÃ­as',
-    description: 'GestiÃ³n de categorÃ­as.',
+    title: 'Categorías',
+    description: 'Gestión de categorías.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -183,7 +183,7 @@ const modules: Module[] = [
   {
     id: 'tipos-producto',
     title: 'Tipos de producto',
-    description: 'AdministraciÃ³n de tipos de producto.',
+    description: 'Administración de tipos de producto.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -192,7 +192,7 @@ const modules: Module[] = [
   {
     id: 'tipos-documento',
     title: 'Tipos de documento',
-    description: 'AdministraciÃ³n de tipos de documento.',
+    description: 'Administración de tipos de documento.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -201,7 +201,7 @@ const modules: Module[] = [
   {
     id: 'unidades-medida',
     title: 'Unidades de medida',
-    description: 'AdministraciÃ³n de unidades de medida.',
+    description: 'Administración de unidades de medida.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -210,7 +210,7 @@ const modules: Module[] = [
   {
     id: 'destinos',
     title: 'Destinos',
-    description: 'AdministraciÃ³n de destinos.',
+    description: 'Administración de destinos.',
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
@@ -219,7 +219,7 @@ const modules: Module[] = [
   {
     id: 'usuarios',
     title: 'Usuarios',
-    description: 'AdministraciÃ³n de usuarios.',
+    description: 'Administración de usuarios.',
     icon: 'users',
     tone: 'violet',
     category: 'Seguridad',
@@ -228,7 +228,7 @@ const modules: Module[] = [
   {
     id: 'roles',
     title: 'Roles',
-    description: 'GestiÃ³n de roles.',
+    description: 'Gestión de roles.',
     icon: 'users',
     tone: 'violet',
     category: 'Seguridad',
@@ -237,7 +237,7 @@ const modules: Module[] = [
   {
     id: 'perfil-usuario',
     title: 'Perfil de usuario',
-    description: 'Consulta y ediciÃ³n del perfil del usuario.',
+    description: 'Consulta y edición del perfil del usuario.',
     icon: 'users',
     tone: 'teal',
     category: 'Perfil',
@@ -396,14 +396,14 @@ function DashboardPage() {
       tone: 'green',
     },
     {
-      label: 'Stock crÃ­tico',
+      label: 'Stock crítico',
       value:
         resumenDashboard
           .productosStockBajo +
         resumenDashboard
           .productosSinStock,
       detail:
-        'Requieren reposiciÃ³n',
+        'Requieren reposición',
       status: 'alert',
       icon: 'clipboard',
       tone: 'orange',
@@ -537,13 +537,13 @@ const filteredModules =
             <h1>Bienvenido, {nombreSaludo}</h1>
 
             <p className="hero-subtitle">
-              Sistema de Control de AlmacÃ©n
+              Sistema de Control de Almacén
             </p>
 
             <p className="hero-description">
               Consulta y administra el inventario,
               los ingresos, los vales de consumo
-              y los reportes del almacÃ©n.
+              y los reportes del almacén.
             </p>
             <p className="hero-date">
               {fechaActual}
@@ -563,7 +563,7 @@ const filteredModules =
 
             <div>
               <small>Estado del sistema</small>
-              <strong>OperaciÃ³n normal</strong>
+              <strong>Operación normal</strong>
             </div>
           </div>
 
@@ -574,7 +574,7 @@ const filteredModules =
             </div>
 
             <div>
-              <span>SesiÃ³n</span>
+              <span>Sesión</span>
               <strong>Activa</strong>
             </div>
 
@@ -657,7 +657,7 @@ const filteredModules =
                 Actividad reciente
               </span>
 
-              <h2>Ãšltimos movimientos</h2>
+              <h2>Últimos movimientos</h2>
             </div>
           </header>
 
@@ -713,19 +713,19 @@ const filteredModules =
             Accesos del sistema
           </span>
 
-          <h2>MÃ³dulos del sistema</h2>
+          <h2>Módulos del sistema</h2>
 
           <p>
-            Selecciona una categorÃ­a para consultar
-            los mÃ³dulos disponibles.
+            Selecciona una categoría para consultar
+            los módulos disponibles.
           </p>
         </div>
 
         <span className="modules-count">
           {filteredModules.length}{' '}
           {filteredModules.length === 1
-            ? 'mÃ³dulo'
-            : 'mÃ³dulos'}
+            ? 'módulo'
+            : 'módulos'}
         </span>
       </section>
 
@@ -757,18 +757,18 @@ const filteredModules =
                 className={`module-action tone-${module.tone}`}
                 type="button"
                 disabled={!module.route}
-                title={!module.route ? 'MÃ³dulo en desarrollo' : undefined}
+                title={!module.route ? 'Módulo en desarrollo' : undefined}
                 onClick={() => manejarAbrirModulo(module)}
               >
-                {module.route ? 'Abrir mÃ³dulo' : 'En desarrollo'}
-                {module.route && <span aria-hidden="true">â†’</span>}
+                {module.route ? 'Abrir módulo' : 'En desarrollo'}
+                {module.route && <span aria-hidden="true">→</span>}
               </button>
             </SpotlightCard>
           </AnimatedContent>
         ))}
       </section>
       <footer className="dashboard-footer">
-        Â© 2026 AGRIHUSAC. Todos los derechos reservados.
+        © 2026 AGRIHUSAC. Todos los derechos reservados.
       </footer>
     </main>
   )

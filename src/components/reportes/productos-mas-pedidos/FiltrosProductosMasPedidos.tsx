@@ -65,7 +65,7 @@ export function FiltrosProductosMasPedidos({
               type="search"
               className="form-control maestro-control"
               value={valores.busqueda}
-              placeholder="CÃ³digo, producto, tipo o categorÃ­a"
+              placeholder="Código, producto, tipo o categoría"
               onChange={(event) =>
                 onChange(
                   'busqueda',
@@ -168,7 +168,7 @@ export function FiltrosProductosMasPedidos({
               className="form-label maestro-label"
               htmlFor="productoPedidoCategoria"
             >
-              CategorÃ­a
+              Categoría
             </label>
 
             <select
@@ -183,7 +183,7 @@ export function FiltrosProductosMasPedidos({
               }
             >
               <option value="">
-                Todas las categorÃ­as
+                Todas las categorías
               </option>
 
               {categorias.map(
