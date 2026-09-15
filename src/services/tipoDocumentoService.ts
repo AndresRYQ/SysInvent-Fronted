@@ -1,9 +1,69 @@
 import type { TipoDocumento, TipoDocumentoFormData } from '../types/tipoDocumento'
 import { registrarEventoBitacora } from './bitacoraService'
 const STORAGE_KEY = 'agrihusac_tipos_documento'
+const TIPOS_DOCUMENTO_INICIALES: TipoDocumento[] = [
+  {
+    id: 1,
+    nombre: 'Factura',
+    descripcion:
+      'Comprobante de compra que permite sustentar el crédito fiscal.',
+    activo: 1,
+    fechaRegistro: '10/08/2026',
+  },
+  {
+    id: 2,
+    nombre: 'Boleta de venta',
+    descripcion:
+      'Comprobante emitido en operaciones con consumidores finales.',
+    activo: 1,
+    fechaRegistro: '11/08/2026',
+  },
+  {
+    id: 3,
+    nombre: 'Guía de remisión',
+    descripcion:
+      'Documento que sustenta el traslado de bienes.',
+    activo: 1,
+    fechaRegistro: '12/08/2026',
+  },
+  {
+    id: 4,
+    nombre: 'Nota de crédito',
+    descripcion:
+      'Documento utilizado para modificar o anular una operación.',
+    activo: 1,
+    fechaRegistro: '13/08/2026',
+  },
+  {
+    id: 5,
+    nombre: 'Orden de compra',
+    descripcion:
+      'Documento que formaliza una solicitud de adquisición.',
+    activo: 0,
+    fechaRegistro: '14/08/2026',
+  },
+]
 type RegistroGuardado = Partial<TipoDocumento> & { id?: number | string; estado?: boolean }
 function normalizarRegistro(r: RegistroGuardado): TipoDocumento | null { const id = typeof r.id === 'number' ? r.id : Number(String(r.id ?? '').replace(/^TD-/, '')); if (!Number.isInteger(id) || id <= 0 || !String(r.nombre ?? '').trim()) return null; return { id, nombre: String(r.nombre).trim(), descripcion: String(r.descripcion ?? '').trim(), activo: r.activo === 0 || r.activo === 1 ? r.activo : r.estado === false ? 0 : 1 } }
-function leer(): TipoDocumento[] { try { const datos: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]'); return Array.isArray(datos) ? datos.map((item) => normalizarRegistro(item as RegistroGuardado)).filter((item): item is TipoDocumento => item !== null) : [] } catch { return [] } }
+function leer(): TipoDocumento[] {
+  try {
+    const datosGuardados = localStorage.getItem(STORAGE_KEY)
+
+    if (!datosGuardados) {
+      guardar(TIPOS_DOCUMENTO_INICIALES)
+      return TIPOS_DOCUMENTO_INICIALES.map((item) => ({ ...item }))
+    }
+
+    const datos: unknown = JSON.parse(datosGuardados)
+    return Array.isArray(datos)
+      ? datos
+          .map((item) => normalizarRegistro(item as RegistroGuardado))
+          .filter((item): item is TipoDocumento => item !== null)
+      : []
+  } catch {
+    return []
+  }
+}
 function guardar(datos: TipoDocumento[]): void { localStorage.setItem(STORAGE_KEY, JSON.stringify(datos)) }
 function normalizar(valor: string): string { return valor.trim().toLowerCase() }
 function validar(datos: TipoDocumentoFormData): void { const nombre = datos.nombre.trim(); const descripcion = datos.descripcion.trim(); if (!nombre) throw new Error('El nombre del tipo de documento es obligatorio.'); if (nombre.length < 2) throw new Error('El nombre debe tener al menos 2 caracteres.'); if (nombre.length > 80) throw new Error('El nombre no puede superar los 80 caracteres.'); if (!descripcion) throw new Error('La descripción es obligatoria.'); if (descripcion.length > 250) throw new Error('La descripción no puede superar los 250 caracteres.') }
