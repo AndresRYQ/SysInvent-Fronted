@@ -62,7 +62,7 @@ export function ReportesKardexPage() {
           { label: 'Movimientos encontrados', valor: movimientos.length, Icon: ListFilter },
           { label: 'Movimientos de entrada', valor: movimientos.filter((m) => m.tipo === 'Entrada').length, Icon: ArrowDownToLine },
           { label: 'Movimientos de salida', valor: movimientos.filter((m) => m.tipo === 'Salida').length, Icon: ArrowUpFromLine },
-        ].map(({ label, valor, Icon }) => <article className="maestro-table-card kardex-stat" key={label}>
+        ].map(({ label, valor, Icon }) => <article className="table-card kardex-stat" key={label}>
           <Icon size={22} aria-hidden="true" /><div><span>{label}</span><strong>{valor}</strong></div>
         </article>)}
       </section>
@@ -79,7 +79,7 @@ export function ReportesKardexPage() {
         {rangoInvalido && <p id="error-fechas" className="text-danger mt-3 mb-0" role="alert">La fecha desde debe ser anterior o igual a la fecha hasta.</p>}
       </section>
 
-      <section className="maestro-table-card kardex-panel" aria-labelledby="stock-actual">
+      <section className="table-card kardex-panel" aria-labelledby="stock-actual">
         <h2 id="stock-actual"><Boxes size={20} aria-hidden="true" /> Stock actual por producto</h2>
         <p className="kardex-note">Saldo al 04/09/2026. Los filtros de fecha y movimiento no modifican el stock actual.</p>
         <div className="kardex-stock-grid">{productos.map((p) => <article className="kardex-stock" key={p.id}>
@@ -87,7 +87,7 @@ export function ReportesKardexPage() {
         </article>)}</div>
       </section>
 
-      <section className="maestro-table-card kardex-panel" aria-labelledby="movimientos-titulo">
+      <section className="table-card kardex-panel" aria-labelledby="movimientos-titulo">
         <h2 id="movimientos-titulo">Kardex de movimientos</h2>
         <p className="kardex-note" aria-live="polite">{movimientos.length} movimientos · Más recientes primero. El stock corresponde al saldo después de cada movimiento.</p>
         <div className="table-responsive">

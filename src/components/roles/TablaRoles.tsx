@@ -6,6 +6,7 @@ import {
   Users,
 } from 'lucide-react'
 import type { Rol } from '../../types/rol'
+import { EmptyState } from '../common/EmptyState'
 import { TablePagination } from '../ui/TablePagination'
 
 export type RolResumen = Rol
@@ -34,9 +35,9 @@ export function TablaRoles({
   onPageSizeChange,
 }: TablaRolesProps) {
   return (
-    <section className="maestro-table-card card border-0 shadow-sm">
+    <section className="table-card card border-0 shadow-sm">
       <div className="card-body p-0">
-        <div className="maestro-table-header">
+        <div className="table-header">
           <div>
             <span className="maestro-kicker">
               <Users size={16} />
@@ -47,7 +48,7 @@ export function TablaRoles({
           {onAgregar && (
             <button
               type="button"
-              className="btn maestro-toolbar-btn"
+              className="btn table-toolbar-btn"
               onClick={onAgregar}
             >
               <Plus size={18} />
@@ -57,10 +58,10 @@ export function TablaRoles({
         </div>
 
         <div className="table-responsive">
-          <table className="table maestro-table align-middle mb-0">
+          <table className="table standard-table roles-table align-middle mb-0">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>N°</th>
                 <th>Rol</th>
                 <th>Descripción</th>
                 <th>Usuarios</th>
@@ -74,17 +75,17 @@ export function TablaRoles({
 
             <tbody>
               {roles.length > 0 ? (
-                roles.map((rol) => (
+                roles.map((rol, index) => (
                   <tr key={rol.id}>
                     <td>
-                      <span className="maestro-id-chip">
-                        {rol.id}
+                      <span className="table-id-chip">
+                        {(page - 1) * pageSize + index + 1}
                       </span>
                     </td>
 
                     <td>
-                      <div className="maestro-cell-main">
-                        <span className="maestro-cell-icon">
+                      <div className="table-cell-main">
+                        <span className="table-cell-icon">
                           <ShieldCheck size={16} />
                         </span>
                         {rol.nombre}
@@ -94,7 +95,7 @@ export function TablaRoles({
                     <td>{rol.descripcion}</td>
                     <td>{rol.usuarios}</td>
                     <td>
-                      <span className="maestro-id-chip">
+                      <span className="table-id-chip">
                         {rol.modulos.length}
                       </span>
                     </td>
@@ -107,18 +108,21 @@ export function TablaRoles({
                             : 'status-label status-label--inactive'
                         }
                       >
-                        <ShieldCheck size={14} />
+                        <span
+                          className="status-label__dot"
+                          aria-hidden="true"
+                        />
                         {rol.estado ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
 
                     {(onEditar || onEliminar) && (
                       <td>
-                        <div className="maestro-actions">
+                        <div className="table-actions">
                           {onEditar && (
                             <button
                               type="button"
-                              className="btn maestro-action-btn"
+                              className="btn table-action-btn"
                               onClick={() => onEditar(rol)}
                               title="Editar"
                               aria-label={`Editar ${rol.nombre}`}
@@ -130,7 +134,7 @@ export function TablaRoles({
                           {onEliminar && (
                             <button
                               type="button"
-                              className="btn maestro-action-btn maestro-action-btn--danger"
+                              className="btn table-action-btn table-action-btn--danger"
                               onClick={() => onEliminar(rol)}
                               title="Eliminar"
                               aria-label={`Eliminar ${rol.nombre}`}
@@ -146,13 +150,7 @@ export function TablaRoles({
               ) : (
                 <tr>
                   <td colSpan={(onEditar || onEliminar) ? 7 : 6}>
-                    <div className="maestro-empty-state">
-                      <Users size={28} />
-                      <p className="mb-1">No se encontraron roles</p>
-                      <span>
-                        Ajusta los filtros o limpia la búsqueda.
-                      </span>
-                    </div>
+                    <EmptyState icon={Users} iconSize={28} title="No se encontraron roles" description="Ajusta los filtros o limpia la búsqueda." />
                   </td>
                 </tr>
               )}

@@ -158,7 +158,7 @@ export function DetalleMovimientosModal({
           </div>
 
           <div className="table-responsive">
-            <table className="table maestro-table align-middle">
+            <table className="table standard-table align-middle">
               <thead>
                 <tr>
                   <th>Fecha</th>
@@ -254,7 +254,7 @@ export function DetalleMovimientosModal({
                           </td>
 
                           <td>
-                            <span className="maestro-id-chip">
+                            <span className="table-id-chip">
                               {
                                 movimiento.numeroDocumento
                               }

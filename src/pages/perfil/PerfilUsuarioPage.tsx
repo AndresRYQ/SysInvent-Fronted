@@ -339,7 +339,7 @@ export function PerfilUsuarioPage() {
             </div>
 
             <div className="col-12 col-lg-8">
-              <section className="maestro-table-card card border-0 shadow-sm">
+              <section className="table-card card border-0 shadow-sm">
                 <div className="card-body p-4">
                   <div className="mb-4">
                     <span className="maestro-kicker">

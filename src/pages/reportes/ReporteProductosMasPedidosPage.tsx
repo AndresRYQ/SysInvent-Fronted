@@ -242,9 +242,9 @@ export function ReporteProductosMasPedidosPage() {
         </div>
 
         <div className="maestro-panel">
-          <section className="maestro-table-card card border-0 shadow-sm">
+          <section className="table-card card border-0 shadow-sm">
             <div className="card-body p-0">
-              <div className="maestro-table-header">
+              <div className="table-header">
                 <div>
                   <span className="maestro-kicker">
                     <BarChart3 size={16} />

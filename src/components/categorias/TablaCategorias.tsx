@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 
 import type { Categoria } from '../../types/categoria'
+import { EmptyState } from '../common/EmptyState'
 import { TablePagination } from '../ui/TablePagination'
 
 interface TablaCategoriasProps {
@@ -39,9 +40,9 @@ export function TablaCategorias({
   onPageSizeChange,
 }: TablaCategoriasProps) {
   return (
-    <section className="maestro-table-card card border-0 shadow-sm">
+    <section className="table-card card border-0 shadow-sm">
       <div className="card-body p-0">
-        <div className="maestro-table-header">
+        <div className="table-header">
           <div>
             <span className="maestro-kicker">
               <FolderKanban size={16} />
@@ -51,7 +52,7 @@ export function TablaCategorias({
 
           <button
             type="button"
-            className="btn maestro-toolbar-btn"
+            className="btn table-toolbar-btn"
             onClick={onAgregar}
           >
             <Plus size={18} />
@@ -60,7 +61,7 @@ export function TablaCategorias({
         </div>
 
         <div className="table-responsive">
-          <table className="table maestro-table align-middle mb-0">
+          <table className="table standard-table align-middle mb-0">
             <thead>
               <tr>
                 <th>N°</th>
@@ -76,14 +77,14 @@ export function TablaCategorias({
                 categorias.map((categoria) => (
                   <tr key={categoria.id}>
                     <td>
-                      <span className="maestro-id-chip">
+                      <span className="table-id-chip">
                         {categoria.id}
                       </span>
                     </td>
 
                     <td>
-                      <div className="maestro-cell-main">
-                        <span className="maestro-cell-icon">
+                      <div className="table-cell-main">
+                        <span className="table-cell-icon">
                           <Tag size={16} />
                         </span>
                         {categoria.nombre}
@@ -105,10 +106,10 @@ export function TablaCategorias({
                     </td>
 
                     <td>
-                      <div className="maestro-actions">
+                      <div className="table-actions">
                         {categoria.activo === 1 ? <><button
                           type="button"
-                          className="btn maestro-action-btn"
+                          className="btn table-action-btn"
                           onClick={() => onEditar(categoria)}
                           title="Editar"
                           aria-label={`Editar ${categoria.nombre}`}
@@ -118,13 +119,13 @@ export function TablaCategorias({
 
                         <button
                           type="button"
-                          className="btn maestro-action-btn maestro-action-btn--danger"
+                          className="btn table-action-btn table-action-btn--danger"
                           onClick={() => onEliminar(categoria)}
                           title="Eliminar"
                           aria-label={`Eliminar ${categoria.nombre}`}
                         >
                           <Trash2 size={16} />
-                        </button></> : <><button type="button" className="btn maestro-action-btn" onClick={() => onVisualizar?.(categoria)} title="Visualizar" aria-label={`Visualizar ${categoria.nombre}`}><Eye size={16} /></button><button type="button" className="btn maestro-action-btn" onClick={() => onReactivar?.(categoria)} title="Reactivar" aria-label={`Reactivar ${categoria.nombre}`}><RotateCcw size={16} /></button></>}
+                        </button></> : <><button type="button" className="btn table-action-btn" onClick={() => onVisualizar?.(categoria)} title="Visualizar" aria-label={`Visualizar ${categoria.nombre}`}><Eye size={16} /></button><button type="button" className="btn table-action-btn" onClick={() => onReactivar?.(categoria)} title="Reactivar" aria-label={`Reactivar ${categoria.nombre}`}><RotateCcw size={16} /></button></>}
                       </div>
                     </td>
                   </tr>
@@ -132,15 +133,7 @@ export function TablaCategorias({
               ) : (
                 <tr>
                   <td colSpan={5}>
-                    <div className="maestro-empty-state">
-                      <FolderKanban size={28} />
-                      <p className="mb-1">
-                        No se encontraron categorías
-                      </p>
-                      <span>
-                        Ajusta los filtros o limpia la búsqueda.
-                      </span>
-                    </div>
+                    <EmptyState icon={FolderKanban} iconSize={28} title="No se encontraron categorías" description="Ajusta los filtros o limpia la búsqueda." />
                   </td>
                 </tr>
               )}

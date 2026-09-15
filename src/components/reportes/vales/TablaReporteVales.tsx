@@ -57,7 +57,7 @@ export function TablaReporteVales({
 }: TablaReporteValesProps) {
   return (
     <div className="table-responsive">
-      <table className="table maestro-table align-middle mb-0">
+      <table className="table standard-table align-middle mb-0">
         <thead>
           <tr>
             <th>Nro. vale</th>
@@ -97,7 +97,7 @@ export function TablaReporteVales({
                 }
               >
                 <td>
-                  <span className="maestro-id-chip">
+                  <span className="table-id-chip">
                     {fila.numeroVale}
                   </span>
                 </td>

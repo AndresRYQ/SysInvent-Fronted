@@ -36,7 +36,7 @@ export function GraficoProductosMasPedidos({
     0
 
   return (
-    <section className="maestro-table-card card border-0 shadow-sm h-100">
+    <section className="table-card card border-0 shadow-sm h-100">
       <div className="card-body p-3">
         <div className="d-flex align-items-center justify-content-between gap-3 mb-4">
           <span className="maestro-kicker">

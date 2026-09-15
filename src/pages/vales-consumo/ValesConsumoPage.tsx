@@ -21,6 +21,7 @@ import {
 } from 'react-router-dom'
 
 import { TablePagination } from '../../components/ui/TablePagination'
+import { EmptyState } from '../../components/common/EmptyState'
 import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
 import { obtenerCentrosCosto } from '../../services/centroCostoService'
@@ -556,9 +557,9 @@ export function ValesConsumoPage() {
           </div>
 
           <div className="maestro-panel">
-            <section className="maestro-table-card card border-0 shadow-sm">
+            <section className="table-card card border-0 shadow-sm">
               <div className="card-body p-0">
-                <div className="maestro-table-header">
+                <div className="table-header">
                   <span className="maestro-kicker">
                     <ClipboardList size={16} />
                     Listado de vales
@@ -566,7 +567,7 @@ export function ValesConsumoPage() {
 
                   <button
                     type="button"
-                    className="btn maestro-toolbar-btn"
+                    className="btn table-toolbar-btn"
                     onClick={() =>
                       navigate(
                         '/vales-consumo/nuevo',
@@ -579,7 +580,7 @@ export function ValesConsumoPage() {
                 </div>
 
                 <div className="table-responsive">
-                  <table className="table maestro-table align-middle mb-0">
+                  <table className="table standard-table align-middle mb-0">
                     <thead>
                       <tr>
                         <th>Número</th>
@@ -602,21 +603,7 @@ export function ValesConsumoPage() {
                       0 ? (
                         <tr>
                           <td colSpan={10}>
-                            <div className="maestro-empty-state">
-                              <ClipboardList
-                                size={28}
-                              />
-
-                              <p className="mb-1">
-                                No se encontraron
-                                vales
-                              </p>
-
-                              <span>
-                                Registra el primer
-                                vale de consumo.
-                              </span>
-                            </div>
+                            <EmptyState icon={ClipboardList} iconSize={28} title="No se encontraron vales" description="Registra el primer vale de consumo." />
                           </td>
                         </tr>
                       ) : (
@@ -624,7 +611,7 @@ export function ValesConsumoPage() {
                           (vale) => (
                             <tr key={vale.id}>
                               <td>
-                                <span className="maestro-id-chip">
+                                <span className="table-id-chip">
                                   {
                                     vale.numeroVale
                                   }
@@ -709,10 +696,10 @@ export function ValesConsumoPage() {
                               </td>
 
                               <td>
-                                <div className="maestro-actions">
+                                <div className="table-actions">
                                   <button
                                     type="button"
-                                    className="btn maestro-action-btn"
+                                    className="btn table-action-btn"
                                     title="Editar"
                                     disabled={
                                       vale.estado ===
@@ -731,7 +718,7 @@ export function ValesConsumoPage() {
 
                                   <button
                                     type="button"
-                                    className="btn maestro-action-btn maestro-action-btn--danger"
+                                    className="btn table-action-btn table-action-btn--danger"
                                     title="Anular"
                                     disabled={
                                       vale.estado ===

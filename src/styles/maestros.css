@@ -66,8 +66,7 @@
   animation: maestro-fade-up 700ms ease both;
 }
 
-.maestro-filter-card,
-.maestro-table-card {
+.maestro-filter-card {
   border: 1px solid var(--brand-border) !important;
   border-radius: 24px !important;
   background: rgb(255 255 255 / 90%) !important;
@@ -96,139 +95,33 @@
   color: #667085;
 }
 
-.maestro-table-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  padding: 12px 15px;
-}
-
-.maestro-toolbar-btn {
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  gap: 10px;
-  min-height: 42px;
-  padding: 0 18px;
-  border: 0 !important;
-  border-radius: 14px !important;
-  background:
-    linear-gradient(
-      135deg,
-      var(--brand-green-dark) 0%,
-      var(--brand-green) 100%
-    ) !important;
-  color: #fff !important;
-  font-weight: 800 !important;
-  transition:
-    transform 180ms ease,
-    box-shadow 180ms ease;
-}
-
-.maestro-toolbar-btn:hover {
-  transform: translateY(-2px);
-}
-
-.maestro-table thead th {
-  padding: 12px 20px;
-  border: 0;
-  background: #0f5132;
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
-
-.maestro-table thead th:first-child {
-  border-top-left-radius: 18px;
-}
-
-.maestro-table thead th:last-child {
-  border-top-right-radius: 18px;
-}
-
-.maestro-table tbody td {
-  padding: 10px 20px;
-  border-color: rgb(15 23 42 / 6%);
-  color: #1f2937;
-}
-
-.maestro-table tbody td:last-child {
-  width: 120px;
-}
-
-.maestro-table tbody tr {
-  transition:
-    transform 160ms ease,
-    background-color 160ms ease;
-}
-
-.maestro-table tbody tr:nth-child(even) {
-  background: #fbfdfc;
-}
-
-.maestro-table tbody tr:hover {
-  background: #eef8f0;
-  transform: scale(0.997);
-}
-
-.maestro-id-chip {
-  display: inline-flex;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: var(--brand-green-soft);
-  color: var(--brand-slate);
-  font-weight: 700;
-}
-
-.maestro-cell-main {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 700;
-}
-
-.maestro-cell-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  background: #edf7ef;
-  color: var(--brand-green-dark);
-}
-
 /* Centro de costos: los controles no se elevan al pasar el cursor. */
 .centro-costo-page .btn-maestro-primary:hover,
 .centro-costo-page .btn-maestro-info:hover,
 .centro-costo-page .btn-maestro-danger:hover,
-.centro-costo-page .maestro-toolbar-btn:hover,
-.centro-costo-page .maestro-action-btn:hover,
-.centro-costo-page .maestro-page-btn:hover:not(:disabled) {
+.centro-costo-page .table-toolbar-btn:hover,
+.centro-costo-page .table-action-btn:hover,
+.centro-costo-page .table-page-btn:hover:not(:disabled) {
   transform: none !important;
 }
 
-.centro-costo-page .maestro-table tbody tr:hover {
+.centro-costo-page .standard-table tbody tr:hover {
   transform: none !important;
   background: transparent !important;
 }
 
-.centro-costo-page .maestro-table tbody tr:nth-child(even):hover {
+.centro-costo-page .standard-table tbody tr:nth-child(even):hover {
   background: #fbfdfc !important;
 }
 
-.centro-costo-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+.centro-costo-page .table-page-btn:not(.table-page-btn--active):hover:not(:disabled) {
   transform: none !important;
   border-color: rgb(17 24 39 / 10%) !important;
   background: #fff !important;
   box-shadow: none !important;
 }
 
-.centro-costo-page .maestro-page-btn--active:hover:not(:disabled) {
+.centro-costo-page .table-page-btn--active:hover:not(:disabled) {
   transform: none !important;
   border-color: var(--brand-green) !important;
   background: var(--brand-green) !important;
@@ -236,14 +129,14 @@
   box-shadow: none !important;
 }
 
-.categorias-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+.categorias-page .table-page-btn:not(.table-page-btn--active):hover:not(:disabled) {
   transform: none !important;
   border-color: rgb(17 24 39 / 10%) !important;
   background: #fff !important;
   box-shadow: none !important;
 }
 
-.categorias-page .maestro-page-btn--active:hover:not(:disabled) {
+.categorias-page .table-page-btn--active:hover:not(:disabled) {
   transform: none !important;
   border-color: var(--brand-green) !important;
   background: var(--brand-green) !important;
@@ -254,88 +147,49 @@
 .categorias-page .btn-maestro-primary:hover,
 .categorias-page .btn-maestro-info:hover,
 .categorias-page .btn-maestro-danger:hover,
-.categorias-page .maestro-toolbar-btn:hover,
-.categorias-page .maestro-action-btn:hover {
+.categorias-page .table-toolbar-btn:hover,
+.categorias-page .table-action-btn:hover {
   transform: none !important;
 }
 
-.categorias-page .maestro-table tbody tr:hover {
+.categorias-page .standard-table tbody tr:hover {
   transform: none !important;
   background: transparent !important;
 }
 
-.categorias-page .maestro-table tbody tr:nth-child(even):hover {
+.categorias-page .standard-table tbody tr:nth-child(even):hover {
   background: #fbfdfc !important;
 }
 
 .tipos-producto-page .btn-maestro-primary:hover,
 .tipos-producto-page .btn-maestro-info:hover,
 .tipos-producto-page .btn-maestro-danger:hover,
-.tipos-producto-page .maestro-toolbar-btn:hover,
-.tipos-producto-page .maestro-action-btn:hover,
-.tipos-producto-page .maestro-page-btn:hover {
+.tipos-producto-page .table-toolbar-btn:hover,
+.tipos-producto-page .table-action-btn:hover,
+.tipos-producto-page .table-page-btn:hover {
   transform: none !important;
 }
 
-.tipos-producto-page .maestro-table tbody tr:hover {
+.tipos-producto-page .standard-table tbody tr:hover {
   transform: none !important;
   background: transparent !important;
 }
 
-.tipos-producto-page .maestro-table tbody tr:nth-child(even):hover {
+.tipos-producto-page .standard-table tbody tr:nth-child(even):hover {
   background: #fbfdfc !important;
 }
 
-.tipos-producto-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+.tipos-producto-page .table-page-btn:not(.table-page-btn--active):hover:not(:disabled) {
   border-color: rgb(17 24 39 / 10%) !important;
   background: #fff !important;
   box-shadow: none !important;
 }
 
-.tipos-producto-page .maestro-page-btn--active:hover:not(:disabled) {
+.tipos-producto-page .table-page-btn--active:hover:not(:disabled) {
   border-color: var(--brand-green) !important;
   background: var(--brand-green) !important;
   color: #fff !important;
   box-shadow: none !important;
-}
-
-.maestro-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.maestro-action-btn {
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  padding: 0;
-  border: 1px solid rgb(17 24 39 / 10%) !important;
-  border-radius: 12px !important;
-  background: #fff !important;
-  color: #0f5132 !important;
-  transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    background-color 180ms ease;
-}
-
-.maestro-action-btn:hover {
-  transform: translateY(-1px);
-  border-color: rgb(51 143 60 / 30%) !important;
-  background: #eef8f0 !important;
-}
-
-.maestro-action-btn--danger {
-  color: #b42318 !important;
-}
-
-.maestro-action-btn--danger:hover {
-  border-color: rgb(180 35 24 / 25%) !important;
-  background: #fef3f2 !important;
 }
 
 .maestro-modal-backdrop {
@@ -458,87 +312,6 @@
   text-align: center;
 }
 
-.maestro-empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 40px 16px;
-  color: #667085;
-  text-align: center;
-}
-
-.maestro-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 12px;
-  border-top: 1px solid rgb(15 23 42 / 8%);
-}
-
-.maestro-pagination__content {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.maestro-pagination__label {
-  color: #475467;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.maestro-pagination__select {
-  width: 75px;
-  min-height: 35px;
-  border-radius: 12px;
-  font-size: 0.9rem;
-  border-color: rgb(17 24 39 / 10%);
-}
-
-.maestro-pagination__nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.maestro-page-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 35px;
-  height: 35px;
-  padding: 0 10px;
-  border: 1px solid rgb(17 24 39 / 10%);
-  border-radius: 12px;
-  background: #fff;
-  color: #344054;
-  font-weight: 700;
-  font-size: 0.8rem;
-  transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    background-color 180ms ease;
-}
-
-.maestro-page-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  border-color: rgb(51 143 60 / 35%);
-  background: #eef8f0;
-}
-
-.maestro-page-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.maestro-page-btn--active {
-  border-color: var(--brand-green);
-  background: var(--brand-green);
-  color: #fff;
-}
-
 @keyframes maestro-fade-up {
   from {
     opacity: 0;
@@ -552,25 +325,6 @@
 }
 
 @media (max-width: 991px) {
-  .maestro-table-header {
-    padding: 20px 20px 10px;
-  }
-
-  .maestro-table thead th,
-  .maestro-table tbody td {
-    padding: 14px 16px;
-  }
-
-  .maestro-pagination {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .maestro-pagination__content {
-    justify-content: space-between;
-    flex-wrap: wrap;
-  }
-
   .maestro-modal-backdrop {
     padding: 16px;
   }
@@ -674,35 +428,6 @@
     inset 0 1px 2px rgb(15 23 42 / 4%) !important;
 }
 
-.maestro-table-card .maestro-kicker {
-  font-size: 0.8rem;
-}
-
-.maestro-table-card .maestro-section-title {
-  font-size: 0.8rem;
-}
-
-.maestro-table-card .maestro-section-copy {
-  font-size: 0.8rem;
-}
-
-.maestro-table-card .maestro-table thead th {
-  font-size: 0.8rem;
-}
-
-.maestro-table-card .maestro-table td {
-  font-size: 0.8rem;
-}
-
-.maestro-table-card .status-label {
-  font-size: 0.8rem;
-}
-
-.maestro-table-card .btn-maestro {
-  min-height: 38px;
-  font-size: 0.8rem;
-}
-
 .role-permissions-header {
   display: flex;
   align-items: center;
@@ -784,10 +509,10 @@
 .tipos-documento-page .btn-maestro-primary:hover,
 .tipos-documento-page .btn-maestro-info:hover,
 .tipos-documento-page .btn-maestro-danger:hover,
-.tipos-documento-page .maestro-toolbar-btn:hover,
-.tipos-documento-page .maestro-action-btn:hover,
-.tipos-documento-page .maestro-table tbody tr:hover,
-.tipos-documento-page .maestro-pagination .maestro-page-btn:hover {
+.tipos-documento-page .table-toolbar-btn:hover,
+.tipos-documento-page .table-action-btn:hover,
+.tipos-documento-page .standard-table tbody tr:hover,
+.tipos-documento-page .table-pagination .table-page-btn:hover {
   transform: none;
   background-color: inherit;
   border-color: inherit;
@@ -795,7 +520,7 @@
   box-shadow: none;
 }
 
-.tipos-documento-page .maestro-pagination .maestro-page-btn--active:hover {
+.tipos-documento-page .table-pagination .table-page-btn--active:hover {
   background-color: var(--brand-green);
   color: #fff;
 }
@@ -803,10 +528,10 @@
 .unidades-medida-page .btn-maestro-primary:hover,
 .unidades-medida-page .btn-maestro-info:hover,
 .unidades-medida-page .btn-maestro-danger:hover,
-.unidades-medida-page .maestro-toolbar-btn:hover,
-.unidades-medida-page .maestro-action-btn:hover,
-.unidades-medida-page .maestro-table tbody tr:hover,
-.unidades-medida-page .maestro-pagination .maestro-page-btn:hover {
+.unidades-medida-page .table-toolbar-btn:hover,
+.unidades-medida-page .table-action-btn:hover,
+.unidades-medida-page .standard-table tbody tr:hover,
+.unidades-medida-page .table-pagination .table-page-btn:hover {
   transform: none;
   background-color: inherit;
   border-color: inherit;
@@ -814,7 +539,7 @@
   box-shadow: none;
 }
 
-.unidades-medida-page .maestro-pagination .maestro-page-btn--active:hover {
+.unidades-medida-page .table-pagination .table-page-btn--active:hover {
   background-color: var(--brand-green);
   color: #fff;
 }
@@ -822,10 +547,10 @@
 .destinos-page .btn-maestro-primary:hover,
 .destinos-page .btn-maestro-info:hover,
 .destinos-page .btn-maestro-danger:hover,
-.destinos-page .maestro-toolbar-btn:hover,
-.destinos-page .maestro-action-btn:hover,
-.destinos-page .maestro-table tbody tr:hover,
-.destinos-page .maestro-pagination .maestro-page-btn:hover {
+.destinos-page .table-toolbar-btn:hover,
+.destinos-page .table-action-btn:hover,
+.destinos-page .standard-table tbody tr:hover,
+.destinos-page .table-pagination .table-page-btn:hover {
   transform: none;
   background-color: inherit;
   border-color: inherit;
@@ -833,7 +558,7 @@
   box-shadow: none;
 }
 
-.destinos-page .maestro-pagination .maestro-page-btn--active:hover {
+.destinos-page .table-pagination .table-page-btn--active:hover {
   background-color: var(--brand-green);
   color: #fff;
 }
@@ -841,10 +566,10 @@
 .proveedores-page .btn-maestro-primary:hover,
 .proveedores-page .btn-maestro-info:hover,
 .proveedores-page .btn-maestro-danger:hover,
-.proveedores-page .maestro-toolbar-btn:hover,
-.proveedores-page .maestro-action-btn:hover,
-.proveedores-page .maestro-table tbody tr:hover,
-.proveedores-page .maestro-pagination .maestro-page-btn:hover {
+.proveedores-page .table-toolbar-btn:hover,
+.proveedores-page .table-action-btn:hover,
+.proveedores-page .standard-table tbody tr:hover,
+.proveedores-page .table-pagination .table-page-btn:hover {
   transform: none;
   background-color: inherit;
   border-color: inherit;
@@ -852,7 +577,7 @@
   box-shadow: none;
 }
 
-.proveedores-page .maestro-pagination .maestro-page-btn--active:hover {
+.proveedores-page .table-pagination .table-page-btn--active:hover {
   background-color: var(--brand-green);
   color: #fff;
 }
@@ -885,38 +610,38 @@
 .productos-page .btn-maestro-primary:hover,
 .productos-page .btn-maestro-info:hover,
 .productos-page .btn-maestro-danger:hover,
-.productos-page .maestro-toolbar-btn:hover,
-.productos-page .maestro-action-btn:hover,
-.productos-page .maestro-page-btn:hover:not(:disabled) {
+.productos-page .table-toolbar-btn:hover,
+.productos-page .table-action-btn:hover,
+.productos-page .table-page-btn:hover:not(:disabled) {
   transform: none !important;
 }
 
 .productos-page .btn-maestro-primary,
 .productos-page .btn-maestro-info,
 .productos-page .btn-maestro-danger,
-.productos-page .maestro-toolbar-btn,
-.productos-page .maestro-action-btn,
-.productos-page .maestro-page-btn {
+.productos-page .table-toolbar-btn,
+.productos-page .table-action-btn,
+.productos-page .table-page-btn {
   transition: none !important;
 }
 
-.productos-page .maestro-table tbody tr:hover {
+.productos-page .standard-table tbody tr:hover {
   transform: none !important;
   background: transparent !important;
 }
 
-.productos-page .maestro-table tbody tr:nth-child(even):hover {
+.productos-page .standard-table tbody tr:nth-child(even):hover {
   background: #fbfdfc !important;
 }
 
-.productos-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+.productos-page .table-page-btn:not(.table-page-btn--active):hover:not(:disabled) {
   transform: none !important;
   border-color: rgb(17 24 39 / 10%) !important;
   background: #fff !important;
   box-shadow: none !important;
 }
 
-.productos-page .maestro-page-btn--active:hover:not(:disabled) {
+.productos-page .table-page-btn--active:hover:not(:disabled) {
   transform: none !important;
   border-color: var(--brand-green) !important;
   background: var(--brand-green) !important;
@@ -927,29 +652,29 @@
 .partes-equipo-page .btn-maestro-primary:hover,
 .partes-equipo-page .btn-maestro-info:hover,
 .partes-equipo-page .btn-maestro-danger:hover,
-.partes-equipo-page .maestro-toolbar-btn:hover,
-.partes-equipo-page .maestro-action-btn:hover,
-.partes-equipo-page .maestro-page-btn:hover:not(:disabled) {
+.partes-equipo-page .table-toolbar-btn:hover,
+.partes-equipo-page .table-action-btn:hover,
+.partes-equipo-page .table-page-btn:hover:not(:disabled) {
   transform: none !important;
 }
 
-.partes-equipo-page .maestro-table tbody tr:hover {
+.partes-equipo-page .standard-table tbody tr:hover {
   transform: none !important;
   background: transparent !important;
 }
 
-.partes-equipo-page .maestro-table tbody tr:nth-child(even):hover {
+.partes-equipo-page .standard-table tbody tr:nth-child(even):hover {
   background: #fbfdfc !important;
 }
 
-.partes-equipo-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+.partes-equipo-page .table-page-btn:not(.table-page-btn--active):hover:not(:disabled) {
   transform: none !important;
   border-color: rgb(17 24 39 / 10%) !important;
   background: #fff !important;
   box-shadow: none !important;
 }
 
-.partes-equipo-page .maestro-page-btn--active:hover:not(:disabled) {
+.partes-equipo-page .table-page-btn--active:hover:not(:disabled) {
   transform: none !important;
   border-color: var(--brand-green) !important;
   background: var(--brand-green) !important;
@@ -960,9 +685,9 @@
 .partes-equipo-page .btn-maestro-primary,
 .partes-equipo-page .btn-maestro-info,
 .partes-equipo-page .btn-maestro-danger,
-.partes-equipo-page .maestro-toolbar-btn,
-.partes-equipo-page .maestro-action-btn,
-.partes-equipo-page .maestro-page-btn {
+.partes-equipo-page .table-toolbar-btn,
+.partes-equipo-page .table-action-btn,
+.partes-equipo-page .table-page-btn {
   transition: none !important;
 }
 
@@ -978,29 +703,29 @@
   transition: none !important;
 }
 
-.contactos-page .maestro-toolbar-btn:hover,
-.contactos-page .maestro-action-btn:hover,
-.contactos-page .maestro-page-btn:hover:not(:disabled) {
+.contactos-page .table-toolbar-btn:hover,
+.contactos-page .table-action-btn:hover,
+.contactos-page .table-page-btn:hover:not(:disabled) {
   transform: none !important;
 }
 
-.contactos-page .maestro-table tbody tr:hover {
+.contactos-page .standard-table tbody tr:hover {
   transform: none !important;
   background: transparent !important;
 }
 
-.contactos-page .maestro-table tbody tr:nth-child(even):hover {
+.contactos-page .standard-table tbody tr:nth-child(even):hover {
   background: #fbfdfc !important;
 }
 
-.contactos-page .maestro-page-btn:not(.maestro-page-btn--active):hover:not(:disabled) {
+.contactos-page .table-page-btn:not(.table-page-btn--active):hover:not(:disabled) {
   transform: none !important;
   border-color: rgb(17 24 39 / 10%) !important;
   background: #fff !important;
   box-shadow: none !important;
 }
 
-.contactos-page .maestro-page-btn--active:hover:not(:disabled) {
+.contactos-page .table-page-btn--active:hover:not(:disabled) {
   transform: none !important;
   border-color: var(--brand-green) !important;
   background: var(--brand-green) !important;
@@ -1008,9 +733,9 @@
   box-shadow: none !important;
 }
 
-.contactos-page .maestro-toolbar-btn,
-.contactos-page .maestro-action-btn,
-.contactos-page .maestro-page-btn {
+.contactos-page .table-toolbar-btn,
+.contactos-page .table-action-btn,
+.contactos-page .table-page-btn {
   transition: none !important;
 }
 
@@ -1018,17 +743,17 @@
 .vales-consumo-page .btn-maestro-primary:hover,
 .vales-consumo-page .btn-maestro-info:hover,
 .vales-consumo-page .btn-maestro-danger:hover,
-.vales-consumo-page .maestro-toolbar-btn:hover,
-.vales-consumo-page .maestro-action-btn:hover,
-.vales-consumo-page .maestro-page-btn:hover:not(:disabled) {
+.vales-consumo-page .table-toolbar-btn:hover,
+.vales-consumo-page .table-action-btn:hover,
+.vales-consumo-page .table-page-btn:hover:not(:disabled) {
   transform: none !important;
 }
 
 .vales-consumo-page .btn-maestro-primary,
 .vales-consumo-page .btn-maestro-info,
 .vales-consumo-page .btn-maestro-danger,
-.vales-consumo-page .maestro-toolbar-btn,
-.vales-consumo-page .maestro-action-btn,
-.vales-consumo-page .maestro-page-btn {
+.vales-consumo-page .table-toolbar-btn,
+.vales-consumo-page .table-action-btn,
+.vales-consumo-page .table-page-btn {
   transition: none !important;
 }

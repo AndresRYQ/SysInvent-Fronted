@@ -1,6 +1,7 @@
 @import './styles/variables.css';
 @import './styles/labels.css';
 @import './styles/button.css';
+@import './styles/table.css';
 
 :root {
   font-family:

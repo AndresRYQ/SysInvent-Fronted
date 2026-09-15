@@ -9,6 +9,7 @@ import {
 
 import type { ParteEquipo } from '../../types/parteEquipo'
 
+import { EmptyState } from '../common/EmptyState'
 import { TablePagination } from '../ui/TablePagination'
 
 interface TablaPartesEquipoProps {
@@ -51,9 +52,9 @@ export function TablaPartesEquipo({
   onPageSizeChange,
 }: TablaPartesEquipoProps) {
   return (
-    <section className="maestro-table-card card border-0 shadow-sm">
+    <section className="table-card card border-0 shadow-sm">
       <div className="card-body p-0">
-        <div className="maestro-table-header">
+        <div className="table-header">
           <span className="maestro-kicker">
             <Boxes size={16} />
             Listado de partes de equipo
@@ -61,7 +62,7 @@ export function TablaPartesEquipo({
 
           <button
             type="button"
-            className="btn maestro-toolbar-btn"
+            className="btn table-toolbar-btn"
             onClick={onAgregar}
           >
             <Plus size={18} />
@@ -70,7 +71,7 @@ export function TablaPartesEquipo({
         </div>
 
         <div className="table-responsive">
-          <table className="table maestro-table align-middle mb-0">
+          <table className="table standard-table align-middle mb-0">
             <thead>
               <tr>
                 <th>N°</th>
@@ -91,7 +92,7 @@ export function TablaPartesEquipo({
                   (parte) => (
                     <tr key={parte.id}>
                       <td>
-                        <span className="maestro-id-chip">
+                        <span className="table-id-chip">
                           {Number(parte.id)}
                         </span>
                       </td>
@@ -103,8 +104,8 @@ export function TablaPartesEquipo({
                       </td>
 
                       <td>
-                        <div className="maestro-cell-main">
-                          <span className="maestro-cell-icon">
+                        <div className="table-cell-main">
+                          <span className="table-cell-icon">
                             <Boxes
                               size={16}
                             />
@@ -144,10 +145,10 @@ export function TablaPartesEquipo({
                       </td>
 
                       <td>
-                        <div className="maestro-actions">
+                        <div className="table-actions">
                           {parte.estado ? <button
                             type="button"
-                            className="btn maestro-action-btn"
+                            className="btn table-action-btn"
                             title="Editar"
                             aria-label={`Editar ${parte.nombre}`}
                             onClick={() =>
@@ -157,11 +158,11 @@ export function TablaPartesEquipo({
                             <Pencil
                               size={16}
                             />
-                          </button> : <><button type="button" className="btn maestro-action-btn" title="Visualizar" aria-label={`Visualizar ${parte.nombre}`} onClick={() => onVisualizar(parte)}><Eye size={16} /></button><button type="button" className="btn maestro-action-btn" title="Reactivar" aria-label={`Reactivar ${parte.nombre}`} onClick={() => onReactivar(parte)}><RotateCcw size={16} /></button></>}
+                          </button> : <><button type="button" className="btn table-action-btn" title="Visualizar" aria-label={`Visualizar ${parte.nombre}`} onClick={() => onVisualizar(parte)}><Eye size={16} /></button><button type="button" className="btn table-action-btn" title="Reactivar" aria-label={`Reactivar ${parte.nombre}`} onClick={() => onReactivar(parte)}><RotateCcw size={16} /></button></>}
 
                           {parte.estado && <button
                             type="button"
-                            className="btn maestro-action-btn maestro-action-btn--danger"
+                            className="btn table-action-btn table-action-btn--danger"
                             title="Eliminar"
                             aria-label={`Eliminar ${parte.nombre}`}
                             onClick={() =>
@@ -180,19 +181,7 @@ export function TablaPartesEquipo({
               ) : (
                 <tr>
                   <td colSpan={7}>
-                    <div className="maestro-empty-state">
-                      <Boxes size={28} />
-
-                      <p className="mb-1">
-                        No se encontraron partes
-                        de equipo
-                      </p>
-
-                      <span>
-                        Ajusta los filtros o
-                        limpia la búsqueda.
-                      </span>
-                    </div>
+                    <EmptyState icon={Boxes} iconSize={28} title="No se encontraron partes de equipo" description="Ajusta los filtros o limpia la búsqueda." />
                   </td>
                 </tr>
               )}

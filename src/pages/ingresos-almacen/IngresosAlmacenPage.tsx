@@ -21,6 +21,7 @@ import {
 } from 'react-router-dom'
 
 import { TablePagination } from '../../components/ui/TablePagination'
+import { EmptyState } from '../../components/common/EmptyState'
 import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
 import {
@@ -579,9 +580,9 @@ export function IngresosAlmacenPage() {
           </div>
 
           <div className="maestro-panel">
-            <section className="maestro-table-card card border-0 shadow-sm">
+            <section className="table-card card border-0 shadow-sm">
               <div className="card-body p-0">
-                <div className="maestro-table-header">
+                <div className="table-header">
                   <span className="maestro-kicker">
                     <PackagePlus size={16} />
                     Listado de ingresos
@@ -589,7 +590,7 @@ export function IngresosAlmacenPage() {
 
                   <button
                     type="button"
-                    className="btn maestro-toolbar-btn"
+                    className="btn table-toolbar-btn"
                     onClick={() =>
                       navigate(
                         '/ingresos-almacen/nuevo',
@@ -602,7 +603,7 @@ export function IngresosAlmacenPage() {
                 </div>
 
                 <div className="table-responsive">
-                  <table className="table maestro-table align-middle mb-0">
+                  <table className="table standard-table align-middle mb-0">
                     <thead>
                       <tr>
                         <th>Número</th>
@@ -625,19 +626,7 @@ export function IngresosAlmacenPage() {
                       0 ? (
                         <tr>
                           <td colSpan={10}>
-                            <div className="maestro-empty-state">
-                              <PackagePlus
-                                size={28}
-                              />
-                              <p className="mb-1">
-                                No se encontraron
-                                ingresos
-                              </p>
-                              <span>
-                                Registra el primer
-                                ingreso de mercadería.
-                              </span>
-                            </div>
+                            <EmptyState icon={PackagePlus} iconSize={28} title="No se encontraron ingresos" description="Registra el primer ingreso de mercadería." />
                           </td>
                         </tr>
                       ) : (
@@ -645,7 +634,7 @@ export function IngresosAlmacenPage() {
                           (ingreso) => (
                             <tr key={ingreso.id}>
                               <td>
-                                <span className="maestro-id-chip">
+                                <span className="table-id-chip">
                                   {
                                     ingreso.numeroIngreso
                                   }
@@ -733,10 +722,10 @@ export function IngresosAlmacenPage() {
                               </td>
 
                               <td>
-                                <div className="maestro-actions">
+                                <div className="table-actions">
                                   <button
                                     type="button"
-                                    className="btn maestro-action-btn"
+                                    className="btn table-action-btn"
                                     title="Editar"
                                     disabled={
                                       ingreso.estado ===
@@ -755,7 +744,7 @@ export function IngresosAlmacenPage() {
 
                                   <button
                                     type="button"
-                                    className="btn maestro-action-btn maestro-action-btn--danger"
+                                    className="btn table-action-btn table-action-btn--danger"
                                     title="Anular"
                                     disabled={
                                       ingreso.estado ===

@@ -57,7 +57,7 @@ export function TablaReporteIngresos({
 }: TablaReporteIngresosProps) {
   return (
     <div className="table-responsive">
-      <table className="table maestro-table align-middle mb-0">
+      <table className="table standard-table align-middle mb-0">
         <thead>
           <tr>
             <th>Nro. ingreso</th>
@@ -95,7 +95,7 @@ export function TablaReporteIngresos({
                 key={`${fila.ingresoId}-${fila.productoId}`}
               >
                 <td>
-                  <span className="maestro-id-chip">
+                  <span className="table-id-chip">
                     {fila.numeroIngreso}
                   </span>
                 </td>

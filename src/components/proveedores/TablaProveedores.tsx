@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 
 import type { Proveedor } from '../../types/proveedor'
+import { EmptyState } from '../common/EmptyState'
 import { TablePagination } from '../ui/TablePagination'
 
 interface TablaProveedoresProps {
@@ -42,9 +43,9 @@ export function TablaProveedores({
   onPageSizeChange,
 }: TablaProveedoresProps) {
   return (
-    <section className="maestro-table-card card border-0 shadow-sm">
+    <section className="table-card card border-0 shadow-sm">
       <div className="card-body p-0">
-        <div className="maestro-table-header">
+        <div className="table-header">
           <span className="maestro-kicker">
             <Building2 size={16} />
             Listado de proveedores
@@ -52,7 +53,7 @@ export function TablaProveedores({
 
           <button
             type="button"
-            className="btn maestro-toolbar-btn"
+            className="btn table-toolbar-btn"
             onClick={onAgregar}
           >
             <Plus size={18} />
@@ -61,7 +62,7 @@ export function TablaProveedores({
         </div>
 
         <div className="table-responsive">
-          <table className="table maestro-table align-middle mb-0">
+          <table className="table standard-table align-middle mb-0">
             <thead>
               <tr>
                 <th>N°</th>
@@ -82,7 +83,7 @@ export function TablaProveedores({
                   (proveedor) => (
                     <tr key={proveedor.id}>
                       <td>
-                        <span className="maestro-id-chip">
+                        <span className="table-id-chip">
                           {proveedor.id}
                         </span>
                       </td>
@@ -90,8 +91,8 @@ export function TablaProveedores({
                       <td>{proveedor.ruc}</td>
 
                       <td>
-                        <div className="maestro-cell-main">
-                          <span className="maestro-cell-icon">
+                        <div className="table-cell-main">
+                          <span className="table-cell-icon">
                             <Building2
                               size={16}
                             />
@@ -136,10 +137,10 @@ export function TablaProveedores({
                       </td>
 
                       <td>
-                        <div className="maestro-actions">
+                        <div className="table-actions">
                         {proveedor.activo === 1 ? <><button
                             type="button"
-                            className="btn maestro-action-btn"
+                            className="btn table-action-btn"
                             title="Editar"
                             aria-label={`Editar ${proveedor.razonSocial}`}
                             onClick={() =>
@@ -153,7 +154,7 @@ export function TablaProveedores({
 
                           <button
                             type="button"
-                            className="btn maestro-action-btn maestro-action-btn--danger"
+                            className="btn table-action-btn table-action-btn--danger"
                           title="Desactivar"
                             aria-label={`Eliminar ${proveedor.razonSocial}`}
                             onClick={() =>
@@ -163,7 +164,7 @@ export function TablaProveedores({
                             }
                           >
                             <Trash2 size={16} />
-                        </button></> : <><button type="button" className="btn maestro-action-btn" title="Visualizar" onClick={() => onVisualizar(proveedor)}><Eye size={16} /></button><button type="button" className="btn maestro-action-btn" title="Reactivar" onClick={() => onReactivar(proveedor)}><RotateCcw size={16} /></button></>}
+                        </button></> : <><button type="button" className="btn table-action-btn" title="Visualizar" onClick={() => onVisualizar(proveedor)}><Eye size={16} /></button><button type="button" className="btn table-action-btn" title="Reactivar" onClick={() => onReactivar(proveedor)}><RotateCcw size={16} /></button></>}
                         </div>
                       </td>
                     </tr>
@@ -172,17 +173,7 @@ export function TablaProveedores({
               ) : (
                 <tr>
                   <td colSpan={7}>
-                    <div className="maestro-empty-state">
-                      <Building2 size={28} />
-
-                      <p className="mb-1">
-                        No se encontraron proveedores
-                      </p>
-
-                      <span>
-                        Ajusta los filtros o registra un proveedor.
-                      </span>
-                    </div>
+                    <EmptyState icon={Building2} iconSize={28} title="No se encontraron proveedores" description="Ajusta los filtros o registra un proveedor." />
                   </td>
                 </tr>
               )}

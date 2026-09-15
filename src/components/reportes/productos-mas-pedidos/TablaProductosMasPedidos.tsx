@@ -43,7 +43,7 @@ export function TablaProductosMasPedidos({
 }: TablaProductosMasPedidosProps) {
   return (
     <div className="table-responsive">
-      <table className="table maestro-table align-middle mb-0">
+      <table className="table standard-table align-middle mb-0">
         <thead>
           <tr>
             <th className="text-center">

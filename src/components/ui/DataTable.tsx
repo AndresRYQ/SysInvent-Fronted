@@ -1,6 +1,8 @@
 
 import type { Key, ReactNode } from 'react'
+import { Inbox } from 'lucide-react'
 import '../../styles/maestros.css'
+import { EmptyState } from '../common/EmptyState'
 
 export interface DataTableColumn<T> {
   key: string
@@ -22,11 +24,11 @@ export interface DataTableProps<T> {
 /** El módulo entrega las filas filtradas y paginadas. */
 export function DataTable<T>({ data, columns, rowKey, caption, emptyMessage = 'No se encontraron registros.', loading = false, className = '' }: DataTableProps<T>) {
   return <div className="table-responsive" aria-busy={loading}>
-    <table className={`table maestro-table align-middle mb-0 ${className}`}>
+    <table className={`table standard-table align-middle mb-0 ${className}`}>
       <caption className="visually-hidden">{caption}</caption>
       <thead><tr>{columns.map((column) => <th scope="col" key={column.key} className={column.className}>{column.header}</th>)}</tr></thead>
       <tbody>{loading || !data.length
-        ? <tr><td colSpan={Math.max(1, columns.length)}><div className="maestro-empty-state" role="status">{loading ? 'Cargando registros…' : emptyMessage}</div></td></tr>
+        ? <tr><td colSpan={Math.max(1, columns.length)}><EmptyState icon={Inbox} iconSize={28} title={loading ? 'Cargando registros…' : String(emptyMessage)} description={loading ? 'Procesando información.' : 'Ajusta los filtros o registra un nuevo elemento.'} /></td></tr>
         : data.map((row) => <tr key={rowKey(row)}>{columns.map((column) => <td key={column.key} className={column.className}>{column.render(row)}</td>)}</tr>)}</tbody>
     </table>
   </div>

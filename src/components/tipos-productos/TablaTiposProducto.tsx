@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 
 import type { TipoProducto } from '../../types/tipoProducto'
+import { EmptyState } from '../common/EmptyState'
 import { TablePagination } from '../ui/TablePagination'
 
 interface TablaTiposProductoProps {
@@ -39,9 +40,9 @@ export function TablaTiposProducto({
   onPageSizeChange,
 }: TablaTiposProductoProps) {
   return (
-    <section className="maestro-table-card card border-0 shadow-sm">
+    <section className="table-card card border-0 shadow-sm">
       <div className="card-body p-0">
-        <div className="maestro-table-header">
+        <div className="table-header">
           <div>
             <span className="maestro-kicker">
               <FolderKanban size={16} />
@@ -51,7 +52,7 @@ export function TablaTiposProducto({
 
           <button
             type="button"
-            className="btn maestro-toolbar-btn"
+            className="btn table-toolbar-btn"
             onClick={onAgregar}
           >
             <Plus size={18} />
@@ -60,7 +61,7 @@ export function TablaTiposProducto({
         </div>
 
         <div className="table-responsive">
-          <table className="table maestro-table align-middle mb-0">
+          <table className="table standard-table align-middle mb-0">
             <thead>
               <tr>
                 <th>N°</th>
@@ -76,14 +77,14 @@ export function TablaTiposProducto({
                 tiposProducto.map((tipoProducto) => (
                   <tr key={tipoProducto.id}>
                     <td>
-                      <span className="maestro-id-chip">
+                      <span className="table-id-chip">
                         {tipoProducto.id}
                       </span>
                     </td>
 
                     <td>
-                      <div className="maestro-cell-main">
-                        <span className="maestro-cell-icon">
+                      <div className="table-cell-main">
+                        <span className="table-cell-icon">
                           <Tags size={16} />
                         </span>
                         {tipoProducto.nombre}
@@ -105,10 +106,10 @@ export function TablaTiposProducto({
                     </td>
 
                     <td>
-                      <div className="maestro-actions">
+                      <div className="table-actions">
                         {tipoProducto.activo === 1 ? <><button
                           type="button"
-                          className="btn maestro-action-btn"
+                          className="btn table-action-btn"
                           onClick={() => onEditar(tipoProducto)}
                           title="Editar"
                           aria-label={`Editar ${tipoProducto.nombre}`}
@@ -118,13 +119,13 @@ export function TablaTiposProducto({
 
                         <button
                           type="button"
-                          className="btn maestro-action-btn maestro-action-btn--danger"
+                          className="btn table-action-btn table-action-btn--danger"
                           onClick={() => onEliminar(tipoProducto)}
                           title="Eliminar"
                           aria-label={`Eliminar ${tipoProducto.nombre}`}
                         >
                           <Trash2 size={16} />
-                        </button></> : <><button type="button" className="btn maestro-action-btn" onClick={() => onVisualizar(tipoProducto)} title="Visualizar" aria-label={`Visualizar ${tipoProducto.nombre}`}><Eye size={16} /></button><button type="button" className="btn maestro-action-btn" onClick={() => onReactivar(tipoProducto)} title="Reactivar" aria-label={`Reactivar ${tipoProducto.nombre}`}><RotateCcw size={16} /></button></>}
+                        </button></> : <><button type="button" className="btn table-action-btn" onClick={() => onVisualizar(tipoProducto)} title="Visualizar" aria-label={`Visualizar ${tipoProducto.nombre}`}><Eye size={16} /></button><button type="button" className="btn table-action-btn" onClick={() => onReactivar(tipoProducto)} title="Reactivar" aria-label={`Reactivar ${tipoProducto.nombre}`}><RotateCcw size={16} /></button></>}
                       </div>
                     </td>
                   </tr>
@@ -132,15 +133,7 @@ export function TablaTiposProducto({
               ) : (
                 <tr>
                   <td colSpan={5}>
-                    <div className="maestro-empty-state">
-                      <FolderKanban size={28} />
-                      <p className="mb-1">
-                        No se encontraron tipos de producto
-                      </p>
-                      <span>
-                        Ajusta los filtros o limpia la búsqueda.
-                      </span>
-                    </div>
+                    <EmptyState icon={FolderKanban} iconSize={28} title="No se encontraron tipos de producto" description="Ajusta los filtros o limpia la búsqueda." />
                   </td>
                 </tr>
               )}

@@ -820,7 +820,7 @@ export function ExportarValesExcelButton({
     <div>
       <button
         type="button"
-        className="btn maestro-toolbar-btn"
+        className="btn table-toolbar-btn"
         disabled={
           exportando ||
           filas.length === 0

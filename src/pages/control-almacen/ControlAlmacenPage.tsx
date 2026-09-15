@@ -15,6 +15,7 @@ import {
 import Select from 'react-select'
 
 import { DetalleMovimientosModal } from '../../components/control-almacen/DetalleMovimientosModal'
+import { EmptyState } from '../../components/common/EmptyState'
 import { TablePagination } from '../../components/ui/TablePagination'
 
 import { obtenerCategorias } from '../../services/categoriaService'
@@ -526,9 +527,9 @@ export function ControlAlmacenPage() {
           </div>
 
           <div className="maestro-panel">
-            <section className="maestro-table-card card border-0 shadow-sm">
+            <section className="table-card card border-0 shadow-sm">
               <div className="card-body p-0">
-                <div className="maestro-table-header">
+                <div className="table-header">
                   <span className="maestro-kicker">
                     <Boxes size={16} />
                     Existencias por producto
@@ -536,7 +537,7 @@ export function ControlAlmacenPage() {
                 </div>
 
                 <div className="table-responsive">
-                  <table className="table maestro-table align-middle mb-0">
+                  <table className="table standard-table align-middle mb-0">
                     <thead>
                       <tr>
                         <th>Código</th>
@@ -558,19 +559,7 @@ export function ControlAlmacenPage() {
                       0 ? (
                         <tr>
                           <td colSpan={9}>
-                            <div className="maestro-empty-state">
-                              <Boxes size={28} />
-
-                              <p className="mb-1">
-                                No se encontraron
-                                productos
-                              </p>
-
-                              <span>
-                                Ajusta los filtros del
-                                control.
-                              </span>
-                            </div>
+                            <EmptyState icon={Boxes} iconSize={28} title="No se encontraron productos" description="Ajusta los filtros del control." />
                           </td>
                         </tr>
                       ) : (
@@ -582,7 +571,7 @@ export function ControlAlmacenPage() {
                               }
                             >
                               <td>
-                                <span className="maestro-id-chip">
+                                <span className="table-id-chip">
                                   {
                                     producto.codigo
                                   }
@@ -669,10 +658,10 @@ export function ControlAlmacenPage() {
                               </td>
 
                               <td>
-                                <div className="maestro-actions">
+                                <div className="table-actions">
                                   <button
                                     type="button"
-                                    className="btn maestro-action-btn"
+                                    className="btn table-action-btn"
                                     title="Ver movimientos"
                                     onClick={() =>
                                       setProductoSeleccionado(

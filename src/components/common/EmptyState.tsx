@@ -14,7 +14,7 @@ export function EmptyState({
   iconSize = 38,
 }: EmptyStateProps) {
   return (
-    <div className="maestro-empty-state" role="status">
+    <div className="table-empty-state" role="status">
       <Icon size={iconSize} />
       <strong>{title}</strong>
       <span>{description}</span>

@@ -49,7 +49,7 @@ type MotivoCierre =
   | 'vencimiento'
 
 const TIEMPO_INACTIVIDAD_MS =
-  2 * 60 * 1000
+  60 * 60 * 1000
 
 const MOTIVO_CIERRE_KEY =
   'agrihusac_motivo_cierre'
@@ -78,9 +78,9 @@ export function AuthProvider({
 
       const detalle =
         motivo === 'inactividad'
-          ? 'La sesión se cerró después de 2 minutos de inactividad.'
+          ? 'La sesión se cerró después de 1 hora de inactividad.'
           : motivo === 'vencimiento'
-            ? 'La sesión se cerró al alcanzar el tiempo máximo de 5 minutos.'
+            ? 'La sesión se cerró al alcanzar el tiempo máximo de 1 hora.'
             : 'El usuario cerró la sesión manualmente.'
 
       cerrarSesion(detalle)
@@ -136,7 +136,7 @@ export function AuthProvider({
 
   /*
    * Cierra automáticamente la sesión
-   * cuando se cumplen los 5 minutos.
+   * cuando se cumple la hora.
    */
   useEffect(() => {
     if (!sesion) {
@@ -181,7 +181,7 @@ export function AuthProvider({
 
   /*
    * Cierra la sesión después de
-   * 2 minutos sin actividad.
+   * 1 hora sin actividad.
    */
   useEffect(() => {
     if (!sesion) {

@@ -40,7 +40,7 @@ export function Modal({ open, title, onClose, children, footer, size = 'md', clo
     }}>
     <div className="ui-modal-header">
       <h2 id={titleId} className="maestro-modal-title">{title}</h2>
-      <button type="button" className="btn maestro-action-btn" onClick={onClose} aria-label="Cerrar ventana"><X size={20} /></button>
+      <button type="button" className="btn table-action-btn" onClick={onClose} aria-label="Cerrar ventana"><X size={20} /></button>
     </div>
     <div>{children}</div>
     {footer && <div className="maestro-modal-footer">{footer}</div>}

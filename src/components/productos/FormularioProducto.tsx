@@ -359,7 +359,7 @@ export function FormularioProducto({
     >
       <div className="card-header bg-white border-bottom p-4">
         <div className="d-flex align-items-center gap-3">
-          <span className="maestro-cell-icon">
+          <span className="table-cell-icon">
             <Package size={20} />
           </span>
 

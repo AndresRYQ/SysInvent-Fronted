@@ -16,7 +16,7 @@ import {
   STORAGE_KEYS,
 } from './storageService'
 
-const DURACION_SESION_MINUTOS = 5
+const DURACION_SESION_MINUTOS = 60
 const MAXIMO_INTENTOS = 3
 const DURACION_BLOQUEO_MINUTOS = 5
 
@@ -338,7 +338,7 @@ export function obtenerSesion():
 
   if (fechaInvalida || sesionVencida) {
     cerrarSesion(
-      'La sesión se cerró al alcanzar el tiempo máximo de 5 minutos.',
+      'La sesión se cerró al alcanzar el tiempo máximo de 1 hora.',
     )
     return null
   }
