@@ -68,7 +68,7 @@ input {
   .form-control,
   .form-select,
   select,
-  input:not([type='checkbox']):not([type='radio']):not([type='file'])
+  input:not([type='checkbox']):not([type='radio']):not([type='file']):not([class*='__input'])
 ) {
   min-height: var(--form-control-height);
   height: var(--form-control-height);
@@ -89,7 +89,7 @@ input {
   .form-control,
   .form-select,
   select,
-  input:not([type='checkbox']):not([type='radio']):not([type='file'])
+  input:not([type='checkbox']):not([type='radio']):not([type='file']):not([class*='__input'])
 ):focus {
   border-color: var(--color-green-focus) !important;
   background: var(--color-white);
@@ -118,7 +118,7 @@ a {
 }
 
 button:focus-visible,
-input:focus-visible {
+input:not([class*='__input']):focus-visible {
   outline: 3px solid var(--color-green-outline);
   outline-offset: 2px;
 }

@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import {
   useEffect,
   useMemo,
@@ -406,7 +407,7 @@ export function ValesConsumoPage() {
                     <input
                       id="valeBusqueda"
                       className="form-control maestro-control"
-                      placeholder="Vale, solicitante, producto o destino"
+                      placeholder={Placeholder.Buscar}
                       value={filtros.busqueda}
                       onChange={(event) =>
                         setFiltros(
@@ -509,7 +510,7 @@ export function ValesConsumoPage() {
                     <input
                       id="valeDesde"
                       className="form-control maestro-control"
-                      type="date"
+                      type="date" placeholder={Placeholder.Fecha}
                       value={filtros.fechaDesde}
                       onChange={(event) =>
                         setFiltros(
@@ -535,7 +536,7 @@ export function ValesConsumoPage() {
                     <input
                       id="valeHasta"
                       className="form-control maestro-control"
-                      type="date"
+                      type="date" placeholder={Placeholder.Fecha}
                       value={filtros.fechaHasta}
                       onChange={(event) =>
                         setFiltros(
@@ -723,8 +724,8 @@ export function ValesConsumoPage() {
                                   className={
                                     vale.estado ===
                                     'REGISTRADO'
-                                      ? 'maestro-status maestro-status--active'
-                                      : 'maestro-status maestro-status--inactive'
+                                      ? 'status-label status-label--active'
+                                      : 'status-label status-label--inactive'
                                   }
                                 >
                                   <ShieldCheck

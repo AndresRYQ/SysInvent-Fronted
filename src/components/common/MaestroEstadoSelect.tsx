@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import Select from 'react-select'
 import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
@@ -19,15 +20,17 @@ export function MaestroEstadoSelect({
   return (
     <Select
       inputId={inputId}
+      classNamePrefix="maestro-select"
       options={opcionesEstado}
       value={
         opcionesEstado.find((opcion) => opcion.value === value) ?? null
       }
       onChange={(opcion) => onChange(opcion?.value ?? '')}
-      placeholder="Seleccionar"
+      placeholder={Placeholder.Seleccionar}
       isClearable
       isSearchable={false}
-      styles={crearEstilosSelect({ zIndex: 10 })}
+
+      menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 10 })}
     />
   )
 }

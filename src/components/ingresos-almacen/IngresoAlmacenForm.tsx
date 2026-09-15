@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import {
   useEffect,
   useMemo,
@@ -499,7 +500,7 @@ export function IngresoAlmacenForm({
           <input
             id="ingresoFecha"
             className="form-control maestro-control"
-            type="date"
+            type="date" placeholder={Placeholder.Fecha}
             value={fechaIngreso}
             onChange={(event) =>
               setFechaIngreso(

@@ -1,5 +1,7 @@
-import { useState } from 'react'
-import { ChevronDown, Filter, RotateCcw, Search } from 'lucide-react'
+import { Placeholder } from '../../constants/placeholders'
+import { Filter, RotateCcw, Search } from 'lucide-react'
+import Select from 'react-select'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
 export interface FiltrosRolesValores {
   busqueda: string
@@ -19,8 +21,6 @@ export function FiltrosRoles({
   onBuscar,
   onLimpiar,
 }: FiltrosRolesProps) {
-  const [estadoAbierto, setEstadoAbierto] = useState(false)
-
   return (
     <section className="maestro-filter-card card border-0 shadow-sm">
       <div className="card-body p-3 p-lg-3">
@@ -44,7 +44,7 @@ export function FiltrosRoles({
               className="form-control"
               type="text"
               value={valores.busqueda}
-              placeholder="Ej. Administrador, Almacenero"
+              placeholder={Placeholder.Buscar}
               onChange={(event) => onChange('busqueda', event.target.value)}
             />
           </div>
@@ -54,28 +54,23 @@ export function FiltrosRoles({
               Estado
             </label>
 
-            <div
-              className={`maestro-select-wrap${estadoAbierto ? ' is-open' : ''}`}
-            >
-              <select
-                id="estadoRol"
-                className="form-select maestro-select-control"
-                value={valores.estado}
-                onMouseDown={() => setEstadoAbierto(true)}
-                onKeyDown={() => setEstadoAbierto(true)}
-                onFocus={() => setEstadoAbierto(true)}
-                onBlur={() => setEstadoAbierto(false)}
-                onChange={(event) => {
-                  onChange('estado', event.target.value)
-                  setEstadoAbierto(false)
-                }}
-              >
-                <option value="">Todos</option>
-                <option value="activo">Activo</option>
-                <option value="inactivo">Inactivo</option>
-              </select>
-              <ChevronDown size={16} />
-            </div>
+            <Select
+              inputId="estadoRol" classNamePrefix="maestro-select"
+              options={[
+                { value: 'activo', label: 'Activo' },
+                { value: 'inactivo', label: 'Inactivo' },
+              ]}
+              value={[
+                { value: 'activo', label: 'Activo' },
+                { value: 'inactivo', label: 'Inactivo' },
+              ].find((opcion) => opcion.value === valores.estado) ?? null}
+              onChange={(opcion) => onChange('estado', opcion?.value ?? '')}
+              placeholder={Placeholder.Seleccionar}
+              isClearable
+              isSearchable={false}
+
+              menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })}
+            />
           </div>
         </div>
 

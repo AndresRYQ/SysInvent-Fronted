@@ -1,10 +1,13 @@
+import { Placeholder } from '../../constants/placeholders'
 import {
   Filter,
   RotateCcw,
   Search,
 } from 'lucide-react'
+import Select from 'react-select'
 
 import type { AccionBitacora } from '../../types/bitacora'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
 export interface FiltrosBitacoraValores {
   busqueda: string
@@ -95,7 +98,7 @@ export function FiltrosBitacora({
               id="buscarBitacora"
               className="form-control"
               value={valores.busqueda}
-              placeholder="Buscar registro"
+              placeholder={Placeholder.Buscar}
               onChange={(event) =>
                 onChange(
                   'busqueda',
@@ -113,28 +116,19 @@ export function FiltrosBitacora({
               Módulo
             </label>
 
-            <select
-              id="moduloBitacora"
-              className="form-select"
-              value={valores.modulo}
-              onChange={(event) =>
-                onChange(
-                  'modulo',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">Todos</option>
+            <Select
+              inputId="moduloBitacora"
+              classNamePrefix="maestro-select"
+              options={modulos.map((modulo) => ({ value: modulo, label: modulo }))}
+              value={modulos.map((modulo) => ({ value: modulo, label: modulo })).find((opcion) => opcion.value === valores.modulo) ?? null}
+              onChange={(opcion) => onChange('modulo', opcion?.value ?? '')}
+              placeholder={Placeholder.Seleccionar}
+              isClearable
+              isSearchable
 
-              {modulos.map((modulo) => (
-                <option
-                  key={modulo}
-                  value={modulo}
-                >
-                  {modulo}
-                </option>
-              ))}
-            </select>
+
+              menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })}
+            />
           </div>
 
           <div className="col-12 col-md-6 col-xl-2">
@@ -145,28 +139,19 @@ export function FiltrosBitacora({
               Acción
             </label>
 
-            <select
-              id="accionBitacora"
-              className="form-select"
-              value={valores.accion}
-              onChange={(event) =>
-                onChange(
-                  'accion',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">Todas</option>
+            <Select
+              inputId="accionBitacora"
+              classNamePrefix="maestro-select"
+              options={ACCIONES.map((accion) => ({ value: accion.valor, label: accion.etiqueta }))}
+              value={ACCIONES.map((accion) => ({ value: accion.valor, label: accion.etiqueta })).find((opcion) => opcion.value === valores.accion) ?? null}
+              onChange={(opcion) => onChange('accion', opcion?.value ?? '')}
+              placeholder={Placeholder.Seleccionar}
+              isClearable
+              isSearchable={false}
 
-              {ACCIONES.map((accion) => (
-                <option
-                  key={accion.valor}
-                  value={accion.valor}
-                >
-                  {accion.etiqueta}
-                </option>
-              ))}
-            </select>
+
+              menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })}
+            />
           </div>
 
           <div className="col-12 col-md-6 col-xl-2">
@@ -180,7 +165,7 @@ export function FiltrosBitacora({
             <input
               id="fechaDesdeBitacora"
               className="form-control"
-              type="date"
+              type="date" placeholder={Placeholder.Fecha}
               value={valores.fechaDesde}
               onChange={(event) =>
                 onChange(
@@ -202,7 +187,7 @@ export function FiltrosBitacora({
             <input
               id="fechaHastaBitacora"
               className="form-control"
-              type="date"
+              type="date" placeholder={Placeholder.Fecha}
               value={valores.fechaHasta}
               onChange={(event) =>
                 onChange(

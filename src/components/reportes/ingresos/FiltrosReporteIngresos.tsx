@@ -1,3 +1,4 @@
+import { Placeholder } from '../../../constants/placeholders'
 import { useMemo } from 'react'
 
 import {
@@ -5,10 +6,12 @@ import {
   RotateCcw,
   Search,
 } from 'lucide-react'
+import Select from 'react-select'
 
 import type {
   FiltrosReporteIngresos as FiltrosValores,
 } from '../../../types/reporteIngreso'
+import { crearEstilosSelect } from '../../../styles/reactSelectStyles'
 
 interface OpcionFiltro {
   id: string
@@ -110,7 +113,7 @@ export function FiltrosReporteIngresos({
               type="search"
               className="form-control maestro-control"
               value={valores.busqueda}
-              placeholder="Ingreso, documento, proveedor o producto"
+              placeholder={Placeholder.Buscar}
               onChange={(event) =>
                 onChange(
                   'busqueda',
@@ -130,7 +133,7 @@ export function FiltrosReporteIngresos({
 
             <input
               id="reporteIngresoDesde"
-              type="date"
+              type="date" placeholder={Placeholder.Fecha}
               className="form-control maestro-control"
               value={valores.fechaDesde}
               max={valores.fechaHasta || undefined}
@@ -153,7 +156,7 @@ export function FiltrosReporteIngresos({
 
             <input
               id="reporteIngresoHasta"
-              type="date"
+              type="date" placeholder={Placeholder.Fecha}
               className="form-control maestro-control"
               value={valores.fechaHasta}
               min={valores.fechaDesde || undefined}
@@ -174,32 +177,7 @@ export function FiltrosReporteIngresos({
               Proveedor
             </label>
 
-            <select
-              id="reporteIngresoProveedor"
-              className="form-select maestro-control"
-              value={valores.proveedorId}
-              onChange={(event) =>
-                onChange(
-                  'proveedorId',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todos los proveedores
-              </option>
-
-              {proveedores.map(
-                (proveedor) => (
-                  <option
-                    key={proveedor.id}
-                    value={proveedor.id}
-                  >
-                    {proveedor.nombre}
-                  </option>
-                ),
-              )}
-            </select>
+            <Select inputId="reporteIngresoProveedor" classNamePrefix="maestro-select" options={proveedores.map((item) => ({ value: item.id, label: item.nombre }))} value={proveedores.map((item) => ({ value: item.id, label: item.nombre })).find((item) => item.value === valores.proveedorId) ?? null} onChange={(opcion) => onChange('proveedorId', opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12 col-md-6 col-xl-3">
@@ -210,29 +188,7 @@ export function FiltrosReporteIngresos({
               Tipo de producto
             </label>
 
-            <select
-              id="reporteIngresoTipo"
-              className="form-select maestro-control"
-              value={valores.tipoProductoId}
-              onChange={(event) =>
-                cambiarTipoProducto(
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todos los tipos
-              </option>
-
-              {tiposProducto.map((tipo) => (
-                <option
-                  key={tipo.id}
-                  value={tipo.id}
-                >
-                  {tipo.nombre}
-                </option>
-              ))}
-            </select>
+            <Select inputId="reporteIngresoTipo" classNamePrefix="maestro-select" options={tiposProducto.map((item) => ({ value: item.id, label: item.nombre }))} value={tiposProducto.map((item) => ({ value: item.id, label: item.nombre })).find((item) => item.value === valores.tipoProductoId) ?? null} onChange={(opcion) => cambiarTipoProducto(opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12 col-md-6 col-xl-3">
@@ -243,33 +199,7 @@ export function FiltrosReporteIngresos({
               Producto
             </label>
 
-            <select
-              id="reporteIngresoProducto"
-              className="form-select maestro-control"
-              value={valores.productoId}
-              onChange={(event) =>
-                onChange(
-                  'productoId',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todos los productos
-              </option>
-
-              {productosFiltrados.map(
-                (producto) => (
-                  <option
-                    key={producto.id}
-                    value={producto.id}
-                  >
-                    {producto.codigo} —{' '}
-                    {producto.nombre}
-                  </option>
-                ),
-              )}
-            </select>
+            <Select inputId="reporteIngresoProducto" classNamePrefix="maestro-select" options={productosFiltrados.map((item) => ({ value: item.id, label: item.codigo + ' — ' + item.nombre }))} value={productosFiltrados.map((item) => ({ value: item.id, label: item.codigo + ' — ' + item.nombre })).find((item) => item.value === valores.productoId) ?? null} onChange={(opcion) => onChange('productoId', opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12 col-md-6 col-xl-3">
@@ -280,29 +210,7 @@ export function FiltrosReporteIngresos({
               Estado
             </label>
 
-            <select
-              id="reporteIngresoEstado"
-              className="form-select maestro-control"
-              value={valores.estado}
-              onChange={(event) =>
-                onChange(
-                  'estado',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todos los estados
-              </option>
-
-              <option value="REGISTRADO">
-                Registrado
-              </option>
-
-              <option value="ANULADO">
-                Anulado
-              </option>
-            </select>
+            <Select inputId="reporteIngresoEstado" classNamePrefix="maestro-select" options={[{ value: 'REGISTRADO', label: 'Registrado' }, { value: 'ANULADO', label: 'Anulado' }]} value={[{ value: 'REGISTRADO', label: 'Registrado' }, { value: 'ANULADO', label: 'Anulado' }].find((item) => item.value === valores.estado) ?? null} onChange={(opcion) => onChange('estado', opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable={false} menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12">
@@ -330,4 +238,3 @@ export function FiltrosReporteIngresos({
     </section>
   )
 }
-

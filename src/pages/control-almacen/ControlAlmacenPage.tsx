@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import {
   useEffect,
   useMemo,
@@ -371,7 +372,7 @@ export function ControlAlmacenPage() {
 
                     <input
                       className="form-control maestro-control"
-                      placeholder="Código, producto o proveedor"
+                      placeholder={Placeholder.Buscar}
                       value={filtros.busqueda}
                       onChange={(event) =>
                         setFiltros(
@@ -506,7 +507,7 @@ export function ControlAlmacenPage() {
 
                     <input
                       className="form-control maestro-control"
-                      type="date"
+                      type="date" placeholder={Placeholder.Fecha}
                       value={filtros.fechaDesde}
                       onChange={(event) =>
                         setFiltros(
@@ -528,7 +529,7 @@ export function ControlAlmacenPage() {
 
                     <input
                       className="form-control maestro-control"
-                      type="date"
+                      type="date" placeholder={Placeholder.Fecha}
                       value={filtros.fechaHasta}
                       onChange={(event) =>
                         setFiltros(
@@ -710,8 +711,8 @@ export function ControlAlmacenPage() {
                                   className={
                                     producto.estadoStock ===
                                     'CON_STOCK'
-                                      ? 'maestro-status maestro-status--active'
-                                      : 'maestro-status maestro-status--inactive'
+                                      ? 'status-label status-label--active'
+                                      : 'status-label status-label--inactive'
                                   }
                                 >
                                   {producto.estadoStock ===

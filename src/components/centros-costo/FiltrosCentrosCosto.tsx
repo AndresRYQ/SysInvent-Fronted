@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import { Filter, RotateCcw, Search } from 'lucide-react'
 import Select from 'react-select'
 import { crearEstilosSelect } from '../../styles/reactSelectStyles'
@@ -51,7 +52,7 @@ export function FiltrosCentrosCosto({
               className="form-control"
               type="text"
               value={valores.nombre}
-              placeholder="Buscar"
+              placeholder={Placeholder.Buscar}
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }
@@ -64,7 +65,7 @@ export function FiltrosCentrosCosto({
             </label>
 
             <Select
-              inputId="estadoCentroCosto"
+              inputId="estadoCentroCosto" classNamePrefix="maestro-select"
               options={opcionesEstado}
               value={
                 opcionesEstado.find(
@@ -74,10 +75,11 @@ export function FiltrosCentrosCosto({
               onChange={(opcion) =>
                 onChange('estado', opcion?.value ?? '')
               }
-              placeholder="Seleccionar"
+              placeholder={Placeholder.Seleccionar}
               isClearable
               isSearchable={false}
-              styles={crearEstilosSelect({ zIndex: 10 })}
+
+              menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 10 })}
             />
           </div>
 
@@ -94,7 +96,7 @@ export function FiltrosCentrosCosto({
                 <RotateCcw size={18} />
                 Limpiar
               </button>
-              
+
               <button
                 type="button"
                 className="btn btn-maestro-primary"

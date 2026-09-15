@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import {
   useEffect,
   useMemo,
@@ -404,7 +405,7 @@ export function FormularioProducto({
                   : ''
               }`}
               maxLength={30}
-              placeholder="Ej. HER-001"
+              placeholder={Placeholder.Ingresar}
               value={form.codigo}
               onChange={(event) => {
                 const value =
@@ -500,7 +501,7 @@ export function FormularioProducto({
                   'tipoProductoId',
                 )
               }}
-              placeholder="Seleccionar"
+              placeholder={Placeholder.Seleccionar}
               isClearable
               isSearchable
               styles={estilosSelect(Boolean(errores.tipoProductoId))}
@@ -545,7 +546,7 @@ export function FormularioProducto({
 
                 limpiarError('categoriaId')
               }}
-              placeholder="Seleccionar"
+              placeholder={Placeholder.Seleccionar}
               isClearable
               isSearchable
               styles={estilosSelect(Boolean(errores.categoriaId))}
@@ -592,7 +593,7 @@ export function FormularioProducto({
                   'unidadMedidaId',
                 )
               }}
-              placeholder="Seleccionar"
+              placeholder={Placeholder.Seleccionar}
               isClearable
               isSearchable
               styles={estilosSelect(Boolean(errores.unidadMedidaId))}
@@ -637,7 +638,7 @@ export function FormularioProducto({
 
                 limpiarError('proveedorId')
               }}
-              placeholder="Seleccionar"
+              placeholder={Placeholder.Seleccionar}
               isClearable
               isSearchable
               styles={estilosSelect(Boolean(errores.proveedorId))}

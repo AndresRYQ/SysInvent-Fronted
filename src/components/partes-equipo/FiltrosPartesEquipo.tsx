@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import { Filter, RotateCcw, Search } from 'lucide-react'
 import { MaestroEstadoSelect } from '../common/MaestroEstadoSelect'
 
@@ -52,7 +53,7 @@ export function FiltrosPartesEquipo({
               className="form-control"
               type="text"
               value={valores.busqueda}
-              placeholder="Buscar"
+              placeholder={Placeholder.Buscar}
               onChange={(event) =>
                 onChange(
                   'busqueda',

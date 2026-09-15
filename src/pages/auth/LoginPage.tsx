@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import {  useEffect,  useState,  type FormEvent,} from 'react'
 import {  AlertCircle,  Eye,  EyeOff,  LoaderCircle,  LockKeyhole,  UserRound,} from 'lucide-react'
 import {  Navigate,  useLocation,  useNavigate,} from 'react-router-dom'
@@ -249,7 +250,7 @@ export function LoginPage() {
             <input
               type="text"
               name="usuario"
-              placeholder="Usuario"
+              placeholder={Placeholder.Ingresar}
               value={usuario}
               maxLength={50}
               autoComplete="username"
@@ -289,7 +290,7 @@ export function LoginPage() {
                   : 'password'
               }
               name="contrasena"
-              placeholder="Contraseña"
+              placeholder={Placeholder.Ingresar}
               value={contrasena}
               maxLength={80}
               autoComplete="current-password"

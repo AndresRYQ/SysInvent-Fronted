@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import { Filter, RotateCcw, Search } from 'lucide-react'
 import { MaestroEstadoSelect } from '../common/MaestroEstadoSelect'
 
@@ -45,7 +46,7 @@ export function FiltrosCategorias({
               className="form-control"
               type="text"
               value={valores.nombre}
-              placeholder="Buscar"
+              placeholder={Placeholder.Buscar}
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }
@@ -77,7 +78,7 @@ export function FiltrosCategorias({
                 <RotateCcw size={18} />
                 Limpiar
               </button>
-              
+
               <button
                 type="button"
                 className="btn btn-maestro-primary"

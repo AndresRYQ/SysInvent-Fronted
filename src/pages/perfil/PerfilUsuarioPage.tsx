@@ -297,8 +297,8 @@ export function PerfilUsuarioPage() {
                         <span
                           className={
                             perfil.estado
-                              ? 'maestro-status maestro-status--active mt-1'
-                              : 'maestro-status maestro-status--inactive mt-1'
+                              ? 'status-label status-label--active mt-1'
+                              : 'status-label status-label--inactive mt-1'
                           }
                         >
                           {perfil.estado

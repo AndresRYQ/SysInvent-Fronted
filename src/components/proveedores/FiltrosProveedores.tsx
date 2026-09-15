@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import {
   Filter,
   RotateCcw,
@@ -56,7 +57,7 @@ export function FiltrosProveedores({
               className="form-control"
               type="text"
               value={valores.busqueda}
-              placeholder="Buscar"
+              placeholder={Placeholder.Buscar}
               onChange={(event) =>
                 onChange(
                   'busqueda',

@@ -103,8 +103,8 @@ export function TablaRoles({
                       <span
                         className={
                           rol.estado
-                            ? 'maestro-status maestro-status--active'
-                            : 'maestro-status maestro-status--inactive'
+                            ? 'status-label status-label--active'
+                            : 'status-label status-label--inactive'
                         }
                       >
                         <ShieldCheck size={14} />

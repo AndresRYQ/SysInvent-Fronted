@@ -1,12 +1,15 @@
+import { Placeholder } from '../../../constants/placeholders'
 import {
   Filter,
   RotateCcw,
   Search,
 } from 'lucide-react'
+import Select from 'react-select'
 
 import type {
   FiltrosProductosMasPedidos as FiltrosValores,
 } from '../../../types/reporteProductoMasPedido'
+import { crearEstilosSelect } from '../../../styles/reactSelectStyles'
 
 interface OpcionFiltro {
   id: string
@@ -65,7 +68,7 @@ export function FiltrosProductosMasPedidos({
               type="search"
               className="form-control maestro-control"
               value={valores.busqueda}
-              placeholder="Código, producto, tipo o categoría"
+              placeholder={Placeholder.Buscar}
               onChange={(event) =>
                 onChange(
                   'busqueda',
@@ -85,7 +88,7 @@ export function FiltrosProductosMasPedidos({
 
             <input
               id="productoPedidoDesde"
-              type="date"
+              type="date" placeholder={Placeholder.Fecha}
               className="form-control maestro-control"
               value={valores.fechaDesde}
               max={
@@ -111,7 +114,7 @@ export function FiltrosProductosMasPedidos({
 
             <input
               id="productoPedidoHasta"
-              type="date"
+              type="date" placeholder={Placeholder.Fecha}
               className="form-control maestro-control"
               value={valores.fechaHasta}
               min={
@@ -135,32 +138,7 @@ export function FiltrosProductosMasPedidos({
               Tipo de producto
             </label>
 
-            <select
-              id="productoPedidoTipo"
-              className="form-select maestro-control"
-              value={
-                valores.tipoProductoId
-              }
-              onChange={(event) =>
-                onChange(
-                  'tipoProductoId',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todos los tipos
-              </option>
-
-              {tiposProducto.map((tipo) => (
-                <option
-                  key={tipo.id}
-                  value={tipo.id}
-                >
-                  {tipo.nombre}
-                </option>
-              ))}
-            </select>
+            <Select inputId="productoPedidoTipo" classNamePrefix="maestro-select" options={tiposProducto.map((item) => ({ value: item.id, label: item.nombre }))} value={tiposProducto.map((item) => ({ value: item.id, label: item.nombre })).find((item) => item.value === valores.tipoProductoId) ?? null} onChange={(opcion) => onChange('tipoProductoId', opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12 col-md-4">
@@ -171,32 +149,7 @@ export function FiltrosProductosMasPedidos({
               Categoría
             </label>
 
-            <select
-              id="productoPedidoCategoria"
-              className="form-select maestro-control"
-              value={valores.categoriaId}
-              onChange={(event) =>
-                onChange(
-                  'categoriaId',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todas las categorías
-              </option>
-
-              {categorias.map(
-                (categoria) => (
-                  <option
-                    key={categoria.id}
-                    value={categoria.id}
-                  >
-                    {categoria.nombre}
-                  </option>
-                ),
-              )}
-            </select>
+            <Select inputId="productoPedidoCategoria" classNamePrefix="maestro-select" options={categorias.map((item) => ({ value: item.id, label: item.nombre }))} value={categorias.map((item) => ({ value: item.id, label: item.nombre })).find((item) => item.value === valores.categoriaId) ?? null} onChange={(opcion) => onChange('categoriaId', opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12 col-md-4">
@@ -207,30 +160,7 @@ export function FiltrosProductosMasPedidos({
               Destino
             </label>
 
-            <select
-              id="productoPedidoDestino"
-              className="form-select maestro-control"
-              value={valores.destinoId}
-              onChange={(event) =>
-                onChange(
-                  'destinoId',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todos los destinos
-              </option>
-
-              {destinos.map((destino) => (
-                <option
-                  key={destino.id}
-                  value={destino.id}
-                >
-                  {destino.nombre}
-                </option>
-              ))}
-            </select>
+            <Select inputId="productoPedidoDestino" classNamePrefix="maestro-select" options={destinos.map((item) => ({ value: item.id, label: item.nombre }))} value={destinos.map((item) => ({ value: item.id, label: item.nombre })).find((item) => item.value === valores.destinoId) ?? null} onChange={(opcion) => onChange('destinoId', opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12">
@@ -258,4 +188,3 @@ export function FiltrosProductosMasPedidos({
     </section>
   )
 }
-

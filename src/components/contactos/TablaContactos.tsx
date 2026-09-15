@@ -152,12 +152,12 @@ export function TablaContactos({
                         <span
                           className={
                             contacto.activo === 1
-                              ? 'maestro-status maestro-status--active'
-                              : 'maestro-status maestro-status--inactive'
+                              ? 'status-label status-label--active'
+                              : 'status-label status-label--inactive'
                           }
                         >
                           <span
-                            className="maestro-status__dot"
+                            className="status-label__dot"
                             aria-hidden="true"
                           />
 

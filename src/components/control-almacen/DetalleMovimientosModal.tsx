@@ -290,8 +290,8 @@ export function DetalleMovimientosModal({
                             <span
                               className={
                                 movimiento.afectaStock
-                                  ? 'maestro-status maestro-status--active'
-                                  : 'maestro-status maestro-status--inactive'
+                                  ? 'status-label status-label--active'
+                                  : 'status-label status-label--inactive'
                               }
                             >
                               {movimiento.afectaStock

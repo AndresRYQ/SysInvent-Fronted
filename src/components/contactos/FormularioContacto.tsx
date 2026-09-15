@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import {
   useEffect,
   useState,
@@ -285,7 +286,7 @@ export function FormularioContacto({
                   proveedorId: '',
                 }))
                 }}
-                placeholder="Seleccionar"
+                placeholder={Placeholder.Seleccionar}
                 isClearable
                 isSearchable
                 styles={estilosSelect(Boolean(errores.proveedorId))}
@@ -320,7 +321,7 @@ export function FormularioContacto({
                   value={
                     form.nombreCompleto
                   }
-                  placeholder="Ej. Carlos Mendoza"
+                  placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
                     setForm((actual) => ({
                       ...actual,
@@ -365,7 +366,7 @@ export function FormularioContacto({
                   type="text"
                   maxLength={80}
                   value={form.cargo}
-                  placeholder="Ej. Ejecutivo de ventas"
+                  placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
                     setForm((actual) => ({
                       ...actual,
@@ -408,7 +409,7 @@ export function FormularioContacto({
                   type="tel"
                   maxLength={20}
                   value={form.telefono}
-                  placeholder="Ej. 987654321"
+                  placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
                     setForm((actual) => ({
                       ...actual,
@@ -451,7 +452,7 @@ export function FormularioContacto({
                   type="email"
                   maxLength={120}
                   value={form.correo}
-                  placeholder="contacto@empresa.com"
+                  placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
                     setForm((actual) => ({
                       ...actual,

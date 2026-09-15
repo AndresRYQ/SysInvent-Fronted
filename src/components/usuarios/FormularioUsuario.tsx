@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import {
   Save,
   UserRound,
@@ -259,11 +260,7 @@ export function FormularioUsuario({
                 minLength={6}
                 maxLength={80}
                 autoComplete="new-password"
-                placeholder={
-                  usuario
-                    ? 'Dejar vacío para conservar'
-                    : 'Mínimo 6 caracteres'
-                }
+                placeholder={Placeholder.Ingresar}
                 onChange={(evento) =>
                   setDatos((actual) => ({
                     ...actual,

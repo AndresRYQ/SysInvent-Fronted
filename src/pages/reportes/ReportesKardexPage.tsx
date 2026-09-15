@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ArrowDownToLine, ArrowUpFromLine, Boxes, Download, ListFilter } from 'lucide-react'
+import { Placeholder } from '../../constants/placeholders'
 import { TablePagination } from '../../components/ui/TablePagination'
 import { movimientosKardex, productosKardex, stockActualKardex } from '../../data/kardex'
 import '../../styles/DashboardPage.css'
@@ -68,14 +69,14 @@ export function ReportesKardexPage() {
         <h2 id="kardex-filtros">Filtrar movimientos</h2>
         <div className="kardex-filters">
           <label>Producto<select className="form-select maestro-control" value={filtros.producto} onChange={(e) => cambiarFiltro('producto', e.target.value)}>
-            <option value="">Todos los productos</option>
+            <option value="">{Placeholder.Seleccionar}</option>
             {productosKardex.map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
           </select></label>
           <label>Tipo de movimiento<select className="form-select maestro-control" value={filtros.tipo} onChange={(e) => cambiarFiltro('tipo', e.target.value)}>
-            <option value="">Todos los movimientos</option><option>Entrada</option><option>Salida</option>
+            <option value="">{Placeholder.Seleccionar}</option><option>Entrada</option><option>Salida</option>
           </select></label>
-          <label>Desde<input className="form-control maestro-control" type="date" value={filtros.desde} onChange={(e) => cambiarFiltro('desde', e.target.value)} aria-invalid={rangoInvalido} aria-describedby={rangoInvalido ? 'error-fechas' : undefined} /></label>
-          <label>Hasta<input className="form-control maestro-control" type="date" value={filtros.hasta} onChange={(e) => cambiarFiltro('hasta', e.target.value)} aria-invalid={rangoInvalido} aria-describedby={rangoInvalido ? 'error-fechas' : undefined} /></label>
+          <label>Desde<input className="form-control maestro-control" type="date" placeholder={Placeholder.Fecha} value={filtros.desde} onChange={(e) => cambiarFiltro('desde', e.target.value)} aria-invalid={rangoInvalido} aria-describedby={rangoInvalido ? 'error-fechas' : undefined} /></label>
+          <label>Hasta<input className="form-control maestro-control" type="date" placeholder={Placeholder.Fecha} value={filtros.hasta} onChange={(e) => cambiarFiltro('hasta', e.target.value)} aria-invalid={rangoInvalido} aria-describedby={rangoInvalido ? 'error-fechas' : undefined} /></label>
           <button className="btn btn-maestro-info" onClick={() => { setFiltros(filtrosIniciales); setPage(1) }}>Limpiar filtros</button>
         </div>
         {rangoInvalido && <p id="error-fechas" className="text-danger mt-3 mb-0" role="alert">La fecha desde debe ser anterior o igual a la fecha hasta.</p>}

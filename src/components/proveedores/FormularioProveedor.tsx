@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import {
   useEffect,
   useState,
@@ -199,7 +200,7 @@ export function FormularioProveedor({
               type="text"
               inputMode="numeric"
               maxLength={11}
-              placeholder="Ingresar"
+              placeholder={Placeholder.Ingresar}
               value={form.ruc}
               aria-invalid={Boolean(
                 errores.ruc,
@@ -250,7 +251,7 @@ export function FormularioProveedor({
               }`}
               type="text"
               maxLength={120}
-              placeholder="Ingresar"
+              placeholder={Placeholder.Ingresar}
               value={form.razonSocial}
               aria-invalid={Boolean(
                 errores.razonSocial,
@@ -295,7 +296,7 @@ export function FormularioProveedor({
               }`}
               type="email"
               maxLength={120}
-              placeholder="Ingresar"
+              placeholder={Placeholder.Ingresar}
               value={form.correo}
               aria-invalid={Boolean(
                 errores.correo,
@@ -340,7 +341,7 @@ export function FormularioProveedor({
               type="tel"
               inputMode="numeric"
               maxLength={9}
-              placeholder="Ingresar"
+              placeholder={Placeholder.Ingresar}
               value={form.telefono}
               aria-invalid={Boolean(
                 errores.telefono,
@@ -387,7 +388,7 @@ export function FormularioProveedor({
               }`}
               rows={3}
               maxLength={200}
-              placeholder="Ingresar"
+              placeholder={Placeholder.Ingresar}
               value={form.direccion}
               aria-invalid={Boolean(
                 errores.direccion,

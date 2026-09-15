@@ -57,7 +57,11 @@ export function crearEstilosSelect({
     }),
     menu: (base: any) => ({
       ...base,
-      zIndex,
+      zIndex: 9999,
+    }),
+    menuPortal: (base: any) => ({
+      ...base,
+      zIndex: Math.max(zIndex, 9999),
     }),
     option: (base: any, state: any) => ({
       ...base,

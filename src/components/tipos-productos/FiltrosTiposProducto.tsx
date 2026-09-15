@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import { Filter, RotateCcw, Search } from 'lucide-react'
 import { MaestroEstadoSelect } from '../common/MaestroEstadoSelect'
 
@@ -45,7 +46,7 @@ export function FiltrosTiposProducto({
               className="form-control"
               type="text"
               value={valores.nombre}
-              placeholder="Buscar"
+              placeholder={Placeholder.Buscar}
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }
@@ -62,26 +63,6 @@ export function FiltrosTiposProducto({
               value={valores.estado}
               onChange={(value) => onChange('estado', value)}
             />
-            {/*
-              <select
-                id="estadoTipoProducto"
-                className="form-select maestro-select-control"
-                value={valores.estado}
-                onMouseDown={() => setEstadoAbierto(true)}
-                onKeyDown={() => setEstadoAbierto(true)}
-                onFocus={() => setEstadoAbierto(true)}
-                onBlur={() => setEstadoAbierto(false)}
-                onChange={(event) => {
-                  onChange('estado', event.target.value)
-                  setEstadoAbierto(false)
-                }}
-              >
-                <option value="">Todos</option>
-                <option value="activo">Activo</option>
-                <option value="inactivo">Inactivo</option>
-              </select>
-              <ChevronDown size={16} />
-            </div> */}
           </div>
 
         </div>
@@ -97,7 +78,7 @@ export function FiltrosTiposProducto({
                 <RotateCcw size={18} />
                 Limpiar
               </button>
-              
+
               <button
                 type="button"
                 className="btn btn-maestro-primary"

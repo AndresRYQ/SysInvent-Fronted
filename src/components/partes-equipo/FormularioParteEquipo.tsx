@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import {
   useEffect,
   useState,
@@ -237,7 +238,7 @@ export function FormularioParteEquipo({
                   type="text"
                   maxLength={30}
                   value={form.codigo}
-                  placeholder="Ej. MOT-001"
+                  placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
                     setForm((actual) => ({
                       ...actual,
@@ -281,7 +282,7 @@ export function FormularioParteEquipo({
                   type="text"
                   maxLength={120}
                   value={form.nombre}
-                  placeholder="Ej. Motor principal"
+                  placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
                     setForm((actual) => ({
                       ...actual,

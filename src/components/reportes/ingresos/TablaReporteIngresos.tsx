@@ -176,8 +176,8 @@ export function TablaReporteIngresos({
                     className={
                       fila.estado ===
                       'REGISTRADO'
-                        ? 'maestro-status maestro-status--active'
-                        : 'maestro-status maestro-status--inactive'
+                        ? 'status-label status-label--active'
+                        : 'status-label status-label--inactive'
                     }
                   >
                     {fila.estado ===
