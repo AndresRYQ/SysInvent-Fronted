@@ -254,13 +254,11 @@ export function FormularioContacto({
 
             <div className="mb-3">
               <label
-                className="form-label"
+                className="form-label required"
                 htmlFor="contactoProveedor"
               >
                 Proveedor
-                <span className="maestro-required">
-                  *
-                </span>
+
               </label>
 
               <Select
@@ -303,13 +301,11 @@ export function FormularioContacto({
             <div className="row g-3">
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label"
+                  className="form-label required"
                   htmlFor="contactoNombre"
                 >
                   Nombre completo
-                  <span className="maestro-required">
-                    *
-                  </span>
+
                 </label>
 
                 <input
@@ -352,13 +348,11 @@ export function FormularioContacto({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label"
+                  className="form-label required"
                   htmlFor="contactoCargo"
                 >
                   Cargo
-                  <span className="maestro-required">
-                    *
-                  </span>
+
                 </label>
 
                 <input
@@ -397,13 +391,11 @@ export function FormularioContacto({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label"
+                  className="form-label required"
                   htmlFor="contactoTelefono"
                 >
                   Teléfono
-                  <span className="maestro-required">
-                    *
-                  </span>
+
                 </label>
 
                 <input
@@ -442,13 +434,11 @@ export function FormularioContacto({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label"
+                  className="form-label required"
                   htmlFor="contactoCorreo"
                 >
                   Correo
-                  <span className="maestro-required">
-                    *
-                  </span>
+
                 </label>
 
                 <input

@@ -153,13 +153,11 @@ export function FormularioRol({
           <div className="row g-3">
             <div className="col-12 col-md-7">
               <label
-                className="form-label"
+                className="form-label required"
                 htmlFor="rolNombre"
               >
                 Nombre del rol
-                <span className="maestro-required">
-                  *
-                </span>
+
               </label>
 
               <input
@@ -213,13 +211,11 @@ export function FormularioRol({
 
             <div className="col-12">
               <label
-                className="form-label"
+                className="form-label required"
                 htmlFor="rolDescripcion"
               >
                 Descripción
-                <span className="maestro-required">
-                  *
-                </span>
+
               </label>
 
               <textarea

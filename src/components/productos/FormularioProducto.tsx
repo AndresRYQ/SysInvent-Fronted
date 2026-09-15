@@ -389,11 +389,11 @@ export function FormularioProducto({
         <div className="row g-4">
           <div className="col-12 col-lg-4">
             <label
-              className="form-label"
+              className="form-label required"
               htmlFor="productoCodigo"
             >
               Código
-              <span className="maestro-required">*</span>
+
             </label>
 
             <input
@@ -433,11 +433,11 @@ export function FormularioProducto({
 
           <div className="col-12 col-lg-8">
             <label
-              className="form-label"
+              className="form-label required"
               htmlFor="productoNombre"
             >
               Nombre
-              <span className="maestro-required">*</span>
+
             </label>
 
             <input
@@ -468,11 +468,11 @@ export function FormularioProducto({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label"
+              className="form-label required"
               htmlFor="productoTipo"
             >
               Tipo de producto
-              <span className="maestro-required">*</span>
+
             </label>
 
             <Select
@@ -515,11 +515,11 @@ export function FormularioProducto({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label"
+              className="form-label required"
               htmlFor="productoCategoria"
             >
               Categoría
-              <span className="maestro-required">*</span>
+
             </label>
 
             <Select
@@ -560,11 +560,11 @@ export function FormularioProducto({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label"
+              className="form-label required"
               htmlFor="productoUnidad"
             >
               Unidad de medida
-              <span className="maestro-required">*</span>
+
             </label>
 
             <Select
@@ -607,11 +607,11 @@ export function FormularioProducto({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label"
+              className="form-label required"
               htmlFor="productoProveedor"
             >
               Proveedor
-              <span className="maestro-required">*</span>
+
             </label>
 
             <Select
@@ -652,11 +652,11 @@ export function FormularioProducto({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label"
+              className="form-label required"
               htmlFor="productoStockMinimo"
             >
               Stock mínimo
-              <span className="maestro-required">*</span>
+
             </label>
 
             <input
@@ -694,11 +694,11 @@ export function FormularioProducto({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label"
+              className="form-label required"
               htmlFor="productoPrecio"
             >
               Precio unitario
-              <span className="maestro-required">*</span>
+
             </label>
 
             <div className="input-group">
@@ -762,11 +762,11 @@ export function FormularioProducto({
 
           <div className="col-12">
             <label
-              className="form-label"
+              className="form-label required"
               htmlFor="productoDescripcion"
             >
               Descripción
-              <span className="maestro-required">*</span>
+
             </label>
 
             <textarea

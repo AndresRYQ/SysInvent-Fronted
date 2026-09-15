@@ -128,13 +128,11 @@ export function FormularioUsuario({
           <div className="row g-3">
             <div className="col-12 col-md-6">
               <label
-                className="form-label"
+                className="form-label required"
                 htmlFor="usuarioNombre"
               >
                 Usuario
-                <span className="maestro-required">
-                  *
-                </span>
+
               </label>
 
               <div className="input-group">
@@ -161,13 +159,11 @@ export function FormularioUsuario({
 
             <div className="col-12 col-md-6">
               <label
-                className="form-label"
+                className="form-label required"
                 htmlFor="usuarioNombreCompleto"
               >
                 Nombre completo
-                <span className="maestro-required">
-                  *
-                </span>
+
               </label>
 
               <input
@@ -187,13 +183,11 @@ export function FormularioUsuario({
 
             <div className="col-12 col-md-6">
               <label
-                className="form-label"
+                className="form-label required"
                 htmlFor="usuarioEmail"
               >
                 Correo
-                <span className="maestro-required">
-                  *
-                </span>
+
               </label>
 
               <input
@@ -215,13 +209,11 @@ export function FormularioUsuario({
 
             <div className="col-12 col-md-6">
               <label
-                className="form-label"
+                className="form-label required"
                 htmlFor="usuarioRol"
               >
                 Rol
-                <span className="maestro-required">
-                  *
-                </span>
+
               </label>
 
               <select
@@ -253,15 +245,10 @@ export function FormularioUsuario({
 
             <div className="col-12 col-md-6">
               <label
-                className="form-label"
+                className="form-label required"
                 htmlFor="usuarioContrasena"
               >
                 Contraseña
-                {!usuario && (
-                  <span className="maestro-required">
-                    *
-                  </span>
-                )}
               </label>
 
               <input

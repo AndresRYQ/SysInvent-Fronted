@@ -220,13 +220,11 @@ export function FormularioParteEquipo({
             <div className="row g-3">
               <div className="col-12 col-md-5">
                 <label
-                  className="form-label"
+                  className="form-label required"
                   htmlFor="parteEquipoCodigo"
                 >
                   Código
-                  <span className="maestro-required">
-                    *
-                  </span>
+
                 </label>
 
                 <input
@@ -266,13 +264,11 @@ export function FormularioParteEquipo({
 
               <div className="col-12 col-md-7">
                 <label
-                  className="form-label"
+                  className="form-label required"
                   htmlFor="parteEquipoNombre"
                 >
                   Nombre
-                  <span className="maestro-required">
-                    *
-                  </span>
+
                 </label>
 
                 <input
@@ -311,13 +307,11 @@ export function FormularioParteEquipo({
 
               <div className="col-12">
                 <label
-                  className="form-label"
+                  className="form-label required"
                   htmlFor="parteEquipoDescripcion"
                 >
                   Descripción
-                  <span className="maestro-required">
-                    *
-                  </span>
+
                 </label>
 
                 <textarea

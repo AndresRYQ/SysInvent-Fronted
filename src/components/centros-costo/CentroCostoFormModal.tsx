@@ -52,12 +52,12 @@ export function CentroCostoFormModal({ abierto, centroCosto, error, soloLectura 
           <div className="maestro-modal-body">
             {error && <div className="alert alert-danger py-2" role="alert">{error}</div>}
             <div className="mb-3">
-              <label className="form-label" htmlFor="centroCostoNombreModal">Nombre de centro de costo{!soloLectura && <span className="maestro-required">*</span>}</label>
+              <label className="form-label required" htmlFor="centroCostoNombreModal">Nombre de centro de costo</label>
               <input id="centroCostoNombreModal" className={`form-control${errores.nombre ? ' maestro-control--error' : ''}`} value={form.nombre} placeholder="Ingresar" disabled={soloLectura} onChange={(event) => actualizar('nombre', event.target.value)} />
               {errores.nombre && <div className="maestro-field-error">Campo requerido</div>}
             </div>
             <div>
-              <label className="form-label" htmlFor="centroCostoDescripcionModal">Descripción{!soloLectura && <span className="maestro-required">*</span>}</label>
+              <label className="form-label required" htmlFor="centroCostoDescripcionModal">Descripción</label>
               <textarea id="centroCostoDescripcionModal" className={`form-control${errores.descripcion ? ' maestro-control--error' : ''}`} value={form.descripcion} placeholder="Ingresar" disabled={soloLectura} maxLength={250} rows={2} onChange={(event) => actualizar('descripcion', event.target.value)} />
               <div className="d-flex justify-content-between">
                 <div>{errores.descripcion && <span className="maestro-field-error">Campo requerido</span>}</div>

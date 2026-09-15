@@ -456,12 +456,6 @@
   margin-bottom: 0.4rem;
 }
 
-.maestro-required {
-  margin-left: 2px;
-  color: #b42318;
-  font-weight: 800;
-}
-
 .maestro-modal-body .maestro-control--error,
 .maestro-modal-body .maestro-control--error:focus {
   border-color: #dc2626 !important;
@@ -1079,10 +1073,6 @@
 .contactos-page .maestro-action-btn,
 .contactos-page .maestro-page-btn {
   transition: none !important;
-}
-
-.modo-visualizacion .maestro-required {
-  display: none;
 }
 
 /* Inventario: los botones no deben desplazarse ni animarse al pasar el cursor. */
