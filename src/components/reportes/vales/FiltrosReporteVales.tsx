@@ -1,18 +1,42 @@
-import { Filter, RotateCcw, Search } from 'lucide-react'
+import { useMemo } from 'react'
 
-export interface FiltrosReporteValesValores {
-  fechaDesde: string
-  fechaHasta: string
-  centroCosto: string
-  destino: string
-  solicitante: string
+import {
+  Filter,
+  RotateCcw,
+  Search,
+} from 'lucide-react'
+
+import type {
+  FiltrosReporteVales as FiltrosValores,
+} from '../../../types/reporteVale'
+
+interface OpcionFiltro {
+  id: string
+  nombre: string
+}
+
+interface OpcionParteEquipo
+  extends OpcionFiltro {
+  codigo: string
+}
+
+interface OpcionProducto
+  extends OpcionFiltro {
+  codigo: string
+  tipoProductoId: string
 }
 
 interface FiltrosReporteValesProps {
-  valores: FiltrosReporteValesValores
-  centrosCosto: string[]
-  destinos: string[]
-  onChange: (campo: keyof FiltrosReporteValesValores, valor: string) => void
+  valores: FiltrosValores
+  centrosCosto: OpcionFiltro[]
+  destinos: OpcionFiltro[]
+  partesEquipo: OpcionParteEquipo[]
+  tiposProducto: OpcionFiltro[]
+  productos: OpcionProducto[]
+  onChange: (
+    campo: keyof FiltrosValores,
+    valor: string,
+  ) => void
   onBuscar: () => void
   onLimpiar: () => void
 }
@@ -21,49 +45,378 @@ export function FiltrosReporteVales({
   valores,
   centrosCosto,
   destinos,
+  partesEquipo,
+  tiposProducto,
+  productos,
   onChange,
   onBuscar,
   onLimpiar,
 }: FiltrosReporteValesProps) {
-  return (
-    <section className="vale-report-filter">
-      <div className="vale-report-filter__heading">
-        <span className="report-kicker"><Filter size={16} /> Criterios de consulta</span>
-        <span className="report-filter-hint">Filtra los vales generados por periodo y responsable</span>
-      </div>
+  const productosFiltrados = useMemo(
+    () =>
+      productos.filter(
+        (producto) =>
+          !valores.tipoProductoId ||
+          producto.tipoProductoId ===
+            valores.tipoProductoId,
+      ),
+    [
+      productos,
+      valores.tipoProductoId,
+    ],
+  )
 
-      <form className="vale-report-filter__grid" onSubmit={(event) => { event.preventDefault(); onBuscar() }}>
-        <label className="report-field">
-          <span>Fecha desde</span>
-          <input type="date" value={valores.fechaDesde} onChange={(event) => onChange('fechaDesde', event.target.value)} />
-        </label>
-        <label className="report-field">
-          <span>Fecha hasta</span>
-          <input type="date" value={valores.fechaHasta} onChange={(event) => onChange('fechaHasta', event.target.value)} />
-        </label>
-        <label className="report-field">
-          <span>Centro de costo</span>
-          <select value={valores.centroCosto} onChange={(event) => onChange('centroCosto', event.target.value)}>
-            <option value="">Todos los centros</option>
-            {centrosCosto.map((centro) => <option key={centro} value={centro}>{centro}</option>)}
-          </select>
-        </label>
-        <label className="report-field">
-          <span>Destino</span>
-          <select value={valores.destino} onChange={(event) => onChange('destino', event.target.value)}>
-            <option value="">Todos los destinos</option>
-            {destinos.map((destino) => <option key={destino} value={destino}>{destino}</option>)}
-          </select>
-        </label>
-        <label className="report-field report-field--wide">
-          <span>Solicitante</span>
-          <input value={valores.solicitante} placeholder="Buscar por nombre" onChange={(event) => onChange('solicitante', event.target.value)} />
-        </label>
-        <div className="report-filter-actions">
-          <button type="button" className="report-button report-button--light" onClick={onLimpiar}><RotateCcw size={17} /> Limpiar</button>
-          <button type="submit" className="report-button report-button--primary"><Search size={17} /> Consultar reporte</button>
+  function cambiarTipoProducto(
+    tipoProductoId: string,
+  ): void {
+    onChange(
+      'tipoProductoId',
+      tipoProductoId,
+    )
+
+    const productoSeleccionado =
+      productos.find(
+        (producto) =>
+          producto.id ===
+          valores.productoId,
+      )
+
+    if (
+      productoSeleccionado &&
+      productoSeleccionado.tipoProductoId !==
+        tipoProductoId
+    ) {
+      onChange('productoId', '')
+    }
+  }
+
+  return (
+    <section className="maestro-filter-card card border-0 shadow-sm">
+      <div className="card-body p-3">
+        <div className="mb-3">
+          <span className="maestro-kicker">
+            <Filter size={16} />
+            Filtros del reporte
+          </span>
         </div>
-      </form>
+
+        <form
+          className="row g-3"
+          onSubmit={(event) => {
+            event.preventDefault()
+            onBuscar()
+          }}
+        >
+          <div className="col-12 col-xl-6">
+            <label
+              className="form-label maestro-label"
+              htmlFor="buscarReporteVale"
+            >
+              Buscar
+            </label>
+
+            <input
+              id="buscarReporteVale"
+              type="search"
+              className="form-control maestro-control"
+              value={valores.busqueda}
+              placeholder="Vale, solicitante, producto, destino o equipo"
+              onChange={(event) =>
+                onChange(
+                  'busqueda',
+                  event.target.value,
+                )
+              }
+            />
+          </div>
+
+          <div className="col-12 col-md-6 col-xl-3">
+            <label
+              className="form-label maestro-label"
+              htmlFor="reporteValeDesde"
+            >
+              Fecha desde
+            </label>
+
+            <input
+              id="reporteValeDesde"
+              type="date"
+              className="form-control maestro-control"
+              value={valores.fechaDesde}
+              max={
+                valores.fechaHasta ||
+                undefined
+              }
+              onChange={(event) =>
+                onChange(
+                  'fechaDesde',
+                  event.target.value,
+                )
+              }
+            />
+          </div>
+
+          <div className="col-12 col-md-6 col-xl-3">
+            <label
+              className="form-label maestro-label"
+              htmlFor="reporteValeHasta"
+            >
+              Fecha hasta
+            </label>
+
+            <input
+              id="reporteValeHasta"
+              type="date"
+              className="form-control maestro-control"
+              value={valores.fechaHasta}
+              min={
+                valores.fechaDesde ||
+                undefined
+              }
+              onChange={(event) =>
+                onChange(
+                  'fechaHasta',
+                  event.target.value,
+                )
+              }
+            />
+          </div>
+
+          <div className="col-12 col-md-6 col-xl-3">
+            <label
+              className="form-label maestro-label"
+              htmlFor="reporteValeCentroCosto"
+            >
+              Centro de costo
+            </label>
+
+            <select
+              id="reporteValeCentroCosto"
+              className="form-select maestro-control"
+              value={valores.centroCostoId}
+              onChange={(event) =>
+                onChange(
+                  'centroCostoId',
+                  event.target.value,
+                )
+              }
+            >
+              <option value="">
+                Todos los centros
+              </option>
+
+              {centrosCosto.map(
+                (centro) => (
+                  <option
+                    key={centro.id}
+                    value={centro.id}
+                  >
+                    {centro.nombre}
+                  </option>
+                ),
+              )}
+            </select>
+          </div>
+
+          <div className="col-12 col-md-6 col-xl-3">
+            <label
+              className="form-label maestro-label"
+              htmlFor="reporteValeDestino"
+            >
+              Destino
+            </label>
+
+            <select
+              id="reporteValeDestino"
+              className="form-select maestro-control"
+              value={valores.destinoId}
+              onChange={(event) =>
+                onChange(
+                  'destinoId',
+                  event.target.value,
+                )
+              }
+            >
+              <option value="">
+                Todos los destinos
+              </option>
+
+              {destinos.map((destino) => (
+                <option
+                  key={destino.id}
+                  value={destino.id}
+                >
+                  {destino.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="col-12 col-md-6 col-xl-3">
+            <label
+              className="form-label maestro-label"
+              htmlFor="reporteValeParteEquipo"
+            >
+              Parte de equipo
+            </label>
+
+            <select
+              id="reporteValeParteEquipo"
+              className="form-select maestro-control"
+              value={valores.parteEquipoId}
+              onChange={(event) =>
+                onChange(
+                  'parteEquipoId',
+                  event.target.value,
+                )
+              }
+            >
+              <option value="">
+                Todas las partes
+              </option>
+
+              {partesEquipo.map(
+                (parte) => (
+                  <option
+                    key={parte.id}
+                    value={parte.id}
+                  >
+                    {parte.codigo} â€”{' '}
+                    {parte.nombre}
+                  </option>
+                ),
+              )}
+            </select>
+          </div>
+
+          <div className="col-12 col-md-6 col-xl-3">
+            <label
+              className="form-label maestro-label"
+              htmlFor="reporteValeEstado"
+            >
+              Estado
+            </label>
+
+            <select
+              id="reporteValeEstado"
+              className="form-select maestro-control"
+              value={valores.estado}
+              onChange={(event) =>
+                onChange(
+                  'estado',
+                  event.target.value,
+                )
+              }
+            >
+              <option value="">
+                Todos los estados
+              </option>
+
+              <option value="REGISTRADO">
+                Registrado
+              </option>
+
+              <option value="ANULADO">
+                Anulado
+              </option>
+            </select>
+          </div>
+
+          <div className="col-12 col-md-6 col-xl-3">
+            <label
+              className="form-label maestro-label"
+              htmlFor="reporteValeTipoProducto"
+            >
+              Tipo de producto
+            </label>
+
+            <select
+              id="reporteValeTipoProducto"
+              className="form-select maestro-control"
+              value={
+                valores.tipoProductoId
+              }
+              onChange={(event) =>
+                cambiarTipoProducto(
+                  event.target.value,
+                )
+              }
+            >
+              <option value="">
+                Todos los tipos
+              </option>
+
+              {tiposProducto.map((tipo) => (
+                <option
+                  key={tipo.id}
+                  value={tipo.id}
+                >
+                  {tipo.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="col-12 col-md-6 col-xl-3">
+            <label
+              className="form-label maestro-label"
+              htmlFor="reporteValeProducto"
+            >
+              Producto
+            </label>
+
+            <select
+              id="reporteValeProducto"
+              className="form-select maestro-control"
+              value={valores.productoId}
+              onChange={(event) =>
+                onChange(
+                  'productoId',
+                  event.target.value,
+                )
+              }
+            >
+              <option value="">
+                Todos los productos
+              </option>
+
+              {productosFiltrados.map(
+                (producto) => (
+                  <option
+                    key={producto.id}
+                    value={producto.id}
+                  >
+                    {producto.codigo} â€”{' '}
+                    {producto.nombre}
+                  </option>
+                ),
+              )}
+            </select>
+          </div>
+
+          <div className="col-12">
+            <div className="maestro-filter-actions">
+              <button
+                type="button"
+                className="btn maestro-btn-secondary maestro-filter-btn"
+                onClick={onLimpiar}
+              >
+                <RotateCcw size={18} />
+                Limpiar
+              </button>
+
+              <button
+                type="submit"
+                className="btn maestro-btn-primary maestro-filter-btn"
+              >
+                <Search size={18} />
+                Buscar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </section>
   )
 }
+
