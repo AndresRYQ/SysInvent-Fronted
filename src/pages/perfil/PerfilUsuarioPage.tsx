@@ -375,7 +375,7 @@ export function PerfilUsuarioPage() {
                     <div className="row g-3">
                       <div className="col-12 col-md-6">
                         <label
-                          className="form-label maestro-label"
+                          className="form-label"
                           htmlFor="perfilUsuario"
                         >
                           Usuario
@@ -401,7 +401,7 @@ export function PerfilUsuarioPage() {
 
                       <div className="col-12 col-md-6">
                         <label
-                          className="form-label maestro-label"
+                          className="form-label"
                           htmlFor="perfilNombre"
                         >
                           Nombre completo
@@ -426,7 +426,7 @@ export function PerfilUsuarioPage() {
 
                       <div className="col-12">
                         <label
-                          className="form-label maestro-label"
+                          className="form-label"
                           htmlFor="perfilCorreo"
                         >
                           Correo electrónico
@@ -491,7 +491,7 @@ export function PerfilUsuarioPage() {
                     <div className="row g-3">
                       <div className="col-12">
                         <label
-                          className="form-label maestro-label"
+                          className="form-label"
                           htmlFor="perfilContrasenaActual"
                         >
                           Contraseña actual
@@ -522,7 +522,7 @@ export function PerfilUsuarioPage() {
 
                       <div className="col-12 col-md-6">
                         <label
-                          className="form-label maestro-label"
+                          className="form-label"
                           htmlFor="perfilNuevaContrasena"
                         >
                           Nueva contraseña
@@ -553,7 +553,7 @@ export function PerfilUsuarioPage() {
 
                       <div className="col-12 col-md-6">
                         <label
-                          className="form-label maestro-label"
+                          className="form-label"
                           htmlFor="perfilConfirmarContrasena"
                         >
                           Confirmar contraseña

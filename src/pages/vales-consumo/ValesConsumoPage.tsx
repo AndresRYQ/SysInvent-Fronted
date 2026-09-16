@@ -8,6 +8,7 @@ import {
 import {
   CalendarDays,
   ClipboardList,
+  Filter,
   Pencil,
   Plus,
   RotateCcw,
@@ -24,6 +25,7 @@ import {
 } from 'react-router-dom'
 
 import { TablePagination } from '../../components/ui/TablePagination'
+import { DatePickerInput } from '../../components/ui/DatePickerInput'
 import { EmptyState } from '../../components/common/EmptyState'
 import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
@@ -400,11 +402,20 @@ export function ValesConsumoPage() {
 
           <div className="maestro-panel">
             <section className="maestro-filter-card card border-0 shadow-sm">
-              <div className="card-body p-3">
+              <div className="card-body p-3 p-lg-3">
+                <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2">
+                  <div>
+                    <span className="maestro-kicker">
+                      <Filter size={16} />
+                      Filtros de búsqueda
+                    </span>
+                  </div>
+                </div>
+
                 <div className="row g-3">
                   <div className="col-12 col-lg-4">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeBusqueda"
                     >
                       Buscar
@@ -430,7 +441,7 @@ export function ValesConsumoPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeCentroFiltro"
                     >
                       Centro de costo
@@ -452,7 +463,7 @@ export function ValesConsumoPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeEstadoFiltro"
                     >
                       Estado
@@ -474,53 +485,35 @@ export function ValesConsumoPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeDesde"
                     >
-                      Desde
+                      Fecha desde
                     </label>
 
-                    <input
+                    <DatePickerInput
                       id="valeDesde"
-                      className="form-control maestro-control"
-                      type="date" placeholder={Placeholder.Fecha}
                       value={filtros.fechaDesde}
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            fechaDesde:
-                              event.target
-                                .value,
-                          }),
-                        )
-                      }
+                      maxValue={filtros.fechaHasta}
+                      rangoEstricto
+                      onChange={(value) => setFiltros((actual) => ({ ...actual, fechaDesde: value }))}
                     />
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeHasta"
                     >
-                      Hasta
+                      Fecha hasta
                     </label>
 
-                    <input
+                    <DatePickerInput
                       id="valeHasta"
-                      className="form-control maestro-control"
-                      type="date" placeholder={Placeholder.Fecha}
                       value={filtros.fechaHasta}
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            fechaHasta:
-                              event.target
-                                .value,
-                          }),
-                        )
-                      }
+                      minValue={filtros.fechaDesde}
+                      rangoEstricto
+                      onChange={(value) => setFiltros((actual) => ({ ...actual, fechaHasta: value }))}
                     />
                   </div>
                 </div>

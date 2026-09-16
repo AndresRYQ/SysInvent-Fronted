@@ -10,6 +10,7 @@ import {
   ArrowUpFromLine,
   Boxes,
   Eye,
+  Filter,
   RotateCcw,
   Search,
 } from 'lucide-react'
@@ -18,6 +19,7 @@ import Select from 'react-select'
 import { DetalleMovimientosModal } from '../../components/control-almacen/DetalleMovimientosModal'
 import { EmptyState } from '../../components/common/EmptyState'
 import { TablePagination } from '../../components/ui/TablePagination'
+import { DatePickerInput } from '../../components/ui/DatePickerInput'
 
 import { obtenerCategorias } from '../../services/categoriaService'
 
@@ -359,18 +361,19 @@ export function ControlAlmacenPage() {
 
           <div className="maestro-panel">
             <section className="maestro-filter-card card border-0 shadow-sm">
-              <div className="card-body p-3">
-                <div className="d-flex align-items-center gap-2 mb-3">
-                  <Search size={17} />
-
-                  <strong>
-                    Filtros del control
-                  </strong>
+              <div className="card-body p-3 p-lg-3">
+                <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2">
+                  <div>
+                    <span className="maestro-kicker">
+                      <Filter size={16} />
+                      Filtros de búsqueda
+                    </span>
+                  </div>
                 </div>
 
                 <div className="row g-3">
                   <div className="col-12 col-lg-4">
-                    <label className="form-label maestro-label">
+                    <label className="form-label">
                       Producto
                     </label>
 
@@ -392,7 +395,7 @@ export function ControlAlmacenPage() {
                   </div>
 
                   <div className="col-12 col-md-4 col-lg-2">
-                    <label className="form-label maestro-label">
+                    <label className="form-label">
                       Tipo
                     </label>
 
@@ -411,7 +414,7 @@ export function ControlAlmacenPage() {
                   </div>
 
                   <div className="col-12 col-md-4 col-lg-2">
-                    <label className="form-label maestro-label">
+                    <label className="form-label">
                       Categoría
                     </label>
 
@@ -430,7 +433,7 @@ export function ControlAlmacenPage() {
                   </div>
 
                   <div className="col-12 col-md-4 col-lg-2">
-                    <label className="form-label maestro-label">
+                    <label className="form-label">
                       Estado
                     </label>
 
@@ -449,46 +452,30 @@ export function ControlAlmacenPage() {
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2">
-                    <label className="form-label maestro-label">
-                      Desde
+                    <label className="form-label">
+                      Fecha desde
                     </label>
 
-                    <input
-                      className="form-control maestro-control"
-                      type="date" placeholder={Placeholder.Fecha}
+                    <DatePickerInput
+                      id="controlAlmacenDesde"
                       value={filtros.fechaDesde}
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            fechaDesde:
-                              event.target
-                                .value,
-                          }),
-                        )
-                      }
+                      maxValue={filtros.fechaHasta}
+                      rangoEstricto
+                      onChange={(value) => setFiltros((actual) => ({ ...actual, fechaDesde: value }))}
                     />
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2 ms-lg-auto">
-                    <label className="form-label maestro-label">
-                      Hasta
+                    <label className="form-label">
+                      Fecha hasta
                     </label>
 
-                    <input
-                      className="form-control maestro-control"
-                      type="date" placeholder={Placeholder.Fecha}
+                    <DatePickerInput
+                      id="controlAlmacenHasta"
                       value={filtros.fechaHasta}
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            fechaHasta:
-                              event.target
-                                .value,
-                          }),
-                        )
-                      }
+                      minValue={filtros.fechaDesde}
+                      rangoEstricto
+                      onChange={(value) => setFiltros((actual) => ({ ...actual, fechaHasta: value }))}
                     />
                   </div>
                 </div>

@@ -3,6 +3,8 @@ import { ArrowDownToLine, ArrowUpFromLine, Boxes, Download, ListFilter } from 'l
 import Select from 'react-select'
 import { Placeholder } from '../../constants/placeholders'
 import { TablePagination } from '../../components/ui/TablePagination'
+import { DatePickerInput } from '../../components/ui/DatePickerInput'
+import { ValidadorRangoFechas } from '../../utils/ValidadorRangoFechas'
 import { movimientosKardex, productosKardex, stockActualKardex } from '../../data/kardex'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
@@ -16,7 +18,7 @@ export function ReportesKardexPage() {
   const [filtros, setFiltros] = useState(filtrosIniciales)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const rangoInvalido = Boolean(filtros.desde && filtros.hasta && filtros.desde > filtros.hasta)
+  const rangoInvalido = Boolean(ValidadorRangoFechas.validar(filtros.desde, filtros.hasta))
   const movimientos = rangoInvalido ? [] : movimientosKardex.filter((m) =>
     (!filtros.producto || m.productoId === filtros.producto) &&
     (!filtros.tipo || m.tipo === filtros.tipo) &&
@@ -72,11 +74,11 @@ export function ReportesKardexPage() {
         <div className="kardex-filters">
           <label>Producto<Select inputId="kardexProducto" classNamePrefix="maestro-select" options={productosKardex.map((p) => ({ value: p.id, label: p.nombre }))} value={productosKardex.map((p) => ({ value: p.id, label: p.nombre })).find((option) => option.value === filtros.producto) ?? null} onChange={(option) => cambiarFiltro('producto', option?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable={false} menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} /></label>
           <label>Tipo de movimiento<Select inputId="kardexTipoMovimiento" classNamePrefix="maestro-select" options={[{ value: 'Entrada', label: 'Entrada' }, { value: 'Salida', label: 'Salida' }]} value={[{ value: 'Entrada', label: 'Entrada' }, { value: 'Salida', label: 'Salida' }].find((option) => option.value === filtros.tipo) ?? null} onChange={(option) => cambiarFiltro('tipo', option?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable={false} menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} /></label>
-          <label>Desde<input className="form-control maestro-control" type="date" placeholder={Placeholder.Fecha} value={filtros.desde} onChange={(e) => cambiarFiltro('desde', e.target.value)} aria-invalid={rangoInvalido} aria-describedby={rangoInvalido ? 'error-fechas' : undefined} /></label>
-          <label>Hasta<input className="form-control maestro-control" type="date" placeholder={Placeholder.Fecha} value={filtros.hasta} onChange={(e) => cambiarFiltro('hasta', e.target.value)} aria-invalid={rangoInvalido} aria-describedby={rangoInvalido ? 'error-fechas' : undefined} /></label>
+          <label>Fecha desde<DatePickerInput id="kardexDesde" value={filtros.desde} maxValue={filtros.hasta} rangoEstricto onChange={(value) => cambiarFiltro('desde', value)} /></label>
+          <label>Fecha hasta<DatePickerInput id="kardexHasta" value={filtros.hasta} minValue={filtros.desde} rangoEstricto onChange={(value) => cambiarFiltro('hasta', value)} /></label>
           <button className="btn btn-maestro-info" onClick={() => { setFiltros(filtrosIniciales); setPage(1) }}>Limpiar filtros</button>
         </div>
-        {rangoInvalido && <p id="error-fechas" className="text-danger mt-3 mb-0" role="alert">La fecha desde debe ser anterior o igual a la fecha hasta.</p>}
+        {rangoInvalido && <p id="error-fechas" className="text-danger mt-3 mb-0" role="alert">La fecha desde debe ser anterior a la fecha hasta.</p>}
       </section>
 
       <section className="table-card kardex-panel" aria-labelledby="stock-actual">

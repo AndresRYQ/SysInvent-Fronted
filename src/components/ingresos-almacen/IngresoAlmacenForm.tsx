@@ -5,6 +5,7 @@ import {
   useState,
   type FormEvent,
 } from 'react'
+import { createPortal } from 'react-dom'
 
 import {
   Plus,
@@ -12,6 +13,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
+import DatePicker from 'react-datepicker'
 
 import { obtenerContactos } from '../../services/contactoService'
 import { obtenerProductos } from '../../services/productoService'
@@ -58,6 +60,29 @@ function obtenerFechaActual(): string {
   )
     .toISOString()
     .slice(0, 10)
+}
+
+function convertirFechaASeleccion(fecha: string): Date | null {
+  if (!fecha) {
+    return null
+  }
+
+  const [anio, mes, dia] = fecha.split('-').map(Number)
+  const seleccion = new Date(anio, mes - 1, dia)
+
+  return Number.isNaN(seleccion.getTime()) ? null : seleccion
+}
+
+function convertirSeleccionAFecha(fecha: Date | null): string {
+  if (!fecha) {
+    return ''
+  }
+
+  const anio = fecha.getFullYear()
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0')
+  const dia = String(fecha.getDate()).padStart(2, '0')
+
+  return `${anio}-${mes}-${dia}`
 }
 
 function obtenerMensajeError(
@@ -491,28 +516,31 @@ export function IngresoAlmacenForm({
       <div className="row g-3">
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoFecha"
           >
             Fecha de ingreso *
           </label>
 
-          <input
+          <DatePicker
             id="ingresoFecha"
             className="form-control maestro-control"
-            type="date" placeholder={Placeholder.Fecha}
-            value={fechaIngreso}
-            onChange={(event) =>
-              setFechaIngreso(
-                event.target.value,
-              )
+            selected={convertirFechaASeleccion(fechaIngreso)}
+            onChange={(fecha: Date | null) => setFechaIngreso(convertirSeleccionAFecha(fecha))}
+            dateFormat="dd/MM/yyyy"
+            locale="es"
+            placeholderText={Placeholder.Fecha}
+            popperClassName="ingreso-datepicker-popper"
+            popperContainer={(props) =>
+              createPortal(props.children, document.body)
             }
+            autoComplete="off"
           />
         </div>
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoProveedor"
           >
             Proveedor *
@@ -552,7 +580,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoContacto"
           >
             Contacto *
@@ -588,7 +616,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoTipoDocumento"
           >
             Tipo de documento *
@@ -628,7 +656,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoNumeroDocumento"
           >
             Número de documento *
@@ -650,7 +678,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="ingresoObservacion"
           >
             Observación
@@ -680,7 +708,7 @@ export function IngresoAlmacenForm({
       <div className="row g-3 align-items-end">
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="detalleTipoProducto"
           >
             Tipo de producto *
@@ -716,7 +744,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="detalleProducto"
           >
             Producto *
@@ -756,7 +784,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-3">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="detalleUnidad"
           >
             Unidad
@@ -775,7 +803,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-3">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="detalleCantidad"
           >
             Cantidad *
@@ -800,7 +828,7 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-3">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="detallePrecio"
           >
             Precio unitario *

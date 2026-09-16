@@ -29,7 +29,7 @@ export function FiltrosPartesEquipo({
         <div className="mb-3">
           <span className="maestro-kicker">
             <Filter size={16} />
-            Filtros
+            Filtros de búsqueda
           </span>
         </div>
 

@@ -15,26 +15,6 @@
   padding: 12px 15px;
 }
 
-.table-toolbar-btn {
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-height: 42px;
-  padding: 0 18px;
-  border: 0 !important;
-  border-radius: 14px !important;
-  background: linear-gradient(135deg, var(--brand-green-dark) 0%, var(--brand-green) 100%) !important;
-  color: #fff !important;
-  font-size: 0.8rem;
-  font-weight: 800 !important;
-  transition: transform 180ms ease, box-shadow 180ms ease;
-}
-
-.table-toolbar-btn:hover {
-  transform: translateY(-2px);
-}
-
 .standard-table thead th {
   padding: 12px 20px;
   border: 0;
@@ -121,7 +101,6 @@
 }
 
 .table-action-btn:hover {
-  transform: translateY(-1px);
   border-color: rgb(51 143 60 / 30%) !important;
   background: #eef8f0 !important;
 }
@@ -197,7 +176,6 @@
 }
 
 .table-page-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
   border-color: rgb(51 143 60 / 35%);
   background: #eef8f0;
 }

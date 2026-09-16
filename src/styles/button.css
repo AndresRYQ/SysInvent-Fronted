@@ -47,6 +47,47 @@
   color: #fff !important;
 }
 
+/* Botón principal reutilizado en las cabeceras de las tablas. */
+.table-toolbar-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 0 !important;
+  border-radius: 14px !important;
+  background: linear-gradient(135deg, var(--brand-green-dark) 0%, var(--brand-green) 100%) !important;
+  color: #fff !important;
+  font-size: 0.8rem;
+  font-weight: 800 !important;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.table-toolbar-btn:hover {
+  transform: none !important;
+}
+
+.btn-maestro-primary,
+.btn-maestro-secondary,
+.btn-maestro-info,
+.btn-maestro-danger,
+.table-toolbar-btn,
+.table-action-btn,
+.table-page-btn {
+  transition: none !important;
+}
+
+.btn-maestro-primary:hover,
+.btn-maestro-secondary:hover,
+.btn-maestro-info:hover,
+.btn-maestro-danger:hover,
+.table-toolbar-btn:hover,
+.table-action-btn:hover,
+.table-page-btn:hover:not(:disabled) {
+  transform: none !important;
+}
+
 .maestro-modal-footer .btn-maestro-primary,
 .maestro-modal-footer .btn-maestro-danger {
   min-height: 38px;

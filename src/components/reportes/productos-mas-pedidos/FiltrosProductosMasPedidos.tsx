@@ -10,6 +10,7 @@ import type {
   FiltrosProductosMasPedidos as FiltrosValores,
 } from '../../../types/reporteProductoMasPedido'
 import { crearEstilosSelect } from '../../../styles/reactSelectStyles'
+import { DatePickerInput } from '../../ui/DatePickerInput'
 
 interface OpcionFiltro {
   id: string
@@ -44,7 +45,7 @@ export function FiltrosProductosMasPedidos({
         <div className="mb-3">
           <span className="maestro-kicker">
             <Filter size={16} />
-            Filtros del ranking
+            Filtros de búsqueda
           </span>
         </div>
 
@@ -57,7 +58,7 @@ export function FiltrosProductosMasPedidos({
         >
           <div className="col-12 col-xl-6">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="buscarProductoPedido"
             >
               Buscar producto
@@ -80,59 +81,41 @@ export function FiltrosProductosMasPedidos({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPedidoDesde"
             >
               Fecha desde
             </label>
 
-            <input
+            <DatePickerInput
               id="productoPedidoDesde"
-              type="date" placeholder={Placeholder.Fecha}
-              className="form-control maestro-control"
               value={valores.fechaDesde}
-              max={
-                valores.fechaHasta ||
-                undefined
-              }
-              onChange={(event) =>
-                onChange(
-                  'fechaDesde',
-                  event.target.value,
-                )
-              }
+              maxValue={valores.fechaHasta}
+              rangoEstricto
+              onChange={(value) => onChange('fechaDesde', value)}
             />
           </div>
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPedidoHasta"
             >
               Fecha hasta
             </label>
 
-            <input
+            <DatePickerInput
               id="productoPedidoHasta"
-              type="date" placeholder={Placeholder.Fecha}
-              className="form-control maestro-control"
               value={valores.fechaHasta}
-              min={
-                valores.fechaDesde ||
-                undefined
-              }
-              onChange={(event) =>
-                onChange(
-                  'fechaHasta',
-                  event.target.value,
-                )
-              }
+              minValue={valores.fechaDesde}
+              rangoEstricto
+              onChange={(value) => onChange('fechaHasta', value)}
             />
           </div>
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPedidoTipo"
             >
               Tipo de producto
@@ -143,7 +126,7 @@ export function FiltrosProductosMasPedidos({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPedidoCategoria"
             >
               Categoría
@@ -154,7 +137,7 @@ export function FiltrosProductosMasPedidos({
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPedidoDestino"
             >
               Destino

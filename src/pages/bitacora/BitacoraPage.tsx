@@ -3,10 +3,7 @@ import {
   useMemo,
   useState,
 } from 'react'
-import {
-  RefreshCw,
-  ShieldCheck,
-} from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
 
 import { DetalleBitacoraModal } from '../../components/bitacora/DetalleBitacoraModal'
 import {
@@ -105,7 +102,7 @@ function filtrarRegistros(
 }
 
 export function BitacoraPage() {
-  const [registros, setRegistros] = useState<
+  const [registros] = useState<
     RegistroBitacora[]
   >(() => obtenerRegistrosBitacora())
 
@@ -178,13 +175,6 @@ export function BitacoraPage() {
     }
   }, [page, pageSize, totalItems])
 
-  const recargarRegistros = () => {
-    setRegistros(
-      obtenerRegistrosBitacora(),
-    )
-    setPage(1)
-  }
-
   return (
     <>
       <main className="dashboard-shell maestro-page-shell">
@@ -199,14 +189,6 @@ export function BitacoraPage() {
               </p>
             </div>
 
-            <button
-              type="button"
-              className="btn btn-maestro-info"
-              onClick={recargarRegistros}
-            >
-              <RefreshCw size={18} />
-              Actualizar
-            </button>
           </section>
 
           <div className="alert alert-light border d-flex align-items-center gap-2 mb-3">

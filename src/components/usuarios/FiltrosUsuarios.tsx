@@ -35,7 +35,7 @@ export function FiltrosUsuarios({
           <div>
             <span className="maestro-kicker">
               <Filter size={16} />
-              Filtros
+              Filtros de búsqueda
             </span>
           </div>
         </div>

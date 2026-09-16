@@ -12,6 +12,7 @@ import type {
   FiltrosReporteVales as FiltrosValores,
 } from '../../../types/reporteVale'
 import { crearEstilosSelect } from '../../../styles/reactSelectStyles'
+import { DatePickerInput } from '../../ui/DatePickerInput'
 
 interface OpcionFiltro {
   id: string
@@ -99,7 +100,7 @@ export function FiltrosReporteVales({
         <div className="mb-3">
           <span className="maestro-kicker">
             <Filter size={16} />
-            Filtros del reporte
+            Filtros de búsqueda
           </span>
         </div>
 
@@ -112,7 +113,7 @@ export function FiltrosReporteVales({
         >
           <div className="col-12 col-xl-6">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="buscarReporteVale"
             >
               Buscar
@@ -135,59 +136,41 @@ export function FiltrosReporteVales({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeDesde"
             >
               Fecha desde
             </label>
 
-            <input
+            <DatePickerInput
               id="reporteValeDesde"
-              type="date" placeholder={Placeholder.Fecha}
-              className="form-control maestro-control"
               value={valores.fechaDesde}
-              max={
-                valores.fechaHasta ||
-                undefined
-              }
-              onChange={(event) =>
-                onChange(
-                  'fechaDesde',
-                  event.target.value,
-                )
-              }
+              maxValue={valores.fechaHasta}
+              rangoEstricto
+              onChange={(value) => onChange('fechaDesde', value)}
             />
           </div>
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeHasta"
             >
               Fecha hasta
             </label>
 
-            <input
+            <DatePickerInput
               id="reporteValeHasta"
-              type="date" placeholder={Placeholder.Fecha}
-              className="form-control maestro-control"
               value={valores.fechaHasta}
-              min={
-                valores.fechaDesde ||
-                undefined
-              }
-              onChange={(event) =>
-                onChange(
-                  'fechaHasta',
-                  event.target.value,
-                )
-              }
+              minValue={valores.fechaDesde}
+              rangoEstricto
+              onChange={(value) => onChange('fechaHasta', value)}
             />
           </div>
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeCentroCosto"
             >
               Centro de costo
@@ -198,7 +181,7 @@ export function FiltrosReporteVales({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeDestino"
             >
               Destino
@@ -209,7 +192,7 @@ export function FiltrosReporteVales({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeParteEquipo"
             >
               Parte de equipo
@@ -220,7 +203,7 @@ export function FiltrosReporteVales({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeEstado"
             >
               Estado
@@ -231,7 +214,7 @@ export function FiltrosReporteVales({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeTipoProducto"
             >
               Tipo de producto
@@ -242,7 +225,7 @@ export function FiltrosReporteVales({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeProducto"
             >
               Producto

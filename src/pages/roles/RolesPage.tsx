@@ -222,7 +222,7 @@ export function RolesPage() {
 
   return (
     <>
-      <main className="dashboard-shell maestro-page-shell">
+      <main className="dashboard-shell maestro-page-shell roles-page">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">

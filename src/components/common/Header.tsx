@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Bell, Leaf, LogOut, Menu, X } from 'lucide-react'
+import { Leaf, LogOut, Menu, X } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
 import { useAuth } from '../../hooks/useAuth'
@@ -24,7 +24,6 @@ export function Header({
   navItems = [],
   brandHref = '/',
   brandMark = <Leaf size={20} />,
-  notifications = 3,
   menuAbierto = false,
   onMenuToggle,
 }: HeaderProps) {
@@ -84,6 +83,7 @@ export function Header({
       )}
 
       <div className="topbar-actions">
+        {/* Notificaciones deshabilitadas temporalmente.
         <button
           className="notification-button"
           type="button"
@@ -92,6 +92,7 @@ export function Header({
           <Bell size={18} />
           <span>{notifications}</span>
         </button>
+        */}
 
         <button className="user-menu" type="button">
           <span className="avatar">{iniciales}</span>

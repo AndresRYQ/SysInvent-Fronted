@@ -32,9 +32,9 @@
   position: relative;
   z-index: 1;
 
-  width: min(100%, 540px);
-  min-height: 560px;
-  padding: 72px 44px 52px;
+  width: min(100%, 460px);
+  min-height: 0;
+  padding: 48px 36px 40px;
 
   border: 1px solid rgb(255 255 255 / 85%);
   border-radius: 22px;
@@ -45,17 +45,17 @@
 
 .login-card__logo {
   display: block;
-  width: min(100%, 235px);
+  width: min(100%, 190px);
   height: auto;
   margin: 0 auto;
   object-fit: contain;
 }
 
 .login-card h1 {
-  margin: 30px 0 36px;
+  margin: 24px 0 28px;
 
   color: #656966;
-  font-size: 21px;
+  font-size: 18px;
   font-weight: 400;
   line-height: 1.2;
   text-align: center;
@@ -64,15 +64,15 @@
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .login-field {
   display: flex;
-  height: 64px;
+  height: 52px;
   align-items: center;
-  gap: 16px;
-  padding: 0 18px;
+  gap: 12px;
+  padding: 0 14px;
 
   border: 1px solid #cfd2cf;
   border-radius: 12px;
@@ -90,24 +90,43 @@
   box-shadow: 0 0 0 4px rgb(51 143 60 / 11%);
 }
 
+.login-field--error {
+  border-color: #dc2626;
+}
+
+.login-field--error:focus-within {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 4px rgb(220 38 38 / 12%);
+}
+
 .login-field__icon {
   flex-shrink: 0;
 }
 
-.login-field input {
+.login-field__input {
   min-width: 0;
+  min-height: 0 !important;
+  height: auto !important;
   flex: 1;
 
-  border: 0;
+  border: 0 !important;
+  border-radius: 0 !important;
   outline: 0;
 
   color: #4c514e;
-  background: transparent;
+  background: transparent !important;
 
-  font-size: 21px;
+  font-size: 16px !important;
+  padding: 0 !important;
+  transform: none !important;
 }
 
-.login-field input::placeholder {
+.login-field__input:focus {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.login-field__input::placeholder {
   color: #6f7370;
   opacity: 1;
 }
@@ -162,7 +181,7 @@
 
 .login-button {
   display: flex;
-  height: 64px;
+  height: 52px;
   align-items: center;
   justify-content: center;
   gap: 10px;
@@ -176,7 +195,7 @@
   background: #338f3c;
   box-shadow: 0 7px 15px rgb(51 143 60 / 17%);
 
-  font-size: 21px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: 1.5px;
 
@@ -268,7 +287,7 @@
     height: 58px;
   }
 
-  .login-field input {
+  .login-field__input {
     font-size: 18px;
   }
 }

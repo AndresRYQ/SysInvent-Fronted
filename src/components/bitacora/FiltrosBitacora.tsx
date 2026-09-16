@@ -8,6 +8,7 @@ import Select from 'react-select'
 
 import type { AccionBitacora } from '../../types/bitacora'
 import { crearEstilosSelect } from '../../styles/reactSelectStyles'
+import { DatePickerInput } from '../ui/DatePickerInput'
 
 export interface FiltrosBitacoraValores {
   busqueda: string
@@ -75,7 +76,7 @@ export function FiltrosBitacora({
         <div className="mb-3">
           <span className="maestro-kicker">
             <Filter size={16} />
-            Filtros de auditoría
+            Filtros de búsqueda
           </span>
         </div>
 
@@ -159,20 +160,16 @@ export function FiltrosBitacora({
               className="form-label"
               htmlFor="fechaDesdeBitacora"
             >
-              Desde
+              Fecha desde
             </label>
 
-            <input
+            <DatePickerInput
               id="fechaDesdeBitacora"
-              className="form-control"
-              type="date" placeholder={Placeholder.Fecha}
               value={valores.fechaDesde}
-              onChange={(event) =>
-                onChange(
-                  'fechaDesde',
-                  event.target.value,
-                )
-              }
+              maxValue={valores.fechaHasta}
+              rangoEstricto
+              className="form-control"
+              onChange={(value) => onChange('fechaDesde', value)}
             />
           </div>
 
@@ -181,20 +178,16 @@ export function FiltrosBitacora({
               className="form-label"
               htmlFor="fechaHastaBitacora"
             >
-              Hasta
+              Fecha hasta
             </label>
 
-            <input
+            <DatePickerInput
               id="fechaHastaBitacora"
-              className="form-control"
-              type="date" placeholder={Placeholder.Fecha}
               value={valores.fechaHasta}
-              onChange={(event) =>
-                onChange(
-                  'fechaHasta',
-                  event.target.value,
-                )
-              }
+              minValue={valores.fechaDesde}
+              rangoEstricto
+              className="form-control"
+              onChange={(value) => onChange('fechaHasta', value)}
             />
           </div>
 

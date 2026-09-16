@@ -4,9 +4,11 @@ import {
   useMemo,
   useState,
 } from 'react'
+import { createPortal } from 'react-dom'
 
 import {
   CalendarDays,
+  Filter,
   PackagePlus,
   Pencil,
   Plus,
@@ -17,6 +19,7 @@ import {
   X,
 } from 'lucide-react'
 import Select from 'react-select'
+import DatePicker from 'react-datepicker'
 
 import {
   useLocation,
@@ -26,6 +29,7 @@ import {
 import { TablePagination } from '../../components/ui/TablePagination'
 import { EmptyState } from '../../components/common/EmptyState'
 import { crearEstilosSelect } from '../../styles/reactSelectStyles'
+import { ValidadorRangoFechas } from '../../utils/ValidadorRangoFechas'
 
 import {
   anularIngresoAlmacen,
@@ -95,6 +99,42 @@ function formatearFecha(
   return new Intl.DateTimeFormat(
     'es-PE',
   ).format(fechaLocal)
+}
+
+function convertirFechaASeleccion(fecha: string): Date | null {
+  if (!fecha) {
+    return null
+  }
+
+  const [anio, mes, dia] = fecha.split('-').map(Number)
+  const seleccion = new Date(anio, mes - 1, dia)
+
+  return Number.isNaN(seleccion.getTime()) ? null : seleccion
+}
+
+function convertirSeleccionAFecha(fecha: Date | null): string {
+  if (!fecha) {
+    return ''
+  }
+
+  const anio = fecha.getFullYear()
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0')
+  const dia = String(fecha.getDate()).padStart(2, '0')
+
+  return `${anio}-${mes}-${dia}`
+}
+
+function desplazarFecha(
+  fecha: Date | null,
+  dias: number,
+): Date | undefined {
+  if (!fecha) {
+    return undefined
+  }
+
+  const resultado = new Date(fecha)
+  resultado.setDate(resultado.getDate() + dias)
+  return resultado
 }
 
 export function IngresosAlmacenPage() {
@@ -388,6 +428,24 @@ export function IngresosAlmacenPage() {
     }
   }
 
+  function aplicarFiltros(): void {
+    const errorRango = ValidadorRangoFechas.validar(
+      filtros.fechaDesde,
+      filtros.fechaHasta,
+    )
+
+    if (errorRango) {
+      setMensaje({
+        tipo: 'danger',
+        texto: errorRango,
+      })
+      return
+    }
+
+    setFiltrosAplicados({ ...filtros })
+    setPage(1)
+  }
+
   return (
     <>
       <main className="dashboard-shell maestro-page-shell">
@@ -423,11 +481,20 @@ export function IngresosAlmacenPage() {
 
           <div className="maestro-panel">
             <section className="maestro-filter-card card border-0 shadow-sm">
-              <div className="card-body p-3">
+              <div className="card-body p-3 p-lg-3">
+                <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2">
+                  <div>
+                    <span className="maestro-kicker">
+                      <Filter size={16} />
+                      Filtros de búsqueda
+                    </span>
+                  </div>
+                </div>
+
                 <div className="row g-3">
                   <div className="col-12 col-lg-4">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="ingresoBusqueda"
                     >
                       Buscar
@@ -453,7 +520,7 @@ export function IngresosAlmacenPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="ingresoProveedorFiltro"
                     >
                       Proveedor
@@ -475,7 +542,7 @@ export function IngresosAlmacenPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="ingresoEstadoFiltro"
                     >
                       Estado
@@ -497,53 +564,69 @@ export function IngresosAlmacenPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="ingresoDesde"
                     >
-                      Desde
+                      Fecha desde
                     </label>
 
-                    <input
+                    <DatePicker
                       id="ingresoDesde"
                       className="form-control maestro-control"
-                      type="date" placeholder={Placeholder.Fecha}
-                      value={filtros.fechaDesde}
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            fechaDesde:
-                              event.target
-                                .value,
-                          }),
-                        )
+                      selected={convertirFechaASeleccion(filtros.fechaDesde)}
+                      maxDate={desplazarFecha(
+                        convertirFechaASeleccion(filtros.fechaHasta),
+                        -1,
+                      )}
+                      onChange={(fecha: Date | null) =>
+                        setFiltros((actual) => ({
+                          ...actual,
+                          fechaDesde: convertirSeleccionAFecha(fecha),
+                        }))
                       }
+                      dateFormat="dd/MM/yyyy"
+                      locale="es"
+                      placeholderText={Placeholder.Fecha}
+                      popperClassName="ingreso-datepicker-popper"
+                      popperContainer={(props) =>
+                        createPortal(props.children, document.body)
+                      }
+                      isClearable
+                      autoComplete="off"
                     />
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="ingresoHasta"
                     >
-                      Hasta
+                      Fecha hasta
                     </label>
 
-                    <input
+                    <DatePicker
                       id="ingresoHasta"
                       className="form-control maestro-control"
-                      type="date" placeholder={Placeholder.Fecha}
-                      value={filtros.fechaHasta}
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            fechaHasta:
-                              event.target
-                                .value,
-                          }),
-                        )
+                      selected={convertirFechaASeleccion(filtros.fechaHasta)}
+                      minDate={desplazarFecha(
+                        convertirFechaASeleccion(filtros.fechaDesde),
+                        1,
+                      )}
+                      onChange={(fecha: Date | null) =>
+                        setFiltros((actual) => ({
+                          ...actual,
+                          fechaHasta: convertirSeleccionAFecha(fecha),
+                        }))
                       }
+                      dateFormat="dd/MM/yyyy"
+                      locale="es"
+                      placeholderText={Placeholder.Fecha}
+                      popperClassName="ingreso-datepicker-popper"
+                      popperContainer={(props) =>
+                        createPortal(props.children, document.body)
+                      }
+                      isClearable
+                      autoComplete="off"
                     />
                   </div>
                 </div>
@@ -569,12 +652,7 @@ export function IngresosAlmacenPage() {
                   <button
                     type="button"
                     className="btn btn-maestro-primary"
-                    onClick={() => {
-                      setFiltrosAplicados({
-                        ...filtros,
-                      })
-                      setPage(1)
-                    }}
+                    onClick={aplicarFiltros}
                   >
                     <Search size={18} />
                     Buscar
