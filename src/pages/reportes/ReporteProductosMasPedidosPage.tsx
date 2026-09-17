@@ -5,31 +5,29 @@ import {
 } from 'react'
 
 import {
-  FileSpreadsheet,
+  BarChart3,
 } from 'lucide-react'
 
-import { ExportarValesExcelButton } from '../../components/reportes/vales/ExportarValesExcelButton'
-import { FiltrosReporteVales } from '../../components/reportes/vales/FiltrosReporteVales'
-import { ResumenReporteVales } from '../../components/reportes/vales/ResumenReporteVales'
-import { TablaReporteVales } from '../../components/reportes/vales/TablaReporteVales'
+import { ExportarProductosMasPedidosButton } from '../../components/reportes/productos-mas-pedidos/ExportarProductosMasPedidosButton'
+import { FiltrosProductosMasPedidos } from '../../components/reportes/productos-mas-pedidos/FiltrosProductosMasPedidos'
+import { GraficoProductosMasPedidos } from '../../components/reportes/productos-mas-pedidos/GraficoProductosMasPedidos'
+import { ResumenProductosMasPedidos } from '../../components/reportes/productos-mas-pedidos/ResumenProductosMasPedidos'
+import { TablaProductosMasPedidos } from '../../components/reportes/productos-mas-pedidos/TablaProductosMasPedidos'
 import { TablePagination } from '../../components/ui/TablePagination'
 
-import { obtenerCentrosCosto } from '../../services/centroCostoService'
+import { obtenerCategorias } from '../../services/categoriaService'
 import { obtenerDestinos } from '../../services/destinoService'
-import { obtenerPartesEquipo } from '../../services/parteEquipoService'
-import { obtenerProductos } from '../../services/productoService'
 
 import {
-  filtrarReporteVales,
-  obtenerFilasReporteVales,
-  obtenerResumenReporteVales,
-} from '../../services/reporteValeService'
+  obtenerProductosMasPedidos,
+  obtenerResumenProductosMasPedidos,
+} from '../../services/reporteProductoMasPedidoService'
 
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
 
 import type {
-  FiltrosReporteVales as Filtros,
-} from '../../types/reporteVale'
+  FiltrosProductosMasPedidos as Filtros,
+} from '../../types/reporteProductoMasPedido'
 
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
@@ -38,19 +36,12 @@ const FILTROS_INICIALES: Filtros = {
   busqueda: '',
   fechaDesde: '',
   fechaHasta: '',
-  centroCostoId: '',
-  destinoId: '',
-  parteEquipoId: '',
   tipoProductoId: '',
-  productoId: '',
-  estado: '',
+  categoriaId: '',
+  destinoId: '',
 }
 
-export function ReporteValesPage() {
-  const [filas] = useState(
-    () => obtenerFilasReporteVales(),
-  )
-
+export function ReporteProductosMasPedidosPage() {
   const [filtros, setFiltros] =
     useState<Filtros>({
       ...FILTROS_INICIALES,
@@ -68,12 +59,28 @@ export function ReporteValesPage() {
   const [pageSize, setPageSize] =
     useState(10)
 
-  const centrosCosto = useMemo(
+  const tiposProducto = useMemo(
     () =>
-      obtenerCentrosCosto()
-        .map((centro) => ({
-          id: centro.id,
-          nombre: centro.nombre,
+      obtenerTiposProducto()
+        .map((tipo) => ({
+          id: tipo.id,
+          nombre: tipo.nombre,
+        }))
+        .sort((primero, segundo) =>
+          primero.nombre.localeCompare(
+            segundo.nombre,
+            'es',
+          ),
+        ),
+    [],
+  )
+
+  const categorias = useMemo(
+    () =>
+      obtenerCategorias()
+        .map((categoria) => ({
+          id: categoria.id,
+          nombre: categoria.nombre,
         }))
         .sort((primero, segundo) =>
           primero.nombre.localeCompare(
@@ -100,90 +107,40 @@ export function ReporteValesPage() {
     [],
   )
 
-  const partesEquipo = useMemo(
+  const filas = useMemo(
     () =>
-      obtenerPartesEquipo()
-        .map((parte) => ({
-          id: parte.id,
-          codigo: parte.codigo,
-          nombre: parte.nombre,
-        }))
-        .sort((primero, segundo) =>
-          primero.nombre.localeCompare(
-            segundo.nombre,
-            'es',
-          ),
-        ),
-    [],
-  )
-
-  const tiposProducto = useMemo(
-    () =>
-      obtenerTiposProducto()
-        .map((tipo) => ({
-          id: tipo.id,
-          nombre: tipo.nombre,
-        }))
-        .sort((primero, segundo) =>
-          primero.nombre.localeCompare(
-            segundo.nombre,
-            'es',
-          ),
-        ),
-    [],
-  )
-
-  const productos = useMemo(
-    () =>
-      obtenerProductos()
-        .map((producto) => ({
-          id: producto.id,
-          codigo: producto.codigo,
-          nombre: producto.nombre,
-          tipoProductoId:
-            producto.tipoProductoId,
-        }))
-        .sort((primero, segundo) =>
-          primero.nombre.localeCompare(
-            segundo.nombre,
-            'es',
-          ),
-        ),
-    [],
-  )
-
-  const filasFiltradas = useMemo(
-    () =>
-      filtrarReporteVales(
-        filas,
+      obtenerProductosMasPedidos(
         filtrosAplicados,
       ),
-    [filas, filtrosAplicados],
+    [filtrosAplicados],
   )
 
   const resumen = useMemo(
     () =>
-      obtenerResumenReporteVales(
-        filasFiltradas,
+      obtenerResumenProductosMasPedidos(
+        filas,
+        filtrosAplicados,
       ),
-    [filasFiltradas],
+    [
+      filas,
+      filtrosAplicados,
+    ],
   )
 
-  const totalItems =
-    filasFiltradas.length
+  const totalItems = filas.length
 
   const filasPaginadas = useMemo(
     () => {
       const inicio =
         (page - 1) * pageSize
 
-      return filasFiltradas.slice(
+      return filas.slice(
         inicio,
         inicio + pageSize,
       )
     },
     [
-      filasFiltradas,
+      filas,
       page,
       pageSize,
     ],
@@ -242,17 +199,18 @@ export function ReporteValesPage() {
         <section className="maestro-topbar">
           <div className="d-flex align-items-center justify-content-between gap-3 flex-wrap">
             <div className="maestro-topbar__copy">
-              <h1>Reporte de vales</h1>
+              <h1>
+                Productos más pedidos
+              </h1>
 
               <p>
-                Consulta las salidas, destinos,
-                partes de equipo y productos
-                entregados mediante vales de
-                consumo.
+                Ranking de productos según las
+                cantidades entregadas mediante
+                vales de consumo registrados.
               </p>
             </div>
 
-            <FileSpreadsheet
+            <BarChart3
               size={36}
               className="text-success"
             />
@@ -260,22 +218,26 @@ export function ReporteValesPage() {
         </section>
 
         <div className="maestro-panel">
-          <ResumenReporteVales
+          <ResumenProductosMasPedidos
             resumen={resumen}
           />
         </div>
 
         <div className="maestro-panel">
-          <FiltrosReporteVales
+          <FiltrosProductosMasPedidos
             valores={filtros}
-            centrosCosto={centrosCosto}
-            destinos={destinos}
-            partesEquipo={partesEquipo}
             tiposProducto={tiposProducto}
-            productos={productos}
+            categorias={categorias}
+            destinos={destinos}
             onChange={cambiarFiltro}
             onBuscar={buscar}
             onLimpiar={limpiar}
+          />
+        </div>
+
+        <div className="maestro-panel">
+          <GraficoProductosMasPedidos
+            filas={filas}
           />
         </div>
 
@@ -285,26 +247,23 @@ export function ReporteValesPage() {
               <div className="maestro-table-header">
                 <div>
                   <span className="maestro-kicker">
-                    <FileSpreadsheet
-                      size={16}
-                    />
-
-                    Detalle de vales
+                    <BarChart3 size={16} />
+                    Ranking completo
                   </span>
 
                   <p className="maestro-section-copy small mb-0 mt-1">
                     {totalItems}{' '}
-                    distribución(es)
-                    encontrada(s)
+                    producto(s) encontrado(s)
                   </p>
                 </div>
 
-                <ExportarValesExcelButton
-                  filas={filasFiltradas}
+                <ExportarProductosMasPedidosButton
+                  filas={filas}
+                  resumen={resumen}
                 />
               </div>
 
-              <TablaReporteVales
+              <TablaProductosMasPedidos
                 filas={filasPaginadas}
               />
 

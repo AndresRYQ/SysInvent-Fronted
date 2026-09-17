@@ -668,48 +668,6 @@ export function FormularioProducto({
           <div className="col-12 col-lg-4">
             <label
               className="form-label maestro-label"
-              htmlFor="productoStockMinimo"
-            >
-              Stock mínimo
-              <span className="maestro-required">*</span>
-            </label>
-
-            <input
-              id="productoStockMinimo"
-              className={`form-control maestro-control${
-                errores.stockMinimo
-                  ? ' maestro-control--error'
-                  : ''
-              }`}
-              type="number"
-              min="0"
-              step="0.001"
-              value={form.stockMinimo}
-              onChange={(event) => {
-                setForm((actual) => ({
-                  ...actual,
-                  stockMinimo:
-                    event.target.value === ''
-                      ? 0
-                      : Number(
-                          event.target.value,
-                        ),
-                }))
-
-                limpiarError('stockMinimo')
-              }}
-            />
-
-            {errores.stockMinimo && (
-              <div className="maestro-field-error">
-                {errores.stockMinimo}
-              </div>
-            )}
-          </div>
-
-          <div className="col-12 col-lg-4">
-            <label
-              className="form-label maestro-label"
               htmlFor="productoPrecio"
             >
               Precio unitario
@@ -791,24 +749,6 @@ export function FormularioProducto({
               </option>
             </select>
           </div>
-
-          {producto && (
-            <div className="col-12 col-lg-4">
-              <label className="form-label maestro-label">
-                Stock actual
-              </label>
-
-              <input
-                className="form-control maestro-control"
-                value={producto.stockActual}
-                readOnly
-              />
-
-              <small className="text-muted">
-                Se actualiza mediante ingresos y vales.
-              </small>
-            </div>
-          )}
 
           <div className="col-12">
             <label

@@ -5,7 +5,6 @@ import {
   Plus,
   ShieldCheck,
   Trash2,
-  TriangleAlert,
 } from 'lucide-react'
 
 import type { Producto } from '../../types/producto'
@@ -79,9 +78,9 @@ export function TablaProductos({
                 <th>Código</th>
                 <th>Producto</th>
                 <th>Clasificación</th>
+                <th>Unidad</th>
                 <th>Proveedor</th>
-                <th>Stock</th>
-                <th>Precio</th>
+                <th>Precio referencial</th>
                 <th>Estado</th>
                 <th className="text-center">
                   Acciones
@@ -91,131 +90,112 @@ export function TablaProductos({
 
             <tbody>
               {productos.length > 0 ? (
-                productos.map((producto) => {
-                  const stockBajo =
-                    producto.stockActual <=
-                    producto.stockMinimo
+                productos.map((producto) => (
+                  <tr key={producto.id}>
+                    <td>
+                      <span className="maestro-id-chip">
+                        {producto.codigo}
+                      </span>
+                    </td>
 
-                  return (
-                    <tr key={producto.id}>
-                      <td>
-                        <span className="maestro-id-chip">
-                          {producto.codigo}
+                    <td>
+                      <div className="maestro-cell-main">
+                        <span className="maestro-cell-icon">
+                          <Boxes size={16} />
                         </span>
-                      </td>
 
-                      <td>
-                        <div className="maestro-cell-main">
-                          <span className="maestro-cell-icon">
-                            <Boxes size={16} />
-                          </span>
+                        <div>
+                          <strong>
+                            {producto.nombre}
+                          </strong>
 
-                          <div>
-                            <strong>
-                              {producto.nombre}
-                            </strong>
-
-                            <div className="small text-muted">
-                              {producto.id}
-                            </div>
+                          <div className="small text-muted">
+                            {producto.id}
                           </div>
                         </div>
-                      </td>
+                      </div>
+                    </td>
 
-                      <td>
-                        <div>
-                          {producto.tipoProductoNombre}
-                        </div>
+                    <td>
+                      <div>
+                        {
+                          producto.tipoProductoNombre
+                        }
+                      </div>
 
-                        <small className="text-muted">
-                          {producto.categoriaNombre}
-                        </small>
-                      </td>
+                      <small className="text-muted">
+                        {
+                          producto.categoriaNombre
+                        }
+                      </small>
+                    </td>
 
-                      <td>
-                        <span className="d-flex align-items-center gap-2">
-                          <Building2 size={14} />
-                          {producto.proveedorNombre}
-                        </span>
-                      </td>
+                    <td>
+                      {
+                        producto.unidadMedidaNombre
+                      }
+                    </td>
 
-                      <td>
-                        <div
-                          className={
-                            stockBajo
-                              ? 'text-danger fw-semibold'
-                              : 'text-success fw-semibold'
+                    <td>
+                      <span className="d-flex align-items-center gap-2">
+                        <Building2 size={14} />
+                        {
+                          producto.proveedorNombre
+                        }
+                      </span>
+                    </td>
+
+                    <td>
+                      {formatearMoneda(
+                        producto.precioUnitario,
+                      )}
+                    </td>
+
+                    <td>
+                      <span
+                        className={
+                          producto.estado
+                            ? 'maestro-status maestro-status--active'
+                            : 'maestro-status maestro-status--inactive'
+                        }
+                      >
+                        <ShieldCheck size={14} />
+
+                        {producto.estado
+                          ? 'Activo'
+                          : 'Inactivo'}
+                      </span>
+                    </td>
+
+                    <td>
+                      <div className="maestro-actions">
+                        <button
+                          type="button"
+                          className="btn maestro-action-btn"
+                          title="Editar"
+                          aria-label={`Editar ${producto.nombre}`}
+                          onClick={() =>
+                            onEditar(producto)
                           }
                         >
-                          {stockBajo && (
-                            <TriangleAlert
-                              size={15}
-                              className="me-1"
-                            />
-                          )}
+                          <Pencil size={16} />
+                        </button>
 
-                          {producto.stockActual}{' '}
-                          {producto.unidadMedidaNombre}
-                        </div>
-
-                        <small className="text-muted">
-                          Mínimo:{' '}
-                          {producto.stockMinimo}
-                        </small>
-                      </td>
-
-                      <td>
-                        {formatearMoneda(
-                          producto.precioUnitario,
-                        )}
-                      </td>
-
-                      <td>
-                        <span
-                          className={
-                            producto.estado
-                              ? 'maestro-status maestro-status--active'
-                              : 'maestro-status maestro-status--inactive'
+                        <button
+                          type="button"
+                          className="btn maestro-action-btn maestro-action-btn--danger"
+                          title="Eliminar"
+                          aria-label={`Eliminar ${producto.nombre}`}
+                          onClick={() =>
+                            onEliminar(producto)
                           }
                         >
-                          <ShieldCheck size={14} />
-
-                          {producto.estado
-                            ? 'Activo'
-                            : 'Inactivo'}
-                        </span>
-                      </td>
-
-                      <td>
-                        <div className="maestro-actions">
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            title="Editar"
-                            aria-label={`Editar ${producto.nombre}`}
-                            onClick={() =>
-                              onEditar(producto)
-                            }
-                          >
-                            <Pencil size={16} />
-                          </button>
-
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn maestro-action-btn--danger"
-                            title="Eliminar"
-                            aria-label={`Eliminar ${producto.nombre}`}
-                            onClick={() =>
-                              onEliminar(producto)
-                            }
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
               ) : (
                 <tr>
                   <td colSpan={8}>
@@ -227,7 +207,8 @@ export function TablaProductos({
                       </p>
 
                       <span>
-                        Ajusta los filtros o registra un producto.
+                        Ajusta los filtros o registra
+                        un producto.
                       </span>
                     </div>
                   </td>

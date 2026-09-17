@@ -1,16 +1,17 @@
 import {
+  Ban,
   Boxes,
+  CircleCheckBig,
   ClipboardList,
-  ListTree,
-  Trophy,
+  PackageCheck,
   WalletCards,
 } from 'lucide-react'
 
 import type {
-  ResumenProductosMasPedidos as Resumen,
-} from '../../../types/reporteProductoMasPedido'
+  ResumenReporteVales as Resumen,
+} from '../../../types/reporteVale'
 
-interface ResumenProductosMasPedidosProps {
+interface ResumenReporteValesProps {
   resumen: Resumen
 }
 
@@ -39,39 +40,72 @@ function formatearMoneda(
   ).format(valor)
 }
 
-export function ResumenProductosMasPedidos({
+export function ResumenReporteVales({
   resumen,
-}: ResumenProductosMasPedidosProps) {
+}: ResumenReporteValesProps) {
   return (
     <section className="mb-3">
       <div className="row g-3">
-        <div className="col-12 col-xl-4">
+        <div className="col-12 col-sm-6 col-xl-2">
           <div className="card border-0 shadow-sm h-100">
             <div className="card-body">
-              <div className="d-flex align-items-start gap-3">
-                <div className="text-warning">
-                  <Trophy size={31} />
+              <div className="d-flex align-items-center gap-3">
+                <div className="text-primary">
+                  <ClipboardList size={25} />
                 </div>
 
-                <div className="flex-grow-1">
+                <div>
                   <span className="text-secondary small">
-                    Producto más pedido
+                    Total de vales
                   </span>
 
-                  <strong className="d-block fs-5 text-success mt-1">
-                    {resumen.productoMasPedido}
+                  <strong className="d-block fs-3 mt-1">
+                    {resumen.totalVales}
                   </strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                  <span className="d-block text-secondary mt-1">
-                    {formatearCantidad(
-                      resumen
-                        .cantidadProductoMasPedido,
-                    )}{' '}
-                    {
-                      resumen
-                        .unidadProductoMasPedido
-                    }
+        <div className="col-12 col-sm-6 col-xl-2">
+          <div className="card border-0 shadow-sm h-100">
+            <div className="card-body">
+              <div className="d-flex align-items-center gap-3">
+                <div className="text-success">
+                  <CircleCheckBig size={25} />
+                </div>
+
+                <div>
+                  <span className="text-secondary small">
+                    Registrados
                   </span>
+
+                  <strong className="d-block fs-3 text-success mt-1">
+                    {resumen.valesRegistrados}
+                  </strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-12 col-sm-6 col-xl-2">
+          <div className="card border-0 shadow-sm h-100">
+            <div className="card-body">
+              <div className="d-flex align-items-center gap-3">
+                <div className="text-danger">
+                  <Ban size={25} />
+                </div>
+
+                <div>
+                  <span className="text-secondary small">
+                    Anulados
+                  </span>
+
+                  <strong className="d-block fs-3 text-danger mt-1">
+                    {resumen.valesAnulados}
+                  </strong>
                 </div>
               </div>
             </div>
@@ -88,58 +122,37 @@ export function ResumenProductosMasPedidos({
 
                 <div>
                   <span className="text-secondary small">
-                    Productos
-                  </span>
-
-                  <strong className="d-block fs-3 mt-1">
-                    {resumen.totalProductos}
-                  </strong>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-12 col-sm-6 col-xl-2">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body">
-              <div className="d-flex align-items-center gap-3">
-                <div className="text-success">
-                  <ClipboardList size={25} />
-                </div>
-
-                <div>
-                  <span className="text-secondary small">
-                    Vales
-                  </span>
-
-                  <strong className="d-block fs-3 mt-1">
-                    {resumen.totalVales}
-                  </strong>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-12 col-sm-6 col-xl-2">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body">
-              <div className="d-flex align-items-center gap-3">
-                <div className="text-primary">
-                  <ListTree size={25} />
-                </div>
-
-                <div>
-                  <span className="text-secondary small">
                     Distribuciones
                   </span>
 
                   <strong className="d-block fs-3 mt-1">
                     {
-                      resumen
-                        .totalDistribuciones
+                      resumen.totalDistribuciones
                     }
+                  </strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-12 col-sm-6 col-xl-2">
+          <div className="card border-0 shadow-sm h-100">
+            <div className="card-body">
+              <div className="d-flex align-items-center gap-3">
+                <div className="text-warning">
+                  <PackageCheck size={25} />
+                </div>
+
+                <div>
+                  <span className="text-secondary small">
+                    Cantidad entregada
+                  </span>
+
+                  <strong className="d-block fs-4 mt-1">
+                    {formatearCantidad(
+                      resumen.cantidadTotal,
+                    )}
                   </strong>
                 </div>
               </div>
@@ -157,7 +170,7 @@ export function ResumenProductosMasPedidos({
 
                 <div>
                   <span className="text-secondary small">
-                    Valorizado
+                    Total valorizado
                   </span>
 
                   <strong className="d-block fs-5 text-success mt-1">

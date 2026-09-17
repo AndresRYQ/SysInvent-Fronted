@@ -8,8 +8,8 @@ import { registrarEventoBitacora } from './bitacoraService'
 const STORAGE_KEY =
   'agrihusac_partes_equipo'
 
-const INGRESOS_STORAGE_KEY =
-  'agrihusac_ingresos_almacen'
+const VALES_STORAGE_KEY =
+  'agrihusac_vales_consumo'
 
 const PARTES_INICIALES:
   ParteEquipo[] = [
@@ -163,27 +163,90 @@ function parteEstaEnUso(
   try {
     const datosGuardados =
       localStorage.getItem(
-        INGRESOS_STORAGE_KEY,
+        VALES_STORAGE_KEY,
       )
 
     if (!datosGuardados) {
       return false
     }
 
-    const ingresos = JSON.parse(
-      datosGuardados,
-    )
+    const datos: unknown =
+      JSON.parse(datosGuardados)
 
-    if (!Array.isArray(ingresos)) {
+    if (!Array.isArray(datos)) {
       return false
     }
 
-    return ingresos.some(
-      (ingreso) =>
-        typeof ingreso === 'object' &&
-        ingreso !== null &&
-        ingreso.parteEquipoId ===
-          parteEquipoId,
+    return datos.some(
+      (valorVale: unknown) => {
+        if (
+          typeof valorVale !== 'object' ||
+          valorVale === null
+        ) {
+          return false
+        }
+
+        const vale = valorVale as {
+          detalles?: unknown
+        }
+
+        if (
+          !Array.isArray(vale.detalles)
+        ) {
+          return false
+        }
+
+        return vale.detalles.some(
+          (valorDetalle: unknown) => {
+            if (
+              typeof valorDetalle !==
+                'object' ||
+              valorDetalle === null
+            ) {
+              return false
+            }
+
+            const detalle =
+              valorDetalle as {
+                distribuciones?: unknown
+              }
+
+            if (
+              !Array.isArray(
+                detalle.distribuciones,
+              )
+            ) {
+              return false
+            }
+
+            return detalle.distribuciones.some(
+              (
+                valorDistribucion:
+                  unknown,
+              ) => {
+                if (
+                  typeof valorDistribucion !==
+                    'object' ||
+                  valorDistribucion ===
+                    null
+                ) {
+                  return false
+                }
+
+                const distribucion =
+                  valorDistribucion as {
+                    parteEquipoId?: unknown
+                  }
+
+                return (
+                  distribucion.parteEquipoId ===
+                  parteEquipoId
+                )
+              },
+            )
+          },
+        )
+      },
     )
   } catch {
     return false
@@ -415,7 +478,7 @@ export function eliminarParteEquipo(
 
   if (parteEstaEnUso(id)) {
     throw new Error(
-      'No puedes eliminar esta parte porque está asignada a uno o más ingresos de almacén. Puedes desactivarla.',
+      'No puedes eliminar esta parte porque está asignada a uno o más vales de consumo. Puedes desactivarla.',
     )
   }
 

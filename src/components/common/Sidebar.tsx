@@ -15,7 +15,6 @@ import {
   Shield,
   UserCircle,
 } from 'lucide-react'
-import { useRef, type PointerEvent } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 
@@ -50,6 +49,7 @@ const SECCIONES: SidebarSection[] = [
     label: 'Inventario',
     items: [
       {
+        to: '/control-almacen',
         label: 'Control de almacén',
         icon: Archive,
         moduleId: 'control-almacen',
@@ -72,16 +72,20 @@ const SECCIONES: SidebarSection[] = [
     label: 'Reportes',
     items: [
       {
+        to: '/reportes/ingresos',
         label: 'Reporte de ingreso',
         icon: FileText,
         moduleId: 'reporte-ingresos',
       },
       {
+        to: '/reportes/vales',
         label: 'Reporte de vale',
         icon: FileText,
         moduleId: 'reporte-vales',
       },
       {
+        to:
+        '/reportes/productos-mas-pedidos',
         label:
           'Reporte de producto más pedido',
         icon: FileText,
@@ -176,6 +180,7 @@ const SECCIONES: SidebarSection[] = [
         moduleId: 'roles',
       },
       {
+        to: '/perfil',
         label: 'Perfil de usuario',
         icon: UserCircle,
         moduleId: 'perfil-usuario',
@@ -208,74 +213,22 @@ const seccionesPermitidas =
   })).filter(
     (seccion) => seccion.items.length > 0,
   )
-  const sidebarRef = useRef<HTMLDivElement>(null)
-  const dragRef = useRef({
-    active: false,
-    dragged: false,
-    startY: 0,
-    startScrollTop: 0,
-  })
-
+ 
   const activo = (to: string) =>
     to === '/dashboard' ? pathname === to : pathname.startsWith(to)
 
-  const manejarPointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0 || !sidebarRef.current) {
-      return
-    }
-
-    dragRef.current = {
-      active: true,
-      dragged: false,
-      startY: event.clientY,
-      startScrollTop: sidebarRef.current.scrollTop,
-    }
-    sidebarRef.current.setPointerCapture(event.pointerId)
-  }
-
-  const manejarPointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current.active || !sidebarRef.current) {
-      return
-    }
-
-    const desplazamiento = event.clientY - dragRef.current.startY
-    if (Math.abs(desplazamiento) > 5) {
-      dragRef.current.dragged = true
-    }
-
-    if (dragRef.current.dragged) {
-      sidebarRef.current.scrollTop = Math.max(
-        0,
-        Math.min(
-          sidebarRef.current.scrollHeight - sidebarRef.current.clientHeight,
-          dragRef.current.startScrollTop - desplazamiento,
-        ),
-      )
-    }
-  }
-
-  const finalizarArrastre = (event: PointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current.active || !sidebarRef.current) {
-      return
-    }
-
-    dragRef.current.active = false
-    sidebarRef.current.releasePointerCapture(event.pointerId)
-  }
-
-  const evitarClickTrasArrastre = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (dragRef.current.dragged) {
-      event.preventDefault()
-      event.stopPropagation()
-      dragRef.current.dragged = false
-    }
-  }
+  
 
   return (
     <aside
-      className={`sidebar ${abierto ? 'sidebar--abierto' : ''}`}
-      aria-hidden={!abierto}
-    >
+        className={
+          `sidebar ${
+            abierto
+              ? 'sidebar--abierto'
+              : ''
+          }`
+        }
+      >
       <button
         type="button"
         className="sidebar-toggle"
@@ -286,15 +239,7 @@ const seccionesPermitidas =
         {abierto ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
       </button>
 
-      <div
-        ref={sidebarRef}
-        className="sidebar-inner"
-        onPointerDown={manejarPointerDown}
-        onPointerMove={manejarPointerMove}
-        onPointerUp={finalizarArrastre}
-        onPointerCancel={finalizarArrastre}
-        onClickCapture={evitarClickTrasArrastre}
-      >
+     <div className="sidebar-inner">
         <div className={`sidebar-head ${abierto ? '' : 'sidebar-head--cerrado'}`}>
           <span className="sidebar-title">Menú</span>
         </div>

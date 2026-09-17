@@ -13,7 +13,6 @@ export interface FiltrosProductosValores {
   busqueda: string
   tipoProductoId: string
   categoriaId: string
-  nivelStock: string
   estado: string
 }
 
@@ -54,7 +53,7 @@ export function FiltrosProductos({
             onBuscar()
           }}
         >
-          <div className="col-12 col-xl-4">
+          <div className="col-12 col-xl-6">
             <label
               className="form-label maestro-label"
               htmlFor="buscarProducto"
@@ -76,7 +75,7 @@ export function FiltrosProductos({
             />
           </div>
 
-          <div className="col-12 col-md-6 col-xl-2">
+          <div className="col-12 col-md-4 col-xl-2">
             <label
               className="form-label maestro-label"
               htmlFor="filtroTipoProducto"
@@ -108,7 +107,7 @@ export function FiltrosProductos({
             </select>
           </div>
 
-          <div className="col-12 col-md-6 col-xl-2">
+          <div className="col-12 col-md-4 col-xl-2">
             <label
               className="form-label maestro-label"
               htmlFor="filtroCategoriaProducto"
@@ -129,47 +128,20 @@ export function FiltrosProductos({
             >
               <option value="">Todas</option>
 
-              {categorias.map((categoria) => (
-                <option
-                  key={categoria.id}
-                  value={categoria.id}
-                >
-                  {categoria.nombre}
-                </option>
-              ))}
+              {categorias.map(
+                (categoria) => (
+                  <option
+                    key={categoria.id}
+                    value={categoria.id}
+                  >
+                    {categoria.nombre}
+                  </option>
+                ),
+              )}
             </select>
           </div>
 
-          <div className="col-12 col-md-6 col-xl-2">
-            <label
-              className="form-label maestro-label"
-              htmlFor="filtroStockProducto"
-            >
-              Nivel de stock
-            </label>
-
-            <select
-              id="filtroStockProducto"
-              className="form-select maestro-control"
-              value={valores.nivelStock}
-              onChange={(event) =>
-                onChange(
-                  'nivelStock',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">Todos</option>
-              <option value="bajo">
-                Stock bajo
-              </option>
-              <option value="normal">
-                Stock normal
-              </option>
-            </select>
-          </div>
-
-          <div className="col-12 col-md-6 col-xl-2">
+          <div className="col-12 col-md-4 col-xl-2">
             <label
               className="form-label maestro-label"
               htmlFor="filtroEstadoProducto"

@@ -8,6 +8,9 @@ import { registrarEventoBitacora } from './bitacoraService'
 const STORAGE_KEY =
   'agrihusac_destinos'
 
+const VALES_STORAGE_KEY =
+  'agrihusac_vales_consumo'
+
 const DESTINOS_INICIALES: Destino[] = [
   {
     id: 'DES-001',
@@ -144,6 +147,102 @@ function crearFechaActual(): string {
   return new Intl.DateTimeFormat(
     'es-PE',
   ).format(new Date())
+}
+
+function destinoEstaEnUso(
+  destinoId: string,
+): boolean {
+  try {
+    const datosGuardados =
+      localStorage.getItem(
+        VALES_STORAGE_KEY,
+      )
+
+    if (!datosGuardados) {
+      return false
+    }
+
+    const datos: unknown =
+      JSON.parse(datosGuardados)
+
+    if (!Array.isArray(datos)) {
+      return false
+    }
+
+    return datos.some(
+      (valorVale: unknown) => {
+        if (
+          typeof valorVale !== 'object' ||
+          valorVale === null
+        ) {
+          return false
+        }
+
+        const vale = valorVale as {
+          detalles?: unknown
+        }
+
+        if (
+          !Array.isArray(vale.detalles)
+        ) {
+          return false
+        }
+
+        return vale.detalles.some(
+          (valorDetalle: unknown) => {
+            if (
+              typeof valorDetalle !==
+                'object' ||
+              valorDetalle === null
+            ) {
+              return false
+            }
+
+            const detalle =
+              valorDetalle as {
+                distribuciones?: unknown
+              }
+
+            if (
+              !Array.isArray(
+                detalle.distribuciones,
+              )
+            ) {
+              return false
+            }
+
+            return detalle.distribuciones.some(
+              (
+                valorDistribucion:
+                  unknown,
+              ) => {
+                if (
+                  typeof valorDistribucion !==
+                    'object' ||
+                  valorDistribucion ===
+                    null
+                ) {
+                  return false
+                }
+
+                const distribucion =
+                  valorDistribucion as {
+                    destinoId?: unknown
+                  }
+
+                return (
+                  distribucion.destinoId ===
+                  destinoId
+                )
+              },
+            )
+          },
+        )
+      },
+    )
+  } catch {
+    return false
+  }
 }
 
 export function obtenerDestinos():
@@ -316,12 +415,18 @@ export function eliminarDestino(
       (destino) =>
         destino.id === id,
     )
-
+  
   if (!destinoAEliminar) {
     throw new Error(
       'El destino no existe.',
     )
   }
+
+   if (destinoEstaEnUso(id)) {
+      throw new Error(
+        'No puedes eliminar este destino porque está utilizado en uno o más vales de consumo. Puedes desactivarlo.',
+      )
+    }
 
   guardarDestinos(
     destinos.filter(

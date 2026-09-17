@@ -12,14 +12,18 @@ import {
   cerrarSesion,
   iniciarSesion,
   obtenerSesion,
+  sincronizarSesionUsuario,
 } from '../services/authService'
 
-import { STORAGE_KEYS } from '../services/storageService'
+import {
+  STORAGE_KEYS,
+} from '../services/storageService'
 
 import type {
   CredencialesLogin,
   ResultadoLogin,
   SesionUsuario,
+  UsuarioLogin,
 } from '../types/auth'
 
 interface AuthContextType {
@@ -30,6 +34,10 @@ interface AuthContextType {
   ) => ResultadoLogin
 
   logout: () => void
+
+  actualizarSesionUsuario: (
+    usuario: UsuarioLogin,
+  ) => void
 }
 
 interface AuthProviderProps {
@@ -47,9 +55,9 @@ const MOTIVO_CIERRE_KEY =
   'agrihusac_motivo_cierre'
 
 const AuthContext =
-  createContext<AuthContextType | undefined>(
-    undefined,
-  )
+  createContext<
+    AuthContextType | undefined
+  >(undefined)
 
 export function AuthProvider({
   children,
@@ -69,21 +77,22 @@ export function AuthProvider({
       }
 
       const detalle =
-          motivo === 'inactividad'
-            ? 'La sesión se cerró después de 2 minutos de inactividad.'
-            : motivo === 'vencimiento'
-              ? 'La sesión se cerró al alcanzar el tiempo máximo de 5 minutos.'
-              : 'El usuario cerró la sesión manualmente.'
+        motivo === 'inactividad'
+          ? 'La sesión se cerró después de 2 minutos de inactividad.'
+          : motivo === 'vencimiento'
+            ? 'La sesión se cerró al alcanzar el tiempo máximo de 5 minutos.'
+            : 'El usuario cerró la sesión manualmente.'
 
-        cerrarSesion(detalle)
-        setSesion(null)
+      cerrarSesion(detalle)
+      setSesion(null)
     },
     [],
   )
 
   const login = useCallback(
     (
-      credenciales: CredencialesLogin,
+      credenciales:
+        CredencialesLogin,
     ): ResultadoLogin => {
       const resultado =
         iniciarSesion(credenciales)
@@ -112,6 +121,19 @@ export function AuthProvider({
     finalizarSesion()
   }, [finalizarSesion])
 
+  const actualizarSesionUsuario =
+    useCallback(
+      (usuario: UsuarioLogin) => {
+        const sesionActualizada =
+          sincronizarSesionUsuario(
+            usuario,
+          )
+
+        setSesion(sesionActualizada)
+      },
+      [],
+    )
+
   /*
    * Cierra automáticamente la sesión
    * cuando se cumplen los 5 minutos.
@@ -121,9 +143,10 @@ export function AuthProvider({
       return
     }
 
-    const fechaExpiracion = Date.parse(
-      sesion.fechaExpiracion,
-    )
+    const fechaExpiracion =
+      Date.parse(
+        sesion.fechaExpiracion,
+      )
 
     const tiempoRestante =
       fechaExpiracion - Date.now()
@@ -136,17 +159,25 @@ export function AuthProvider({
       return
     }
 
-    const temporizador = window.setTimeout(
-      () => {
-        finalizarSesion('vencimiento')
-      },
-      tiempoRestante,
-    )
+    const temporizador =
+      window.setTimeout(
+        () => {
+          finalizarSesion(
+            'vencimiento',
+          )
+        },
+        tiempoRestante,
+      )
 
     return () => {
-      window.clearTimeout(temporizador)
+      window.clearTimeout(
+        temporizador,
+      )
     }
-  }, [sesion, finalizarSesion])
+  }, [
+    sesion,
+    finalizarSesion,
+  ])
 
   /*
    * Cierra la sesión después de
@@ -160,20 +191,29 @@ export function AuthProvider({
     let temporizador:
       number | undefined
 
-    const cerrarPorInactividad = () => {
-      finalizarSesion('inactividad')
-    }
-
-    const reiniciarTemporizador = () => {
-      if (temporizador !== undefined) {
-        window.clearTimeout(temporizador)
+    const cerrarPorInactividad =
+      () => {
+        finalizarSesion(
+          'inactividad',
+        )
       }
 
-      temporizador = window.setTimeout(
-        cerrarPorInactividad,
-        TIEMPO_INACTIVIDAD_MS,
-      )
-    }
+    const reiniciarTemporizador =
+      () => {
+        if (
+          temporizador !== undefined
+        ) {
+          window.clearTimeout(
+            temporizador,
+          )
+        }
+
+        temporizador =
+          window.setTimeout(
+            cerrarPorInactividad,
+            TIEMPO_INACTIVIDAD_MS,
+          )
+      }
 
     const eventosActividad: Array<
       keyof WindowEventMap
@@ -186,38 +226,52 @@ export function AuthProvider({
 
     reiniciarTemporizador()
 
-    eventosActividad.forEach((evento) => {
-      window.addEventListener(
-        evento,
-        reiniciarTemporizador,
-        { passive: true },
-      )
-    })
-
-    return () => {
-      if (temporizador !== undefined) {
-        window.clearTimeout(temporizador)
-      }
-
-      eventosActividad.forEach((evento) => {
-        window.removeEventListener(
+    eventosActividad.forEach(
+      (evento) => {
+        window.addEventListener(
           evento,
           reiniciarTemporizador,
+          {
+            passive: true,
+          },
         )
-      })
+      },
+    )
+
+    return () => {
+      if (
+        temporizador !== undefined
+      ) {
+        window.clearTimeout(
+          temporizador,
+        )
+      }
+
+      eventosActividad.forEach(
+        (evento) => {
+          window.removeEventListener(
+            evento,
+            reiniciarTemporizador,
+          )
+        },
+      )
     }
-  }, [sesion, finalizarSesion])
+  }, [
+    sesion,
+    finalizarSesion,
+  ])
 
   /*
-   * Sincroniza inicio y cierre de sesión
-   * entre las pestañas del navegador.
+   * Sincroniza inicio, cierre y actualización
+   * de sesión entre las pestañas.
    */
   useEffect(() => {
     const sincronizarSesion = (
       evento: StorageEvent,
     ) => {
       if (
-        evento.key === STORAGE_KEYS.sesion
+        evento.key ===
+        STORAGE_KEYS.sesion
       ) {
         setSesion(obtenerSesion())
       }
@@ -242,8 +296,14 @@ export function AuthProvider({
         sesion,
         login,
         logout,
+        actualizarSesionUsuario,
       }),
-      [sesion, login, logout],
+      [
+        sesion,
+        login,
+        logout,
+        actualizarSesionUsuario,
+      ],
     )
 
   return (
@@ -255,8 +315,10 @@ export function AuthProvider({
   )
 }
 
-export function useAuth(): AuthContextType {
-  const contexto = useContext(AuthContext)
+export function useAuth():
+  AuthContextType {
+  const contexto =
+    useContext(AuthContext)
 
   if (!contexto) {
     throw new Error(

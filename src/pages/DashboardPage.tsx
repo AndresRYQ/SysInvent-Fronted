@@ -7,6 +7,9 @@ import { useNavigate } from 'react-router-dom'
 import {
   tienePermisoModulo,
 } from '../services/rolService'
+import {
+  obtenerResumenDashboard,
+} from '../services/dashboardService'
 import AnimatedContent from '../components/ui/AnimatedContent'
 import CountUp from '../components/ui/CountUp'
 import SpotlightCard from '../components/ui/SpotlightCard'
@@ -49,126 +52,6 @@ type Module = {
   route?: string
 }
 
-type DashboardAlert = {
-  id: number
-  title: string
-  detail: string
-  tone: 'warning' | 'danger' | 'info'
-}
-
-type RecentMovement = {
-  id: number
-  date: string
-  type: 'Ingreso' | 'Vale'
-  document: string
-  product: string
-  quantity: number
-  responsible: string
-}
-
-const metrics: Metric[] = [
-  {
-    label: 'Inventario total',
-    value: 2450,
-    detail: 'Productos registrados',
-    status: 'neutral',
-    icon: 'box',
-    tone: 'green',
-  },
-  {
-    label: 'Stock bajo',
-    value: 8,
-    detail: 'Requieren reposición',
-    status: 'alert',
-    icon: 'clipboard',
-    tone: 'orange',
-  },
-  {
-    label: 'Ingresos del mes',
-    value: 35,
-    detail: 'Movimientos registrados',
-    status: 'positive',
-    icon: 'entry',
-    tone: 'blue',
-  },
-  {
-    label: 'Vales pendientes',
-    value: 6,
-    detail: 'Pendientes de entrega',
-    status: 'alert',
-    icon: 'order',
-    tone: 'violet',
-  },
-  {
-    label: 'Movimientos de hoy',
-    value: 12,
-    detail: 'Entradas y salidas',
-    status: 'neutral',
-    icon: 'audit',
-    tone: 'teal',
-  },
-]
-
-const dashboardAlerts: DashboardAlert[] = [
-  {
-    id: 1,
-    title: 'Productos con stock bajo',
-    detail: '8 productos requieren reposición.',
-    tone: 'warning',
-  },
-  {
-    id: 2,
-    title: 'Vales pendientes',
-    detail: '6 vales esperan ser entregados.',
-    tone: 'danger',
-  },
-  {
-    id: 3,
-    title: 'Inventario actualizado',
-    detail: 'Última actualización realizada hoy.',
-    tone: 'info',
-  },
-]
-
-const recentMovements: RecentMovement[] = [
-  {
-    id: 1,
-    date: '11/09/2026',
-    type: 'Ingreso',
-    document: 'IA-2026-0035',
-    product: 'Guantes de nitrilo',
-    quantity: 24,
-    responsible: 'Administrador',
-  },
-  {
-    id: 2,
-    date: '11/09/2026',
-    type: 'Vale',
-    document: 'VC-2026-0087',
-    product: 'Mascarilla descartable',
-    quantity: 12,
-    responsible: 'Almacén',
-  },
-  {
-    id: 3,
-    date: '10/09/2026',
-    type: 'Ingreso',
-    document: 'IA-2026-0034',
-    product: 'Lentes de seguridad',
-    quantity: 18,
-    responsible: 'Administrador',
-  },
-  {
-    id: 4,
-    date: '10/09/2026',
-    type: 'Vale',
-    document: 'VC-2026-0086',
-    product: 'Cinta de embalaje',
-    quantity: 8,
-    responsible: 'Almacén',
-  },
-]
-
 const categories = [
   'Todos',
   'Inventario',
@@ -202,7 +85,7 @@ const modules: Module[] = [
     title: 'Bitácora',
     description: 'Consulta de actividades y cambios.',
     icon: 'audit',
-    tone: 'green',
+    tone: 'violet',
     category: 'Seguridad',
     route: '/bitacora',
   },
@@ -231,6 +114,7 @@ const modules: Module[] = [
     icon: 'box',
     tone: 'green',
     category: 'Inventario',
+    route: '/control-almacen',
   },
   {
     id: 'vales-consumo',
@@ -257,6 +141,7 @@ const modules: Module[] = [
     icon: 'report',
     tone: 'blue',
     category: 'Reportes',
+    route: '/reportes/ingresos',
   },
   {
     id: 'reporte-vales',
@@ -265,14 +150,17 @@ const modules: Module[] = [
     icon: 'report',
     tone: 'blue',
     category: 'Reportes',
+    route: '/reportes/vales',
   },
   {
     id: 'reporte-productos',
-    title: 'Reporte de producto más pedido',
+    title: 'Reporte acumulado',
     description: 'Consulta de productos más solicitados.',
     icon: 'chart',
     tone: 'blue',
     category: 'Reportes',
+     route:
+    '/reportes/productos-mas-pedidos',
   },
   {
     id: 'centros-costo',
@@ -353,6 +241,7 @@ const modules: Module[] = [
     icon: 'users',
     tone: 'teal',
     category: 'Perfil',
+    route: '/perfil',
   },
 ]
 
@@ -484,15 +373,118 @@ function Icon({ name }: { name: IconName }) {
 function DashboardPage() {
   const navigate = useNavigate()
   const { sesion } = useAuth()
-  const [selectedCategory, setSelectedCategory] = useState('Todos')
-  const nombreUsuario = sesion?.nombreCompleto ?? 'Frank Arone'
-  const nombreSaludo = nombreUsuario.split(' ')[0] || 'Frank'
-  const fechaActual = new Intl.DateTimeFormat('es-PE', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date())
+
+  const [
+    selectedCategory,
+    setSelectedCategory,
+  ] = useState('Todos')
+
+  const resumenDashboard = useMemo(
+    () => obtenerResumenDashboard(),
+    [],
+  )
+
+  const metrics: Metric[] = [
+    {
+      label: 'Productos activos',
+      value:
+        resumenDashboard.productosActivos,
+      detail:
+        'Productos registrados',
+      status: 'neutral',
+      icon: 'box',
+      tone: 'green',
+    },
+    {
+      label: 'Stock crítico',
+      value:
+        resumenDashboard
+          .productosStockBajo +
+        resumenDashboard
+          .productosSinStock,
+      detail:
+        'Requieren reposición',
+      status: 'alert',
+      icon: 'clipboard',
+      tone: 'orange',
+    },
+    {
+      label: 'Ingresos del mes',
+      value:
+        resumenDashboard.ingresosDelMes,
+      detail:
+        'Documentos registrados',
+      status: 'positive',
+      icon: 'entry',
+      tone: 'blue',
+    },
+    {
+      label: 'Vales del mes',
+      value:
+        resumenDashboard.valesDelMes,
+      detail:
+        'Documentos registrados',
+      status: 'neutral',
+      icon: 'order',
+      tone: 'violet',
+    },
+    {
+      label: 'Movimientos de hoy',
+      value:
+        resumenDashboard.movimientosHoy,
+      detail:
+        'Entradas y salidas',
+      status: 'neutral',
+      icon: 'audit',
+      tone: 'teal',
+    },
+  ]
+
+  const dashboardAlerts =
+    resumenDashboard.alertas.map(
+      (alerta) => ({
+        id: alerta.id,
+        title: alerta.titulo,
+        detail: alerta.detalle,
+        tone: alerta.tono,
+      }),
+    )
+
+  const recentMovements =
+    resumenDashboard
+      .movimientosRecientes
+      .map((movimiento) => ({
+        id: movimiento.id,
+        date: movimiento.fecha,
+        type: movimiento.tipo,
+        document:
+          movimiento.documento,
+        product:
+          movimiento.producto,
+        quantity:
+          movimiento.cantidad,
+        responsible:
+          movimiento.responsable,
+      }))
+
+  const nombreUsuario =
+    sesion?.nombreCompleto ??
+    'Usuario'
+
+  const nombreSaludo =
+    nombreUsuario.split(' ')[0] ||
+    'Usuario'
+
+  const fechaActual =
+    new Intl.DateTimeFormat(
+      'es-PE',
+      {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      },
+    ).format(new Date())
 
  const modulosPermitidos = useMemo(
   () =>

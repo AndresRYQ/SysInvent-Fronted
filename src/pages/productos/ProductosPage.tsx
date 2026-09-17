@@ -38,8 +38,7 @@ import '../../styles/maestros.css'
 const FILTROS_INICIALES: FiltrosProductosValores = {
   busqueda: '',
   tipoProductoId: '',
-  categoriaId: '',
-  nivelStock: '',
+  categoriaId: '',  
   estado: '',
 }
 
@@ -251,19 +250,6 @@ export function ProductosPage() {
           producto.categoriaId ===
             filtrosAplicados.categoriaId
 
-        const stockBajo =
-          producto.stockActual <=
-          producto.stockMinimo
-
-        const coincideStock =
-          !filtrosAplicados.nivelStock ||
-          (filtrosAplicados.nivelStock ===
-            'bajo' &&
-            stockBajo) ||
-          (filtrosAplicados.nivelStock ===
-            'normal' &&
-            !stockBajo)
-
         const coincideEstado =
           !filtrosAplicados.estado ||
           (filtrosAplicados.estado ===
@@ -276,8 +262,7 @@ export function ProductosPage() {
         return (
           coincideBusqueda &&
           coincideTipo &&
-          coincideCategoria &&
-          coincideStock &&
+          coincideCategoria &&       
           coincideEstado
         )
       },

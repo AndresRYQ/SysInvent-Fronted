@@ -81,19 +81,33 @@
   flex-direction: column;
   padding: 20px 14px;
   box-sizing: border-box;
+  overflow-x: hidden;
   overflow-y: auto;
-  cursor: grab;
-  touch-action: none;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.sidebar-inner:active {
-  cursor: grabbing;
+  cursor: default;
+  touch-action: pan-y;
+  scrollbar-width: thin;
+  scrollbar-color:
+    rgba(255, 255, 255, 0.28)
+    transparent;
 }
 
 .sidebar-inner::-webkit-scrollbar {
-  display: none;
+  width: 6px;
+}
+
+.sidebar-inner::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-inner::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background:
+    rgba(255, 255, 255, 0.28);
+}
+
+.sidebar-inner::-webkit-scrollbar-thumb:hover {
+  background:
+    rgba(255, 255, 255, 0.45);
 }
 
 .sidebar-head {

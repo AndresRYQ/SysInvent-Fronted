@@ -371,3 +371,39 @@ export function cerrarSesion(
 export function estaAutenticado(): boolean {
   return obtenerSesion() !== null
 }
+
+export function sincronizarSesionUsuario(
+  usuario: UsuarioLogin,
+): SesionUsuario | null {
+  const sesionActual =
+    obtenerStorage<SesionUsuario | null>(
+      STORAGE_KEYS.sesion,
+      null,
+    )
+
+  if (!sesionActual) {
+    return null
+  }
+
+  if (
+    sesionActual.id !== usuario.id
+  ) {
+    return sesionActual
+  }
+
+  const sesionActualizada:
+    SesionUsuario = {
+      ...sesionActual,
+      usuario: usuario.usuario,
+      nombreCompleto:
+        usuario.nombreCompleto,
+      rol: usuario.rol,
+    }
+
+  guardarStorage(
+    STORAGE_KEYS.sesion,
+    sesionActualizada,
+  )
+
+  return sesionActualizada
+}

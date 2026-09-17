@@ -1,204 +1,343 @@
-
-import { useEffect, useMemo, useState } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
 import {
-  FiltrosIngreso,
-  type FiltrosIngresoValores,
-} from '../../components/ingresos-almacen/FiltrosIngreso'
+  CalendarDays,
+  PackagePlus,
+  Pencil,
+  Plus,
+  ShieldCheck,
+  Trash2,
+} from 'lucide-react'
+
 import {
-  FormularioIngreso,
-  type IngresoFormPayload,
-} from '../../components/ingresos-almacen/FormularioIngreso'
-import { IngresoDeleteModal } from '../../components/ingresos-almacen/IngresoDeleteModal'
-import { TablaIngresos } from '../../components/ingresos-almacen/TablaIngresos'
-import type { IngresoAlmacen } from '../../types/ingresoAlmacen'
+  useLocation,
+  useNavigate,
+} from 'react-router-dom'
+
+import { TablePagination } from '../../components/ui/TablePagination'
+
+import {
+  anularIngresoAlmacen,
+  calcularTotalIngreso,
+  obtenerIngresosAlmacen,
+} from '../../services/ingresoAlmacenService'
+
+import { obtenerContactos } from '../../services/contactoService'
+import { obtenerProductos } from '../../services/productoService'
+import { obtenerProveedores } from '../../services/proveedorService'
+import { obtenerTiposDocumento } from '../../services/tipoComprobanteService'
+import { obtenerUnidadesMedida } from '../../services/unidadMedidaService'
+import type { IngresoAlmacenRegistro } from '../../types/ingresoAlmacen'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
-const FILTROS_INICIALES: FiltrosIngresoValores = {
-  numeroIngreso: '',
-  proveedor: '',
+interface FiltrosIngresos {
+  busqueda: string
+  proveedorId: string
+  estado: string
+  fechaDesde: string
+  fechaHasta: string
+}
+
+interface EstadoNavegacion {
+  mensaje?: string
+}
+
+interface MensajePagina {
+  tipo: 'success' | 'danger'
+  texto: string
+}
+
+const FILTROS_INICIALES: FiltrosIngresos = {
+  busqueda: '',
+  proveedorId: '',
   estado: '',
+  fechaDesde: '',
+  fechaHasta: '',
 }
 
-const INGRESOS_MOCK: IngresoAlmacen[] = [
-  {
-    id: 'ING-001',
-    numeroIngreso: 'ING-2026-0001',
-    fechaRegistro: '2026-08-05',
-    proveedor: 'Ferreteria Industrial SAC',
-    producto: 'Guantes de nitrilo',
-    cantidad: 50,
-    unidadMedida: 'Caja',
-    almacen: 'Almacén Central',
-    observacion: 'Ingreso por reposición de stock.',
-    estado: true,
-  },
-  {
-    id: 'ING-002',
-    numeroIngreso: 'ING-2026-0002',
-    fechaRegistro: '2026-08-08',
-    proveedor: 'Distribuidora Lima Norte',
-    producto: 'Mascarillas N95',
-    cantidad: 100,
-    unidadMedida: 'Paquete',
-    almacen: 'Almacén Central',
-    observacion: 'Material para seguridad industrial.',
-    estado: true,
-  },
-  {
-    id: 'ING-003',
-    numeroIngreso: 'ING-2026-0003',
-    fechaRegistro: '2026-08-10',
-    proveedor: 'Importaciones del Sur',
-    producto: 'Cinta de embalaje',
-    cantidad: 200,
-    unidadMedida: 'Rollo',
-    almacen: 'Almacén Secundario',
-    observacion: 'Ingreso de materiales para despacho.',
-    estado: true,
-  },
-  {
-    id: 'ING-004',
-    numeroIngreso: 'ING-2026-0004',
-    fechaRegistro: '2026-08-12',
-    proveedor: 'Comercial Huaral EIRL',
-    producto: 'Lentes de seguridad',
-    cantidad: 75,
-    unidadMedida: 'Unidad',
-    almacen: 'Almacén Central',
-    observacion: 'Entrega parcial del proveedor.',
-    estado: true,
-  },
-  {
-    id: 'ING-005',
-    numeroIngreso: 'ING-2026-0005',
-    fechaRegistro: '2026-08-15',
-    proveedor: 'Ferreteria Industrial SAC',
-    producto: 'Tornillos hexagonales',
-    cantidad: 500,
-    unidadMedida: 'Bolsa',
-    almacen: 'Almacén Secundario',
-    observacion: 'Registro anulado para maqueta.',
-    estado: false,
-  },
-  {
-    id: 'ING-006',
-    numeroIngreso: 'ING-2026-0006',
-    fechaRegistro: '2026-08-18',
-    proveedor: 'Distribuidora Lima Norte',
-    producto: 'Desinfectante industrial',
-    cantidad: 30,
-    unidadMedida: 'Galon',
-    almacen: 'Almacén Central',
-    observacion: 'Ingreso para limpieza general.',
-    estado: true,
-  },
-  {
-    id: 'ING-007',
-    numeroIngreso: 'ING-2026-0007',
-    fechaRegistro: '2026-08-22',
-    proveedor: 'Importaciones del Sur',
-    producto: 'Casco de seguridad',
-    cantidad: 40,
-    unidadMedida: 'Unidad',
-    almacen: 'Almacén Central',
-    observacion: 'Stock inicial para operaciones.',
-    estado: true,
-  },
-  {
-    id: 'ING-008',
-    numeroIngreso: 'ING-2026-0008',
-    fechaRegistro: '2026-08-25',
-    proveedor: 'Comercial Huaral EIRL',
-    producto: 'Aceite lubricante',
-    cantidad: 20,
-    unidadMedida: 'Litro',
-    almacen: 'Almacén Secundario',
-    observacion: 'Material para mantenimiento.',
-    estado: true,
-  },
-]
-
-function filtrarIngresos(
-  ingresos: IngresoAlmacen[],
-  filtros: FiltrosIngresoValores,
-) {
-  const numeroIngreso = filtros.numeroIngreso.trim().toLowerCase()
-  const proveedor = filtros.proveedor.trim().toLowerCase()
-
-  return ingresos.filter((ingreso) => {
-    const coincideNumero =
-      numeroIngreso.length === 0 ||
-      ingreso.numeroIngreso.toLowerCase().includes(numeroIngreso)
-
-    const coincideProveedor =
-      proveedor.length === 0 ||
-      ingreso.proveedor.toLowerCase().includes(proveedor)
-
-    const coincideEstado =
-      filtros.estado.length === 0 ||
-      (filtros.estado === 'activo' && ingreso.estado) ||
-      (filtros.estado === 'anulado' && !ingreso.estado)
-
-    return coincideNumero && coincideProveedor && coincideEstado
-  })
+function obtenerMensajeError(
+  error: unknown,
+): string {
+  return error instanceof Error
+    ? error.message
+    : 'Ocurrió un error inesperado.'
 }
 
-function crearCodigoIngreso(total: number) {
-  return String(total + 1).padStart(3, '0')
-}
+function formatearFecha(
+  fecha: string,
+): string {
+  if (!fecha) {
+    return '-'
+  }
 
-function crearNumeroIngreso(total: number) {
-  return `ING-2026-${String(total + 1).padStart(4, '0')}`
+  const fechaLocal = new Date(
+    `${fecha}T00:00:00`,
+  )
+
+  if (
+    Number.isNaN(fechaLocal.getTime())
+  ) {
+    return fecha
+  }
+
+  return new Intl.DateTimeFormat(
+    'es-PE',
+  ).format(fechaLocal)
 }
 
 export function IngresosAlmacenPage() {
-  const [ingresos, setIngresos] =
-    useState<IngresoAlmacen[]>(INGRESOS_MOCK)
-  const [filtros, setFiltros] =
-    useState<FiltrosIngresoValores>(FILTROS_INICIALES)
-  const [filtrosAplicados, setFiltrosAplicados] =
-    useState<FiltrosIngresoValores>(FILTROS_INICIALES)
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
-  const [modalFormOpen, setModalFormOpen] =
-    useState(false)
-  const [ingresoEnEdicion, setIngresoEnEdicion] =
-    useState<IngresoAlmacen | null>(null)
-  const [modalDeleteOpen, setModalDeleteOpen] =
-    useState(false)
-  const [ingresoAEliminar, setIngresoAEliminar] =
-    useState<IngresoAlmacen | null>(null)
+  const navigate = useNavigate()
+  const location = useLocation()
 
-  const ingresosFiltrados = useMemo(
-    () =>
-      filtrarIngresos(
-        ingresos,
-        filtrosAplicados,
-      ),
-    [ingresos, filtrosAplicados],
+  const [ingresos, setIngresos] =
+    useState<IngresoAlmacenRegistro[]>(
+      () => obtenerIngresosAlmacen(),
+    )
+
+  const [filtros, setFiltros] =
+    useState<FiltrosIngresos>(
+      FILTROS_INICIALES,
+    )
+
+  const [
+    filtrosAplicados,
+    setFiltrosAplicados,
+  ] = useState<FiltrosIngresos>(
+    FILTROS_INICIALES,
   )
 
-  const totalItems = ingresosFiltrados.length
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] =
+    useState(10)
 
-  const ingresosPaginados = useMemo(() => {
-    const startIndex = (page - 1) * pageSize
-    const endIndex = startIndex + pageSize
-
-    return ingresosFiltrados.slice(
-      startIndex,
-      endIndex,
+  const [
+    ingresoAAnular,
+    setIngresoAAnular,
+  ] =
+    useState<IngresoAlmacenRegistro | null>(
+      null,
     )
+
+  const [mensaje, setMensaje] =
+    useState<MensajePagina | null>(null)
+
+  const proveedores = useMemo(
+    () => obtenerProveedores(),
+    [],
+  )
+
+  const contactos = useMemo(
+    () => obtenerContactos(),
+    [],
+  )
+
+  const tiposDocumento = useMemo(
+    () => obtenerTiposDocumento(),
+    [],
+  )
+
+  const productos = useMemo(
+    () => obtenerProductos(),
+    [],
+  )
+
+  const unidadesMedida = useMemo(
+    () => obtenerUnidadesMedida(),
+    [],
+  )
+  useEffect(() => {
+    const estado =
+      location.state as EstadoNavegacion | null
+
+    if (!estado?.mensaje) {
+      return
+    }
+
+    setMensaje({
+      tipo: 'success',
+      texto: estado.mensaje,
+    })
+
+    navigate(location.pathname, {
+      replace: true,
+      state: null,
+    })
   }, [
-    ingresosFiltrados,
-    page,
-    pageSize,
+    location.pathname,
+    location.state,
+    navigate,
   ])
 
-  const numeroIngresoSugerido = useMemo(
-    () => crearNumeroIngreso(ingresos.length),
-    [ingresos.length],
+  const ingresosConDetalle = useMemo(
+    () =>
+      ingresos.map((ingreso) => {
+        const proveedor =
+          proveedores.find(
+            (item) =>
+              item.id ===
+              ingreso.proveedorId,
+          )
+
+        const contacto = contactos.find(
+          (item) =>
+            item.id ===
+            ingreso.contactoId,
+        )
+
+        const tipoDocumento =
+          tiposDocumento.find(
+            (item) =>
+              item.id ===
+              ingreso.tipoComprobanteId,
+          )
+
+        const detallesProductos =
+        ingreso.detalles.map((detalle) => {
+          const producto = productos.find(
+            (item) =>
+              item.id === detalle.productoId,
+          )
+
+          const unidad = unidadesMedida.find(
+            (item) =>
+              item.id ===
+              producto?.unidadMedidaId,
+          )
+
+            return {
+              nombre:
+                producto?.nombre ??
+                'Producto no disponible',
+              cantidad: detalle.cantidad,
+              unidad:
+                unidad?.nombre ?? 'Sin unidad',
+            }
+          })
+
+        const nombresProductos =
+          detallesProductos.map(
+            (detalle) => detalle.nombre,
+          )
+
+        const cantidadesResumen =
+          detallesProductos
+            .map(
+              (detalle) =>
+                `${detalle.nombre}: ${detalle.cantidad} ${detalle.unidad}`,
+            )
+            .join(' | ')
+
+        return {
+          ...ingreso,
+          proveedorNombre:
+            proveedor?.razonSocial ??
+            'Proveedor no disponible',
+          contactoNombre:
+            contacto?.nombreCompleto ??
+            'Contacto no disponible',
+          tipoDocumentoNombre:
+            tipoDocumento?.nombre ??
+            'Documento no disponible',
+          productosResumen:
+            nombresProductos.join(', '),
+            cantidadesResumen,
+          total:
+            calcularTotalIngreso(ingreso),
+        }
+      }),
+    [
+      ingresos,
+      proveedores,
+      contactos,
+      tiposDocumento,
+      productos,
+      unidadesMedida,
+    ],
+  )
+
+  const ingresosFiltrados = useMemo(
+    () => {
+      const busqueda =
+        filtrosAplicados.busqueda
+          .trim()
+          .toLowerCase()
+
+      return ingresosConDetalle.filter(
+        (ingreso) => {
+          const coincideBusqueda =
+            !busqueda ||
+            ingreso.numeroIngreso
+              .toLowerCase()
+              .includes(busqueda) ||
+            ingreso.numeroDocumento
+              .toLowerCase()
+              .includes(busqueda) ||
+            ingreso.proveedorNombre
+              .toLowerCase()
+              .includes(busqueda) ||
+            ingreso.productosResumen
+              .toLowerCase()
+              .includes(busqueda)
+
+          const coincideProveedor =
+            !filtrosAplicados.proveedorId ||
+            ingreso.proveedorId ===
+              filtrosAplicados.proveedorId
+
+          const coincideEstado =
+            !filtrosAplicados.estado ||
+            ingreso.estado ===
+              filtrosAplicados.estado
+
+          const coincideDesde =
+            !filtrosAplicados.fechaDesde ||
+            ingreso.fechaIngreso >=
+              filtrosAplicados.fechaDesde
+
+          const coincideHasta =
+            !filtrosAplicados.fechaHasta ||
+            ingreso.fechaIngreso <=
+              filtrosAplicados.fechaHasta
+
+          return (
+            coincideBusqueda &&
+            coincideProveedor &&
+            coincideEstado &&
+            coincideDesde &&
+            coincideHasta
+          )
+        },
+      )
+    },
+    [
+      ingresosConDetalle,
+      filtrosAplicados,
+    ],
+  )
+
+  const totalItems =
+    ingresosFiltrados.length
+
+  const ingresosPaginados = useMemo(
+    () => {
+      const inicio =
+        (page - 1) * pageSize
+
+      return ingresosFiltrados.slice(
+        inicio,
+        inicio + pageSize,
+      )
+    },
+    [
+      ingresosFiltrados,
+      page,
+      pageSize,
+    ],
   )
 
   useEffect(() => {
@@ -212,31 +351,34 @@ export function IngresosAlmacenPage() {
     }
   }, [page, pageSize, totalItems])
 
-  const guardarIngreso = (payload: IngresoFormPayload) => {
-    if (ingresoEnEdicion) {
-      setIngresos((actual) =>
-        actual.map((ingreso) =>
-          ingreso.id === ingresoEnEdicion.id
-            ? {
-                ...ingreso,
-                ...payload,
-              }
-            : ingreso,
-        ),
-      )
-    } else {
-      setIngresos((actual) => [
-        {
-          id: `ING-${crearCodigoIngreso(actual.length)}`,
-          estado: true,
-          ...payload,
-        },
-        ...actual,
-      ])
+  function confirmarAnulacion(): void {
+    if (!ingresoAAnular) {
+      return
     }
 
-    setModalFormOpen(false)
-    setIngresoEnEdicion(null)
+    try {
+      const ingresoAnulado =
+        anularIngresoAlmacen(
+          ingresoAAnular.id,
+        )
+
+      setIngresos(
+        obtenerIngresosAlmacen(),
+      )
+
+      setMensaje({
+        tipo: 'success',
+        texto:
+          `Ingreso ${ingresoAnulado.numeroIngreso} anulado correctamente.`,
+      })
+    } catch (error) {
+      setMensaje({
+        tipo: 'danger',
+        texto: obtenerMensajeError(error),
+      })
+    } finally {
+      setIngresoAAnular(null)
+    }
   }
 
   return (
@@ -245,98 +387,511 @@ export function IngresosAlmacenPage() {
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
-              <h1>Ingresos de Almacén</h1>
-              <p>Registro de entradas de productos al almacén</p>
+              <h1>Ingresos de almacén</h1>
+
+              <p>
+                Registro de mercadería y
+                actualización de existencias.
+              </p>
             </div>
           </section>
 
+          {mensaje && (
+            <div
+              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
+              role="alert"
+            >
+              {mensaje.texto}
+
+              <button
+                type="button"
+                className="btn-close"
+                aria-label="Cerrar"
+                onClick={() =>
+                  setMensaje(null)
+                }
+              />
+            </div>
+          )}
+
           <div className="maestro-panel">
-            <FiltrosIngreso
-              valores={filtros}
-              onChange={(campo, valor) =>
-                setFiltros((actual) => ({
-                  ...actual,
-                  [campo]: valor,
-                }))
-              }
-              onBuscar={() => {
-                setFiltrosAplicados(filtros)
-                setPage(1)
-              }}
-              onLimpiar={() => {
-                setFiltros(FILTROS_INICIALES)
-                setFiltrosAplicados(FILTROS_INICIALES)
-                setPage(1)
-              }}
-            />
+            <section className="card border-0 shadow-sm">
+              <div className="card-body p-3">
+                <div className="row g-3">
+                  <div className="col-12 col-lg-4">
+                    <label
+                      className="form-label maestro-label"
+                      htmlFor="ingresoBusqueda"
+                    >
+                      Buscar
+                    </label>
+
+                    <input
+                      id="ingresoBusqueda"
+                      className="form-control maestro-control"
+                      placeholder="Ingreso, documento, proveedor o producto"
+                      value={filtros.busqueda}
+                      onChange={(event) =>
+                        setFiltros(
+                          (actual) => ({
+                            ...actual,
+                            busqueda:
+                              event.target
+                                .value,
+                          }),
+                        )
+                      }
+                    />
+                  </div>
+
+                  <div className="col-12 col-md-6 col-lg-2">
+                    <label
+                      className="form-label maestro-label"
+                      htmlFor="ingresoProveedorFiltro"
+                    >
+                      Proveedor
+                    </label>
+
+                    <select
+                      id="ingresoProveedorFiltro"
+                      className="form-select maestro-control"
+                      value={
+                        filtros.proveedorId
+                      }
+                      onChange={(event) =>
+                        setFiltros(
+                          (actual) => ({
+                            ...actual,
+                            proveedorId:
+                              event.target
+                                .value,
+                          }),
+                        )
+                      }
+                    >
+                      <option value="">
+                        Todos
+                      </option>
+
+                      {proveedores.map(
+                        (proveedor) => (
+                          <option
+                            key={
+                              proveedor.id
+                            }
+                            value={
+                              proveedor.id
+                            }
+                          >
+                            {
+                              proveedor.razonSocial
+                            }
+                          </option>
+                        ),
+                      )}
+                    </select>
+                  </div>
+
+                  <div className="col-12 col-md-6 col-lg-2">
+                    <label
+                      className="form-label maestro-label"
+                      htmlFor="ingresoEstadoFiltro"
+                    >
+                      Estado
+                    </label>
+
+                    <select
+                      id="ingresoEstadoFiltro"
+                      className="form-select maestro-control"
+                      value={filtros.estado}
+                      onChange={(event) =>
+                        setFiltros(
+                          (actual) => ({
+                            ...actual,
+                            estado:
+                              event.target
+                                .value,
+                          }),
+                        )
+                      }
+                    >
+                      <option value="">
+                        Todos
+                      </option>
+                      <option value="REGISTRADO">
+                        Registrado
+                      </option>
+                      <option value="ANULADO">
+                        Anulado
+                      </option>
+                    </select>
+                  </div>
+
+                  <div className="col-12 col-md-6 col-lg-2">
+                    <label
+                      className="form-label maestro-label"
+                      htmlFor="ingresoDesde"
+                    >
+                      Desde
+                    </label>
+
+                    <input
+                      id="ingresoDesde"
+                      className="form-control maestro-control"
+                      type="date"
+                      value={filtros.fechaDesde}
+                      onChange={(event) =>
+                        setFiltros(
+                          (actual) => ({
+                            ...actual,
+                            fechaDesde:
+                              event.target
+                                .value,
+                          }),
+                        )
+                      }
+                    />
+                  </div>
+
+                  <div className="col-12 col-md-6 col-lg-2">
+                    <label
+                      className="form-label maestro-label"
+                      htmlFor="ingresoHasta"
+                    >
+                      Hasta
+                    </label>
+
+                    <input
+                      id="ingresoHasta"
+                      className="form-control maestro-control"
+                      type="date"
+                      value={filtros.fechaHasta}
+                      onChange={(event) =>
+                        setFiltros(
+                          (actual) => ({
+                            ...actual,
+                            fechaHasta:
+                              event.target
+                                .value,
+                          }),
+                        )
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="d-flex justify-content-end gap-2 mt-3">
+                  <button
+                    type="button"
+                    className="btn maestro-btn-secondary"
+                    onClick={() => {
+                      setFiltros(
+                        FILTROS_INICIALES,
+                      )
+                      setFiltrosAplicados(
+                        FILTROS_INICIALES,
+                      )
+                      setPage(1)
+                    }}
+                  >
+                    Limpiar
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn maestro-btn-primary"
+                    onClick={() => {
+                      setFiltrosAplicados({
+                        ...filtros,
+                      })
+                      setPage(1)
+                    }}
+                  >
+                    Buscar
+                  </button>
+                </div>
+              </div>
+            </section>
           </div>
 
           <div className="maestro-panel">
-            <TablaIngresos
-              ingresos={ingresosPaginados}
-              totalItems={totalItems}
-              page={page}
-              pageSize={pageSize}
-              onAgregar={() => {
-                setIngresoEnEdicion(null)
-                setModalFormOpen(true)
-              }}
-              onEditar={(ingreso) => {
-                setIngresoEnEdicion(ingreso)
-                setModalFormOpen(true)
-              }}
-              onEliminar={(ingreso) => {
-                setIngresoAEliminar(ingreso)
-                setModalDeleteOpen(true)
-              }}
-              onPageChange={(nextPage) =>
-                setPage(nextPage)
-              }
-              onPageSizeChange={(nextPageSize) => {
-                setPageSize(nextPageSize)
-                setPage(1)
-              }}
-            />
+            <section className="maestro-table-card card border-0 shadow-sm">
+              <div className="card-body p-0">
+                <div className="maestro-table-header">
+                  <span className="maestro-kicker">
+                    <PackagePlus size={16} />
+                    Listado de ingresos
+                  </span>
+
+                  <button
+                    type="button"
+                    className="btn maestro-toolbar-btn"
+                    onClick={() =>
+                      navigate(
+                        '/ingresos-almacen/nuevo',
+                      )
+                    }
+                  >
+                    <Plus size={18} />
+                    Registrar ingreso
+                  </button>
+                </div>
+
+                <div className="table-responsive">
+                  <table className="table maestro-table align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th>Número</th>
+                        <th>Fecha</th>
+                        <th>Proveedor</th>
+                        <th>Contacto</th>
+                        <th>Documento</th>
+                        <th>Productos</th>
+                        <th>Cantidad ingresada</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th className="text-center">
+                          Acciones
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {ingresosPaginados.length ===
+                      0 ? (
+                        <tr>
+                          <td colSpan={10}>
+                            <div className="maestro-empty-state">
+                              <PackagePlus
+                                size={28}
+                              />
+                              <p className="mb-1">
+                                No se encontraron
+                                ingresos
+                              </p>
+                              <span>
+                                Registra el primer
+                                ingreso de mercadería.
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : (
+                        ingresosPaginados.map(
+                          (ingreso) => (
+                            <tr key={ingreso.id}>
+                              <td>
+                                <span className="maestro-id-chip">
+                                  {
+                                    ingreso.numeroIngreso
+                                  }
+                                </span>
+                              </td>
+
+                              <td>
+                                <CalendarDays
+                                  size={15}
+                                  className="me-1"
+                                />
+                                {formatearFecha(
+                                  ingreso.fechaIngreso,
+                                )}
+                              </td>
+
+                              <td>
+                                {
+                                  ingreso.proveedorNombre
+                                }
+                              </td>
+
+                              <td>
+                                {
+                                  ingreso.contactoNombre
+                                }
+                              </td>
+
+                              <td>
+                                <strong>
+                                  {
+                                    ingreso.tipoDocumentoNombre
+                                  }
+                                </strong>
+                                <div className="small text-secondary">
+                                  {
+                                    ingreso.numeroDocumento
+                                  }
+                                </div>
+                              </td>
+
+                              <td
+                                title={
+                                  ingreso.productosResumen
+                                }
+                              >
+                                {
+                                  ingreso.detalles
+                                    .length
+                                }{' '}
+                                producto(s)
+                              </td>
+                              <td
+                                title={
+                                  ingreso.cantidadesResumen
+                                }
+                              >
+                                {ingreso.cantidadesResumen}
+                              </td>
+
+                              <td>
+                                S/{' '}
+                                {ingreso.total.toFixed(
+                                  2,
+                                )}
+                              </td>
+
+                              <td>
+                                <span
+                                  className={
+                                    ingreso.estado ===
+                                    'REGISTRADO'
+                                      ? 'maestro-status maestro-status--active'
+                                      : 'maestro-status maestro-status--inactive'
+                                  }
+                                >
+                                  <ShieldCheck
+                                    size={14}
+                                  />
+                                  {ingreso.estado ===
+                                  'REGISTRADO'
+                                    ? 'Registrado'
+                                    : 'Anulado'}
+                                </span>
+                              </td>
+
+                              <td>
+                                <div className="maestro-actions">
+                                  <button
+                                    type="button"
+                                    className="btn maestro-action-btn"
+                                    title="Editar"
+                                    disabled={
+                                      ingreso.estado ===
+                                      'ANULADO'
+                                    }
+                                    onClick={() =>
+                                      navigate(
+                                        `/ingresos-almacen/${ingreso.id}/editar`,
+                                      )
+                                    }
+                                  >
+                                    <Pencil
+                                      size={16}
+                                    />
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    className="btn maestro-action-btn maestro-action-btn--danger"
+                                    title="Anular"
+                                    disabled={
+                                      ingreso.estado ===
+                                      'ANULADO'
+                                    }
+                                    onClick={() =>
+                                      setIngresoAAnular(
+                                        ingreso,
+                                      )
+                                    }
+                                  >
+                                    <Trash2
+                                      size={16}
+                                    />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ),
+                        )
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                <TablePagination
+                  totalItems={totalItems}
+                  page={page}
+                  pageSize={pageSize}
+                  onPageChange={setPage}
+                  onPageSizeChange={(
+                    nuevoTamano,
+                  ) => {
+                    setPageSize(
+                      nuevoTamano,
+                    )
+                    setPage(1)
+                  }}
+                />
+              </div>
+            </section>
           </div>
         </div>
       </main>
 
-      <FormularioIngreso
-        abierto={modalFormOpen}
-        ingreso={ingresoEnEdicion}
-        numeroIngresoSugerido={numeroIngresoSugerido}
-        onClose={() => {
-          setModalFormOpen(false)
-          setIngresoEnEdicion(null)
-        }}
-        onSubmit={guardarIngreso}
-      />
-
-      <IngresoDeleteModal
-        abierto={modalDeleteOpen}
-        ingreso={ingresoAEliminar}
-        onClose={() => {
-          setModalDeleteOpen(false)
-          setIngresoAEliminar(null)
-        }}
-        onConfirm={() => {
-          if (ingresoAEliminar) {
-            setIngresos((actual) =>
-              actual.map((ingreso) =>
-                ingreso.id === ingresoAEliminar.id
-                  ? {
-                      ...ingreso,
-                      estado: false,
-                    }
-                  : ingreso,
-              ),
-            )
+      {ingresoAAnular && (
+        <div
+          className="maestro-modal-backdrop"
+          role="presentation"
+          onClick={() =>
+            setIngresoAAnular(null)
           }
+        >
+          <div
+            className="maestro-modal-card maestro-modal-card--sm"
+            role="dialog"
+            aria-modal="true"
+            onClick={(event) =>
+              event.stopPropagation()
+            }
+          >
+            <h3 className="maestro-modal-title text-center">
+              Anular ingreso
+            </h3>
 
-          setModalDeleteOpen(false)
-          setIngresoAEliminar(null)
-        }}
-      />
+            <p className="maestro-modal-copy text-center">
+              Se descontarán del stock todos
+              los productos registrados en:
+            </p>
+
+            <p className="maestro-delete-name">
+              {
+                ingresoAAnular.numeroIngreso
+              }
+            </p>
+
+            <div className="maestro-modal-footer maestro-modal-footer--center">
+              <button
+                type="button"
+                className="btn maestro-btn-secondary"
+                onClick={() =>
+                  setIngresoAAnular(null)
+                }
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                className="btn maestro-btn-danger"
+                onClick={
+                  confirmarAnulacion
+                }
+              >
+                Anular ingreso
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

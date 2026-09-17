@@ -7,6 +7,12 @@ import { registrarEventoBitacora } from './bitacoraService'
 
 const STORAGE_KEY = 'agrihusac_productos'
 
+const INGRESOS_STORAGE_KEY =
+  'agrihusac_ingresos_almacen'
+
+const STOCK_MIGRATION_KEY =
+  'agrihusac_stock_desde_ingresos_v1'
+
 const PRODUCTOS_INICIALES: Producto[] = [
   {
     id: 'PROD-001',
@@ -18,8 +24,8 @@ const PRODUCTOS_INICIALES: Producto[] = [
     categoriaId: 'CAT-001',
     unidadMedidaId: 'UM-001',
     proveedorId: 'PROV-001',
-    stockActual: 12,
-    stockMinimo: 5,
+    stockActual: 0,
+    stockMinimo: 0,
     precioUnitario: 350,
     estado: true,
     fechaRegistro: '10/08/2026',
@@ -34,8 +40,8 @@ const PRODUCTOS_INICIALES: Producto[] = [
     categoriaId: 'CAT-002',
     unidadMedidaId: 'UM-005',
     proveedorId: 'PROV-002',
-    stockActual: 4,
-    stockMinimo: 10,
+    stockActual: 0,
+    stockMinimo: 0,
     precioUnitario: 28.5,
     estado: true,
     fechaRegistro: '11/08/2026',
@@ -50,8 +56,8 @@ const PRODUCTOS_INICIALES: Producto[] = [
     categoriaId: 'CAT-003',
     unidadMedidaId: 'UM-003',
     proveedorId: 'PROV-003',
-    stockActual: 18,
-    stockMinimo: 8,
+    stockActual: 0,
+    stockMinimo: 0,
     precioUnitario: 45.9,
     estado: true,
     fechaRegistro: '12/08/2026',
@@ -66,8 +72,8 @@ const PRODUCTOS_INICIALES: Producto[] = [
     categoriaId: 'CAT-004',
     unidadMedidaId: 'UM-001',
     proveedorId: 'PROV-003',
-    stockActual: 3,
-    stockMinimo: 6,
+    stockActual: 0,
+    stockMinimo: 0,
     precioUnitario: 85,
     estado: true,
     fechaRegistro: '13/08/2026',
@@ -89,6 +95,116 @@ function guardarProductos(
     STORAGE_KEY,
     JSON.stringify(productos),
   )
+}
+
+function migrarStockDesdeIngresos(
+  productos: Producto[],
+): Producto[] {
+  const migracionRealizada =
+    localStorage.getItem(
+      STOCK_MIGRATION_KEY,
+    ) === 'true'
+
+  if (migracionRealizada) {
+    return productos
+  }
+
+  const cantidadesPorProducto =
+    new Map<string, number>()
+
+  try {
+    const datosGuardados =
+      localStorage.getItem(
+        INGRESOS_STORAGE_KEY,
+      )
+
+    if (datosGuardados) {
+      const ingresos = JSON.parse(
+        datosGuardados,
+      )
+
+      if (Array.isArray(ingresos)) {
+        ingresos.forEach((ingreso) => {
+          if (
+            typeof ingreso !== 'object' ||
+            ingreso === null ||
+            ingreso.estado !==
+              'REGISTRADO' ||
+            !Array.isArray(
+              ingreso.detalles,
+            )
+          ) {
+            return
+          }
+
+          ingreso.detalles.forEach(
+            (detalle: unknown) => {
+              if (
+                typeof detalle !==
+                  'object' ||
+                detalle === null
+              ) {
+                return
+              }
+
+              const movimiento =
+                detalle as {
+                  productoId?: unknown
+                  cantidad?: unknown
+                }
+
+              if (
+                typeof movimiento.productoId !==
+                  'string' ||
+                typeof movimiento.cantidad !==
+                  'number' ||
+                !Number.isFinite(
+                  movimiento.cantidad,
+                ) ||
+                movimiento.cantidad <= 0
+              ) {
+                return
+              }
+
+              const cantidadActual =
+                cantidadesPorProducto.get(
+                  movimiento.productoId,
+                ) ?? 0
+
+              cantidadesPorProducto.set(
+                movimiento.productoId,
+                cantidadActual +
+                  movimiento.cantidad,
+              )
+            },
+          )
+        })
+      }
+    }
+  } catch {
+    cantidadesPorProducto.clear()
+  }
+
+  const productosMigrados =
+    productos.map((producto) => ({
+      ...producto,
+      stockActual: Number(
+        (
+          cantidadesPorProducto.get(
+            producto.id,
+          ) ?? 0
+        ).toFixed(3),
+      ),
+    }))
+
+  guardarProductos(productosMigrados)
+
+  localStorage.setItem(
+    STOCK_MIGRATION_KEY,
+    'true',
+  )
+
+  return productosMigrados
 }
 
 function normalizarTexto(
@@ -216,7 +332,9 @@ export function obtenerProductos():
     guardarProductos(PRODUCTOS_INICIALES)
 
     return copiarProductos(
-      PRODUCTOS_INICIALES,
+      migrarStockDesdeIngresos(
+        PRODUCTOS_INICIALES,
+      ),
     )
   }
 
@@ -228,13 +346,17 @@ export function obtenerProductos():
     }
 
     return copiarProductos(
-      datos as Producto[],
-    )
+        migrarStockDesdeIngresos(
+          datos as Producto[],
+        ),
+      )
   } catch {
     guardarProductos(PRODUCTOS_INICIALES)
 
     return copiarProductos(
-      PRODUCTOS_INICIALES,
+      migrarStockDesdeIngresos(
+        PRODUCTOS_INICIALES,
+      ),
     )
   }
 }
