@@ -3,6 +3,13 @@ import { registrarEventoBitacora } from './bitacoraService'
 
 const STORAGE_KEY = 'agrihusac_centros_costo'
 const VALES_STORAGE_KEY = 'agrihusac_vales_consumo'
+const CENTROS_INICIALES: CentroCosto[] = [
+  { id: 1, nombre: 'Administración', descripcion: 'Gestión general y dirección de la organización.', activo: 1 },
+  { id: 2, nombre: 'Producción', descripcion: 'Procesos productivos y operaciones de planta.', activo: 1 },
+  { id: 3, nombre: 'Mantenimiento', descripcion: 'Conservación de equipos e instalaciones.', activo: 1 },
+  { id: 4, nombre: 'Logística', descripcion: 'Almacenamiento y distribución de materiales.', activo: 1 },
+  { id: 5, nombre: 'Ventas', descripcion: 'Comercialización y atención de clientes.', activo: 0 },
+]
 
 type RegistroGuardado = Partial<CentroCosto> & { estado?: boolean; id?: number | string }
 
@@ -63,7 +70,8 @@ function centroCostoEstaEnUso(id: number): boolean {
 }
 
 export function obtenerCentrosCosto(): CentroCosto[] {
-  const centros = leerCentrosGuardados().sort((a, b) => a.id - b.id)
+  const guardados = leerCentrosGuardados()
+  const centros = (guardados.length ? guardados : CENTROS_INICIALES.map((item) => ({ ...item }))).sort((a, b) => a.id - b.id)
   guardarCentros(centros)
   return centros.map((centro) => ({ ...centro }))
 }

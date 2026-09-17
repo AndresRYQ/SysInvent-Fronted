@@ -2,6 +2,13 @@ import type { TipoProducto, TipoProductoFormData } from '../types/tipoProducto'
 import { registrarEventoBitacora } from './bitacoraService'
 
 const STORAGE_KEY = 'agrihusac_tipos_producto'
+const TIPOS_PRODUCTO_INICIALES: TipoProducto[] = [
+  { id: 1, nombre: 'Insumo', descripcion: 'Materia prima utilizada en los procesos.', activo: 1 },
+  { id: 2, nombre: 'Producto terminado', descripcion: 'Artículos listos para su comercialización.', activo: 1 },
+  { id: 3, nombre: 'Material de empaque', descripcion: 'Insumos para el embalaje de los productos.', activo: 1 },
+  { id: 4, nombre: 'Repuesto', descripcion: 'Piezas de reemplazo para mantenimiento.', activo: 1 },
+  { id: 5, nombre: 'Material de oficina', descripcion: 'Útiles y suministros para labores administrativas.', activo: 0 },
+]
 type RegistroGuardado = Partial<TipoProducto> & { estado?: boolean; id?: number | string }
 
 function normalizarRegistro(registro: RegistroGuardado): TipoProducto | null {
@@ -26,7 +33,7 @@ function validar(datos: TipoProductoFormData): void {
   if (!descripcion) throw new Error('La descripción es obligatoria.')
   if (descripcion.length > 250) throw new Error('La descripción no puede superar los 250 caracteres.')
 }
-export function obtenerTiposProducto(): TipoProducto[] { const datos = leer().sort((a, b) => a.id - b.id); guardar(datos); return datos.map((item) => ({ ...item })) }
+export function obtenerTiposProducto(): TipoProducto[] { const guardados = leer(); const datos = (guardados.length ? guardados : TIPOS_PRODUCTO_INICIALES.map((item) => ({ ...item }))).sort((a, b) => a.id - b.id); guardar(datos); return datos.map((item) => ({ ...item })) }
 export function crearTipoProducto(datos: TipoProductoFormData): TipoProducto {
   validar(datos); const lista = obtenerTiposProducto()
   if (lista.some((item) => normalizar(item.nombre) === normalizar(datos.nombre))) throw new Error('Ya existe un tipo de producto con ese nombre.')

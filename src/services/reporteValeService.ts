@@ -12,6 +12,7 @@ import { obtenerProductos } from './productoService'
 import { obtenerTiposProducto } from './tipoProductoService'
 import { obtenerUnidadesMedida } from './unidadMedidaService'
 import { obtenerValesConsumo } from './valeConsumoService'
+import { coincidenIds } from '../utils/identificadores'
 
 function normalizarTexto(
   valor: string,
@@ -53,8 +54,7 @@ export function obtenerFilasReporteVales():
       const centroCosto =
         centrosCosto.find(
           (item) =>
-            String(item.id) ===
-            String(vale.centroCostoId),
+            coincidenIds(item.id, vale.centroCostoId, 'CC-'),
         )
 
       return vale.detalles.flatMap(
@@ -62,29 +62,25 @@ export function obtenerFilasReporteVales():
           const producto =
             productos.find(
               (item) =>
-                String(item.id) ===
-                String(detalle.productoId),
+                coincidenIds(item.id, detalle.productoId, 'PROD-'),
             )
 
           const tipoProducto =
             tiposProducto.find(
               (item) =>
-                String(item.id) ===
-                String(producto?.tipoProductoId),
+                coincidenIds(item.id, producto?.tipoProductoId, 'TP-'),
             )
 
           const categoria =
             categorias.find(
               (item) =>
-                String(item.id) ===
-                String(producto?.categoriaId),
+                coincidenIds(item.id, producto?.categoriaId, 'CAT-'),
             )
 
           const unidadMedida =
             unidadesMedida.find(
               (item) =>
-                String(item.id) ===
-                String(producto?.unidadMedidaId),
+                coincidenIds(item.id, producto?.unidadMedidaId, 'UM-'),
             )
 
           return detalle.distribuciones.map(
@@ -92,8 +88,7 @@ export function obtenerFilasReporteVales():
               const destino =
                 destinos.find(
                   (item) =>
-                        String(item.id) ===
-                        String(distribucion.destinoId),
+                        coincidenIds(item.id, distribucion.destinoId, 'DES-'),
                 )
 
               const parteEquipo =
@@ -129,10 +124,9 @@ export function obtenerFilasReporteVales():
                 solicitante:
                   vale.solicitante,
                 motivo: vale.motivo,
-                tipoProductoId:
-                  producto
-                    ?.tipoProductoId ??
-                  '',
+                tipoProductoId: String(
+                  producto?.tipoProductoId ?? '',
+                ),
                 tipoProducto:
                   tipoProducto?.nombre ??
                   'No disponible',
@@ -251,13 +245,11 @@ export function filtrarReporteVales(
 
     const coincideCentroCosto =
       !filtros.centroCostoId ||
-      fila.centroCostoId ===
-        filtros.centroCostoId
+      coincidenIds(fila.centroCostoId, filtros.centroCostoId, 'CC-')
 
     const coincideDestino =
       !filtros.destinoId ||
-      fila.destinoId ===
-        filtros.destinoId
+      coincidenIds(fila.destinoId, filtros.destinoId, 'DES-')
 
     const coincideParteEquipo =
       !filtros.parteEquipoId ||
@@ -266,13 +258,11 @@ export function filtrarReporteVales(
 
     const coincideTipoProducto =
       !filtros.tipoProductoId ||
-      fila.tipoProductoId ===
-        filtros.tipoProductoId
+      coincidenIds(fila.tipoProductoId, filtros.tipoProductoId, 'TP-')
 
     const coincideProducto =
       !filtros.productoId ||
-      fila.productoId ===
-        filtros.productoId
+      coincidenIds(fila.productoId, filtros.productoId, 'PROD-')
 
     const coincideEstado =
       !filtros.estado ||

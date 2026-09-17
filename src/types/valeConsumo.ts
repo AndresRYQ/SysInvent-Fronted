@@ -32,7 +32,7 @@ export type DistribucionValeConsumoFormData =
  */
 export interface DetalleValeConsumo {
   id: string
-  productoId: string
+  productoId: number
   precioUnitario: number
   distribuciones:
     DistribucionValeConsumo[]
@@ -43,7 +43,7 @@ export interface DetalleValeConsumo {
  * desde el formulario.
  */
 export interface DetalleValeConsumoFormData {
-  productoId: string
+  productoId: number
   precioUnitario: number
   distribuciones:
     DistribucionValeConsumoFormData[]

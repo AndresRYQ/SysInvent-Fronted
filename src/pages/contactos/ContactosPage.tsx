@@ -22,6 +22,7 @@ import {
 } from '../../services/contactoService'
 
 import { obtenerProveedores } from '../../services/proveedorService'
+import { coincidenIds } from '../../utils/identificadores'
 
 import type {
   Contacto,
@@ -54,8 +55,11 @@ function filtrarContactos(
       const nombreProveedor =
         proveedores.find(
           (proveedor) =>
-          String(proveedor.id) ===
+          coincidenIds(
+            proveedor.id,
             contacto.proveedorId,
+            'PROV-',
+          ),
         )?.razonSocial ?? ''
 
       const coincideBusqueda =
@@ -78,8 +82,11 @@ function filtrarContactos(
 
       const coincideProveedor =
         !filtros.proveedorId ||
-        contacto.proveedorId ===
-          filtros.proveedorId
+        coincidenIds(
+          contacto.proveedorId,
+          filtros.proveedorId,
+          'PROV-',
+        )
 
       const coincideEstado =
         !filtros.estado ||

@@ -39,6 +39,7 @@ import type {
 
 import '../../styles/DashboardPage.css'
 import { crearEstilosSelect } from '../../styles/reactSelectStyles'
+import { coincidenIds } from '../../utils/identificadores'
 import '../../styles/maestros.css'
 
 const FILTROS_INICIALES:
@@ -170,13 +171,19 @@ export function ControlAlmacenPage() {
 
         const coincideTipo =
           !filtrosAplicados.tipoProductoId ||
-          producto.tipoProductoId ===
-            filtrosAplicados.tipoProductoId
+          coincidenIds(
+            producto.tipoProductoId,
+            filtrosAplicados.tipoProductoId,
+            'TP-',
+          )
 
         const coincideCategoria =
           !filtrosAplicados.categoriaId ||
-          producto.categoriaId ===
-            filtrosAplicados.categoriaId
+          coincidenIds(
+            producto.categoriaId,
+            filtrosAplicados.categoriaId,
+            'CAT-',
+          )
 
         const coincideEstado =
           !filtrosAplicados.estadoStock ||

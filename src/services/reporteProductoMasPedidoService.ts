@@ -9,13 +9,14 @@ import type {
 } from '../types/reporteVale'
 
 import { obtenerProductos } from './productoService'
+import { coincidenIds } from '../utils/identificadores'
 
 import {
   obtenerFilasReporteVales,
 } from './reporteValeService'
 
 interface ProductoAcumulado {
-  productoId: string
+  productoId: number
   codigoProducto: string
   producto: string
   tipoProductoId: string
@@ -67,8 +68,7 @@ function filtrarDistribuciones(
       const producto =
         productos.find(
           (item) =>
-            item.id ===
-            fila.productoId,
+            coincidenIds(item.id, fila.productoId, 'PROD-'),
         )
 
       const coincideBusqueda =
@@ -98,18 +98,15 @@ function filtrarDistribuciones(
 
       const coincideTipo =
         !filtros.tipoProductoId ||
-        fila.tipoProductoId ===
-          filtros.tipoProductoId
+        coincidenIds(fila.tipoProductoId, filtros.tipoProductoId, 'TP-')
 
       const coincideCategoria =
         !filtros.categoriaId ||
-        producto?.categoriaId ===
-          filtros.categoriaId
+        coincidenIds(producto?.categoriaId, filtros.categoriaId, 'CAT-')
 
       const coincideDestino =
         !filtros.destinoId ||
-        fila.destinoId ===
-          filtros.destinoId
+        coincidenIds(fila.destinoId, filtros.destinoId, 'DES-')
 
       return (
         coincideBusqueda &&
@@ -131,7 +128,7 @@ export function obtenerProductosMasPedidos(
   const productos = obtenerProductos()
 
   const acumulados = new Map<
-    string,
+    number,
     ProductoAcumulado
   >()
 
@@ -139,8 +136,7 @@ export function obtenerProductosMasPedidos(
     const producto =
       productos.find(
         (item) =>
-          item.id ===
-          fila.productoId,
+          coincidenIds(item.id, fila.productoId, 'PROD-'),
       )
 
     const existente =
@@ -180,9 +176,9 @@ export function obtenerProductosMasPedidos(
           fila.tipoProductoId,
         tipoProducto:
           fila.tipoProducto,
-        categoriaId:
-          producto?.categoriaId ??
-          '',
+        categoriaId: String(
+          producto?.categoriaId ?? '',
+        ),
         categoria:
           fila.categoria,
         unidadMedida:

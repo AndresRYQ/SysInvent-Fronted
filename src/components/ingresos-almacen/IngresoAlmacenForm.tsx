@@ -21,6 +21,7 @@ import { obtenerProveedores } from '../../services/proveedorService'
 import { obtenerTiposDocumento } from '../../services/tipoDocumentoService'
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
 import { obtenerUnidadesMedida } from '../../services/unidadMedidaService'
+import { coincidenIds } from '../../utils/identificadores'
 
 import type {
   DetalleIngresoAlmacenFormData,
@@ -211,9 +212,12 @@ export function IngresoAlmacenForm({
       () =>
         contactos.filter(
           (contacto) =>
-            contacto.estado &&
-            contacto.proveedorId ===
+            contacto.activo === 1 &&
+            coincidenIds(
+              contacto.proveedorId,
               proveedorId,
+              'PROV-',
+            ),
         ),
       [contactos, proveedorId],
     )
@@ -224,10 +228,16 @@ export function IngresoAlmacenForm({
         productos.filter(
           (producto) =>
             producto.estado &&
-            producto.proveedorId ===
-              proveedorId &&
-            producto.tipoProductoId ===
+            coincidenIds(
+              producto.proveedorId,
+              proveedorId,
+              'PROV-',
+            ) &&
+            coincidenIds(
+              producto.tipoProductoId,
               detalle.tipoProductoId,
+              'TP-',
+            ),
         ),
       [
         productos,
@@ -241,7 +251,7 @@ export function IngresoAlmacenForm({
       () =>
         productos.find(
           (producto) =>
-            producto.id ===
+            String(producto.id) ===
             detalle.productoId,
         ) ?? null,
       [productos, detalle.productoId],
@@ -252,10 +262,10 @@ export function IngresoAlmacenForm({
       () =>
         unidadesMedida.find(
           (unidad) =>
-            String(unidad.id) ===
-            String(
-              productoSeleccionado
-                ?.unidadMedidaId,
+            coincidenIds(
+              unidad.id,
+              productoSeleccionado?.unidadMedidaId,
+              'UM-',
             ),
         ) ?? null,
       [
@@ -304,7 +314,7 @@ export function IngresoAlmacenForm({
     productoId: string,
   ): void {
     const producto = productos.find(
-      (item) => item.id === productoId,
+      (item) => String(item.id) === productoId,
     )
 
     setDetalle((actual) => ({
@@ -369,7 +379,7 @@ export function IngresoAlmacenForm({
     const productoYaAgregado =
       detalles.some(
         (item) =>
-          item.productoId ===
+          String(item.productoId) ===
           detalle.productoId,
       )
 
@@ -383,7 +393,7 @@ export function IngresoAlmacenForm({
     setDetalles((actuales) => [
       ...actuales,
       {
-        productoId: detalle.productoId,
+        productoId: Number(detalle.productoId),
         cantidad: Number(
           cantidad.toFixed(3),
         ),
@@ -403,7 +413,7 @@ export function IngresoAlmacenForm({
   }
 
   function eliminarDetalle(
-    productoId: string,
+    productoId: number,
   ): void {
     setDetalles((actuales) =>
       actuales.filter(
@@ -443,9 +453,9 @@ export function IngresoAlmacenForm({
       return
     }
 
-    if (!numeroDocumento.trim()) {
+    if (!/^\d{7}$/.test(numeroDocumento)) {
       setError(
-        'Ingresa el número del documento.',
+        'El número de documento debe tener exactamente 7 dígitos.',
       )
       return
     }
@@ -563,7 +573,7 @@ export function IngresoAlmacenForm({
             {proveedores
               .filter(
                 (proveedor) =>
-                  proveedor.estado ||
+                  proveedor.activo === 1 ||
                   String(proveedor.id) ===
                     String(proveedorId),
               )
@@ -639,7 +649,7 @@ export function IngresoAlmacenForm({
             {tiposDocumento
               .filter(
                 (tipo) =>
-                  tipo.estado ||
+                  tipo.activo === 1 ||
                   String(tipo.id) ===
                     String(tipoDocumentoId),
               )
@@ -666,11 +676,15 @@ export function IngresoAlmacenForm({
             id="ingresoNumeroDocumento"
             className="form-control maestro-control"
             type="text"
-            maxLength={50}
+            maxLength={7}
+            inputMode="numeric"
+            pattern="[0-9]{7}"
             value={numeroDocumento}
             onChange={(event) =>
               setNumeroDocumento(
-                event.target.value,
+                event.target.value
+                  .replace(/\D/g, '')
+                  .slice(0, 7),
               )
             }
           />
@@ -730,7 +744,7 @@ export function IngresoAlmacenForm({
             </option>
 
             {tiposProducto
-              .filter((tipo) => tipo.estado)
+              .filter((tipo) => tipo.activo === 1)
               .map((tipo) => (
                 <option
                   key={tipo.id}
@@ -906,8 +920,7 @@ export function IngresoAlmacenForm({
                 tiposProducto.find(
                   (tipo) =>
                     String(tipo.id) ===
-                    producto
-                      ?.tipoProductoId,
+                    String(producto?.tipoProductoId),
                 )
 
               return (

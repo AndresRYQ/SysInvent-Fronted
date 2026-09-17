@@ -54,7 +54,7 @@ export function EditarProductoPage() {
     }
 
     try {
-      actualizarProducto(id, datos)
+      actualizarProducto(Number(id), datos)
 
       navigate('/productos', {
         replace: true,

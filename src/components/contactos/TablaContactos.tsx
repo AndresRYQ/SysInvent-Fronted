@@ -13,6 +13,7 @@ import type { Proveedor } from '../../types/proveedor'
 
 import { EmptyState } from '../common/EmptyState'
 import { TablePagination } from '../ui/TablePagination'
+import { coincidenIds } from '../../utils/identificadores'
 
 interface TablaContactosProps {
   contactos: Contacto[]
@@ -56,12 +57,12 @@ export function TablaContactos({
   onPageSizeChange,
 }: TablaContactosProps) {
   function obtenerProveedor(
-    proveedorId: string,
+    proveedorId: number,
   ): string {
     return (
       proveedores.find(
         (proveedor) =>
-          String(proveedor.id) === proveedorId,
+          coincidenIds(proveedor.id, proveedorId, 'PROV-'),
       )?.razonSocial ??
       'Proveedor no disponible'
     )

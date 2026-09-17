@@ -142,7 +142,7 @@ export function ReporteValesPage() {
           nombre: producto.nombre,
           tipoProductoId: String(
             producto.tipoProductoId,
-          ),
+          ).replace(/^TP-0*/, ''),
         }))
         .sort((primero, segundo) =>
           primero.nombre.localeCompare(

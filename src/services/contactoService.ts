@@ -5,6 +5,7 @@ import type {
 
 import { registrarEventoBitacora } from './bitacoraService'
 import { obtenerProveedores } from './proveedorService'
+import { coincidenIds } from '../utils/identificadores'
 
 const STORAGE_KEY =
   'agrihusac_contactos'
@@ -19,7 +20,7 @@ const CONTACTOS_INICIALES:
   Contacto[] = [
     {
       id: 1,
-      proveedorId: 'PROV-001',
+      proveedorId: 1,
       nombreCompleto:
         'Carlos Mendoza',
       cargo:
@@ -32,7 +33,7 @@ const CONTACTOS_INICIALES:
     },
     {
       id: 2,
-      proveedorId: 'PROV-002',
+      proveedorId: 2,
       nombreCompleto:
         'María Salazar',
       cargo:
@@ -45,7 +46,7 @@ const CONTACTOS_INICIALES:
     },
     {
       id: 3,
-      proveedorId: 'PROV-003',
+      proveedorId: 3,
       nombreCompleto:
         'José Ramírez',
       cargo:
@@ -58,7 +59,7 @@ const CONTACTOS_INICIALES:
     },
     {
       id: 4,
-      proveedorId: 'PROV-004',
+      proveedorId: 4,
       nombreCompleto:
         'Ana Torres',
       cargo:
@@ -92,7 +93,10 @@ function normalizarContacto(
 
   return {
     id,
-    proveedorId: String(registro.proveedorId ?? ''),
+    proveedorId: Number(
+      String(registro.proveedorId ?? '')
+        .replace(/^PROV-0*/i, ''),
+    ),
     nombreCompleto: String(registro.nombreCompleto).trim(),
     cargo: String(registro.cargo ?? '').trim(),
     telefono: String(registro.telefono ?? '').trim(),
@@ -280,8 +284,11 @@ export function crearContacto(
   const correoDuplicado =
     contactos.some(
       (contacto) =>
-        contacto.proveedorId ===
-          datos.proveedorId &&
+        coincidenIds(
+          contacto.proveedorId,
+          datos.proveedorId,
+          'PROV-',
+        ) &&
         normalizarTexto(
           contacto.correo,
         ) ===
@@ -298,8 +305,9 @@ export function crearContacto(
 
   const nuevoContacto: Contacto = {
     id: crearSiguienteId(contactos),
-    proveedorId:
-      datos.proveedorId,
+    proveedorId: Number(
+      datos.proveedorId.replace(/^PROV-0*/i, ''),
+    ),
     nombreCompleto:
       datos.nombreCompleto.trim(),
     cargo: datos.cargo.trim(),
@@ -356,8 +364,11 @@ export function actualizarContacto(
     contactos.some(
       (contacto) =>
         contacto.id !== id &&
-        contacto.proveedorId ===
-          datos.proveedorId &&
+        coincidenIds(
+          contacto.proveedorId,
+          datos.proveedorId,
+          'PROV-',
+        ) &&
         normalizarTexto(
           contacto.correo,
         ) ===
@@ -375,8 +386,9 @@ export function actualizarContacto(
   const contactoActualizado:
     Contacto = {
       ...contactoActual,
-      proveedorId:
-        datos.proveedorId,
+    proveedorId: Number(
+      datos.proveedorId.replace(/^PROV-0*/i, ''),
+    ),
       nombreCompleto:
         datos.nombreCompleto.trim(),
       cargo: datos.cargo.trim(),

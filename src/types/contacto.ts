@@ -1,6 +1,6 @@
 export interface Contacto {
   id: number
-  proveedorId: string
+  proveedorId: number
   nombreCompleto: string
   cargo: string
   telefono: string

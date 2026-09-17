@@ -2,13 +2,20 @@ import type { Destino, DestinoFormData } from '../types/destino'
 import { registrarEventoBitacora } from './bitacoraService'
 const STORAGE_KEY = 'agrihusac_destinos'
 const VALES_STORAGE_KEY = 'agrihusac_vales_consumo'
+const DESTINOS_INICIALES: Destino[] = [
+  { id: 1, nombre: 'Almacén Central', descripcion: 'Almacén principal de la empresa.', activo: 1, fechaRegistro: '10/08/2026' },
+  { id: 2, nombre: 'Planta de procesamiento', descripcion: 'Área donde se procesa la mercadería.', activo: 1, fechaRegistro: '11/08/2026' },
+  { id: 3, nombre: 'Sucursal Norte', descripcion: 'Sucursal ubicada en la zona norte.', activo: 1, fechaRegistro: '12/08/2026' },
+  { id: 4, nombre: 'Punto de venta Sur', descripcion: 'Punto de venta ubicado en la zona sur.', activo: 1, fechaRegistro: '13/08/2026' },
+  { id: 5, nombre: 'Depósito temporal', descripcion: 'Espacio temporal para almacenamiento.', activo: 0, fechaRegistro: '14/08/2026' },
+]
 type RegistroGuardado = Partial<Destino> & { id?: number | string; estado?: boolean }
 function normalizarRegistro(r: RegistroGuardado): Destino | null { const id = typeof r.id === 'number' ? r.id : Number(String(r.id ?? '').replace(/^DES-/, '')); if (!Number.isInteger(id) || id <= 0 || !String(r.nombre ?? '').trim()) return null; return { id, nombre: String(r.nombre).trim(), descripcion: String(r.descripcion ?? '').trim(), activo: r.activo === 0 || r.activo === 1 ? r.activo : r.estado === false ? 0 : 1 } }
 function leer(): Destino[] { try { const datos: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]'); return Array.isArray(datos) ? datos.map((item) => normalizarRegistro(item as RegistroGuardado)).filter((item): item is Destino => item !== null) : [] } catch { return [] } }
 function guardar(datos: Destino[]): void { localStorage.setItem(STORAGE_KEY, JSON.stringify(datos)) }
 function normalizar(v: string): string { return v.trim().toLowerCase() }
 function validar(datos: DestinoFormData): void { const n = datos.nombre.trim(); const d = datos.descripcion.trim(); if (!n) throw new Error('El nombre del destino es obligatorio.'); if (n.length < 2) throw new Error('El nombre debe tener al menos 2 caracteres.'); if (n.length > 100) throw new Error('El nombre no puede superar los 100 caracteres.'); if (!d) throw new Error('La descripción es obligatoria.'); if (d.length > 250) throw new Error('La descripción no puede superar los 250 caracteres.') }
-export function obtenerDestinos(): Destino[] { const datos = leer().sort((a, b) => a.id - b.id); guardar(datos); return datos.map((item) => ({ ...item })) }
+export function obtenerDestinos(): Destino[] { const guardados = leer(); const datos = (guardados.length ? guardados : DESTINOS_INICIALES.map((item) => ({ ...item }))).sort((a, b) => a.id - b.id); guardar(datos); return datos.map((item) => ({ ...item })) }
 export function crearDestino(datos: DestinoFormData): Destino { validar(datos); const lista = obtenerDestinos(); if (lista.some((i) => normalizar(i.nombre) === normalizar(datos.nombre))) throw new Error('Ya existe un destino con ese nombre.'); const nuevo: Destino = { id: lista.reduce((max, i) => Math.max(max, i.id), 0) + 1, nombre: datos.nombre.trim(), descripcion: datos.descripcion.trim(), activo: 1 }; guardar([...lista, nuevo].sort((a, b) => a.id - b.id)); registrarEventoBitacora({ modulo: 'Destinos', accion: 'CREAR', detalle: `Se creó el destino "${nuevo.nombre}".`, registroId: String(nuevo.id) }); return nuevo }
 export function actualizarDestino(id: number, datos: DestinoFormData): Destino { validar(datos); const lista = obtenerDestinos(); const actual = lista.find((i) => i.id === id); if (!actual) throw new Error('El destino no existe.'); if (actual.activo === 0) throw new Error('Un destino inactivo solo puede visualizarse o reactivarse.'); if (lista.some((i) => i.id !== id && normalizar(i.nombre) === normalizar(datos.nombre))) throw new Error('Ya existe otro destino con ese nombre.'); const actualizado = { ...actual, nombre: datos.nombre.trim(), descripcion: datos.descripcion.trim() }; guardar(lista.map((i) => i.id === id ? actualizado : i)); registrarEventoBitacora({ modulo: 'Destinos', accion: 'EDITAR', detalle: `Se actualizó el destino "${actualizado.nombre}".`, registroId: String(id) }); return actualizado }
 function destinoEstaEnUso(id: number): boolean {
