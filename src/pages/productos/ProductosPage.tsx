@@ -35,6 +35,7 @@ import { obtenerProveedores } from '../../services/proveedorService'
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
 
 import type { Producto } from '../../types/producto'
+import { coincidenIds } from '../../utils/identificadores'
 
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
@@ -43,7 +44,6 @@ const FILTROS_INICIALES: FiltrosProductosValores = {
   busqueda: '',
   tipoProductoId: '',
   categoriaId: '',
-  nivelStock: '',
   estado: '',
 }
 
@@ -96,6 +96,16 @@ function obtenerMensajeError(error: unknown): string {
   return error instanceof Error
     ? error.message
     : 'Ocurrió un error inesperado.'
+}
+
+function coincideIdMaestro(
+  valorProducto: string | number,
+  idMaestro: string | number,
+  prefijo: string,
+): boolean {
+  const valor = String(valorProducto)
+  const id = String(idMaestro)
+  return valor === id || valor === `${prefijo}${id.padStart(3, '0')}`
 }
 
 export function ProductosPage() {
@@ -186,32 +196,44 @@ export function ProductosPage() {
     return productos.map((producto) => ({
       ...producto,
 
-      tipoProductoNombre:
+        tipoProductoNombre:
         tiposProducto.find(
           (tipo) =>
-          String(tipo.id) ===
-            String(producto.tipoProductoId),
+            coincideIdMaestro(
+              producto.tipoProductoId,
+              tipo.id,
+              'TP-',
+            ),
         )?.nombre ?? 'Sin tipo',
 
       categoriaNombre:
         categorias.find(
           (categoria) =>
-            categoria.id ===
-            producto.categoriaId,
+            coincideIdMaestro(
+              producto.categoriaId,
+              categoria.id,
+              'CAT-',
+            ),
         )?.nombre ?? 'Sin categoría',
 
       unidadMedidaNombre:
         unidadesMedida.find(
           (unidad) =>
-            unidad.id ===
-            producto.unidadMedidaId,
+            coincideIdMaestro(
+              producto.unidadMedidaId,
+              unidad.id,
+              'UM-',
+            ),
         )?.nombre ?? 'Sin unidad',
 
-      proveedorNombre:
+        proveedorNombre:
         proveedores.find(
           (proveedor) =>
-            String(proveedor.id) ===
-            producto.proveedorId,
+            coincideIdMaestro(
+              producto.proveedorId,
+              proveedor.id,
+              'PROV-',
+            ),
         )?.razonSocial ?? 'Sin proveedor',
     }))
   }, [
@@ -244,26 +266,19 @@ export function ProductosPage() {
 
         const coincideTipo =
           !filtrosAplicados.tipoProductoId ||
-          producto.tipoProductoId ===
-            filtrosAplicados.tipoProductoId
+          coincidenIds(
+            producto.tipoProductoId,
+            filtrosAplicados.tipoProductoId,
+            'TP-',
+          )
 
         const coincideCategoria =
           !filtrosAplicados.categoriaId ||
-          producto.categoriaId ===
-            filtrosAplicados.categoriaId
-
-        const stockBajo =
-          producto.stockActual <=
-          producto.stockMinimo
-
-        const coincideStock =
-          !filtrosAplicados.nivelStock ||
-          (filtrosAplicados.nivelStock ===
-            'bajo' &&
-            stockBajo) ||
-          (filtrosAplicados.nivelStock ===
-            'normal' &&
-            !stockBajo)
+          coincidenIds(
+            producto.categoriaId,
+            filtrosAplicados.categoriaId,
+            'CAT-',
+          )
 
         const coincideEstado =
           !filtrosAplicados.estado ||
@@ -278,7 +293,6 @@ export function ProductosPage() {
           coincideBusqueda &&
           coincideTipo &&
           coincideCategoria &&
-          coincideStock &&
           coincideEstado
         )
       },
@@ -407,7 +421,6 @@ export function ProductosPage() {
               pageSize={pageSize}
               onAgregar={() => { setProductoEnEdicion(null); setModoVisualizacion(false); setErrorFormulario(''); setModalFormOpen(true) }}
               onEditar={(producto) => { setProductoEnEdicion(producto); setModoVisualizacion(false); setErrorFormulario(''); setModalFormOpen(true) }}
-              onVisualizar={(producto) => { setProductoEnEdicion(producto); setModoVisualizacion(true); setErrorFormulario(''); setModalFormOpen(true) }}
               onEliminar={(producto) => {
                 setProductoAEliminar(producto)
                 setModalDeleteOpen(true)

@@ -12,6 +12,7 @@ import type {
   FiltrosReporteVales as FiltrosValores,
 } from '../../../types/reporteVale'
 import { crearEstilosSelect } from '../../../styles/reactSelectStyles'
+import { coincidenIds } from '../../../utils/identificadores'
 import { DatePickerInput } from '../../ui/DatePickerInput'
 
 interface OpcionFiltro {
@@ -61,8 +62,11 @@ export function FiltrosReporteVales({
       productos.filter(
         (producto) =>
           !valores.tipoProductoId ||
-          producto.tipoProductoId ===
+          coincidenIds(
+            producto.tipoProductoId,
             valores.tipoProductoId,
+            'TP-',
+          ),
       ),
     [
       productos,
@@ -87,8 +91,11 @@ export function FiltrosReporteVales({
 
     if (
       productoSeleccionado &&
-      productoSeleccionado.tipoProductoId !==
-        tipoProductoId
+      !coincidenIds(
+        productoSeleccionado.tipoProductoId,
+        tipoProductoId,
+        'TP-',
+      )
     ) {
       onChange('productoId', '')
     }

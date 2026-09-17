@@ -248,7 +248,7 @@ export function obtenerControlAlmacen():
 }
 
 export function obtenerControlProductoPorId(
-  productoId: string,
+  productoId: number,
 ): ControlAlmacenProducto | null {
   const producto =
     obtenerControlAlmacen().find(
@@ -267,7 +267,7 @@ export function obtenerControlProductoPorId(
  */
 export function obtenerDiferenciasStock():
   Array<{
-    productoId: string
+    productoId: number
     codigo: string
     nombre: string
     stockCalculado: number

@@ -56,7 +56,10 @@ const ERRORES_INICIALES:
   }
 
 const estilosSelect = (tieneError: boolean) =>
-  crearEstilosSelect({ tieneError, zIndex: 20 })
+  crearEstilosSelect({
+    tieneError,
+    zIndex: 1300,
+  })
 
 export function FormularioContacto({
   abierto,
@@ -85,7 +88,7 @@ export function FormularioContacto({
     if (contacto) {
       setForm({
         proveedorId:
-          contacto.proveedorId,
+          String(contacto.proveedorId),
         nombreCompleto:
           contacto.nombreCompleto,
         cargo: contacto.cargo,
@@ -264,6 +267,7 @@ export function FormularioContacto({
 
               <Select
                 inputId="contactoProveedor"
+                classNamePrefix="maestro-select"
                 options={proveedores.map((proveedor) => ({
                   value: String(proveedor.id),
                   label: proveedor.razonSocial,
@@ -289,6 +293,7 @@ export function FormularioContacto({
                 placeholder={Placeholder.Seleccionar}
                 isClearable
                 isSearchable
+                menuPortalTarget={document.body}
                 styles={estilosSelect(Boolean(errores.proveedorId))}
               />
 

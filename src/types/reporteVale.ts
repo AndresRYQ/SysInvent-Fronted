@@ -27,7 +27,7 @@ export interface FilaReporteVale {
   motivo: string
   tipoProductoId: string
   tipoProducto: string
-  productoId: string
+  productoId: number
   codigoProducto: string
   producto: string
   categoria: string

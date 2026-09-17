@@ -13,9 +13,18 @@ import {
   ajustarStockProducto,
   obtenerProductos,
 } from './productoService'
+import { coincidenIds } from '../utils/identificadores'
 
 const STORAGE_KEY =
   'agrihusac_vales_consumo'
+
+function normalizarProductoId(
+  id: unknown,
+): number {
+  return Number(
+    String(id ?? '').replace(/^PROD-0*/i, ''),
+  )
+}
 
 function copiarVale(
   vale: ValeConsumo,
@@ -25,6 +34,9 @@ function copiarVale(
     detalles: vale.detalles.map(
       (detalle) => ({
         ...detalle,
+        productoId: normalizarProductoId(
+          detalle.productoId,
+        ),
         distribuciones:
           detalle.distribuciones.map(
             (distribucion) => ({
@@ -65,8 +77,7 @@ function esValeValido(
   )
 }
 
-export function obtenerValesConsumo():
-  ValeConsumo[] {
+function obtenerValesReales(): ValeConsumo[] {
   const datosGuardados =
     localStorage.getItem(STORAGE_KEY)
 
@@ -89,6 +100,11 @@ export function obtenerValesConsumo():
   } catch {
     return []
   }
+}
+
+export function obtenerValesConsumo():
+  ValeConsumo[] {
+  return obtenerValesReales()
 }
 
 export function obtenerValeConsumoPorId(
@@ -129,7 +145,7 @@ export function obtenerSiguienteNumeroVale():
   const prefijo = `VAL-${anio}-`
 
   const numeroMayor =
-    obtenerValesConsumo().reduce(
+    obtenerValesReales().reduce(
       (mayor, vale) => {
         if (
           !vale.numeroVale.startsWith(
@@ -202,7 +218,7 @@ function validarDatosVale(
   const centroCosto =
     obtenerCentrosCosto().find(
       (item) =>
-        String(item.id) === String(datos.centroCostoId),
+        coincidenIds(item.id, datos.centroCostoId, 'CC-'),
     )
 
   if (!centroCosto) {
@@ -261,7 +277,7 @@ function validarDatosVale(
     obtenerPartesEquipo()
 
   const productosAgregados =
-    new Set<string>()
+    new Set<number>()
 
   datos.detalles.forEach(
     (detalle, indiceDetalle) => {
@@ -283,7 +299,7 @@ function validarDatosVale(
 
       const producto = productos.find(
         (item) =>
-          item.id === detalle.productoId,
+          coincidenIds(item.id, detalle.productoId, 'PROD-'),
       )
 
       if (!producto) {
@@ -335,8 +351,7 @@ function validarDatosVale(
           const destino =
             destinos.find(
               (item) =>
-                String(item.id) ===
-                String(distribucion.destinoId),
+                coincidenIds(item.id, distribucion.destinoId, 'DES-'),
             )
 
           if (!destino) {
@@ -345,7 +360,7 @@ function validarDatosVale(
             )
           }
 
-          if (!destino.estado) {
+          if (destino.activo !== 1) {
             throw new Error(
               `El destino "${destino.nombre}" está inactivo.`,
             )
@@ -453,9 +468,9 @@ function crearDetalles(
 
 function obtenerCantidadesPorProducto(
   detalles: DetalleValeConsumo[],
-): Map<string, number> {
+): Map<number, number> {
   const cantidades =
-    new Map<string, number>()
+    new Map<number, number>()
 
   detalles.forEach((detalle) => {
     cantidades.set(
@@ -479,7 +494,7 @@ function calcularAjustesStock(
     DetalleValeConsumo[],
   detallesNuevos:
     DetalleValeConsumo[],
-): Map<string, number> {
+): Map<number, number> {
   const anteriores =
     obtenerCantidadesPorProducto(
       detallesAnteriores,
@@ -496,7 +511,7 @@ function calcularAjustesStock(
   ])
 
   const ajustes =
-    new Map<string, number>()
+    new Map<number, number>()
 
   productosIds.forEach((productoId) => {
     const cantidadAnterior =
@@ -520,7 +535,7 @@ function calcularAjustesStock(
 }
 
 function validarAjustesStock(
-  ajustes: Map<string, number>,
+  ajustes: Map<number, number>,
 ): void {
   const productos = obtenerProductos()
 
@@ -550,10 +565,10 @@ function validarAjustesStock(
 }
 
 function aplicarAjustesStock(
-  ajustes: Map<string, number>,
+  ajustes: Map<number, number>,
 ): void {
   const aplicados: Array<{
-    productoId: string
+    productoId: number
     cantidad: number
   }> = []
 
@@ -591,7 +606,7 @@ function aplicarAjustesStock(
 }
 
 function revertirAjustesStock(
-  ajustes: Map<string, number>,
+  ajustes: Map<number, number>,
 ): void {
   Array.from(ajustes.entries())
     .reverse()
@@ -610,7 +625,7 @@ export function crearValeConsumo(
 ): ValeConsumo {
   validarDatosVale(datos)
 
-  const vales = obtenerValesConsumo()
+  const vales = obtenerValesReales()
   const valeId = crearSiguienteId(vales)
 
   const nuevoVale: ValeConsumo = {
@@ -665,7 +680,7 @@ export function actualizarValeConsumo(
   id: string,
   datos: ValeConsumoFormData,
 ): ValeConsumo {
-  const vales = obtenerValesConsumo()
+  const vales = obtenerValesReales()
 
   const valeActual = vales.find(
     (vale) => vale.id === id,
@@ -738,7 +753,7 @@ export function actualizarValeConsumo(
 export function anularValeConsumo(
   id: string,
 ): ValeConsumo {
-  const vales = obtenerValesConsumo()
+  const vales = obtenerValesReales()
 
   const valeActual = vales.find(
     (vale) => vale.id === id,

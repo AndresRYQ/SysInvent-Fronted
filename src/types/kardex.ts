@@ -28,7 +28,7 @@ export interface MovimientoAlmacen {
   documentoId: string
   numeroDocumento: string
   fecha: string
-  productoId: string
+  productoId: number
   cantidad: number
   precioUnitario: number
   destinoId: string | null
@@ -47,13 +47,13 @@ export interface MovimientoAlmacen {
  * Se genera usando Ingresos y Vales.
  */
 export interface ControlAlmacenProducto {
-  productoId: string
+  productoId: number
   codigo: string
   nombre: string
-  tipoProductoId: string
-  categoriaId: string
-  unidadMedidaId: string
-  proveedorId: string
+  tipoProductoId: number
+  categoriaId: number
+  unidadMedidaId: number
+  proveedorId: number
   totalEntradas: number
   totalSalidas: number
   stockDisponible: number

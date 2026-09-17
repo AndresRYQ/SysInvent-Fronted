@@ -10,7 +10,7 @@ export type EstadoIngresoAlmacen =
  */
 export interface DetalleIngresoAlmacen {
   id: string
-  productoId: string
+  productoId: number
   cantidad: number
   precioUnitario: number
 }

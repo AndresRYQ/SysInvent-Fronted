@@ -38,8 +38,15 @@ export function crearEstilosSelect({
     }),
     valueContainer: (base: any) => ({
       ...base,
+      height: altura - 2,
+      minHeight: altura - 2,
       padding: '0 12px',
       fontSize: 'var(--form-control-font-size)',
+    }),
+    input: (base: any) => ({
+      ...base,
+      margin: 0,
+      padding: 0,
     }),
     singleValue: (base: any) => ({
       ...base,

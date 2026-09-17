@@ -19,6 +19,7 @@ import { obtenerPartesEquipo } from '../../services/parteEquipoService'
 import { obtenerProductos } from '../../services/productoService'
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
 import { obtenerUnidadesMedida } from '../../services/unidadMedidaService'
+import { coincidenIds } from '../../utils/identificadores'
 import { DatePickerInput } from '../ui/DatePickerInput'
 
 import type {
@@ -208,8 +209,11 @@ export function ValeConsumoForm({
         productos.filter((producto) => {
           if (
             !producto.estado ||
-            producto.tipoProductoId !==
-              borrador.tipoProductoId
+            !coincidenIds(
+              producto.tipoProductoId,
+              borrador.tipoProductoId,
+              'TP-',
+            )
           ) {
             return false
           }
@@ -246,7 +250,7 @@ export function ValeConsumoForm({
       () =>
         productos.find(
           (producto) =>
-            producto.id ===
+            String(producto.id) ===
             borrador.productoId,
         ) ?? null,
       [productos, borrador.productoId],
@@ -257,10 +261,10 @@ export function ValeConsumoForm({
       () =>
         unidadesMedida.find(
           (unidad) =>
-            String(unidad.id) ===
-            String(
-              productoSeleccionado
-                ?.unidadMedidaId,
+            coincidenIds(
+              unidad.id,
+              productoSeleccionado?.unidadMedidaId,
+              'UM-',
             ),
         ) ?? null,
       [
@@ -275,7 +279,7 @@ export function ValeConsumoForm({
         vale?.detalles
           .find(
             (detalle) =>
-              detalle.productoId ===
+              String(detalle.productoId) ===
               borrador.productoId,
           )
           ?.distribuciones.reduce(
@@ -512,8 +516,8 @@ export function ValeConsumoForm({
 
     setBorrador({
       tipoProductoId:
-        producto.tipoProductoId,
-      productoId: producto.id,
+        String(producto.tipoProductoId),
+      productoId: String(producto.id),
       destinoId: '',
       parteEquipoId: '',
       cantidad: '',
@@ -749,7 +753,7 @@ export function ValeConsumoForm({
             </option>
 
             {tiposProducto
-              .filter((tipo) => tipo.estado)
+              .filter((tipo) => tipo.activo === 1)
               .map((tipo) => (
                 <option
                   key={tipo.id}
@@ -839,7 +843,7 @@ export function ValeConsumoForm({
             {destinos
               .filter(
                 (destino) =>
-                  destino.estado,
+                  destino.activo === 1,
               )
               .map((destino) => (
                 <option

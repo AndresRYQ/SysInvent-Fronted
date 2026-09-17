@@ -9,65 +9,65 @@ const STORAGE_KEY = 'agrihusac_productos'
 
 const PRODUCTOS_INICIALES: Producto[] = [
   {
-    id: 'PROD-001',
+    id: 1,
     codigo: 'HER-001',
     nombre: 'Taladro industrial',
     descripcion:
       'Taladro eléctrico para trabajos de mantenimiento.',
-    tipoProductoId: 'TP-002',
-    categoriaId: 'CAT-001',
-    unidadMedidaId: 'UM-001',
-    proveedorId: 'PROV-001',
-    stockActual: 12,
-    stockMinimo: 5,
+    tipoProductoId: 2,
+    categoriaId: 1,
+    unidadMedidaId: 1,
+    proveedorId: 1,
+    stockActual: 0,
+    stockMinimo: 0,
     precioUnitario: 350,
     estado: true,
     fechaRegistro: '10/08/2026',
   },
   {
-    id: 'PROD-002',
+    id: 2,
     codigo: 'SEG-001',
     nombre: 'Guantes de nitrilo',
     descripcion:
       'Guantes para protección durante operaciones.',
-    tipoProductoId: 'TP-001',
-    categoriaId: 'CAT-002',
-    unidadMedidaId: 'UM-005',
-    proveedorId: 'PROV-002',
-    stockActual: 4,
-    stockMinimo: 10,
+    tipoProductoId: 1,
+    categoriaId: 2,
+    unidadMedidaId: 5,
+    proveedorId: 2,
+    stockActual: 0,
+    stockMinimo: 0,
     precioUnitario: 28.5,
     estado: true,
     fechaRegistro: '11/08/2026',
   },
   {
-    id: 'PROD-003',
+    id: 3,
     codigo: 'FER-001',
     nombre: 'Aceite lubricante',
     descripcion:
       'Lubricante para equipos y maquinaria.',
-    tipoProductoId: 'TP-001',
-    categoriaId: 'CAT-003',
-    unidadMedidaId: 'UM-003',
-    proveedorId: 'PROV-003',
-    stockActual: 18,
-    stockMinimo: 8,
+    tipoProductoId: 1,
+    categoriaId: 3,
+    unidadMedidaId: 3,
+    proveedorId: 3,
+    stockActual: 0,
+    stockMinimo: 0,
     precioUnitario: 45.9,
     estado: true,
     fechaRegistro: '12/08/2026',
   },
   {
-    id: 'PROD-004',
+    id: 4,
     codigo: 'REP-001',
     nombre: 'Rodamiento industrial',
     descripcion:
       'Repuesto para mantenimiento de maquinaria.',
-    tipoProductoId: 'TP-004',
-    categoriaId: 'CAT-004',
-    unidadMedidaId: 'UM-001',
-    proveedorId: 'PROV-003',
-    stockActual: 3,
-    stockMinimo: 6,
+    tipoProductoId: 4,
+    categoriaId: 4,
+    unidadMedidaId: 1,
+    proveedorId: 3,
+    stockActual: 0,
+    stockMinimo: 0,
     precioUnitario: 85,
     estado: true,
     fechaRegistro: '13/08/2026',
@@ -180,25 +180,65 @@ function validarDatos(
   }
 }
 
-function crearSiguienteId(
-  productos: Producto[],
-): string {
-  const numeroMayor = productos.reduce(
-    (mayor, producto) => {
-      const numero = Number(
-        producto.id.replace('PROD-', ''),
-      )
-
-      return Number.isNaN(numero)
-        ? mayor
-        : Math.max(mayor, numero)
-    },
-    0,
+function normalizarIdProducto(
+  id: unknown,
+): number | null {
+  const texto = String(id ?? '').trim()
+  const numero = Number(
+    texto.replace(/^PROD-0*/i, ''),
   )
 
-  return `PROD-${String(
-    numeroMayor + 1,
-  ).padStart(3, '0')}`
+  return Number.isInteger(numero) && numero > 0
+    ? numero
+    : null
+}
+
+function normalizarIdForaneo(
+  id: unknown,
+  prefijo: string,
+): number {
+  return Number(
+    String(id ?? '').replace(
+      new RegExp(`^${prefijo}-0*`, 'i'),
+      '',
+    ),
+  )
+}
+
+function normalizarProducto(
+  registro: Partial<Producto>,
+): Producto | null {
+  const id = normalizarIdProducto(registro.id)
+
+  if (!id || !registro.codigo || !registro.nombre) {
+    return null
+  }
+
+  return {
+    ...registro,
+    id,
+    codigo: String(registro.codigo),
+    nombre: String(registro.nombre),
+    descripcion: String(registro.descripcion ?? ''),
+    tipoProductoId: normalizarIdForaneo(registro.tipoProductoId, 'TP'),
+    categoriaId: normalizarIdForaneo(registro.categoriaId, 'CAT'),
+    unidadMedidaId: normalizarIdForaneo(registro.unidadMedidaId, 'UM'),
+    proveedorId: normalizarIdForaneo(registro.proveedorId, 'PROV'),
+    stockActual: Number(registro.stockActual ?? 0),
+    stockMinimo: Number(registro.stockMinimo ?? 0),
+    precioUnitario: Number(registro.precioUnitario ?? 0),
+    estado: registro.estado !== false,
+    fechaRegistro: String(registro.fechaRegistro ?? ''),
+  }
+}
+
+function crearSiguienteId(
+  productos: Producto[],
+): number {
+  return productos.reduce(
+    (mayor, producto) => Math.max(mayor, producto.id),
+    0,
+  ) + 1
 }
 
 function crearFechaActual(): string {
@@ -227,9 +267,13 @@ export function obtenerProductos():
       throw new Error('Formato inválido')
     }
 
-    return copiarProductos(
-      datos as Producto[],
-    )
+    const productos = datos
+      .map((item) => normalizarProducto(item as Partial<Producto>))
+      .filter((item): item is Producto => item !== null)
+
+    guardarProductos(productos)
+
+    return copiarProductos(productos)
   } catch {
     guardarProductos(PRODUCTOS_INICIALES)
 
@@ -240,10 +284,10 @@ export function obtenerProductos():
 }
 
 export function obtenerProductoPorId(
-  id: string,
+  id: string | number,
 ): Producto | null {
   const producto = obtenerProductos().find(
-    (item) => item.id === id,
+    (item) => item.id === Number(id),
   )
 
   return producto ? { ...producto } : null
@@ -288,12 +332,10 @@ export function crearProducto(
     codigo,
     nombre: datos.nombre.trim(),
     descripcion: datos.descripcion.trim(),
-    tipoProductoId:
-      datos.tipoProductoId,
-    categoriaId: datos.categoriaId,
-    unidadMedidaId:
-      datos.unidadMedidaId,
-    proveedorId: datos.proveedorId,
+    tipoProductoId: normalizarIdForaneo(datos.tipoProductoId, 'TP'),
+    categoriaId: normalizarIdForaneo(datos.categoriaId, 'CAT'),
+    unidadMedidaId: normalizarIdForaneo(datos.unidadMedidaId, 'UM'),
+    proveedorId: normalizarIdForaneo(datos.proveedorId, 'PROV'),
     stockActual: 0,
     stockMinimo: datos.stockMinimo,
     precioUnitario:
@@ -312,14 +354,14 @@ export function crearProducto(
     accion: 'CREAR',
     detalle:
       `Se creó el producto "${nuevoProducto.nombre}" con código ${nuevoProducto.codigo}.`,
-    registroId: nuevoProducto.id,
+    registroId: String(nuevoProducto.id),
   })
 
   return { ...nuevoProducto }
 }
 
 export function actualizarProducto(
-  id: string,
+  id: number,
   datos: ProductoFormData,
 ): Producto {
   validarDatos(datos)
@@ -371,12 +413,10 @@ export function actualizarProducto(
     codigo,
     nombre: datos.nombre.trim(),
     descripcion: datos.descripcion.trim(),
-    tipoProductoId:
-      datos.tipoProductoId,
-    categoriaId: datos.categoriaId,
-    unidadMedidaId:
-      datos.unidadMedidaId,
-    proveedorId: datos.proveedorId,
+    tipoProductoId: normalizarIdForaneo(datos.tipoProductoId, 'TP'),
+    categoriaId: normalizarIdForaneo(datos.categoriaId, 'CAT'),
+    unidadMedidaId: normalizarIdForaneo(datos.unidadMedidaId, 'UM'),
+    proveedorId: normalizarIdForaneo(datos.proveedorId, 'PROV'),
     stockMinimo: datos.stockMinimo,
     precioUnitario:
       datos.precioUnitario,
@@ -397,14 +437,14 @@ export function actualizarProducto(
     detalle:
       `Se actualizó el producto "${productoActualizado.nombre}" con código ${productoActualizado.codigo}.`,
     registroId:
-      productoActualizado.id,
+      String(productoActualizado.id),
   })
 
   return { ...productoActualizado }
 }
 
 export function ajustarStockProducto(
-  id: string,
+  id: number,
   cantidad: number,
 ): Producto {
   if (!Number.isFinite(cantidad)) {
@@ -463,7 +503,7 @@ export function obtenerProductosBajoStock():
 }
 
 export function eliminarProducto(
-  id: string,
+  id: number,
 ): void {
   const productos = obtenerProductos()
 
@@ -494,6 +534,6 @@ export function eliminarProducto(
     accion: 'ELIMINAR',
     detalle:
       `Se eliminó el producto "${producto.nombre}" con código ${producto.codigo}.`,
-    registroId: producto.id,
+    registroId: String(producto.id),
   })
 }

@@ -3,6 +3,13 @@ import { obtenerProductos } from './productoService'
 import { registrarEventoBitacora } from './bitacoraService'
 
 const STORAGE_KEY = 'agrihusac_categorias'
+const CATEGORIAS_INICIALES: Categoria[] = [
+  { id: 1, nombre: 'Herramientas', descripcion: 'Implementos y accesorios de uso técnico.', activo: 1, fechaRegistro: '10/08/2026' },
+  { id: 2, nombre: 'Seguridad Industrial', descripcion: 'Equipos para protección personal.', activo: 1, fechaRegistro: '11/08/2026' },
+  { id: 3, nombre: 'Ferretería', descripcion: 'Materiales y piezas de soporte operativo.', activo: 1, fechaRegistro: '12/08/2026' },
+  { id: 4, nombre: 'Repuestos', descripcion: 'Piezas de reemplazo para mantenimiento.', activo: 1, fechaRegistro: '13/08/2026' },
+  { id: 5, nombre: 'Limpieza', descripcion: 'Insumos para orden e higiene del almacén.', activo: 1, fechaRegistro: '14/08/2026' },
+]
 type RegistroGuardado = Partial<Categoria> & { estado?: boolean; id?: number | string }
 
 function normalizarRegistro(registro: RegistroGuardado): Categoria | null {
@@ -43,7 +50,8 @@ function validarDatos(datos: CategoriaFormData): void {
 }
 
 export function obtenerCategorias(): Categoria[] {
-  const categorias = leerCategorias().sort((a, b) => a.id - b.id)
+  const guardadas = leerCategorias()
+  const categorias = (guardadas.length ? guardadas : CATEGORIAS_INICIALES.map((item) => ({ ...item }))).sort((a, b) => a.id - b.id)
   guardarCategorias(categorias)
   return categorias.map((categoria) => ({ ...categoria }))
 }
