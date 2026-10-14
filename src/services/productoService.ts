@@ -4,6 +4,12 @@ import type {
 } from '../types/producto'
 
 import { registrarEventoBitacora } from './bitacoraService'
+import {
+  listarCatalogo,
+  obtenerEstadoActivo,
+  obtenerIdCatalogo,
+  type CatalogoPaginado,
+} from './catalogoApi'
 
 const STORAGE_KEY = 'agrihusac_productos'
 
@@ -281,6 +287,24 @@ export function obtenerProductos():
       PRODUCTOS_INICIALES,
     )
   }
+}
+
+export function listarProductosApi(): Promise<CatalogoPaginado<Producto>> {
+  return listarCatalogo('/api/v1/productos', (registro) => ({
+    id: obtenerIdCatalogo(registro, 'productoId', 'id'),
+    codigo: String(registro.codigo ?? ''),
+    nombre: String(registro.nombre ?? ''),
+    descripcion: String(registro.descripcion ?? ''),
+    tipoProductoId: Number(registro.tipoProductoId),
+    categoriaId: Number(registro.categoriaId ?? 0),
+    unidadMedidaId: Number(registro.unidadMedidaId),
+    proveedorId: Number(registro.proveedorId ?? 0),
+    stockActual: Number(registro.stockActual ?? 0),
+    stockMinimo: Number(registro.stockMinimo ?? 0),
+    precioUnitario: Number(registro.precioUnitario ?? 0),
+    estado: obtenerEstadoActivo(registro),
+    fechaRegistro: String(registro.fechaRegistro ?? ''),
+  }))
 }
 
 export function obtenerProductoPorId(

@@ -4,6 +4,12 @@ import type {
 } from '../types/parteEquipo'
 
 import { registrarEventoBitacora } from './bitacoraService'
+import {
+  listarCatalogo,
+  obtenerEstadoActivo,
+  obtenerIdCatalogo,
+  type CatalogoPaginado,
+} from './catalogoApi'
 
 const STORAGE_KEY =
   'agrihusac_partes_equipo'
@@ -193,6 +199,21 @@ export function obtenerPartesEquipo():
       PARTES_INICIALES,
     )
   }
+}
+
+export function listarPartesEquipoApi():
+  Promise<CatalogoPaginado<ParteEquipo>> {
+  return listarCatalogo(
+    '/api/v1/catalogos/partes-equipo',
+    (registro) => ({
+      id: obtenerIdCatalogo(registro, 'parteEquipoId', 'id'),
+      codigo: String(registro.codigo ?? ''),
+      nombre: String(registro.nombre ?? ''),
+      descripcion: String(registro.descripcion ?? ''),
+      estado: obtenerEstadoActivo(registro),
+      fechaRegistro: String(registro.fechaRegistro ?? ''),
+    }),
+  )
 }
 
 export function obtenerParteEquipoPorId(

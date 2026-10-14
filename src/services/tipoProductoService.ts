@@ -1,5 +1,11 @@
 import type { TipoProducto, TipoProductoFormData } from '../types/tipoProducto'
 import { registrarEventoBitacora } from './bitacoraService'
+import {
+  listarCatalogo,
+  obtenerEstadoActivo,
+  obtenerIdCatalogo,
+  type CatalogoPaginado,
+} from './catalogoApi'
 
 const STORAGE_KEY = 'agrihusac_tipos_producto'
 const TIPOS_PRODUCTO_INICIALES: TipoProducto[] = [
@@ -34,6 +40,14 @@ function validar(datos: TipoProductoFormData): void {
   if (descripcion.length > 250) throw new Error('La descripción no puede superar los 250 caracteres.')
 }
 export function obtenerTiposProducto(): TipoProducto[] { const guardados = leer(); const datos = (guardados.length ? guardados : TIPOS_PRODUCTO_INICIALES.map((item) => ({ ...item }))).sort((a, b) => a.id - b.id); guardar(datos); return datos.map((item) => ({ ...item })) }
+export function listarTiposProductoApi(): Promise<CatalogoPaginado<TipoProducto>> {
+  return listarCatalogo('/api/v1/catalogos/tipos-producto', (registro) => ({
+    id: obtenerIdCatalogo(registro, 'tipoProductoId', 'id'),
+    nombre: String(registro.nombre ?? ''),
+    descripcion: String(registro.descripcion ?? ''),
+    activo: obtenerEstadoActivo(registro) ? 1 : 0,
+  }))
+}
 export function crearTipoProducto(datos: TipoProductoFormData): TipoProducto {
   validar(datos); const lista = obtenerTiposProducto()
   if (lista.some((item) => normalizar(item.nombre) === normalizar(datos.nombre))) throw new Error('Ya existe un tipo de producto con ese nombre.')

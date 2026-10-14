@@ -11,10 +11,6 @@ import type {
 import { obtenerProductos } from './productoService'
 import { coincidenIds } from '../utils/identificadores'
 
-import {
-  obtenerFilasReporteVales,
-} from './reporteValeService'
-
 interface ProductoAcumulado {
   productoId: number
   codigoProducto: string
@@ -53,13 +49,14 @@ function redondearImporte(
 
 function filtrarDistribuciones(
   filtros: FiltrosProductosMasPedidos,
+  filasReporte: FilaReporteVale[],
 ): FilaReporteVale[] {
   const busqueda =
     normalizarTexto(filtros.busqueda)
 
   const productos = obtenerProductos()
 
-  return obtenerFilasReporteVales()
+  return filasReporte
     .filter(
       (fila) =>
         fila.estado === 'REGISTRADO',
@@ -121,9 +118,10 @@ function filtrarDistribuciones(
 
 export function obtenerProductosMasPedidos(
   filtros: FiltrosProductosMasPedidos,
+  filasReporte: FilaReporteVale[],
 ): FilaProductoMasPedido[] {
   const distribuciones =
-    filtrarDistribuciones(filtros)
+    filtrarDistribuciones(filtros, filasReporte)
 
   const productos = obtenerProductos()
 
@@ -282,9 +280,10 @@ export function obtenerProductosMasPedidos(
 export function obtenerResumenProductosMasPedidos(
   filas: FilaProductoMasPedido[],
   filtros: FiltrosProductosMasPedidos,
+  filasReporte: FilaReporteVale[],
 ): ResumenProductosMasPedidos {
   const distribuciones =
-    filtrarDistribuciones(filtros)
+    filtrarDistribuciones(filtros, filasReporte)
 
   const valesIds = new Set(
     distribuciones.map(
@@ -323,4 +322,3 @@ export function obtenerResumenProductosMasPedidos(
         ?.unidadMedida ?? '',
   }
 }
-

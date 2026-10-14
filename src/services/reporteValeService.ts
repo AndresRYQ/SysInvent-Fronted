@@ -11,7 +11,7 @@ import { obtenerPartesEquipo } from './parteEquipoService'
 import { obtenerProductos } from './productoService'
 import { obtenerTiposProducto } from './tipoProductoService'
 import { obtenerUnidadesMedida } from './unidadMedidaService'
-import { obtenerValesConsumo } from './valeConsumoService'
+import type { ValeConsumo } from '../types/valeConsumo'
 import { coincidenIds } from '../utils/identificadores'
 
 function normalizarTexto(
@@ -34,9 +34,10 @@ function redondearImporte(
   return Number(valor.toFixed(2))
 }
 
-export function obtenerFilasReporteVales():
+export function obtenerFilasReporteVales(
+  vales: ValeConsumo[],
+):
   FilaReporteVale[] {
-  const vales = obtenerValesConsumo()
   const centrosCosto =
     obtenerCentrosCosto()
   const destinos = obtenerDestinos()

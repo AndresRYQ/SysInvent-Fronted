@@ -22,8 +22,15 @@ import {
   obtenerProductosMasPedidos,
   obtenerResumenProductosMasPedidos,
 } from '../../services/reporteProductoMasPedidoService'
+import {
+  listarVales,
+  obtenerMensajeErrorVale,
+} from '../../services/valeConsumoService'
+import { obtenerFilasReporteVales } from '../../services/reporteValeService'
 
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
+import type { ValeConsumo } from '../../types/valeConsumo'
+import type { FilaReporteVale } from '../../types/reporteVale'
 
 import type {
   FiltrosProductosMasPedidos as Filtros,
@@ -42,6 +49,34 @@ const FILTROS_INICIALES: Filtros = {
 }
 
 export function ReporteProductosMasPedidosPage() {
+  const [vales, setVales] = useState<ValeConsumo[]>([])
+  const [errorCarga, setErrorCarga] = useState<string | null>(null)
+
+  useEffect(() => {
+    let activo = true
+
+    listarVales()
+      .then((resultado) => {
+        if (activo) {
+          setVales(resultado)
+        }
+      })
+      .catch((error) => {
+        if (activo) {
+          setErrorCarga(obtenerMensajeErrorVale(error))
+        }
+      })
+
+    return () => {
+      activo = false
+    }
+  }, [])
+
+  const filasReporte = useMemo<FilaReporteVale[]>(
+    () => obtenerFilasReporteVales(vales),
+    [vales],
+  )
+
   const [filtros, setFiltros] =
     useState<Filtros>({
       ...FILTROS_INICIALES,
@@ -111,8 +146,9 @@ export function ReporteProductosMasPedidosPage() {
     () =>
       obtenerProductosMasPedidos(
         filtrosAplicados,
+        filasReporte,
       ),
-    [filtrosAplicados],
+    [filtrosAplicados, filasReporte],
   )
 
   const resumen = useMemo(
@@ -120,10 +156,12 @@ export function ReporteProductosMasPedidosPage() {
       obtenerResumenProductosMasPedidos(
         filas,
         filtrosAplicados,
+        filasReporte,
       ),
     [
       filas,
       filtrosAplicados,
+      filasReporte,
     ],
   )
 
@@ -216,6 +254,12 @@ export function ReporteProductosMasPedidosPage() {
             />
           </div>
         </section>
+
+        {errorCarga && (
+          <div className="alert alert-danger" role="alert">
+            {errorCarga}
+          </div>
+        )}
 
         <div className="maestro-panel">
           <ResumenProductosMasPedidos

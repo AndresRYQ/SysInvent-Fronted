@@ -13,15 +13,23 @@ import {
   X,
 } from 'lucide-react'
 
-import { obtenerCentrosCosto } from '../../services/centroCostoService'
-import { obtenerDestinos } from '../../services/destinoService'
-import { obtenerPartesEquipo } from '../../services/parteEquipoService'
-import { obtenerProductos } from '../../services/productoService'
-import { obtenerTiposProducto } from '../../services/tipoProductoService'
-import { obtenerUnidadesMedida } from '../../services/unidadMedidaService'
+import { listarCentrosCostoApi } from '../../services/centroCostoService'
+import { listarDestinosApi } from '../../services/destinoService'
+import { listarPartesEquipoApi } from '../../services/parteEquipoService'
+import { listarProductosApi } from '../../services/productoService'
+import { listarTiposProductoApi } from '../../services/tipoProductoService'
+import { listarUnidadesMedidaApi } from '../../services/unidadMedidaService'
 import { coincidenIds } from '../../utils/identificadores'
+import { obtenerMensajeErrorVale } from '../../services/valeConsumoService'
 import { DatePickerInput } from '../ui/DatePickerInput'
 
+import type { CentroCosto } from '../../types/centroCosto'
+import type { Destino } from '../../types/destino'
+import type { ParteEquipo } from '../../types/parteEquipo'
+import type { Producto } from '../../types/producto'
+import type { TipoProducto } from '../../types/tipoProducto'
+import type { UnidadMedida } from '../../types/unidadMedida'
+import type { CatalogoPaginado } from '../../services/catalogoApi'
 import type {
   DetalleValeConsumoFormData,
   DistribucionValeConsumoFormData,
@@ -33,7 +41,7 @@ interface ValeConsumoFormProps {
   vale?: ValeConsumo | null
   onSubmit: (
     datos: ValeConsumoFormData,
-  ) => void
+  ) => void | Promise<void>
   onCancelar: () => void
 }
 
@@ -66,14 +74,6 @@ function obtenerFechaActual(): string {
     .slice(0, 10)
 }
 
-function obtenerMensajeError(
-  error: unknown,
-): string {
-  return error instanceof Error
-    ? error.message
-    : 'Ocurrió un error inesperado.'
-}
-
 function calcularCantidadDistribuida(
   distribuciones:
     DistribucionValeConsumoFormData[],
@@ -89,40 +89,52 @@ function calcularCantidadDistribuida(
   )
 }
 
+function aplicarResultadoCatalogo<T>(
+  resultado: PromiseSettledResult<CatalogoPaginado<T>>,
+  etiqueta: string,
+  endpoint: string,
+  guardar: (datos: T[]) => void,
+): string | null {
+  if (resultado.status === 'fulfilled') {
+    guardar(resultado.value.datos)
+    if (import.meta.env.DEV) {
+      console.info(`${etiqueta}: ${resultado.value.datos.length}`)
+    }
+    return null
+  }
+
+  console.error(`[Catálogo ${endpoint}] error de carga`, resultado.reason)
+  if (import.meta.env.DEV) {
+    console.info(`${etiqueta}: 0`)
+  }
+  return `${endpoint}: ${
+    resultado.reason instanceof Error
+      ? resultado.reason.message
+      : 'Error desconocido'
+  }`
+}
+
 export function ValeConsumoForm({
   vale = null,
   onSubmit,
   onCancelar,
 }: ValeConsumoFormProps) {
-  const centrosCosto = useMemo(
-    () => obtenerCentrosCosto(),
-    [],
-  )
-
-  const destinos = useMemo(
-    () => obtenerDestinos(),
-    [],
-  )
-
-  const partesEquipo = useMemo(
-    () => obtenerPartesEquipo(),
-    [],
-  )
-
-  const tiposProducto = useMemo(
-    () => obtenerTiposProducto(),
-    [],
-  )
-
-  const productos = useMemo(
-    () => obtenerProductos(),
-    [],
-  )
-
-  const unidadesMedida = useMemo(
-    () => obtenerUnidadesMedida(),
-    [],
-  )
+  const [centrosCosto, setCentrosCosto] =
+    useState<CentroCosto[]>([])
+  const [destinos, setDestinos] =
+    useState<Destino[]>([])
+  const [partesEquipo, setPartesEquipo] =
+    useState<ParteEquipo[]>([])
+  const [tiposProducto, setTiposProducto] =
+    useState<TipoProducto[]>([])
+  const [productos, setProductos] =
+    useState<Producto[]>([])
+  const [unidadesMedida, setUnidadesMedida] =
+    useState<UnidadMedida[]>([])
+  const [catalogosCargando, setCatalogosCargando] =
+    useState(true)
+  const [errorCatalogos, setErrorCatalogos] =
+    useState<string | null>(null)
 
   const [fechaVale, setFechaVale] =
     useState(obtenerFechaActual())
@@ -157,6 +169,77 @@ export function ValeConsumoForm({
 
   const [error, setError] =
     useState<string | null>(null)
+  const [guardando, setGuardando] =
+    useState(false)
+
+  useEffect(() => {
+    let cancelado = false
+
+    async function cargarCatalogos(): Promise<void> {
+      const resultados = await Promise.allSettled([
+        listarCentrosCostoApi(),
+        listarDestinosApi(),
+        listarPartesEquipoApi(),
+        listarTiposProductoApi(),
+        listarProductosApi(),
+        listarUnidadesMedidaApi(),
+      ])
+
+      if (cancelado) return
+
+      const errores = [
+        aplicarResultadoCatalogo(
+          resultados[0],
+          'Centros cargados',
+          '/api/v1/catalogos/centros-costo',
+          setCentrosCosto,
+        ),
+        aplicarResultadoCatalogo(
+          resultados[1],
+          'Destinos cargados',
+          '/api/v1/catalogos/destinos',
+          setDestinos,
+        ),
+        aplicarResultadoCatalogo(
+          resultados[2],
+          'Partes cargadas',
+          '/api/v1/catalogos/partes-equipo',
+          setPartesEquipo,
+        ),
+        aplicarResultadoCatalogo(
+          resultados[3],
+          'Tipos cargados',
+          '/api/v1/catalogos/tipos-producto',
+          setTiposProducto,
+        ),
+        aplicarResultadoCatalogo(
+          resultados[4],
+          'Productos cargados',
+          '/api/v1/productos',
+          setProductos,
+        ),
+        aplicarResultadoCatalogo(
+          resultados[5],
+          'Unidades cargadas',
+          '/api/v1/catalogos/unidades-medida',
+          setUnidadesMedida,
+        ),
+      ].filter((mensaje): mensaje is string => mensaje !== null)
+
+      setErrorCatalogos(
+        errores.length > 0
+          ? errores.join(' ')
+          : null,
+      )
+      setCatalogosCargando(false)
+    }
+
+    void cargarCatalogos()
+
+    return () => {
+      cancelado = true
+    }
+  }, [])
 
   useEffect(() => {
     if (!vale) {
@@ -217,33 +300,46 @@ export function ValeConsumoForm({
           ) {
             return false
           }
-
-          const cantidadOriginal =
-            vale?.detalles
-              .find(
-                (detalle) =>
-                  detalle.productoId ===
-                  producto.id,
-              )
-              ?.distribuciones.reduce(
-                (total, distribucion) =>
-                  total +
-                  distribucion.cantidad,
-                0,
-              ) ?? 0
-
-          return (
-            producto.stockActual +
-              cantidadOriginal >
-            0
-          )
+          return true
         }),
       [
         productos,
         borrador.tipoProductoId,
-        vale,
       ],
     )
+
+  useEffect(() => {
+    if (!import.meta.env.DEV || catalogosCargando) return
+
+    console.debug('[ValeConsumoForm] opciones después de filtros', {
+      centrosCosto: centrosCosto.filter(
+        (centro) =>
+          centro.activo === 1 ||
+          String(centro.id) === String(centroCostoId),
+      ).length,
+      tiposProducto: tiposProducto.filter(
+        (tipo) => tipo.activo === 1,
+      ).length,
+      productos: productosFiltrados.length,
+      destinos: destinos.filter(
+        (destino) => destino.activo === 1,
+      ).length,
+      partesEquipo: partesEquipo.filter(
+        (parte) => parte.estado,
+      ).length,
+    })
+  }, [
+    catalogosCargando,
+    centroCostoId,
+    centrosCosto,
+    destinos,
+    partesEquipo,
+    productosFiltrados,
+    tiposProducto,
+  ])
+
+  const catalogosNoDisponibles =
+    catalogosCargando
 
   const productoSeleccionado =
     useMemo(
@@ -272,34 +368,6 @@ export function ValeConsumoForm({
         productoSeleccionado,
       ],
     )
-
-  const cantidadOriginal =
-    useMemo(
-      () =>
-        vale?.detalles
-          .find(
-            (detalle) =>
-              String(detalle.productoId) ===
-              borrador.productoId,
-          )
-          ?.distribuciones.reduce(
-            (total, distribucion) =>
-              total +
-              distribucion.cantidad,
-            0,
-          ) ?? 0,
-      [vale, borrador.productoId],
-    )
-
-  const stockDisponible =
-    productoSeleccionado
-      ? Number(
-          (
-            productoSeleccionado.stockActual +
-            cantidadOriginal
-          ).toFixed(3),
-        )
-      : 0
 
   const totalVale = useMemo(
     () =>
@@ -382,21 +450,6 @@ export function ValeConsumoForm({
     if (repetida) {
       setError(
         'Ese destino y parte de equipo ya fueron agregados.',
-      )
-      return
-    }
-
-    const cantidadAcumulada =
-      calcularCantidadDistribuida(
-        distribucionesBorrador,
-      ) + cantidad
-
-    if (
-      cantidadAcumulada >
-      stockDisponible
-    ) {
-      setError(
-        `Stock insuficiente. Disponible: ${stockDisponible} ${unidadSeleccionada?.nombre ?? ''}.`,
       )
       return
     }
@@ -534,14 +587,20 @@ export function ValeConsumoForm({
     setError(null)
   }
 
-  function guardar(
+  async function guardar(
     event: FormEvent<HTMLFormElement>,
-  ): void {
+  ): Promise<void> {
     event.preventDefault()
+    if (guardando) {
+      return
+    }
     setError(null)
 
-    if (!fechaVale) {
-      setError('Selecciona la fecha.')
+    if (
+      !fechaVale ||
+      Number.isNaN(Date.parse(fechaVale))
+    ) {
+      setError('Selecciona una fecha válida.')
       return
     }
 
@@ -559,9 +618,23 @@ export function ValeConsumoForm({
       return
     }
 
+    if (solicitante.trim().length > 120) {
+      setError(
+        'El solicitante no puede superar los 120 caracteres.',
+      )
+      return
+    }
+
     if (motivo.trim().length < 5) {
       setError(
         'Describe el motivo de la salida.',
+      )
+      return
+    }
+
+    if (motivo.trim().length > 500) {
+      setError(
+        'El motivo no puede superar los 500 caracteres.',
       )
       return
     }
@@ -573,8 +646,9 @@ export function ValeConsumoForm({
       return
     }
 
+    setGuardando(true)
     try {
-      onSubmit({
+      await onSubmit({
         fechaVale,
         centroCostoId,
         solicitante:
@@ -584,10 +658,10 @@ export function ValeConsumoForm({
       })
     } catch (errorGuardado) {
       setError(
-        obtenerMensajeError(
-          errorGuardado,
-        ),
+        obtenerMensajeErrorVale(errorGuardado),
       )
+    } finally {
+      setGuardando(false)
     }
   }
 
@@ -627,6 +701,18 @@ export function ValeConsumoForm({
         </div>
       )}
 
+      {catalogosCargando && (
+        <div className="alert alert-info" role="status">
+          Cargando catálogos…
+        </div>
+      )}
+
+      {errorCatalogos && (
+        <div className="alert alert-danger" role="alert">
+          No se pudieron cargar los catálogos: {errorCatalogos}
+        </div>
+      )}
+
       <div className="row g-3">
         <div className="col-12 col-md-4">
           <label
@@ -655,6 +741,7 @@ export function ValeConsumoForm({
             id="valeCentroCosto"
             className="form-select maestro-control"
             value={centroCostoId}
+            disabled={catalogosNoDisponibles}
             onChange={(event) =>
               setCentroCostoId(
                 event.target.value,
@@ -742,6 +829,7 @@ export function ValeConsumoForm({
           <select
             className="form-select maestro-control"
             value={borrador.tipoProductoId}
+            disabled={catalogosNoDisponibles}
             onChange={(event) =>
               cambiarTipoProducto(
                 event.target.value,
@@ -774,6 +862,7 @@ export function ValeConsumoForm({
             className="form-select maestro-control"
             value={borrador.productoId}
             disabled={
+              catalogosNoDisponibles ||
               !borrador.tipoProductoId
             }
             onChange={(event) =>
@@ -809,11 +898,9 @@ export function ValeConsumoForm({
             className="form-control maestro-control"
             readOnly
             value={
-              productoSeleccionado
-                ? `${stockDisponible} ${unidadSeleccionada?.nombre ?? ''}`
-                : ''
+              ''
             }
-            placeholder="Automático"
+            placeholder="Se valida al guardar."
           />
         </div>
       </div>
@@ -827,7 +914,10 @@ export function ValeConsumoForm({
           <select
             className="form-select maestro-control"
             value={borrador.destinoId}
-            disabled={!borrador.productoId}
+            disabled={
+              catalogosNoDisponibles ||
+              !borrador.productoId
+            }
             onChange={(event) =>
               setBorrador((actual) => ({
                 ...actual,
@@ -864,7 +954,10 @@ export function ValeConsumoForm({
           <select
             className="form-select maestro-control"
             value={borrador.parteEquipoId}
-            disabled={!borrador.productoId}
+            disabled={
+              catalogosNoDisponibles ||
+              !borrador.productoId
+            }
             onChange={(event) =>
               setBorrador((actual) => ({
                 ...actual,
@@ -918,6 +1011,7 @@ export function ValeConsumoForm({
             type="button"
             className="btn btn-maestro-primary w-100"
             onClick={agregarDistribucion}
+            disabled={catalogosNoDisponibles}
           >
             <Plus size={18} />
             Distribuir
@@ -1008,6 +1102,7 @@ export function ValeConsumoForm({
           type="button"
           className="btn btn-maestro-primary"
           onClick={agregarProducto}
+          disabled={catalogosNoDisponibles}
         >
           <Plus size={18} />
           Agregar producto al vale
@@ -1158,9 +1253,10 @@ export function ValeConsumoForm({
         <button
           type="submit"
           className="btn btn-maestro-primary"
+          disabled={guardando || catalogosNoDisponibles}
         >
           <Save size={18} />
-          Guardar vale
+          {guardando ? 'Guardando…' : 'Guardar vale'}
         </button>
       </div>
     </form>

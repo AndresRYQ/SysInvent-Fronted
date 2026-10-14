@@ -8,9 +8,7 @@ import {
 import {
   obtenerIngresosAlmacen,
 } from './ingresoAlmacenService'
-import {
-  obtenerValesConsumo,
-} from './valeConsumoService'
+import { listarVales } from './valeConsumoService'
 
 export interface MovimientoRecienteDashboard {
   id: string
@@ -84,8 +82,9 @@ function formatearFecha(
   ).format(fechaLocal)
 }
 
-export function obtenerResumenDashboard():
-  ResumenDashboard {
+export async function obtenerResumenDashboard():
+  Promise<ResumenDashboard> {
+  const vales = await listarVales()
   const fechaActual =
     obtenerFechaActual()
 
@@ -110,7 +109,7 @@ export function obtenerResumenDashboard():
     )
 
   const controlAlmacen =
-    obtenerControlAlmacen().filter(
+    (await obtenerControlAlmacen(vales)).filter(
       (control) =>
         productosActivosIds.has(
           control.productoId,
@@ -156,7 +155,7 @@ export function obtenerResumenDashboard():
     ).length
 
   const valesDelMes =
-    obtenerValesConsumo().filter(
+    vales.filter(
       (vale) =>
         vale.estado ===
           'REGISTRADO' &&
@@ -166,7 +165,7 @@ export function obtenerResumenDashboard():
     ).length
 
   const movimientos =
-    obtenerMovimientosAlmacen()
+    await obtenerMovimientosAlmacen(vales)
 
   const movimientosHoy =
     movimientos.filter(
@@ -286,4 +285,3 @@ export function obtenerResumenDashboard():
     movimientosRecientes,
   }
 }
-

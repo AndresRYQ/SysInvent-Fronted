@@ -7,6 +7,14 @@ const AUTH_TOKEN_KEY = 'sysinvent_token'
 export interface ApiError extends Error {
   status?: number
   isConnectionError?: boolean
+  data?: unknown
+}
+
+export interface ApiResponseDiagnostic {
+  status: number
+  statusText: string
+  headers: Record<string, string>
+  body: unknown
 }
 
 function buildUrl(endpoint: string): string {
@@ -20,6 +28,7 @@ function buildUrl(endpoint: string): string {
 export async function apiFetch<T>(
   endpoint: string,
   options: RequestInit = {},
+  onResponse?: (diagnostic: ApiResponseDiagnostic) => void,
 ): Promise<T> {
   const headers = new Headers(options.headers)
 
@@ -44,14 +53,26 @@ export async function apiFetch<T>(
       ? await response.json()
       : await response.text()
 
+    onResponse?.({
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries()),
+      body: data,
+    })
+
     if (!response.ok) {
-      const error = new Error(
-        typeof data === 'object' && data && 'message' in data
-          ? String(data.message)
-          : response.statusText,
-      ) as ApiError
+      const message =
+        typeof data === 'object' && data
+          ? 'message' in data
+            ? String(data.message)
+            : 'mensaje' in data
+              ? String(data.mensaje)
+              : response.statusText
+          : response.statusText
+      const error = new Error(message) as ApiError
 
       error.status = response.status
+      error.data = data
       throw error
     }
 

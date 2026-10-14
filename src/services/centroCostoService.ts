@@ -1,8 +1,14 @@
 import type { CentroCosto, CentroCostoFormData } from '../types/centroCosto'
 import { registrarEventoBitacora } from './bitacoraService'
+import { listarVales } from './valeConsumoService'
+import {
+  listarCatalogo,
+  obtenerEstadoActivo,
+  obtenerIdCatalogo,
+  type CatalogoPaginado,
+} from './catalogoApi'
 
 const STORAGE_KEY = 'agrihusac_centros_costo'
-const VALES_STORAGE_KEY = 'agrihusac_vales_consumo'
 const CENTROS_INICIALES: CentroCosto[] = [
   { id: 1, nombre: 'Administración', descripcion: 'Gestión general y dirección de la organización.', activo: 1 },
   { id: 2, nombre: 'Producción', descripcion: 'Procesos productivos y operaciones de planta.', activo: 1 },
@@ -60,20 +66,23 @@ function validarDatos(datos: CentroCostoFormData): void {
   if (descripcion.length > 250) throw new Error('La descripción no puede superar los 250 caracteres.')
 }
 
-function centroCostoEstaEnUso(id: number): boolean {
-  try {
-    const vales = JSON.parse(localStorage.getItem(VALES_STORAGE_KEY) ?? '[]')
-    return Array.isArray(vales) && vales.some((vale) => String(vale?.centroCostoId) === String(id))
-  } catch {
-    return false
-  }
-}
-
 export function obtenerCentrosCosto(): CentroCosto[] {
   const guardados = leerCentrosGuardados()
   const centros = (guardados.length ? guardados : CENTROS_INICIALES.map((item) => ({ ...item }))).sort((a, b) => a.id - b.id)
   guardarCentros(centros)
   return centros.map((centro) => ({ ...centro }))
+}
+
+export function listarCentrosCostoApi(): Promise<CatalogoPaginado<CentroCosto>> {
+  return listarCatalogo(
+    '/api/v1/catalogos/centros-costo',
+    (registro) => ({
+      id: obtenerIdCatalogo(registro, 'centroCostoId', 'id'),
+      nombre: String(registro.nombre ?? ''),
+      descripcion: String(registro.descripcion ?? ''),
+      activo: obtenerEstadoActivo(registro) ? 1 : 0,
+    }),
+  )
 }
 
 export function crearCentroCosto(datos: CentroCostoFormData): CentroCosto {
@@ -108,11 +117,14 @@ export function actualizarCentroCosto(id: number, datos: CentroCostoFormData): C
   return { ...actualizado }
 }
 
-export function eliminarCentroCosto(id: number): void {
+export async function eliminarCentroCosto(id: number): Promise<void> {
   const centros = obtenerCentrosCosto()
   const actual = centros.find((centro) => centro.id === id)
   if (!actual) throw new Error('El centro de costo no existe.')
-  if (centroCostoEstaEnUso(id)) throw new Error('No puedes eliminar este centro de costo porque está asignado a uno o más vales. Puedes desactivarlo.')
+  const vales = await listarVales()
+  if (vales.some((vale) => String(vale.centroCostoId) === String(id))) {
+    throw new Error('No puedes eliminar este centro de costo porque está asignado a uno o más vales. Puedes desactivarlo.')
+  }
   guardarCentros(centros.map((centro) => centro.id === id ? { ...centro, activo: 0 as const } : centro))
   registrarEventoBitacora({ modulo: 'Centros de costo', accion: 'ELIMINAR', detalle: `Se desactivó el centro de costo "${actual.nombre}".`, registroId: String(actual.id) })
 }
