@@ -243,13 +243,13 @@ export function CentrosCostoPage() {
     setCentroCostoAReactivar(null)
   }
 
-  function confirmarEliminacion(): void {
+  async function confirmarEliminacion(): Promise<void> {
     if (!centroCostoAEliminar) {
       return
     }
 
     try {
-      eliminarCentroCosto(
+      await eliminarCentroCosto(
         centroCostoAEliminar.id,
       )
 

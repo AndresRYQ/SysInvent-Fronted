@@ -24,8 +24,13 @@ import {
   obtenerFilasReporteVales,
   obtenerResumenReporteVales,
 } from '../../services/reporteValeService'
+import {
+  listarVales,
+  obtenerMensajeErrorVale,
+} from '../../services/valeConsumoService'
 
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
+import type { ValeConsumo } from '../../types/valeConsumo'
 
 import type {
   FiltrosReporteVales as Filtros,
@@ -47,8 +52,32 @@ const FILTROS_INICIALES: Filtros = {
 }
 
 export function ReporteValesPage() {
-  const [filas] = useState(
-    () => obtenerFilasReporteVales(),
+  const [vales, setVales] = useState<ValeConsumo[]>([])
+  const [errorCarga, setErrorCarga] = useState<string | null>(null)
+
+  useEffect(() => {
+    let activo = true
+
+    listarVales()
+      .then((resultado) => {
+        if (activo) {
+          setVales(resultado)
+        }
+      })
+      .catch((error) => {
+        if (activo) {
+          setErrorCarga(obtenerMensajeErrorVale(error))
+        }
+      })
+
+    return () => {
+      activo = false
+    }
+  }, [])
+
+  const filas = useMemo(
+    () => obtenerFilasReporteVales(vales),
+    [vales],
   )
 
   const [filtros, setFiltros] =
@@ -259,6 +288,12 @@ export function ReporteValesPage() {
             />
           </div>
         </section>
+
+        {errorCarga && (
+          <div className="alert alert-danger" role="alert">
+            {errorCarga}
+          </div>
+        )}
 
         <div className="maestro-panel">
           <ResumenReporteVales

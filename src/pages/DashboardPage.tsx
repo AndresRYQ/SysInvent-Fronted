@@ -1,6 +1,7 @@
 import {
   useMemo,
   useState,
+  useEffect,
   type ReactNode,
 } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -9,6 +10,7 @@ import {
 } from '../services/rolService'
 import {
   obtenerResumenDashboard,
+  type ResumenDashboard,
 } from '../services/dashboardService'
 import AnimatedContent from '../components/ui/AnimatedContent'
 import CountUp from '../components/ui/CountUp'
@@ -16,6 +18,17 @@ import SpotlightCard from '../components/ui/SpotlightCard'
 import { useAuth } from '../hooks/useAuth'
 import '../styles/react-bits.css'
 import '../styles/DashboardPage.css'
+
+const RESUMEN_VACIO: ResumenDashboard = {
+  productosActivos: 0,
+  productosStockBajo: 0,
+  productosSinStock: 0,
+  ingresosDelMes: 0,
+  valesDelMes: 0,
+  movimientosHoy: 0,
+  alertas: [],
+  movimientosRecientes: [],
+}
 
 type IconName =
   | 'leaf'
@@ -379,10 +392,37 @@ function DashboardPage() {
     setSelectedCategory,
   ] = useState('Todos')
 
-  const resumenDashboard = useMemo(
-    () => obtenerResumenDashboard(),
-    [],
-  )
+  const [resumenCargado, setResumenCargado] =
+    useState<ResumenDashboard | null>(null)
+  const [errorResumen, setErrorResumen] =
+    useState<string | null>(null)
+
+  useEffect(() => {
+    let activo = true
+
+    obtenerResumenDashboard()
+      .then((resumen) => {
+        if (activo) {
+          setResumenCargado(resumen)
+        }
+      })
+      .catch((error: unknown) => {
+        if (activo) {
+          setErrorResumen(
+            error instanceof Error
+              ? error.message
+              : 'No se pudo cargar el resumen del panel.',
+          )
+        }
+      })
+
+    return () => {
+      activo = false
+    }
+  }, [])
+
+  const resumenDashboard =
+    resumenCargado ?? RESUMEN_VACIO
 
   const metrics: Metric[] = [
     {
@@ -527,6 +567,11 @@ const filteredModules =
 
   return (
     <main className="dashboard-shell">
+      {errorResumen && (
+        <div className="alert alert-danger" role="alert">
+          {errorResumen}
+        </div>
+      )}
 
       <section className="hero-panel">
         <div className="hero-copy">
@@ -775,5 +820,4 @@ const filteredModules =
 }
 
 export default DashboardPage
-
 

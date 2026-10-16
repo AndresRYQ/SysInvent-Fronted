@@ -27,6 +27,7 @@ import {
   obtenerControlAlmacen,
   obtenerDiferenciasStock,
 } from '../../services/kardexService'
+import { listarVales, obtenerMensajeErrorVale } from '../../services/valeConsumoService'
 
 import { obtenerProveedores } from '../../services/proveedorService'
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
@@ -53,9 +54,40 @@ const FILTROS_INICIALES:
   }
 
 export function ControlAlmacenPage() {
-  const [control] = useState<
+  const [control, setControl] = useState<
     ControlAlmacenProducto[]
-  >(() => obtenerControlAlmacen())
+  >([])
+  const [diferenciasStock, setDiferenciasStock] =
+    useState<Awaited<ReturnType<typeof obtenerDiferenciasStock>>>([])
+  const [errorCarga, setErrorCarga] =
+    useState<string | null>(null)
+
+  useEffect(() => {
+    let activo = true
+
+    listarVales()
+      .then((vales) =>
+        Promise.all([
+          obtenerControlAlmacen(vales),
+          obtenerDiferenciasStock(vales),
+        ] as const),
+      )
+      .then(([resultadoControl, resultadoDiferencias]) => {
+        if (activo) {
+          setControl(resultadoControl)
+          setDiferenciasStock(resultadoDiferencias)
+        }
+      })
+      .catch((error: unknown) => {
+        if (activo) {
+          setErrorCarga(obtenerMensajeErrorVale(error))
+        }
+      })
+
+    return () => {
+      activo = false
+    }
+  }, [])
 
   const [filtros, setFiltros] =
     useState<FiltrosControlAlmacen>(
@@ -98,11 +130,6 @@ export function ControlAlmacenPage() {
 
   const proveedores = useMemo(
     () => obtenerProveedores(),
-    [],
-  )
-
-  const diferenciasStock = useMemo(
-    () => obtenerDiferenciasStock(),
     [],
   )
 
@@ -284,6 +311,12 @@ export function ControlAlmacenPage() {
     <>
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
+          {errorCarga && (
+            <div className="alert alert-danger" role="alert">
+              {errorCarga}
+            </div>
+          )}
+
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
               <h1>Control de almacén</h1>
@@ -710,8 +743,5 @@ export function ControlAlmacenPage() {
     </>
   )
 }
-
-
-
 
 

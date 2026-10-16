@@ -34,10 +34,11 @@ import { obtenerDestinos } from '../../services/destinoService'
 import { obtenerProductos } from '../../services/productoService'
 
 import {
-  anularValeConsumo,
+  anularVale,
   calcularCantidadDetalle,
   calcularTotalVale,
-  obtenerValesConsumo,
+  listarVales,
+  obtenerMensajeErrorVale,
 } from '../../services/valeConsumoService'
 
 import type { ValeConsumo } from '../../types/valeConsumo'
@@ -70,14 +71,6 @@ const FILTROS_INICIALES: FiltrosVales = {
   fechaHasta: '',
 }
 
-function obtenerMensajeError(
-  error: unknown,
-): string {
-  return error instanceof Error
-    ? error.message
-    : 'Ocurrió un error inesperado.'
-}
-
 function formatearFecha(
   fecha: string,
 ): string {
@@ -105,9 +98,9 @@ export function ValesConsumoPage() {
   const location = useLocation()
 
   const [vales, setVales] =
-    useState<ValeConsumo[]>(
-      () => obtenerValesConsumo(),
-    )
+    useState<ValeConsumo[]>([])
+  const [cargando, setCargando] =
+    useState(true)
 
   const [filtros, setFiltros] =
     useState<FiltrosVales>(
@@ -147,6 +140,34 @@ export function ValesConsumoPage() {
     () => obtenerProductos(),
     [],
   )
+
+  useEffect(() => {
+    let activo = true
+
+    listarVales()
+      .then((resultado) => {
+        if (activo) {
+          setVales(resultado)
+        }
+      })
+      .catch((error) => {
+        if (activo) {
+          setMensaje({
+            tipo: 'danger',
+            texto: obtenerMensajeErrorVale(error),
+          })
+        }
+      })
+      .finally(() => {
+        if (activo) {
+          setCargando(false)
+        }
+      })
+
+    return () => {
+      activo = false
+    }
+  }, [])
 
   useEffect(() => {
     const estado =
@@ -226,6 +247,7 @@ export function ValesConsumoPage() {
         return {
           ...vale,
           centroCostoNombre:
+            vale.centroCosto ??
             centroCosto?.nombre ??
             'Centro no disponible',
           productosResumen:
@@ -339,18 +361,18 @@ export function ValesConsumoPage() {
     }
   }, [page, pageSize, totalItems])
 
-  function confirmarAnulacion(): void {
+  async function confirmarAnulacion(): Promise<void> {
     if (!valeAAnular) {
       return
     }
 
     try {
-      const valeAnulado =
-        anularValeConsumo(
-          valeAAnular.id,
-        )
-
-      setVales(obtenerValesConsumo())
+      const valeAnulado = await anularVale(valeAAnular.id)
+      setVales((actuales) =>
+        actuales.map((vale) =>
+          vale.id === valeAnulado.id ? valeAnulado : vale,
+        ),
+      )
 
       setMensaje({
         tipo: 'success',
@@ -360,7 +382,7 @@ export function ValesConsumoPage() {
     } catch (error) {
       setMensaje({
         tipo: 'danger',
-        texto: obtenerMensajeError(error),
+        texto: obtenerMensajeErrorVale(error),
       })
     } finally {
       setValeAAnular(null)
@@ -597,7 +619,13 @@ export function ValesConsumoPage() {
                     </thead>
 
                     <tbody>
-                      {valesPaginados.length ===
+                      {cargando ? (
+                        <tr>
+                          <td colSpan={10} className="text-center py-4">
+                            Cargando vales…
+                          </td>
+                        </tr>
+                      ) : valesPaginados.length ===
                       0 ? (
                         <tr>
                           <td colSpan={10}>

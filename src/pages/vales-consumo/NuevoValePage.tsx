@@ -2,7 +2,7 @@ import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 import { ValeConsumoForm } from '../../components/vales-consumo/ValeConsumoForm'
-import { crearValeConsumo } from '../../services/valeConsumoService'
+import { crearVale } from '../../services/valeConsumoService'
 
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
@@ -39,9 +39,8 @@ export function NuevoValePage() {
           onCancelar={() =>
             navigate('/vales-consumo')
           }
-          onSubmit={(datos) => {
-            const vale =
-              crearValeConsumo(datos)
+          onSubmit={async (datos) => {
+            const vale = await crearVale(datos)
 
             navigate('/vales-consumo', {
               replace: true,
@@ -56,5 +55,4 @@ export function NuevoValePage() {
     </main>
   )
 }
-
 

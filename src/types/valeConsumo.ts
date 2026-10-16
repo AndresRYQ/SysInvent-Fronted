@@ -57,11 +57,15 @@ export interface ValeConsumo {
   numeroVale: string
   fechaVale: string
   centroCostoId: string
+  centroCosto: string
   solicitante: string
   motivo: string
   estado: EstadoValeConsumo
   detalles: DetalleValeConsumo[]
   fechaRegistro: string
+  cantidadTotal: number
+  total: number
+  movimientosKardex: unknown[]
 }
 
 /**
@@ -77,5 +81,3 @@ export interface ValeConsumoFormData {
   motivo: string
   detalles: DetalleValeConsumoFormData[]
 }
-
-

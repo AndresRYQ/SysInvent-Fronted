@@ -6,7 +6,8 @@ import type {
 import { obtenerContactos } from './contactoService'
 import { obtenerIngresosAlmacen } from './ingresoAlmacenService'
 import { obtenerProductos } from './productoService'
-import { obtenerValesConsumo } from './valeConsumoService'
+import { listarVales } from './valeConsumoService'
+import type { ValeConsumo } from '../types/valeConsumo'
 
 function redondearCantidad(
   cantidad: number,
@@ -77,10 +78,9 @@ function crearMovimientosEntrada():
   })
 }
 
-function crearMovimientosSalida():
-  MovimientoAlmacen[] {
-  const vales = obtenerValesConsumo()
-
+function crearMovimientosSalida(
+  vales: ValeConsumo[],
+): MovimientoAlmacen[] {
   return vales.flatMap((vale) =>
     vale.detalles.flatMap((detalle) =>
       detalle.distribuciones.map(
@@ -124,11 +124,13 @@ function crearMovimientosSalida():
  * También incluye documentos anulados
  * para conservar el historial.
  */
-export function obtenerMovimientosAlmacen():
-  MovimientoAlmacen[] {
+export async function obtenerMovimientosAlmacen(
+  vales?: ValeConsumo[],
+):
+  Promise<MovimientoAlmacen[]> {
   const movimientos = [
     ...crearMovimientosEntrada(),
-    ...crearMovimientosSalida(),
+    ...crearMovimientosSalida(vales ?? await listarVales()),
   ]
 
   return movimientos
@@ -153,12 +155,14 @@ export function obtenerMovimientosAlmacen():
  * Calcula entradas, salidas y saldo
  * para cada producto.
  */
-export function obtenerControlAlmacen():
-  ControlAlmacenProducto[] {
+export async function obtenerControlAlmacen(
+  vales?: ValeConsumo[],
+):
+  Promise<ControlAlmacenProducto[]> {
   const productos = obtenerProductos()
 
   const movimientos =
-    obtenerMovimientosAlmacen()
+    await obtenerMovimientosAlmacen(vales)
 
   return productos
     .map((producto) => {
@@ -249,67 +253,58 @@ export function obtenerControlAlmacen():
 
 export function obtenerControlProductoPorId(
   productoId: number,
-): ControlAlmacenProducto | null {
-  const producto =
-    obtenerControlAlmacen().find(
-      (item) =>
-        item.productoId === productoId,
+  vales?: ValeConsumo[],
+): Promise<ControlAlmacenProducto | null> {
+  return obtenerControlAlmacen(vales).then((control) => {
+    const producto = control.find(
+      (item) => item.productoId === productoId,
     )
 
-  return producto
-    ? copiarControlProducto(producto)
-    : null
+    return producto
+      ? copiarControlProducto(producto)
+      : null
+  })
 }
 
 /**
  * Compara el saldo calculado con el
  * stock técnico guardado en Producto.
  */
-export function obtenerDiferenciasStock():
-  Array<{
+export function obtenerDiferenciasStock(
+  vales?: ValeConsumo[],
+):
+  Promise<Array<{
     productoId: number
     codigo: string
     nombre: string
     stockCalculado: number
     stockRegistrado: number
     diferencia: number
-  }> {
+  }>> {
   const productos = obtenerProductos()
-  const controles =
-    obtenerControlAlmacen()
+  return obtenerControlAlmacen(vales).then((controles) =>
+    controles
+      .map((control) => {
+        const producto = productos.find(
+          (item) =>
+            String(item.id) === String(control.productoId),
+        )
 
-  return controles
-    .map((control) => {
-      const producto = productos.find(
-        (item) =>
-          String(item.id) === String(
-          control.productoId),
-      )
+        const stockRegistrado =
+          producto?.stockActual ?? 0
 
-      const stockRegistrado =
-        producto?.stockActual ?? 0
-
-      return {
-        productoId:
-          control.productoId,
-        codigo: control.codigo,
-        nombre: control.nombre,
-        stockCalculado:
-          control.stockDisponible,
-        stockRegistrado,
-        diferencia:
-          redondearCantidad(
-            stockRegistrado -
-              control.stockDisponible,
+        return {
+          productoId: control.productoId,
+          codigo: control.codigo,
+          nombre: control.nombre,
+          stockCalculado: control.stockDisponible,
+          stockRegistrado,
+          diferencia: redondearCantidad(
+            stockRegistrado - control.stockDisponible,
           ),
-      }
-    })
-    .filter(
-      (resultado) =>
-        resultado.diferencia !== 0,
-    )
+        }
+      })
+      .filter((resultado) => resultado.diferencia !== 0),
+  )
 }
-
-
-
 

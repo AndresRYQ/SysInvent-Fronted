@@ -3,809 +3,319 @@ import type {
   ValeConsumo,
   ValeConsumoFormData,
 } from '../types/valeConsumo'
+import { apiFetch, type ApiError } from './api'
+import { obtenerProductos } from './productoService'
 
-import { registrarEventoBitacora } from './bitacoraService'
-import { obtenerCentrosCosto } from './centroCostoService'
-import { obtenerDestinos } from './destinoService'
-import { obtenerPartesEquipo } from './parteEquipoService'
-
-import {
-  ajustarStockProducto,
-  obtenerProductos,
-} from './productoService'
-import { coincidenIds } from '../utils/identificadores'
-
-const STORAGE_KEY =
-  'agrihusac_vales_consumo'
-
-function normalizarProductoId(
-  id: unknown,
-): number {
-  return Number(
-    String(id ?? '').replace(/^PROD-0*/i, ''),
-  )
+interface ApiResponse<T> {
+  success: boolean
+  message: string
+  status: number
+  data: T
 }
 
-function copiarVale(
-  vale: ValeConsumo,
-): ValeConsumo {
+interface ValeConsumoApiRequest {
+  fechaVale: string
+  centroCostoId: number
+  solicitante: string
+  motivo: string
+  detalles: Array<{
+    productoId: number
+    distribuciones: Array<{
+      destinoId: number
+      parteEquipoId: number | null
+      cantidad: number
+    }>
+  }>
+}
+
+interface ValeDistribucionResponse {
+  id?: number | string
+  destinoId: number | string
+  parteEquipoId: number | string | null
+  cantidad: number
+}
+
+interface ValeDetalleResponse {
+  id?: number | string
+  productoId: number
+  precioUnitario?: number
+  distribuciones: ValeDistribucionResponse[]
+}
+
+export interface ValeConsumoResponse {
+  id: number | string
+  numeroVale: string
+  fechaVale: string
+  centroCostoId: number | string
+  centroCosto: string
+  solicitante: string
+  motivo: string
+  estado: 'REGISTRADO' | 'ANULADO'
+  fechaRegistro: string
+  cantidadTotal: number
+  total: number
+  detalles: ValeDetalleResponse[]
+  movimientosKardex: unknown[]
+}
+
+function mapearVale(response: ValeConsumoResponse): ValeConsumo {
   return {
-    ...vale,
-    detalles: vale.detalles.map(
-      (detalle) => ({
-        ...detalle,
-        productoId: normalizarProductoId(
-          detalle.productoId,
-        ),
-        distribuciones:
-          detalle.distribuciones.map(
-            (distribucion) => ({
-              ...distribucion,
-            }),
+    id: String(response.id),
+    numeroVale: response.numeroVale,
+    fechaVale: response.fechaVale,
+    centroCostoId: String(response.centroCostoId),
+    solicitante: response.solicitante,
+    motivo: response.motivo,
+    estado: response.estado,
+    fechaRegistro: response.fechaRegistro,
+    cantidadTotal: response.cantidadTotal,
+    total: response.total,
+    centroCosto: response.centroCosto,
+    movimientosKardex: response.movimientosKardex,
+    detalles: response.detalles.map((detalle, detalleIndex) => ({
+      id: String(detalle.id ?? `${response.id}-DET-${detalleIndex + 1}`),
+      productoId: Number(detalle.productoId),
+      precioUnitario:
+        detalle.precioUnitario ??
+        obtenerProductos().find(
+          (producto) => producto.id === Number(detalle.productoId),
+        )?.precioUnitario ??
+        0,
+      distribuciones: detalle.distribuciones.map(
+        (distribucion, distribucionIndex) => ({
+          id: String(
+            distribucion.id ??
+              `${response.id}-DET-${detalleIndex + 1}-DIS-${distribucionIndex + 1}`,
           ),
-      }),
-    ),
+          destinoId: String(distribucion.destinoId),
+          parteEquipoId:
+            distribucion.parteEquipoId == null
+              ? null
+              : String(distribucion.parteEquipoId),
+          cantidad: Number(distribucion.cantidad),
+        }),
+      ),
+    })),
   }
 }
 
-function guardarVales(
-  vales: ValeConsumo[],
-): void {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(vales),
-  )
-}
-
-function esValeValido(
-  valor: unknown,
-): valor is ValeConsumo {
-  if (
-    typeof valor !== 'object' ||
-    valor === null
-  ) {
-    return false
+function serializarVale(datos: ValeConsumoFormData): ValeConsumoApiRequest {
+  return {
+    fechaVale: datos.fechaVale,
+    centroCostoId: Number(datos.centroCostoId),
+    solicitante: datos.solicitante.trim(),
+    motivo: datos.motivo.trim(),
+    detalles: datos.detalles.map((detalle) => ({
+      productoId: Number(detalle.productoId),
+      distribuciones: detalle.distribuciones.map((distribucion) => ({
+        destinoId: Number(distribucion.destinoId),
+        parteEquipoId:
+          distribucion.parteEquipoId == null ||
+          distribucion.parteEquipoId === ''
+            ? null
+            : Number(distribucion.parteEquipoId),
+        cantidad: Number(distribucion.cantidad),
+      })),
+    })),
   }
-
-  const vale =
-    valor as Partial<ValeConsumo>
-
-  return (
-    typeof vale.id === 'string' &&
-    typeof vale.numeroVale === 'string' &&
-    Array.isArray(vale.detalles)
-  )
-}
-
-function obtenerValesReales(): ValeConsumo[] {
-  const datosGuardados =
-    localStorage.getItem(STORAGE_KEY)
-
-  if (!datosGuardados) {
-    return []
-  }
-
-  try {
-    const datos = JSON.parse(
-      datosGuardados,
-    )
-
-    if (!Array.isArray(datos)) {
-      return []
-    }
-
-    return datos
-      .filter(esValeValido)
-      .map(copiarVale)
-  } catch {
-    return []
-  }
-}
-
-export function obtenerValesConsumo():
-  ValeConsumo[] {
-  return obtenerValesReales()
-}
-
-export function obtenerValeConsumoPorId(
-  id: string,
-): ValeConsumo | null {
-  const vale =
-    obtenerValesConsumo().find(
-      (item) => item.id === id,
-    )
-
-  return vale ? copiarVale(vale) : null
-}
-
-function crearSiguienteId(
-  vales: ValeConsumo[],
-): string {
-  const numeroMayor = vales.reduce(
-    (mayor, vale) => {
-      const numero = Number(
-        vale.id.replace('VAL-', ''),
-      )
-
-      return Number.isNaN(numero)
-        ? mayor
-        : Math.max(mayor, numero)
-    },
-    0,
-  )
-
-  return `VAL-${String(
-    numeroMayor + 1,
-  ).padStart(3, '0')}`
-}
-
-export function obtenerSiguienteNumeroVale():
-  string {
-  const anio = new Date().getFullYear()
-  const prefijo = `VAL-${anio}-`
-
-  const numeroMayor =
-    obtenerValesReales().reduce(
-      (mayor, vale) => {
-        if (
-          !vale.numeroVale.startsWith(
-            prefijo,
-          )
-        ) {
-          return mayor
-        }
-
-        const numero = Number(
-          vale.numeroVale.replace(
-            prefijo,
-            '',
-          ),
-        )
-
-        return Number.isNaN(numero)
-          ? mayor
-          : Math.max(mayor, numero)
-      },
-      0,
-    )
-
-  return `${prefijo}${String(
-    numeroMayor + 1,
-  ).padStart(4, '0')}`
 }
 
 export function calcularCantidadDetalle(
   detalle: DetalleValeConsumo,
 ): number {
-  const cantidad =
-    detalle.distribuciones.reduce(
-      (total, distribucion) =>
-        total + distribucion.cantidad,
-      0,
-    )
-
-  return Number(cantidad.toFixed(3))
-}
-
-export function calcularTotalVale(
-  vale: ValeConsumo,
-): number {
-  const total = vale.detalles.reduce(
-    (acumulado, detalle) =>
-      acumulado +
-      calcularCantidadDetalle(detalle) *
-        detalle.precioUnitario,
-    0,
+  return Number(
+    detalle.distribuciones
+      .reduce(
+        (total, distribucion) => total + distribucion.cantidad,
+        0,
+      )
+      .toFixed(3),
   )
-
-  return Number(total.toFixed(2))
 }
 
-function validarDatosVale(
+export function calcularTotalVale(vale: ValeConsumo): number {
+  return Number(vale.total)
+}
+
+export async function listarVales(): Promise<ValeConsumo[]> {
+  const response = await apiFetch<ApiResponse<ValeConsumoResponse[]>>(
+    '/api/vales-consumo',
+  )
+  return response.data.map(mapearVale)
+}
+
+export async function obtenerValePorId(
+  id: string,
+): Promise<ValeConsumo> {
+  const response = await apiFetch<ApiResponse<ValeConsumoResponse>>(
+    `/api/vales-consumo/${encodeURIComponent(id)}`,
+  )
+  return mapearVale(response.data)
+}
+
+export async function crearVale(
   datos: ValeConsumoFormData,
-): void {
-  if (
-    !datos.fechaVale ||
-    Number.isNaN(
-      Date.parse(datos.fechaVale),
-    )
-  ) {
-    throw new Error(
-      'Selecciona una fecha válida.',
-    )
-  }
-
-  const centroCosto =
-    obtenerCentrosCosto().find(
-      (item) =>
-        coincidenIds(item.id, datos.centroCostoId, 'CC-'),
-    )
-
-  if (!centroCosto) {
-    throw new Error(
-      'El centro de costo seleccionado no existe.',
-    )
-  }
-
-  if (centroCosto.activo !== 1) {
-    throw new Error(
-      'El centro de costo seleccionado está inactivo.',
-    )
-  }
-
-  const solicitante =
-    datos.solicitante.trim()
-
-  if (solicitante.length < 3) {
-    throw new Error(
-      'El solicitante debe tener al menos 3 caracteres.',
-    )
-  }
-
-  if (solicitante.length > 120) {
-    throw new Error(
-      'El solicitante no puede superar los 120 caracteres.',
-    )
-  }
-
-  const motivo = datos.motivo.trim()
-
-  if (motivo.length < 5) {
-    throw new Error(
-      'El motivo debe tener al menos 5 caracteres.',
-    )
-  }
-
-  if (motivo.length > 500) {
-    throw new Error(
-      'El motivo no puede superar los 500 caracteres.',
-    )
-  }
-
-  if (
-    !Array.isArray(datos.detalles) ||
-    datos.detalles.length === 0
-  ) {
-    throw new Error(
-      'Agrega al menos un producto al vale.',
-    )
-  }
-
-  const productos = obtenerProductos()
-  const destinos = obtenerDestinos()
-  const partesEquipo =
-    obtenerPartesEquipo()
-
-  const productosAgregados =
-    new Set<number>()
-
-  datos.detalles.forEach(
-    (detalle, indiceDetalle) => {
-      const fila = indiceDetalle + 1
-
-      if (
-        productosAgregados.has(
-          detalle.productoId,
-        )
-      ) {
-        throw new Error(
-          `El producto de la fila ${fila} está repetido.`,
-        )
-      }
-
-      productosAgregados.add(
-        detalle.productoId,
-      )
-
-      const producto = productos.find(
-        (item) =>
-          coincidenIds(item.id, detalle.productoId, 'PROD-'),
-      )
-
-      if (!producto) {
-        throw new Error(
-          `El producto de la fila ${fila} no existe.`,
-        )
-      }
-
-      if (!producto.estado) {
-        throw new Error(
-          `El producto "${producto.nombre}" está inactivo.`,
-        )
-      }
-
-      if (
-        !Number.isFinite(
-          detalle.precioUnitario,
-        ) ||
-        detalle.precioUnitario < 0
-      ) {
-        throw new Error(
-          `El precio del producto "${producto.nombre}" no es válido.`,
-        )
-      }
-
-      if (
-        !Array.isArray(
-          detalle.distribuciones,
-        ) ||
-        detalle.distribuciones.length ===
-          0
-      ) {
-        throw new Error(
-          `Agrega al menos un destino para "${producto.nombre}".`,
-        )
-      }
-
-      const distribucionesAgregadas =
-        new Set<string>()
-
-      detalle.distribuciones.forEach(
-        (
-          distribucion,
-          indiceDistribucion,
-        ) => {
-          const numeroDistribucion =
-            indiceDistribucion + 1
-
-          const destino =
-            destinos.find(
-              (item) =>
-                coincidenIds(item.id, distribucion.destinoId, 'DES-'),
-            )
-
-          if (!destino) {
-            throw new Error(
-              `El destino ${numeroDistribucion} de "${producto.nombre}" no existe.`,
-            )
-          }
-
-          if (destino.activo !== 1) {
-            throw new Error(
-              `El destino "${destino.nombre}" está inactivo.`,
-            )
-          }
-
-          if (
-            distribucion.parteEquipoId
-          ) {
-            const parte =
-              partesEquipo.find(
-                (item) =>
-                  String(item.id) ===
-                  String(distribucion.parteEquipoId),
-              )
-
-            if (!parte) {
-              throw new Error(
-                `La parte de equipo ${numeroDistribucion} de "${producto.nombre}" no existe.`,
-              )
-            }
-
-            if (!parte.estado) {
-              throw new Error(
-                `La parte de equipo "${parte.nombre}" está inactiva.`,
-              )
-            }
-          }
-
-          if (
-            !Number.isFinite(
-              distribucion.cantidad,
-            ) ||
-            distribucion.cantidad <= 0
-          ) {
-            throw new Error(
-              `La cantidad de la distribución ${numeroDistribucion} de "${producto.nombre}" debe ser mayor que cero.`,
-            )
-          }
-
-          const claveDistribucion =
-            `${distribucion.destinoId}|${distribucion.parteEquipoId ?? ''}`
-
-          if (
-            distribucionesAgregadas.has(
-              claveDistribucion,
-            )
-          ) {
-            throw new Error(
-              `El destino y la parte de equipo están repetidos para "${producto.nombre}".`,
-            )
-          }
-
-          distribucionesAgregadas.add(
-            claveDistribucion,
-          )
-        },
-      )
+): Promise<ValeConsumo> {
+  const response = await apiFetch<ApiResponse<ValeConsumoResponse>>(
+    '/api/vales-consumo',
+    {
+      method: 'POST',
+      body: JSON.stringify(serializarVale(datos)),
     },
   )
+  return mapearVale(response.data)
 }
 
-function crearDetalles(
-  valeId: string,
-  datos: ValeConsumoFormData,
-): DetalleValeConsumo[] {
-  return datos.detalles.map(
-    (detalle, indiceDetalle) => {
-      const detalleId =
-        `${valeId}-DET-${String(
-          indiceDetalle + 1,
-        ).padStart(3, '0')}`
-
-      return {
-        id: detalleId,
-        productoId: detalle.productoId,
-        precioUnitario: Number(
-          detalle.precioUnitario.toFixed(2),
-        ),
-        distribuciones:
-          detalle.distribuciones.map(
-            (
-              distribucion,
-              indiceDistribucion,
-            ) => ({
-              id:
-                `${detalleId}-DIS-${String(
-                  indiceDistribucion + 1,
-                ).padStart(3, '0')}`,
-              destinoId:
-                distribucion.destinoId,
-              parteEquipoId:
-                distribucion.parteEquipoId ||
-                null,
-              cantidad: Number(
-                distribucion.cantidad.toFixed(
-                  3,
-                ),
-              ),
-            }),
-          ),
-      }
-    },
-  )
-}
-
-function obtenerCantidadesPorProducto(
-  detalles: DetalleValeConsumo[],
-): Map<number, number> {
-  const cantidades =
-    new Map<number, number>()
-
-  detalles.forEach((detalle) => {
-    cantidades.set(
-      detalle.productoId,
-      calcularCantidadDetalle(detalle),
-    )
-  })
-
-  return cantidades
-}
-
-/**
- * Calcula cuánto debe modificarse el stock.
- *
- * Crear vale: resultado negativo.
- * Editar vale: solamente la diferencia.
- * Anular vale: resultado positivo.
- */
-function calcularAjustesStock(
-  detallesAnteriores:
-    DetalleValeConsumo[],
-  detallesNuevos:
-    DetalleValeConsumo[],
-): Map<number, number> {
-  const anteriores =
-    obtenerCantidadesPorProducto(
-      detallesAnteriores,
-    )
-
-  const nuevos =
-    obtenerCantidadesPorProducto(
-      detallesNuevos,
-    )
-
-  const productosIds = new Set([
-    ...anteriores.keys(),
-    ...nuevos.keys(),
-  ])
-
-  const ajustes =
-    new Map<number, number>()
-
-  productosIds.forEach((productoId) => {
-    const cantidadAnterior =
-      anteriores.get(productoId) ?? 0
-
-    const cantidadNueva =
-      nuevos.get(productoId) ?? 0
-
-    const diferencia =
-      cantidadAnterior - cantidadNueva
-
-    if (diferencia !== 0) {
-      ajustes.set(
-        productoId,
-        Number(diferencia.toFixed(3)),
-      )
-    }
-  })
-
-  return ajustes
-}
-
-function validarAjustesStock(
-  ajustes: Map<number, number>,
-): void {
-  const productos = obtenerProductos()
-
-  ajustes.forEach(
-    (ajuste, productoId) => {
-      const producto = productos.find(
-        (item) =>
-          item.id === productoId,
-      )
-
-      if (!producto) {
-        throw new Error(
-          'Uno de los productos ya no existe.',
-        )
-      }
-
-      if (
-        ajuste < 0 &&
-        producto.stockActual + ajuste < 0
-      ) {
-        throw new Error(
-          `Stock insuficiente para "${producto.nombre}". Disponible: ${producto.stockActual}.`,
-        )
-      }
-    },
-  )
-}
-
-function aplicarAjustesStock(
-  ajustes: Map<number, number>,
-): void {
-  const aplicados: Array<{
-    productoId: number
-    cantidad: number
-  }> = []
-
-  try {
-    ajustes.forEach(
-      (cantidad, productoId) => {
-        ajustarStockProducto(
-          productoId,
-          cantidad,
-        )
-
-        aplicados.push({
-          productoId,
-          cantidad,
-        })
-      },
-    )
-  } catch (error) {
-    aplicados
-      .reverse()
-      .forEach(
-        ({
-          productoId,
-          cantidad,
-        }) => {
-          ajustarStockProducto(
-            productoId,
-            -cantidad,
-          )
-        },
-      )
-
-    throw error
-  }
-}
-
-function revertirAjustesStock(
-  ajustes: Map<number, number>,
-): void {
-  Array.from(ajustes.entries())
-    .reverse()
-    .forEach(
-      ([productoId, cantidad]) => {
-        ajustarStockProducto(
-          productoId,
-          -cantidad,
-        )
-      },
-    )
-}
-
-export function crearValeConsumo(
-  datos: ValeConsumoFormData,
-): ValeConsumo {
-  validarDatosVale(datos)
-
-  const vales = obtenerValesReales()
-  const valeId = crearSiguienteId(vales)
-
-  const nuevoVale: ValeConsumo = {
-    id: valeId,
-    numeroVale:
-      obtenerSiguienteNumeroVale(),
-    fechaVale: datos.fechaVale,
-    centroCostoId:
-      datos.centroCostoId,
-    solicitante:
-      datos.solicitante.trim(),
-    motivo: datos.motivo.trim(),
-    estado: 'REGISTRADO',
-    detalles: crearDetalles(
-      valeId,
-      datos,
-    ),
-    fechaRegistro:
-      new Date().toISOString(),
-  }
-
-  const ajustes = calcularAjustesStock(
-    [],
-    nuevoVale.detalles,
-  )
-
-  validarAjustesStock(ajustes)
-  aplicarAjustesStock(ajustes)
-
-  try {
-    guardarVales([
-      nuevoVale,
-      ...vales,
-    ])
-  } catch (error) {
-    revertirAjustesStock(ajustes)
-    throw error
-  }
-
-  registrarEventoBitacora({
-    modulo: 'Vales de consumo',
-    accion: 'CREAR',
-    detalle:
-      `Se registró el vale ${nuevoVale.numeroVale} con ${nuevoVale.detalles.length} producto(s).`,
-    registroId: nuevoVale.id,
-  })
-
-  return copiarVale(nuevoVale)
-}
-
-export function actualizarValeConsumo(
+export async function actualizarVale(
   id: string,
   datos: ValeConsumoFormData,
-): ValeConsumo {
-  const vales = obtenerValesReales()
-
-  const valeActual = vales.find(
-    (vale) => vale.id === id,
+): Promise<ValeConsumo> {
+  const response = await apiFetch<ApiResponse<ValeConsumoResponse>>(
+    `/api/vales-consumo/${encodeURIComponent(id)}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(serializarVale(datos)),
+    },
   )
+  return mapearVale(response.data)
+}
 
-  if (!valeActual) {
-    throw new Error(
-      'El vale de consumo no existe.',
-    )
+export async function anularVale(
+  id: string,
+): Promise<ValeConsumo> {
+  const response = await apiFetch<ApiResponse<ValeConsumoResponse>>(
+    `/api/vales-consumo/${encodeURIComponent(id)}/anular`,
+    {
+      method: 'PATCH',
+    },
+  )
+  return mapearVale(response.data)
+}
+
+function obtenerMensajeErrorDetalle(error: unknown): string[] {
+  const data = (error as ApiError | null)?.data
+  if (!data || typeof data !== 'object') {
+    return []
   }
 
-  if (
-    valeActual.estado === 'ANULADO'
-  ) {
-    throw new Error(
-      'No se puede editar un vale anulado.',
-    )
+  const record = data as Record<string, unknown>
+  const errores = record.errores
+  if (!Array.isArray(errores)) {
+    return []
   }
 
-  validarDatosVale(datos)
+  return errores
+    .map((item) => {
+      if (typeof item === 'string') {
+        return item
+      }
+      if (item && typeof item === 'object') {
+        const error = item as Record<string, unknown>
+        return String(error.mensaje ?? error.message ?? '')
+      }
+      return ''
+    })
+    .filter(Boolean)
+}
 
-  const valeActualizado:
-    ValeConsumo = {
-      ...valeActual,
-      fechaVale: datos.fechaVale,
-      centroCostoId:
-        datos.centroCostoId,
-      solicitante:
-        datos.solicitante.trim(),
-      motivo: datos.motivo.trim(),
-      detalles: crearDetalles(
-        valeActual.id,
-        datos,
-      ),
+function obtenerProductosConStockInsuficiente(
+  error: unknown,
+): string[] {
+  const payload = (error as ApiError | null)?.data
+  if (!payload || typeof payload !== 'object') {
+    return []
+  }
+
+  const data = (payload as Record<string, unknown>).data
+  if (!data || typeof data !== 'object') {
+    return []
+  }
+
+  const productos = (data as Record<string, unknown>).productos
+  if (!Array.isArray(productos)) {
+    return []
+  }
+
+  const catalogo = obtenerProductos()
+  return productos.map((item) => {
+    if (typeof item === 'string') {
+      return item
+    }
+    if (!item || typeof item !== 'object') {
+      return ''
     }
 
-  const ajustes = calcularAjustesStock(
-    valeActual.detalles,
-    valeActualizado.detalles,
-  )
+    const producto = item as Record<string, unknown>
+    const nombre =
+      producto.nombre ??
+      producto.producto ??
+      producto.nombreProducto ??
+      producto.productoNombre ??
+      producto.codigoProducto
+    if (typeof nombre === 'string' && nombre.trim()) {
+      return nombre
+    }
 
-  validarAjustesStock(ajustes)
-  aplicarAjustesStock(ajustes)
-
-  try {
-    guardarVales(
-      vales.map((vale) =>
-        vale.id === id
-          ? valeActualizado
-          : vale,
-      ),
+    const productoAnidado = producto.producto
+    const id = Number(
+      producto.productoId ??
+        producto.id ??
+        (productoAnidado && typeof productoAnidado === 'object'
+          ? (productoAnidado as Record<string, unknown>).id
+          : undefined),
     )
-  } catch (error) {
-    revertirAjustesStock(ajustes)
-    throw error
-  }
-
-  registrarEventoBitacora({
-    modulo: 'Vales de consumo',
-    accion: 'EDITAR',
-    detalle:
-      `Se actualizó el vale ${valeActualizado.numeroVale}.`,
-    registroId:
-      valeActualizado.id,
-  })
-
-  return copiarVale(valeActualizado)
+    return (
+      catalogo.find((registro) => registro.id === id)?.nombre ??
+      (Number.isFinite(id) ? `Producto ${id}` : '')
+    )
+  }).filter(Boolean)
 }
 
-export function anularValeConsumo(
-  id: string,
-): ValeConsumo {
-  const vales = obtenerValesReales()
+export function obtenerMensajeErrorVale(error: unknown): string {
+  const apiError = error as ApiError | null
+  const status = apiError?.status
+  const message =
+    error instanceof Error && error.message
+      ? error.message
+      : 'Ocurrió un error inesperado.'
 
-  const valeActual = vales.find(
-    (vale) => vale.id === id,
-  )
-
-  if (!valeActual) {
-    throw new Error(
-      'El vale de consumo no existe.',
-    )
+  if (status === 400) {
+    const errores = obtenerMensajeErrorDetalle(error)
+    return errores.length > 0
+      ? errores.join(' ')
+      : message
   }
 
-  if (
-    valeActual.estado === 'ANULADO'
-  ) {
-    throw new Error(
-      'El vale ya se encuentra anulado.',
-    )
+  if (status === 404) {
+    return message || 'No se encontró el vale solicitado.'
   }
 
-  const valeAnulado: ValeConsumo = {
-    ...valeActual,
-    estado: 'ANULADO',
+  if (status === 409) {
+    const payload = apiError?.data
+    const body =
+      payload && typeof payload === 'object'
+        ? (payload as Record<string, unknown>).data
+        : null
+    const code =
+      body && typeof body === 'object'
+        ? (body as Record<string, unknown>).code
+        : null
+
+    if (code === 'STOCK_INSUFFICIENT') {
+      const productos = obtenerProductosConStockInsuficiente(error)
+      return productos.length > 0
+        ? `${message} Productos afectados: ${productos.join(', ')}.`
+        : message
+    }
+
+    return message
   }
 
-  const ajustes = calcularAjustesStock(
-    valeActual.detalles,
-    [],
-  )
-
-  aplicarAjustesStock(ajustes)
-
-  try {
-    guardarVales(
-      vales.map((vale) =>
-        vale.id === id
-          ? valeAnulado
-          : vale,
-      ),
-    )
-  } catch (error) {
-    revertirAjustesStock(ajustes)
-    throw error
+  if (status === 500) {
+    return /^(500|internal server error)$/i.test(message)
+      ? 'Ocurrió un error en el servidor. Inténtalo nuevamente.'
+      : message
   }
 
-  registrarEventoBitacora({
-    modulo: 'Vales de consumo',
-    accion: 'ELIMINAR',
-    detalle:
-      `Se anuló el vale ${valeAnulado.numeroVale} y se devolvieron sus productos al stock.`,
-    registroId: valeAnulado.id,
-  })
-
-  return copiarVale(valeAnulado)
+  return message
 }
-

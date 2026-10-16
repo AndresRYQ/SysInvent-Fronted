@@ -77,11 +77,15 @@ export function DestinosPage() {
     setObjetivo(null)
   }
 
-  const confirmar = () => {
+  const confirmar = async () => {
     if (!objetivo) return
     const reactivando = reactivarOpen
     try {
-      reactivando ? reactivarDestino(objetivo.id) : eliminarDestino(objetivo.id)
+      if (reactivando) {
+        reactivarDestino(objetivo.id)
+      } else {
+        await eliminarDestino(objetivo.id)
+      }
       recargar()
       setPage(1)
       mostrarAlerta('success', reactivando ? 'Destino reactivado correctamente.' : 'Destino eliminado correctamente.')

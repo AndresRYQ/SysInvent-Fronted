@@ -160,7 +160,7 @@ export function LoginPage() {
     )
   }
 
-  const manejarEnvio = (
+  const manejarEnvio = async (
     evento: FormEvent<HTMLFormElement>,
   ) => {
     evento.preventDefault()
@@ -187,8 +187,7 @@ export function LoginPage() {
 
     setEnviando(true)
 
-    window.setTimeout(() => {
-      const resultado = login({
+    const resultado = await login({
         usuario,
         contrasena,
       })
@@ -222,7 +221,6 @@ export function LoginPage() {
       navigate(rutaDestino, {
         replace: true,
       })
-    }, 350)
   }
 
   const formularioBloqueado =
