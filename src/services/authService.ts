@@ -103,19 +103,7 @@ export async function login(
   contrasena: string,
 ): Promise<ResultadoLogin> {
   try {
-    let response: LoginBackendResponse
-
-    try {
-      response = await requestLogin('/api/auth/login', usuario, contrasena)
-    } catch (error) {
-      const apiError = error as ApiError
-
-      if (apiError.status !== 404) {
-        throw error
-      }
-
-      response = await requestLogin('/api/login', usuario, contrasena)
-    }
+    const response = await requestLogin('/api/login', usuario, contrasena)
 
     if (response.success === true && response.data) {
       localStorage.setItem(AUTH_TOKEN_KEY, response.data)
