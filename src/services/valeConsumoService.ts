@@ -3,29 +3,19 @@ import type {
   ValeConsumo,
   ValeConsumoFormData,
 } from '../types/valeConsumo'
-import { apiFetch, type ApiError } from './api'
+import { toApiError } from './api'
 import { obtenerProductos } from './productoService'
+import {
+  ValeConsumoControllerApi,
+  type ValeConsumoRequest,
+} from '../api/generated'
+import { apiConfiguration } from '../api/client'
 
 interface ApiResponse<T> {
   success: boolean
   message: string
   status: number
   data: T
-}
-
-interface ValeConsumoApiRequest {
-  fechaVale: string
-  centroCostoId: number
-  solicitante: string
-  motivo: string
-  detalles: Array<{
-    productoId: number
-    distribuciones: Array<{
-      destinoId: number
-      parteEquipoId: number | null
-      cantidad: number
-    }>
-  }>
 }
 
 interface ValeDistribucionResponse {
@@ -99,9 +89,9 @@ function mapearVale(response: ValeConsumoResponse): ValeConsumo {
   }
 }
 
-function serializarVale(datos: ValeConsumoFormData): ValeConsumoApiRequest {
+function serializarVale(datos: ValeConsumoFormData): ValeConsumoRequest {
   return {
-    fechaVale: datos.fechaVale,
+    fechaVale: new Date(`${datos.fechaVale}T00:00:00Z`),
     centroCostoId: Number(datos.centroCostoId),
     solicitante: datos.solicitante.trim(),
     motivo: datos.motivo.trim(),
@@ -112,13 +102,15 @@ function serializarVale(datos: ValeConsumoFormData): ValeConsumoApiRequest {
         parteEquipoId:
           distribucion.parteEquipoId == null ||
           distribucion.parteEquipoId === ''
-            ? null
+            ? undefined
             : Number(distribucion.parteEquipoId),
         cantidad: Number(distribucion.cantidad),
       })),
     })),
   }
 }
+
+const valeApi = new ValeConsumoControllerApi(apiConfiguration)
 
 export function calcularCantidadDetalle(
   detalle: DetalleValeConsumo,
@@ -138,31 +130,27 @@ export function calcularTotalVale(vale: ValeConsumo): number {
 }
 
 export async function listarVales(): Promise<ValeConsumo[]> {
-  const response = await apiFetch<ApiResponse<ValeConsumoResponse[]>>(
-    '/api/vales-consumo',
-  )
+  const response = (await valeApi.listar()) as ApiResponse<
+    ValeConsumoResponse[]
+  >
   return response.data.map(mapearVale)
 }
 
 export async function obtenerValePorId(
   id: string,
 ): Promise<ValeConsumo> {
-  const response = await apiFetch<ApiResponse<ValeConsumoResponse>>(
-    `/api/vales-consumo/${encodeURIComponent(id)}`,
-  )
+  const response = (await valeApi.obtener({ id: Number(id) })) as ApiResponse<
+    ValeConsumoResponse
+  >
   return mapearVale(response.data)
 }
 
 export async function crearVale(
   datos: ValeConsumoFormData,
 ): Promise<ValeConsumo> {
-  const response = await apiFetch<ApiResponse<ValeConsumoResponse>>(
-    '/api/vales-consumo',
-    {
-      method: 'POST',
-      body: JSON.stringify(serializarVale(datos)),
-    },
-  )
+  const response = (await valeApi.crear({
+    valeConsumoRequest: serializarVale(datos),
+  })) as ApiResponse<ValeConsumoResponse>
   return mapearVale(response.data)
 }
 
@@ -170,30 +158,24 @@ export async function actualizarVale(
   id: string,
   datos: ValeConsumoFormData,
 ): Promise<ValeConsumo> {
-  const response = await apiFetch<ApiResponse<ValeConsumoResponse>>(
-    `/api/vales-consumo/${encodeURIComponent(id)}`,
-    {
-      method: 'PUT',
-      body: JSON.stringify(serializarVale(datos)),
-    },
-  )
+  const response = (await valeApi.actualizar({
+    id: Number(id),
+    valeConsumoRequest: serializarVale(datos),
+  })) as ApiResponse<ValeConsumoResponse>
   return mapearVale(response.data)
 }
 
 export async function anularVale(
   id: string,
 ): Promise<ValeConsumo> {
-  const response = await apiFetch<ApiResponse<ValeConsumoResponse>>(
-    `/api/vales-consumo/${encodeURIComponent(id)}/anular`,
-    {
-      method: 'PATCH',
-    },
-  )
+  const response = (await valeApi.anular({
+    id: Number(id),
+  })) as ApiResponse<ValeConsumoResponse>
   return mapearVale(response.data)
 }
 
 function obtenerMensajeErrorDetalle(error: unknown): string[] {
-  const data = (error as ApiError | null)?.data
+  const data = toApiError(error).data
   if (!data || typeof data !== 'object') {
     return []
   }
@@ -221,7 +203,7 @@ function obtenerMensajeErrorDetalle(error: unknown): string[] {
 function obtenerProductosConStockInsuficiente(
   error: unknown,
 ): string[] {
-  const payload = (error as ApiError | null)?.data
+  const payload = toApiError(error).data
   if (!payload || typeof payload !== 'object') {
     return []
   }
@@ -272,7 +254,7 @@ function obtenerProductosConStockInsuficiente(
 }
 
 export function obtenerMensajeErrorVale(error: unknown): string {
-  const apiError = error as ApiError | null
+  const apiError = toApiError(error)
   const status = apiError?.status
   const message =
     error instanceof Error && error.message

@@ -1,3 +1,13 @@
+import {
+  CentroCostoControllerApi,
+  DestinoControllerApi,
+  ParteEquipoControllerApi,
+  ProveedorControllerApi,
+  TipoDocumentoControllerApi,
+  TipoProductoControllerApi,
+  UnidadMedidaControllerApi,
+} from '../api/generated'
+import { apiConfiguration } from '../api/client'
 import { apiFetch } from './api'
 
 export interface CatalogoPaginado<T> {
@@ -6,6 +16,23 @@ export interface CatalogoPaginado<T> {
 }
 
 type RegistroApi = Record<string, unknown>
+
+const catalogoApis = {
+  '/api/v1/catalogos/centros-costo': () =>
+    new CentroCostoControllerApi(apiConfiguration).listar8(),
+  '/api/v1/catalogos/destinos': () =>
+    new DestinoControllerApi(apiConfiguration).listar6(),
+  '/api/v1/catalogos/partes-equipo': () =>
+    new ParteEquipoControllerApi(apiConfiguration).listar5(),
+  '/api/v1/catalogos/proveedores': () =>
+    new ProveedorControllerApi(apiConfiguration).listar4(),
+  '/api/v1/catalogos/tipos-documento': () =>
+    new TipoDocumentoControllerApi(apiConfiguration).listar3(),
+  '/api/v1/catalogos/tipos-producto': () =>
+    new TipoProductoControllerApi(apiConfiguration).listar2(),
+  '/api/v1/catalogos/unidades-medida': () =>
+    new UnidadMedidaControllerApi(apiConfiguration).listar1(),
+} as const
 
 export async function listarCatalogo<T>(
   endpoint: string,
@@ -22,10 +49,28 @@ export async function listarCatalogo<T>(
       }
     : undefined
 
-  const response = await apiFetch<{
-    datos?: unknown
-    paginacion?: unknown
-  }>(endpoint, {}, diagnostico)
+  const listar = Object.prototype.hasOwnProperty.call(catalogoApis, endpoint)
+    ? catalogoApis[endpoint as keyof typeof catalogoApis]
+    : undefined
+
+  const response = listar
+    ? ((await listar()) as {
+        datos?: unknown
+        paginacion?: unknown
+      })
+    : await apiFetch<{
+        datos?: unknown
+        paginacion?: unknown
+      }>(endpoint, {}, diagnostico)
+
+  if (listar) {
+    diagnostico?.({
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      body: response,
+    })
+  }
 
   if (!Array.isArray(response.datos)) {
     throw new Error(

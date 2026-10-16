@@ -1,7 +1,12 @@
 
+const DEFAULT_LOCAL_API_URL = 'http://localhost:8080'
+const DEFAULT_PRODUCTION_API_URL = 'https://sysinvent-backend.onrender.com'
+
 export const API_URL =
   (import.meta.env.VITE_API_URL ||
-    'https://sysinvent-backend.onrender.com').replace(/\/+$/, '')
+    (import.meta.env.DEV
+      ? DEFAULT_LOCAL_API_URL
+      : DEFAULT_PRODUCTION_API_URL)).replace(/\/+$/, '')
 
 const AUTH_TOKEN_KEY = 'sysinvent_token'
 
@@ -16,6 +21,21 @@ export interface ApiResponseDiagnostic {
   statusText: string
   headers: Record<string, string>
   body: unknown
+}
+
+export function toApiError(error: unknown): ApiError {
+  const response = (error as { response?: Response } | null)?.response
+
+  if (response instanceof Response) {
+    const apiError = new Error(
+      error instanceof Error ? error.message : response.statusText,
+    ) as ApiError
+
+    apiError.status = response.status
+    return apiError
+  }
+
+  return error as ApiError
 }
 
 function buildUrl(endpoint: string): string {
