@@ -1,6 +1,7 @@
 
 export const API_URL =
-  import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
+  (import.meta.env.VITE_API_URL ||
+    'https://sysinvent-backend.onrender.com').replace(/\/+$/, '')
 
 const AUTH_TOKEN_KEY = 'sysinvent_token'
 
