@@ -1,4 +1,6 @@
-import { apiFetch, type ApiError } from './api'
+import { toApiError } from './api'
+import { LoginApi, type LoginRequest } from '../api/generated'
+import { apiConfiguration } from '../api/client'
 
 import type {
   CredencialesLogin,
@@ -28,18 +30,14 @@ interface JwtPayload {
   iat?: number
 }
 
+const loginApi = new LoginApi(apiConfiguration)
+
 async function requestLogin(
-  endpoint: string,
   usuario: string,
   contrasena: string,
 ): Promise<LoginBackendResponse> {
-  return apiFetch<LoginBackendResponse>(endpoint, {
-    method: 'POST',
-    body: JSON.stringify({
-      usuario,
-      contrasena,
-    }),
-  })
+  const request: LoginRequest = { usuario, contrasena }
+  return (await loginApi.login({ loginRequest: request })) as LoginBackendResponse
 }
 
 function decodeBase64Url(value: string): string {
@@ -103,7 +101,7 @@ export async function login(
   contrasena: string,
 ): Promise<ResultadoLogin> {
   try {
-    const response = await requestLogin('/api/login', usuario, contrasena)
+    const response = await requestLogin(usuario, contrasena)
 
     if (response.success === true && response.data) {
       localStorage.setItem(AUTH_TOKEN_KEY, response.data)
@@ -123,7 +121,7 @@ export async function login(
       bloqueadoHasta: null,
     }
   } catch (error) {
-    const apiError = error as ApiError
+    const apiError = toApiError(error)
 
     return {
       exitoso: false,
