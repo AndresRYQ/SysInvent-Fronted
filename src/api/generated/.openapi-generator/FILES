@@ -1,6 +1,5 @@
 apis/BitacoraControllerApi.ts
 apis/CategorasApi.ts
-apis/CategoriaCatalogoControllerApi.ts
 apis/CentroCostoControllerApi.ts
 apis/ContactoControllerApi.ts
 apis/ControlAlmacenControllerApi.ts
@@ -27,7 +26,6 @@ apis/index.ts
 docs/ActualizarUsuarioRequest.md
 docs/BitacoraControllerApi.md
 docs/CategorasApi.md
-docs/CategoriaCatalogoControllerApi.md
 docs/CategoriaCatalogoRequest.md
 docs/CategoriaCatalogoResponse.md
 docs/CategoriaRequest.md

@@ -2,7 +2,6 @@
 /* eslint-disable */
 export * from './BitacoraControllerApi';
 export * from './CategorasApi';
-export * from './CategoriaCatalogoControllerApi';
 export * from './CentroCostoControllerApi';
 export * from './ContactoControllerApi';
 export * from './ControlAlmacenControllerApi';

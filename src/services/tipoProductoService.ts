@@ -21,8 +21,10 @@ export function obtenerTiposProducto(): TipoProducto[] {
   return tiposProductoEnMemoria.map((tipo) => ({ ...tipo }))
 }
 
-function formatearFechaRegistro(fecha?: string): string | undefined {
-  return fecha?.trim() || undefined
+function formatearFechaRegistro(fecha?: string | Date): string | undefined {
+  if (typeof fecha === 'string') return fecha.trim() || undefined
+  if (!fecha || Number.isNaN(fecha.getTime())) return undefined
+  return fecha.toISOString().slice(0, 10)
 }
 
 function mapearRespuestaTipoProducto(response: CustomPageTipoProductoResponse): CatalogoPaginado<TipoProducto> {

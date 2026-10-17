@@ -48,7 +48,7 @@ export interface TipoDocumentoResponse {
      * @type {Date}
      * @memberof TipoDocumentoResponse
      */
-    fechaRegistro?: string;
+    fechaRegistro?: Date;
 }
 
 /**
@@ -72,7 +72,7 @@ export function TipoDocumentoResponseFromJSONTyped(json: any, ignoreDiscriminato
         'nombre': json['nombre'] == null ? undefined : json['nombre'],
         'descripcion': json['descripcion'] == null ? undefined : json['descripcion'],
         'activo': json['activo'] == null ? undefined : json['activo'],
-        'fechaRegistro': json['fechaRegistro'] == null ? undefined : String(json['fechaRegistro']),
+        'fechaRegistro': json['fechaRegistro'] == null ? undefined : (new Date(json['fechaRegistro'])),
     };
 }
 
@@ -91,7 +91,7 @@ export function TipoDocumentoResponseToJSONTyped(value?: TipoDocumentoResponse |
         'nombre': value['nombre'],
         'descripcion': value['descripcion'],
         'activo': value['activo'],
-        'fechaRegistro': value['fechaRegistro'],
+        'fechaRegistro': value['fechaRegistro'] == null ? value['fechaRegistro'] : value['fechaRegistro'].toISOString().substring(0,10),
     };
 }
 

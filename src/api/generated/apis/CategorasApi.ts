@@ -14,15 +14,45 @@
 
 import * as runtime from '../runtime';
 import {
+    type CategoriaCatalogoRequest,
+    CategoriaCatalogoRequestFromJSON,
+    CategoriaCatalogoRequestToJSON,
+} from '../models/CategoriaCatalogoRequest';
+import {
     type CategoriaRequest,
     CategoriaRequestFromJSON,
     CategoriaRequestToJSON,
 } from '../models/CategoriaRequest';
 import {
+    type CustomPageCategoriaCatalogoResponse,
+    CustomPageCategoriaCatalogoResponseFromJSON,
+    CustomPageCategoriaCatalogoResponseToJSON,
+} from '../models/CustomPageCategoriaCatalogoResponse';
+import {
     type CustomPageCategoriaResponse,
     CustomPageCategoriaResponseFromJSON,
     CustomPageCategoriaResponseToJSON,
 } from '../models/CustomPageCategoriaResponse';
+import {
+    type EstadoCatalogoRequest,
+    EstadoCatalogoRequestFromJSON,
+    EstadoCatalogoRequestToJSON,
+} from '../models/EstadoCatalogoRequest';
+import {
+    type MessageResponse,
+    MessageResponseFromJSON,
+    MessageResponseToJSON,
+} from '../models/MessageResponse';
+
+export interface ActualizarCategoriaRequest {
+    id: number;
+    categoriaCatalogoRequest: CategoriaCatalogoRequest;
+}
+
+export interface CambiarEstadoCategoriaRequest {
+    id: number;
+    estadoCatalogoRequest: EstadoCatalogoRequest;
+}
 
 export interface EliminarCategoriaRequest {
     categoriaId: number;
@@ -34,14 +64,150 @@ export interface ListarCategoriasRequest {
     tamPagina?: number;
 }
 
+export interface ListarCategoriasCatalogoRequest {
+    nombre?: string;
+    pagina?: number;
+    tamPagina?: number;
+}
+
 export interface RegistrarActualizarCategoriaRequest {
     categoriaRequest: CategoriaRequest;
+}
+
+export interface RegistrarCategoriaRequest {
+    categoriaCatalogoRequest: CategoriaCatalogoRequest;
 }
 
 /**
  * 
  */
 export class CategorasApi extends runtime.BaseAPI {
+
+    /**
+     * Creates request options for actualizarCategoria without sending the request
+     */
+    async actualizarCategoriaRequestOpts(requestParameters: ActualizarCategoriaRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling actualizarCategoria().'
+            );
+        }
+
+        if (requestParameters['categoriaCatalogoRequest'] == null) {
+            throw new runtime.RequiredError(
+                'categoriaCatalogoRequest',
+                'Required parameter "categoriaCatalogoRequest" was null or undefined when calling actualizarCategoria().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/v1/catalogos/categorias/{id}`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CategoriaCatalogoRequestToJSON(requestParameters['categoriaCatalogoRequest']),
+        };
+    }
+
+    /**
+     * Actualizar categoría
+     */
+    async actualizarCategoriaRaw(requestParameters: ActualizarCategoriaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.actualizarCategoriaRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Actualizar categoría
+     */
+    async actualizarCategoria(requestParameters: ActualizarCategoriaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.actualizarCategoriaRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for cambiarEstadoCategoria without sending the request
+     */
+    async cambiarEstadoCategoriaRequestOpts(requestParameters: CambiarEstadoCategoriaRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling cambiarEstadoCategoria().'
+            );
+        }
+
+        if (requestParameters['estadoCatalogoRequest'] == null) {
+            throw new runtime.RequiredError(
+                'estadoCatalogoRequest',
+                'Required parameter "estadoCatalogoRequest" was null or undefined when calling cambiarEstadoCategoria().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/v1/catalogos/categorias/{id}/estado`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: EstadoCatalogoRequestToJSON(requestParameters['estadoCatalogoRequest']),
+        };
+    }
+
+    /**
+     * Cambiar estado de categoría
+     */
+    async cambiarEstadoCategoriaRaw(requestParameters: CambiarEstadoCategoriaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.cambiarEstadoCategoriaRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Cambiar estado de categoría
+     */
+    async cambiarEstadoCategoria(requestParameters: CambiarEstadoCategoriaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.cambiarEstadoCategoriaRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Creates request options for eliminarCategoria without sending the request
@@ -161,6 +327,63 @@ export class CategorasApi extends runtime.BaseAPI {
     }
 
     /**
+     * Creates request options for listarCategoriasCatalogo without sending the request
+     */
+    async listarCategoriasCatalogoRequestOpts(requestParameters: ListarCategoriasCatalogoRequest): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        if (requestParameters['nombre'] != null) {
+            queryParameters['nombre'] = requestParameters['nombre'];
+        }
+
+        if (requestParameters['pagina'] != null) {
+            queryParameters['pagina'] = requestParameters['pagina'];
+        }
+
+        if (requestParameters['tamPagina'] != null) {
+            queryParameters['tamPagina'] = requestParameters['tamPagina'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/v1/catalogos/categorias`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Listar categorías
+     */
+    async listarCategoriasCatalogoRaw(requestParameters: ListarCategoriasCatalogoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageCategoriaCatalogoResponse>> {
+        const requestOptions = await this.listarCategoriasCatalogoRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageCategoriaCatalogoResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Listar categorías
+     */
+    async listarCategoriasCatalogo(requestParameters: ListarCategoriasCatalogoRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageCategoriaCatalogoResponse> {
+        const response = await this.listarCategoriasCatalogoRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Creates request options for registrarActualizarCategoria without sending the request
      */
     async registrarActualizarCategoriaRequestOpts(requestParameters: RegistrarActualizarCategoriaRequest): Promise<runtime.RequestOpts> {
@@ -214,6 +437,61 @@ export class CategorasApi extends runtime.BaseAPI {
      */
     async registrarActualizarCategoria(requestParameters: RegistrarActualizarCategoriaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.registrarActualizarCategoriaRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for registrarCategoria without sending the request
+     */
+    async registrarCategoriaRequestOpts(requestParameters: RegistrarCategoriaRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['categoriaCatalogoRequest'] == null) {
+            throw new runtime.RequiredError(
+                'categoriaCatalogoRequest',
+                'Required parameter "categoriaCatalogoRequest" was null or undefined when calling registrarCategoria().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/v1/catalogos/categorias`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CategoriaCatalogoRequestToJSON(requestParameters['categoriaCatalogoRequest']),
+        };
+    }
+
+    /**
+     * Registrar categoría
+     */
+    async registrarCategoriaRaw(requestParameters: RegistrarCategoriaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.registrarCategoriaRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Registrar categoría
+     */
+    async registrarCategoria(requestParameters: RegistrarCategoriaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.registrarCategoriaRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
