@@ -21,12 +21,6 @@ import { mapValues } from '../runtime';
 export interface RolRequest {
     /**
      * 
-     * @type {number}
-     * @memberof RolRequest
-     */
-    rolId: number;
-    /**
-     * 
      * @type {string}
      * @memberof RolRequest
      */
@@ -37,15 +31,21 @@ export interface RolRequest {
      * @memberof RolRequest
      */
     descripcion: string;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof RolRequest
+     */
+    modulos: Array<number>;
 }
 
 /**
  * Check if a given object implements the RolRequest interface.
  */
 export function instanceOfRolRequest(value: object): value is RolRequest {
-    if (!('rolId' in value) || value['rolId'] === undefined) return false;
     if (!('nombre' in value) || value['nombre'] === undefined) return false;
     if (!('descripcion' in value) || value['descripcion'] === undefined) return false;
+    if (!('modulos' in value) || value['modulos'] === undefined) return false;
     return true;
 }
 
@@ -59,9 +59,9 @@ export function RolRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     }
     return {
         
-        'rolId': json['rolId'],
         'nombre': json['nombre'],
         'descripcion': json['descripcion'],
+        'modulos': json['modulos'],
     };
 }
 
@@ -76,9 +76,9 @@ export function RolRequestToJSONTyped(value?: RolRequest | null, ignoreDiscrimin
 
     return {
         
-        'rolId': value['rolId'],
         'nombre': value['nombre'],
         'descripcion': value['descripcion'],
+        'modulos': value['modulos'],
     };
 }
 

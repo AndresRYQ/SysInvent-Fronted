@@ -51,7 +51,7 @@ export interface ParteEquipoResponse {
     activo?: boolean;
     /**
      * 
-     * @type {Date}
+     * @type {string}
      * @memberof ParteEquipoResponse
      */
     fechaRegistro?: string;
