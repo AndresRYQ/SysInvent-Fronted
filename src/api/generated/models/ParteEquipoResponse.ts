@@ -54,7 +54,7 @@ export interface ParteEquipoResponse {
      * @type {Date}
      * @memberof ParteEquipoResponse
      */
-    fechaRegistro?: Date;
+    fechaRegistro?: string;
 }
 
 /**
@@ -79,7 +79,7 @@ export function ParteEquipoResponseFromJSONTyped(json: any, ignoreDiscriminator:
         'nombre': json['nombre'] == null ? undefined : json['nombre'],
         'descripcion': json['descripcion'] == null ? undefined : json['descripcion'],
         'activo': json['activo'] == null ? undefined : json['activo'],
-        'fechaRegistro': json['fechaRegistro'] == null ? undefined : (new Date(json['fechaRegistro'])),
+        'fechaRegistro': json['fechaRegistro'] == null ? undefined : String(json['fechaRegistro']),
     };
 }
 
@@ -99,7 +99,7 @@ export function ParteEquipoResponseToJSONTyped(value?: ParteEquipoResponse | nul
         'nombre': value['nombre'],
         'descripcion': value['descripcion'],
         'activo': value['activo'],
-        'fechaRegistro': value['fechaRegistro'] == null ? value['fechaRegistro'] : value['fechaRegistro'].toISOString().substring(0,10),
+        'fechaRegistro': value['fechaRegistro'],
     };
 }
 

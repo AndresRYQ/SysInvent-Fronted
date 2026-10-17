@@ -1,414 +1,110 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
-
-import {
-  FiltrosPartesEquipo,
-  type FiltrosPartesEquipoValores,
-} from '../../components/partes-equipo/FiltrosPartesEquipo'
+import { useEffect, useMemo, useState } from 'react'
+import { FiltrosPartesEquipo, type FiltrosPartesEquipoValores } from '../../components/partes-equipo/FiltrosPartesEquipo'
 import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
-
 import { FormularioParteEquipo } from '../../components/partes-equipo/FormularioParteEquipo'
 import { ParteEquipoDeleteModal } from '../../components/partes-equipo/ParteEquipoDeleteModal'
 import { TablaPartesEquipo } from '../../components/partes-equipo/TablaPartesEquipo'
-
-import {
-  actualizarParteEquipo,
-  crearParteEquipo,
-  eliminarParteEquipo,
-  obtenerPartesEquipo,
-  reactivarParteEquipo,
-} from '../../services/parteEquipoService'
-
-import type {
-  ParteEquipo,
-  ParteEquipoFormData,
-} from '../../types/parteEquipo'
-
+import { actualizarParteEquipo, crearParteEquipo, eliminarParteEquipo, listarPartesEquipo, reactivarParteEquipo } from '../../services/parteEquipoService'
+import type { ParteEquipo, ParteEquipoFormData } from '../../types/parteEquipo'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
-const FILTROS_INICIALES:
-  FiltrosPartesEquipoValores = {
-    busqueda: '',
-    estado: '',
-  }
+const FILTROS_INICIALES: FiltrosPartesEquipoValores = { busqueda: '', estado: '' }
 
-function filtrarPartesEquipo(
-  partesEquipo: ParteEquipo[],
-  filtros: FiltrosPartesEquipoValores,
-): ParteEquipo[] {
-  const busqueda = filtros.busqueda
-    .trim()
-    .toLowerCase()
-
-  return partesEquipo.filter(
-    (parte) => {
-      const coincideBusqueda =
-        !busqueda ||
-        parte.codigo
-          .toLowerCase()
-          .includes(busqueda) ||
-        parte.nombre
-          .toLowerCase()
-          .includes(busqueda) ||
-        parte.descripcion
-          .toLowerCase()
-          .includes(busqueda)
-
-      const coincideEstado =
-        !filtros.estado ||
-        (filtros.estado ===
-          'activo' &&
-          parte.estado) ||
-        (filtros.estado ===
-          'inactivo' &&
-          !parte.estado)
-
-      return (
-        coincideBusqueda &&
-        coincideEstado
-      )
-    },
-  )
-}
-
-function obtenerMensajeError(
-  error: unknown,
-): string {
-  return error instanceof Error
-    ? error.message
-    : 'Ocurrió un error inesperado.'
+function filtrarPartesEquipo(partes: ParteEquipo[], filtros: FiltrosPartesEquipoValores) {
+  return partes.filter((parte) => (
+    !filtros.estado || (filtros.estado === 'activo' ? parte.estado : !parte.estado)
+  ))
 }
 
 export function PartesEquipoPage() {
-  const [
-    partesEquipo,
-    setPartesEquipo,
-  ] = useState<ParteEquipo[]>(() =>
-    obtenerPartesEquipo(),
-  )
-
-  const [filtros, setFiltros] =
-    useState<FiltrosPartesEquipoValores>({
-      ...FILTROS_INICIALES,
-    })
-
-  const [
-    filtrosAplicados,
-    setFiltrosAplicados,
-  ] =
-    useState<FiltrosPartesEquipoValores>({
-      ...FILTROS_INICIALES,
-    })
-
-  const [page, setPage] =
-    useState(1)
-
-  const [pageSize, setPageSize] =
-    useState(10)
-
-  const [
-    formularioAbierto,
-    setFormularioAbierto,
-  ] = useState(false)
-
-  const [modoConfirmacion, setModoConfirmacion] = useState<'desactivar' | 'reactivar'>('desactivar')
-
-  const [
-    parteEnEdicion,
-    setParteEnEdicion,
-  ] = useState<ParteEquipo | null>(
-    null,
-  )
-
+  const [partes, setPartes] = useState<ParteEquipo[]>([])
+  const [totalItems, setTotalItems] = useState(0)
+  const [recarga, setRecarga] = useState(0)
+  const [filtros, setFiltros] = useState(FILTROS_INICIALES)
+  const [aplicados, setAplicados] = useState(FILTROS_INICIALES)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [formOpen, setFormOpen] = useState(false)
   const [soloLectura, setSoloLectura] = useState(false)
-
-  const [
-    errorFormulario,
-    setErrorFormulario,
-  ] = useState('')
+  const [seleccionado, setSeleccionado] = useState<ParteEquipo | null>(null)
+  const [error, setError] = useState('')
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [modoConfirmacion, setModoConfirmacion] = useState<'desactivar' | 'reactivar'>('desactivar')
+  const [objetivo, setObjetivo] = useState<ParteEquipo | null>(null)
   const { mensaje, abierta, mostrarAlerta, cerrarAlerta, limpiarAlerta } = useSnackbar()
 
-  const [
-    eliminarAbierto,
-    setEliminarAbierto,
-  ] = useState(false)
-
-  const [
-    parteAEliminar,
-    setParteAEliminar,
-  ] = useState<ParteEquipo | null>(
-    null,
-  )
-
-  const partesFiltradas =
-    useMemo(
-      () =>
-        filtrarPartesEquipo(
-          partesEquipo,
-          filtrosAplicados,
-        ),
-      [
-        partesEquipo,
-        filtrosAplicados,
-      ],
-    )
-
-  const totalItems =
-    partesFiltradas.length
-
-  const partesPaginadas =
-    useMemo(() => {
-      const indiceInicial =
-        (page - 1) * pageSize
-
-      return partesFiltradas.slice(
-        indiceInicial,
-        indiceInicial + pageSize,
-      )
-    }, [
-      partesFiltradas,
-      page,
-      pageSize,
-    ])
+  const filtrados = useMemo(() => filtrarPartesEquipo(partes, aplicados), [partes, aplicados])
 
   useEffect(() => {
-    const totalPaginas = Math.max(
-      1,
-      Math.ceil(
-        totalItems / pageSize,
-      ),
-    )
+    let activo = true
+    listarPartesEquipo({ nombre: aplicados.busqueda, pagina: page, tamPagina: pageSize })
+      .then((resultado) => {
+        if (!activo) return
+        setPartes(resultado.datos)
+        setTotalItems(resultado.paginacion.totalElementos ?? resultado.datos.length)
+      })
+      .catch((e) => {
+        if (!activo) return
+        mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar las partes de equipo.')
+      })
+    return () => { activo = false }
+  }, [aplicados.busqueda, page, pageSize, recarga])
 
-    if (page > totalPaginas) {
-      setPage(totalPaginas)
-    }
-  }, [
-    page,
-    pageSize,
-    totalItems,
-  ])
-
-  function recargarPartes(): void {
-    setPartesEquipo(
-      obtenerPartesEquipo(),
-    )
+  const recargar = () => {
+    setPage(1)
+    setRecarga((actual) => actual + 1)
   }
 
-  function abrirFormularioNuevo(): void {
-    setErrorFormulario('')
-    setParteEnEdicion(null)
+  const cerrarFormulario = () => {
+    setFormOpen(false)
+    setSeleccionado(null)
     setSoloLectura(false)
-    setFormularioAbierto(true)
+    setError('')
   }
 
-  function abrirFormularioEdicion(
-    parte: ParteEquipo,
-  ): void {
-    setErrorFormulario('')
-    setParteEnEdicion(parte)
-    setSoloLectura(false)
-    setFormularioAbierto(true)
-  }
-
-  function abrirVisualizacion(parte: ParteEquipo): void {
-    setErrorFormulario('')
-    setParteEnEdicion(parte)
-    setSoloLectura(true)
-    setFormularioAbierto(true)
-  }
-
-  function cerrarFormulario(): void {
-    setFormularioAbierto(false)
-    setParteEnEdicion(null)
-    setSoloLectura(false)
-    setErrorFormulario('')
-  }
-
-  function guardarParte(
-    datos: ParteEquipoFormData,
-  ): void {
+  const guardar = async (datos: ParteEquipoFormData) => {
     try {
-      if (parteEnEdicion) {
-        actualizarParteEquipo(
-          parteEnEdicion.id,
-          datos,
-        )
-
-      } else {
-        crearParteEquipo(datos)
-      }
-
-      recargarPartes()
+      const editando = Boolean(seleccionado)
+      const respuesta = editando ? await actualizarParteEquipo(seleccionado!.id, datos) : await crearParteEquipo(datos)
+      recargar()
       cerrarFormulario()
-      setPage(1)
-      mostrarAlerta('success', parteEnEdicion ? 'Parte de equipo actualizada correctamente.' : 'Parte de equipo registrada correctamente.')
-    } catch (error) {
-      setErrorFormulario(
-        obtenerMensajeError(error),
-      )
+      mostrarAlerta('success', respuesta.message ?? (editando ? 'Parte de equipo actualizada correctamente.' : 'Parte de equipo registrada correctamente.'))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Ocurrió un error inesperado.')
     }
   }
 
-  function abrirConfirmacionEliminar(
-    parte: ParteEquipo,
-  ): void {
-    setParteAEliminar(parte)
-    setModoConfirmacion('desactivar')
-    setEliminarAbierto(true)
+  const cerrarConfirmacion = () => {
+    setConfirmOpen(false)
+    setObjetivo(null)
   }
 
-  function abrirConfirmacionReactivar(parte: ParteEquipo): void {
-    setParteAEliminar(parte)
-    setModoConfirmacion('reactivar')
-    setEliminarAbierto(true)
-  }
-
-  function cerrarConfirmacionEliminar():
-    void {
-    setEliminarAbierto(false)
-    setParteAEliminar(null)
-  }
-
-  function confirmarEliminacion(): void {
-    if (!parteAEliminar) {
-      return
-    }
-
+  const confirmar = async () => {
+    if (!objetivo) return
     try {
-      if (modoConfirmacion === 'reactivar') {
-        reactivarParteEquipo(parteAEliminar.id)
-      } else {
-        eliminarParteEquipo(parteAEliminar.id)
-      }
-
-      recargarPartes()
-      cerrarConfirmacionEliminar()
-      mostrarAlerta('success', modoConfirmacion === 'reactivar' ? 'Parte de equipo reactivada correctamente.' : 'Parte de equipo eliminada correctamente.')
-
-    } catch (error) {
-      cerrarConfirmacionEliminar()
-      mostrarAlerta('error', obtenerMensajeError(error))
+      const respuesta = modoConfirmacion === 'reactivar' ? await reactivarParteEquipo(objetivo.id) : await eliminarParteEquipo(objetivo.id)
+      recargar()
+      mostrarAlerta('success', respuesta.message ?? (modoConfirmacion === 'reactivar' ? 'Parte de equipo reactivada correctamente.' : 'Parte de equipo desactivada correctamente.'))
+    } catch (e) {
+      mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudo actualizar la parte de equipo.')
+    } finally {
+      cerrarConfirmacion()
     }
   }
 
   return (
-    <>
-      <div className="partes-equipo-page">
+    <div className="partes-equipo-page">
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
-          <section className="maestro-topbar">
-            <div className="maestro-topbar__copy">
-              <h1>Partes de equipo</h1>
-
-              <p>
-                Administración de partes y
-                componentes utilizados por los
-                equipos del almacén.
-              </p>
-            </div>
-          </section>
-
-          <div className="maestro-panel">
-            <FiltrosPartesEquipo
-              valores={filtros}
-              onChange={(
-                campo,
-                valor,
-              ) =>
-                setFiltros(
-                  (actual) => ({
-                    ...actual,
-                    [campo]: valor,
-                  }),
-                )
-              }
-              onBuscar={() => {
-                setFiltrosAplicados({
-                  ...filtros,
-                })
-                setPage(1)
-              }}
-              onLimpiar={() => {
-                setFiltros({
-                  ...FILTROS_INICIALES,
-                })
-
-                setFiltrosAplicados({
-                  ...FILTROS_INICIALES,
-                })
-
-                setPage(1)
-              }}
-            />
-          </div>
-
-          <div className="maestro-panel">
-            <TablaPartesEquipo
-              partesEquipo={
-                partesPaginadas
-              }
-              totalItems={totalItems}
-              page={page}
-              pageSize={pageSize}
-              onAgregar={
-                abrirFormularioNuevo
-              }
-              onEditar={
-                abrirFormularioEdicion
-              }
-              onEliminar={
-                abrirConfirmacionEliminar
-              }
-              onReactivar={
-                abrirConfirmacionReactivar
-              }
-              onVisualizar={
-                abrirVisualizacion
-              }
-              onPageChange={setPage}
-              onPageSizeChange={(
-                cantidad,
-              ) => {
-                setPageSize(cantidad)
-                setPage(1)
-              }}
-            />
-          </div>
+          <section className="maestro-topbar"><div className="maestro-topbar__copy"><h1>Partes de equipo</h1><p>Administración de partes y componentes utilizados por los equipos del almacén.</p></div></section>
+          <div className="maestro-panel"><FiltrosPartesEquipo valores={filtros} onChange={(campo, valor) => setFiltros((actual) => ({ ...actual, [campo]: valor }))} onBuscar={() => { setAplicados({ ...filtros }); setPage(1) }} onLimpiar={() => { setFiltros(FILTROS_INICIALES); setAplicados(FILTROS_INICIALES); setPage(1) }} /></div>
+          <div className="maestro-panel"><TablaPartesEquipo partesEquipo={filtrados} totalItems={aplicados.estado ? filtrados.length : totalItems} page={page} pageSize={pageSize} onAgregar={() => { setSeleccionado(null); setSoloLectura(false); setError(''); setFormOpen(true) }} onEditar={(item) => { setSeleccionado(item); setSoloLectura(false); setError(''); setFormOpen(true) }} onVisualizar={(item) => { setSeleccionado(item); setSoloLectura(true); setError(''); setFormOpen(true) }} onEliminar={(item) => { setObjetivo(item); setModoConfirmacion('desactivar'); setConfirmOpen(true) }} onReactivar={(item) => { setObjetivo(item); setModoConfirmacion('reactivar'); setConfirmOpen(true) }} onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(1) }} /></div>
         </div>
       </main>
-      </div>
-
-      <FormularioParteEquipo
-        abierto={formularioAbierto}
-        parteEquipo={parteEnEdicion}
-        error={errorFormulario}
-        soloLectura={soloLectura}
-        onClose={cerrarFormulario}
-        onSubmit={guardarParte}
-      />
-
-      <SnackbarAlert
-        mensaje={mensaje}
-        abierta={abierta}
-        onClose={cerrarAlerta}
-        onExited={limpiarAlerta}
-      />
-
-      <ParteEquipoDeleteModal
-        abierto={eliminarAbierto}
-        parteEquipo={parteAEliminar}
-        onClose={
-          cerrarConfirmacionEliminar
-        }
-        onConfirm={
-          confirmarEliminacion
-        }
-        modo={modoConfirmacion}
-      />
-    </>
+      <FormularioParteEquipo abierto={formOpen} parteEquipo={seleccionado} error={error} soloLectura={soloLectura} onClose={cerrarFormulario} onSubmit={guardar} />
+      <SnackbarAlert mensaje={mensaje} abierta={abierta} onClose={cerrarAlerta} onExited={limpiarAlerta} />
+      <ParteEquipoDeleteModal abierto={confirmOpen} parteEquipo={objetivo} onClose={cerrarConfirmacion} onConfirm={confirmar} modo={modoConfirmacion} />
+    </div>
   )
 }
