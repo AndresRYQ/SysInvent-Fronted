@@ -10,7 +10,7 @@ All URIs are relative to *http://localhost:8080*
 
 ## login
 
-> object login(loginRequest)
+> LoginResponse login(loginRequest)
 
 Iniciar sesión
 
@@ -55,7 +55,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**LoginResponse**](LoginResponse.md)
 
 ### Authorization
 

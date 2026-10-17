@@ -4,18 +4,18 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**actualizar6**](DestinoControllerApi.md#actualizar6) | **PUT** /api/v1/catalogos/destinos/{id} |  |
+| [**actualizar5**](DestinoControllerApi.md#actualizar5) | **PUT** /api/v1/catalogos/destinos/{id} |  |
 | [**cambiarEstado5**](DestinoControllerApi.md#cambiarestado5) | **PUT** /api/v1/catalogos/destinos/{id}/estado |  |
-| [**crear6**](DestinoControllerApi.md#crear6) | **POST** /api/v1/catalogos/destinos |  |
+| [**crear5**](DestinoControllerApi.md#crear5) | **POST** /api/v1/catalogos/destinos |  |
 | [**desactivar5**](DestinoControllerApi.md#desactivar5) | **DELETE** /api/v1/catalogos/destinos/{id} |  |
-| [**listar6**](DestinoControllerApi.md#listar6) | **GET** /api/v1/catalogos/destinos |  |
-| [**obtener6**](DestinoControllerApi.md#obtener6) | **GET** /api/v1/catalogos/destinos/{id} |  |
+| [**listar5**](DestinoControllerApi.md#listar5) | **GET** /api/v1/catalogos/destinos |  |
+| [**obtener5**](DestinoControllerApi.md#obtener5) | **GET** /api/v1/catalogos/destinos/{id} |  |
 
 
 
-## actualizar6
+## actualizar5
 
-> object actualizar6(id, destinoRequest)
+> MessageResponse actualizar5(id, destinoRequest)
 
 
 
@@ -26,7 +26,7 @@ import {
   Configuration,
   DestinoControllerApi,
 } from '';
-import type { Actualizar6Request } from '';
+import type { Actualizar5Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -41,10 +41,10 @@ async function example() {
     id: 56,
     // DestinoRequest
     destinoRequest: ...,
-  } satisfies Actualizar6Request;
+  } satisfies Actualizar5Request;
 
   try {
-    const data = await api.actualizar6(body);
+    const data = await api.actualizar5(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -65,7 +65,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -87,7 +87,7 @@ example().catch(console.error);
 
 ## cambiarEstado5
 
-> object cambiarEstado5(id, estadoCatalogoRequest)
+> MessageResponse cambiarEstado5(id, estadoCatalogoRequest)
 
 
 
@@ -137,7 +137,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -157,9 +157,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## crear6
+## crear5
 
-> object crear6(destinoRequest)
+> MessageResponse crear5(destinoRequest)
 
 
 
@@ -170,7 +170,7 @@ import {
   Configuration,
   DestinoControllerApi,
 } from '';
-import type { Crear6Request } from '';
+import type { Crear5Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -183,10 +183,10 @@ async function example() {
   const body = {
     // DestinoRequest
     destinoRequest: ...,
-  } satisfies Crear6Request;
+  } satisfies Crear5Request;
 
   try {
-    const data = await api.crear6(body);
+    const data = await api.crear5(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -206,7 +206,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -228,7 +228,7 @@ example().catch(console.error);
 
 ## desactivar5
 
-> object desactivar5(id)
+> MessageResponse desactivar5(id)
 
 
 
@@ -275,7 +275,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -295,9 +295,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## listar6
+## listar5
 
-> CustomPageDestinoResponse listar6(nombre, pagina, tamPagina)
+> CustomPageDestinoResponse listar5(nombre, pagina, tamPagina)
 
 
 
@@ -308,7 +308,7 @@ import {
   Configuration,
   DestinoControllerApi,
 } from '';
-import type { Listar6Request } from '';
+import type { Listar5Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -325,10 +325,10 @@ async function example() {
     pagina: 56,
     // number (optional)
     tamPagina: 56,
-  } satisfies Listar6Request;
+  } satisfies Listar5Request;
 
   try {
-    const data = await api.listar6(body);
+    const data = await api.listar5(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -370,9 +370,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## obtener6
+## obtener5
 
-> object obtener6(id)
+> MessageResponse obtener5(id)
 
 
 
@@ -383,7 +383,7 @@ import {
   Configuration,
   DestinoControllerApi,
 } from '';
-import type { Obtener6Request } from '';
+import type { Obtener5Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -396,10 +396,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Obtener6Request;
+  } satisfies Obtener5Request;
 
   try {
-    const data = await api.obtener6(body);
+    const data = await api.obtener5(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -419,7 +419,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 

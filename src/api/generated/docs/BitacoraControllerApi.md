@@ -4,13 +4,13 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**plantilla9**](BitacoraControllerApi.md#plantilla9) | **GET** /api/bitacora/_plantilla |  |
+| [**plantilla10**](BitacoraControllerApi.md#plantilla10) | **GET** /api/bitacora/_plantilla |  |
 
 
 
-## plantilla9
+## plantilla10
 
-> plantilla9()
+> plantilla10()
 
 
 
@@ -21,7 +21,7 @@ import {
   Configuration,
   BitacoraControllerApi,
 } from '';
-import type { Plantilla9Request } from '';
+import type { Plantilla10Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -32,7 +32,7 @@ async function example() {
   const api = new BitacoraControllerApi(config);
 
   try {
-    const data = await api.plantilla9();
+    const data = await api.plantilla10();
     console.log(data);
   } catch (error) {
     console.error(error);

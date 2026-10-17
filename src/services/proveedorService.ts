@@ -1,57 +1,129 @@
 import type { Proveedor, ProveedorFormData } from '../types/proveedor'
-import { registrarEventoBitacora } from './bitacoraService'
-const STORAGE_KEY = 'agrihusac_proveedores'
-const PROVEEDORES_INICIALES: Proveedor[] = [
-  {
-    id: 1,
-    ruc: '20100070970',
-    razonSocial: 'Ferretería Industrial S.A.C.',
-    correo: 'ventas@ferreteriaindustrial.pe',
-    telefono: '987654321',
-    direccion: 'Av. Industrial 450, Lima',
-    activo: 1,
-    fechaRegistro: '10/08/2026',
-  },
-  {
-    id: 2,
-    ruc: '20548796321',
-    razonSocial: 'Suministros del Norte E.I.R.L.',
-    correo: 'contacto@suministrosnorte.pe',
-    telefono: '945678210',
-    direccion: 'Av. Chancay 320, Huaral',
-    activo: 1,
-    fechaRegistro: '11/08/2026',
-  },
-  {
-    id: 3,
-    ruc: '20601234567',
-    razonSocial: 'Equipos y Repuestos Perú S.A.C.',
-    correo: 'pedidos@equiposrepuestos.pe',
-    telefono: '912345678',
-    direccion: 'Jr. Los Talleres 125, Lima',
-    activo: 1,
-    fechaRegistro: '12/08/2026',
-  },
-  {
-    id: 4,
-    ruc: '20456789123',
-    razonSocial: 'Distribuidora Agrícola Huaral S.R.L.',
-    correo: 'ventas@dahuaral.pe',
-    telefono: '901234567',
-    direccion: 'Carretera Huaral 780, Huaral',
-    activo: 0,
-    fechaRegistro: '13/08/2026',
-  },
-]
-type Registro = Partial<Proveedor> & { id?: number | string; estado?: boolean }
-function normalizarRegistro(r: Registro): Proveedor | null { const id = typeof r.id === 'number' ? r.id : Number(String(r.id ?? '').replace(/^PROV-/, '')); if (!Number.isInteger(id) || id <= 0 || !r.ruc || !r.razonSocial) return null; return { id, ruc: String(r.ruc), razonSocial: String(r.razonSocial).trim(), correo: String(r.correo ?? '').trim().toLowerCase(), telefono: String(r.telefono ?? '').trim(), direccion: String(r.direccion ?? '').trim(), activo: r.activo === 0 || r.activo === 1 ? r.activo : r.estado === false ? 0 : 1, fechaRegistro: r.fechaRegistro ?? '' } }
-function leer(): Proveedor[] { try { const datos: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]'); return Array.isArray(datos) ? datos.map((x) => normalizarRegistro(x as Registro)).filter((x): x is Proveedor => x !== null) : [] } catch { return [] } }
-function guardar(datos: Proveedor[]): void { localStorage.setItem(STORAGE_KEY, JSON.stringify(datos)) }
-function texto(v: string): string { return v.trim().toLowerCase() }
-function validar(d: ProveedorFormData): void { if (!/^\d{11}$/.test(d.ruc.trim())) throw new Error('El RUC debe contener exactamente 11 números.'); if (d.razonSocial.trim().length < 2) throw new Error('La razón social debe tener al menos 2 caracteres.'); if (d.razonSocial.trim().length > 120) throw new Error('La razón social no puede superar los 120 caracteres.'); if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.correo.trim())) throw new Error('Ingresa un correo electrónico válido.'); const t = d.telefono.replace(/\D/g, ''); if (t.length !== 9) throw new Error('El teléfono debe contener exactamente 9 dígitos.'); if (d.direccion.trim().length < 5) throw new Error('La dirección debe tener al menos 5 caracteres.'); if (d.direccion.trim().length > 200) throw new Error('La dirección no puede superar los 200 caracteres.') }
-export function obtenerProveedores(): Proveedor[] { const datos = leer(); const proveedores = datos.length > 0 ? datos.sort((a, b) => a.id - b.id) : PROVEEDORES_INICIALES.map((x) => ({ ...x })); guardar(proveedores); return proveedores.map((x) => ({ ...x })) }
-export function obtenerProveedorPorId(id: number | string): Proveedor | null { const n = typeof id === 'number' ? id : Number(String(id).replace(/^PROV-/, '')); const item = obtenerProveedores().find((x) => x.id === n); return item ? { ...item } : null }
-export function crearProveedor(d: ProveedorFormData): Proveedor { validar(d); const lista = obtenerProveedores(); if (lista.some((x) => x.ruc === d.ruc.trim())) throw new Error('Ya existe un proveedor con ese RUC.'); if (lista.some((x) => texto(x.razonSocial) === texto(d.razonSocial))) throw new Error('Ya existe un proveedor con esa razón social.'); const nuevo: Proveedor = { id: lista.reduce((m, x) => Math.max(m, x.id), 0) + 1, ruc: d.ruc.trim(), razonSocial: d.razonSocial.trim(), correo: d.correo.trim().toLowerCase(), telefono: d.telefono.trim(), direccion: d.direccion.trim(), activo: 1, fechaRegistro: new Intl.DateTimeFormat('es-PE').format(new Date()) }; guardar([...lista, nuevo].sort((a, b) => a.id - b.id)); registrarEventoBitacora({ modulo: 'Proveedores', accion: 'CREAR', detalle: `Se creó el proveedor "${nuevo.razonSocial}".`, registroId: String(nuevo.id) }); return nuevo }
-export function actualizarProveedor(id: number | string, d: ProveedorFormData): Proveedor { const numericId = typeof id === 'number' ? id : Number(String(id).replace(/^PROV-/, '')); validar(d); const lista = obtenerProveedores(); const actual = lista.find((x) => x.id === numericId); if (!actual) throw new Error('El proveedor no existe.'); if (actual.activo === 0) throw new Error('Un proveedor inactivo solo puede visualizarse o reactivarse.'); if (lista.some((x) => x.id !== numericId && x.ruc === d.ruc.trim())) throw new Error('Ya existe otro proveedor con ese RUC.'); const actualizado = { ...actual, ruc: d.ruc.trim(), razonSocial: d.razonSocial.trim(), correo: d.correo.trim().toLowerCase(), telefono: d.telefono.trim(), direccion: d.direccion.trim() }; guardar(lista.map((x) => x.id === numericId ? actualizado : x)); return actualizado }
-export function eliminarProveedor(id: number | string): void { const numericId = typeof id === 'number' ? id : Number(String(id).replace(/^PROV-/, '')); const lista = obtenerProveedores(); const actual = lista.find((x) => x.id === numericId); if (!actual) throw new Error('El proveedor no existe.'); guardar(lista.map((x) => x.id === numericId ? { ...x, activo: 0 as const } : x)) }
-export function reactivarProveedor(id: number | string): void { const numericId = typeof id === 'number' ? id : Number(String(id).replace(/^PROV-/, '')); const lista = obtenerProveedores(); if (!lista.some((x) => x.id === numericId)) throw new Error('El proveedor no existe.'); guardar(lista.map((x) => x.id === numericId ? { ...x, activo: 1 as const } : x)) }
+import {
+  ProveedoresApi,
+  type CustomPageProveedorResponse,
+  type MessageResponse,
+} from '../api/generated'
+import { apiConfiguration } from '../api/client'
+import type { CatalogoPaginado } from './catalogoApi'
+
+let proveedoresEnMemoria: Proveedor[] = []
+const proveedoresApi = new ProveedoresApi(apiConfiguration)
+const solicitudesEnCurso = new Map<string, Promise<CatalogoPaginado<Proveedor>>>()
+
+export interface ListarProveedoresParams {
+  nombre?: string
+  pagina?: number
+  tamPagina?: number
+}
+
+export function obtenerProveedores(): Proveedor[] {
+  return proveedoresEnMemoria.map((proveedor) => ({ ...proveedor }))
+}
+
+export function obtenerProveedorPorId(id: number | string): Proveedor | null {
+  const numericId = typeof id === 'number' ? id : Number(String(id).replace(/^PROV-/, ''))
+  const proveedor = proveedoresEnMemoria.find((item) => item.id === numericId)
+  return proveedor ? { ...proveedor } : null
+}
+
+function formatearFechaRegistro(fecha?: string | Date): string {
+  if (typeof fecha === 'string') return fecha.trim()
+  if (!fecha || Number.isNaN(fecha.getTime())) return ''
+  return fecha.toISOString().slice(0, 10)
+}
+
+function mapearProveedor(proveedor: NonNullable<CustomPageProveedorResponse['datos']>[number]): Proveedor {
+  return {
+    id: proveedor.proveedorId ?? 0,
+    ruc: proveedor.ruc ?? '',
+    razonSocial: proveedor.razonSocial ?? '',
+    correo: proveedor.correo ?? '',
+    telefono: proveedor.telefono ?? '',
+    direccion: proveedor.direccion ?? '',
+    activo: proveedor.activo ? 1 : 0,
+    fechaRegistro: formatearFechaRegistro(proveedor.fechaRegistro),
+  }
+}
+
+function mapearRespuesta(response: CustomPageProveedorResponse): CatalogoPaginado<Proveedor> {
+  const resultado: CatalogoPaginado<Proveedor> = {
+    datos: (response.datos ?? []).map(mapearProveedor),
+    paginacion: response.paginacion ?? {},
+  }
+  proveedoresEnMemoria = resultado.datos
+  return resultado
+}
+
+export async function listarProveedores(
+  params: ListarProveedoresParams = {},
+): Promise<CatalogoPaginado<Proveedor>> {
+  const parametros = {
+    nombre: params.nombre?.trim() || undefined,
+    pagina: params.pagina,
+    tamPagina: params.tamPagina,
+  }
+  const clave = JSON.stringify(parametros)
+  const solicitudExistente = solicitudesEnCurso.get(clave)
+  if (solicitudExistente) return solicitudExistente
+
+  const solicitud = proveedoresApi
+    .listarProveedores(parametros)
+    .then(mapearRespuesta)
+    .finally(() => solicitudesEnCurso.delete(clave))
+  solicitudesEnCurso.set(clave, solicitud)
+  return solicitud
+}
+
+export const listarProveedoresApi = listarProveedores
+
+function validar(datos: ProveedorFormData): void {
+  if (!/^\d{11}$/.test(datos.ruc.trim())) throw new Error('El RUC debe contener exactamente 11 números.')
+  const razonSocial = datos.razonSocial.trim()
+  if (razonSocial.length < 2) throw new Error('La razón social debe tener al menos 2 caracteres.')
+  if (razonSocial.length > 120) throw new Error('La razón social no puede superar los 120 caracteres.')
+  if (datos.correo.trim() && !/^\S+@\S+\.\S+$/.test(datos.correo.trim())) throw new Error('Ingresa un correo electrónico válido.')
+  const telefono = datos.telefono.replace(/\D/g, '')
+  if (datos.telefono.trim() && (telefono.length < 7 || telefono.length > 15)) throw new Error('Ingresa un teléfono válido.')
+  if (datos.direccion.trim().length < 5) throw new Error('La dirección debe tener al menos 5 caracteres.')
+  if (datos.direccion.trim().length > 200) throw new Error('La dirección no puede superar los 200 caracteres.')
+}
+
+function validarRespuesta(response: MessageResponse): MessageResponse {
+  if (response.success === false) throw new Error(response.message ?? 'La operación de proveedores no fue completada.')
+  return response
+}
+
+function construirRequest(datos: ProveedorFormData) {
+  return {
+    ruc: datos.ruc.trim(),
+    razonSocial: datos.razonSocial.trim(),
+    correo: datos.correo.trim().toLowerCase() || undefined,
+    telefono: datos.telefono.trim() || undefined,
+    direccion: datos.direccion.trim() || undefined,
+  }
+}
+
+export async function crearProveedor(datos: ProveedorFormData): Promise<MessageResponse> {
+  validar(datos)
+  return validarRespuesta(await proveedoresApi.registrarProveedor({ proveedorRequest: construirRequest(datos) }))
+}
+
+export async function actualizarProveedor(id: number | string, datos: ProveedorFormData): Promise<MessageResponse> {
+  validar(datos)
+  const numericId = typeof id === 'number' ? id : Number(String(id).replace(/^PROV-/, ''))
+  return validarRespuesta(await proveedoresApi.actualizarProveedor({ id: numericId, proveedorRequest: construirRequest(datos) }))
+}
+
+export async function cambiarEstadoProveedor(id: number | string, activo: boolean): Promise<MessageResponse> {
+  const numericId = typeof id === 'number' ? id : Number(String(id).replace(/^PROV-/, ''))
+  return validarRespuesta(await proveedoresApi.cambiarEstadoProveedor({ id: numericId, estadoCatalogoRequest: { activo } }))
+}
+
+export function eliminarProveedor(id: number | string): Promise<MessageResponse> {
+  return cambiarEstadoProveedor(id, false)
+}
+
+export function reactivarProveedor(id: number | string): Promise<MessageResponse> {
+  return cambiarEstadoProveedor(id, true)
+}

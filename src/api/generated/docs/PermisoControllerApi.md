@@ -4,13 +4,13 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**plantilla6**](PermisoControllerApi.md#plantilla6) | **GET** /api/permisos/_plantilla |  |
+| [**plantilla7**](PermisoControllerApi.md#plantilla7) | **GET** /api/permisos/_plantilla |  |
 
 
 
-## plantilla6
+## plantilla7
 
-> plantilla6()
+> plantilla7()
 
 
 
@@ -21,7 +21,7 @@ import {
   Configuration,
   PermisoControllerApi,
 } from '';
-import type { Plantilla6Request } from '';
+import type { Plantilla7Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -32,7 +32,7 @@ async function example() {
   const api = new PermisoControllerApi(config);
 
   try {
-    const data = await api.plantilla6();
+    const data = await api.plantilla7();
     console.log(data);
   } catch (error) {
     console.error(error);

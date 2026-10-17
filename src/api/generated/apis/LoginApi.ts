@@ -18,6 +18,11 @@ import {
     LoginRequestFromJSON,
     LoginRequestToJSON,
 } from '../models/LoginRequest';
+import {
+    type LoginResponse,
+    LoginResponseFromJSON,
+    LoginResponseToJSON,
+} from '../models/LoginResponse';
 
 export interface LoginOperationRequest {
     loginRequest: LoginRequest;
@@ -61,18 +66,18 @@ export class LoginApi extends runtime.BaseAPI {
      * Valida las credenciales del usuario
      * Iniciar sesión
      */
-    async loginRaw(requestParameters: LoginOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async loginRaw(requestParameters: LoginOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LoginResponse>> {
         const requestOptions = await this.loginRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => LoginResponseFromJSON(jsonValue));
     }
 
     /**
      * Valida las credenciales del usuario
      * Iniciar sesión
      */
-    async login(requestParameters: LoginOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async login(requestParameters: LoginOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginResponse> {
         const response = await this.loginRaw(requestParameters, initOverrides);
         return await response.value();
     }

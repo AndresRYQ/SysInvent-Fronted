@@ -24,36 +24,41 @@ import {
     EstadoCatalogoRequestToJSON,
 } from '../models/EstadoCatalogoRequest';
 import {
+    type MessageResponse,
+    MessageResponseFromJSON,
+    MessageResponseToJSON,
+} from '../models/MessageResponse';
+import {
     type ProveedorRequest,
     ProveedorRequestFromJSON,
     ProveedorRequestToJSON,
 } from '../models/ProveedorRequest';
 
-export interface Actualizar4Request {
+export interface ActualizarRequest {
     id: number;
     proveedorRequest: ProveedorRequest;
 }
 
-export interface CambiarEstado3Request {
+export interface CambiarEstadoRequest {
     id: number;
     estadoCatalogoRequest: EstadoCatalogoRequest;
 }
 
-export interface Crear4Request {
+export interface CrearRequest {
     proveedorRequest: ProveedorRequest;
 }
 
-export interface Desactivar3Request {
+export interface DesactivarRequest {
     id: number;
 }
 
-export interface Listar4Request {
+export interface ListarRequest {
     nombre?: string;
     pagina?: number;
     tamPagina?: number;
 }
 
-export interface Obtener4Request {
+export interface ObtenerRequest {
     id: number;
 }
 
@@ -63,20 +68,20 @@ export interface Obtener4Request {
 export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for actualizar4 without sending the request
+     * Creates request options for actualizar without sending the request
      */
-    async actualizar4RequestOpts(requestParameters: Actualizar4Request): Promise<runtime.RequestOpts> {
+    async actualizarRequestOpts(requestParameters: ActualizarRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling actualizar4().'
+                'Required parameter "id" was null or undefined when calling actualizar().'
             );
         }
 
         if (requestParameters['proveedorRequest'] == null) {
             throw new runtime.RequiredError(
                 'proveedorRequest',
-                'Required parameter "proveedorRequest" was null or undefined when calling actualizar4().'
+                'Required parameter "proveedorRequest" was null or undefined when calling actualizar().'
             );
         }
 
@@ -109,35 +114,35 @@ export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async actualizar4Raw(requestParameters: Actualizar4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.actualizar4RequestOpts(requestParameters);
+    async actualizarRaw(requestParameters: ActualizarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.actualizarRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async actualizar4(requestParameters: Actualizar4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.actualizar4Raw(requestParameters, initOverrides);
+    async actualizar(requestParameters: ActualizarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.actualizarRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for cambiarEstado3 without sending the request
+     * Creates request options for cambiarEstado without sending the request
      */
-    async cambiarEstado3RequestOpts(requestParameters: CambiarEstado3Request): Promise<runtime.RequestOpts> {
+    async cambiarEstadoRequestOpts(requestParameters: CambiarEstadoRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling cambiarEstado3().'
+                'Required parameter "id" was null or undefined when calling cambiarEstado().'
             );
         }
 
         if (requestParameters['estadoCatalogoRequest'] == null) {
             throw new runtime.RequiredError(
                 'estadoCatalogoRequest',
-                'Required parameter "estadoCatalogoRequest" was null or undefined when calling cambiarEstado3().'
+                'Required parameter "estadoCatalogoRequest" was null or undefined when calling cambiarEstado().'
             );
         }
 
@@ -170,28 +175,28 @@ export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async cambiarEstado3Raw(requestParameters: CambiarEstado3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.cambiarEstado3RequestOpts(requestParameters);
+    async cambiarEstadoRaw(requestParameters: CambiarEstadoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.cambiarEstadoRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async cambiarEstado3(requestParameters: CambiarEstado3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.cambiarEstado3Raw(requestParameters, initOverrides);
+    async cambiarEstado(requestParameters: CambiarEstadoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.cambiarEstadoRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for crear4 without sending the request
+     * Creates request options for crear without sending the request
      */
-    async crear4RequestOpts(requestParameters: Crear4Request): Promise<runtime.RequestOpts> {
+    async crearRequestOpts(requestParameters: CrearRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['proveedorRequest'] == null) {
             throw new runtime.RequiredError(
                 'proveedorRequest',
-                'Required parameter "proveedorRequest" was null or undefined when calling crear4().'
+                'Required parameter "proveedorRequest" was null or undefined when calling crear().'
             );
         }
 
@@ -223,28 +228,28 @@ export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async crear4Raw(requestParameters: Crear4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.crear4RequestOpts(requestParameters);
+    async crearRaw(requestParameters: CrearRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.crearRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async crear4(requestParameters: Crear4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.crear4Raw(requestParameters, initOverrides);
+    async crear(requestParameters: CrearRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.crearRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for desactivar3 without sending the request
+     * Creates request options for desactivar without sending the request
      */
-    async desactivar3RequestOpts(requestParameters: Desactivar3Request): Promise<runtime.RequestOpts> {
+    async desactivarRequestOpts(requestParameters: DesactivarRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling desactivar3().'
+                'Required parameter "id" was null or undefined when calling desactivar().'
             );
         }
 
@@ -274,24 +279,24 @@ export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async desactivar3Raw(requestParameters: Desactivar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.desactivar3RequestOpts(requestParameters);
+    async desactivarRaw(requestParameters: DesactivarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.desactivarRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async desactivar3(requestParameters: Desactivar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.desactivar3Raw(requestParameters, initOverrides);
+    async desactivar(requestParameters: DesactivarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.desactivarRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for listar4 without sending the request
+     * Creates request options for listar without sending the request
      */
-    async listar4RequestOpts(requestParameters: Listar4Request): Promise<runtime.RequestOpts> {
+    async listarRequestOpts(requestParameters: ListarRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['nombre'] != null) {
@@ -329,8 +334,8 @@ export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar4Raw(requestParameters: Listar4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageProveedorResponse>> {
-        const requestOptions = await this.listar4RequestOpts(requestParameters);
+    async listarRaw(requestParameters: ListarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageProveedorResponse>> {
+        const requestOptions = await this.listarRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageProveedorResponseFromJSON(jsonValue));
@@ -338,19 +343,19 @@ export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar4(requestParameters: Listar4Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageProveedorResponse> {
-        const response = await this.listar4Raw(requestParameters, initOverrides);
+    async listar(requestParameters: ListarRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageProveedorResponse> {
+        const response = await this.listarRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for obtener4 without sending the request
+     * Creates request options for obtener without sending the request
      */
-    async obtener4RequestOpts(requestParameters: Obtener4Request): Promise<runtime.RequestOpts> {
+    async obtenerRequestOpts(requestParameters: ObtenerRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling obtener4().'
+                'Required parameter "id" was null or undefined when calling obtener().'
             );
         }
 
@@ -380,17 +385,17 @@ export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async obtener4Raw(requestParameters: Obtener4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.obtener4RequestOpts(requestParameters);
+    async obtenerRaw(requestParameters: ObtenerRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.obtenerRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async obtener4(requestParameters: Obtener4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.obtener4Raw(requestParameters, initOverrides);
+    async obtener(requestParameters: ObtenerRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.obtenerRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

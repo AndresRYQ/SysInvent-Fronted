@@ -6,9 +6,9 @@
 
 Name | Type
 ------------ | -------------
+`rolId` | number
 `nombre` | string
 `descripcion` | string
-`modulos` | Array&lt;number&gt;
 
 ## Example
 
@@ -17,9 +17,9 @@ import type { RolRequest } from ''
 
 // TODO: Update the object below with actual values
 const example = {
+  "rolId": null,
   "nombre": null,
   "descripcion": null,
-  "modulos": null,
 } satisfies RolRequest
 
 console.log(example)
