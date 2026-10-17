@@ -44,19 +44,10 @@ export interface CambiarEstadoDestinoRequest {
     estadoCatalogoRequest: EstadoCatalogoRequest;
 }
 
-export interface DesactivarDestinoRequest {
-    id: number;
-}
-
 export interface ListarDestinosRequest {
     nombre?: string;
-    estado?: boolean;
     pagina?: number;
     tamPagina?: number;
-}
-
-export interface ObtenerDestinoRequest {
-    id: number;
 }
 
 export interface RegistrarDestinoRequest {
@@ -195,59 +186,6 @@ export class DestinosApi extends runtime.BaseAPI {
     }
 
     /**
-     * Creates request options for desactivarDestino without sending the request
-     */
-    async desactivarDestinoRequestOpts(requestParameters: DesactivarDestinoRequest): Promise<runtime.RequestOpts> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling desactivarDestino().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("bearerAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-
-        let urlPath = `/api/v1/catalogos/destinos/{id}`;
-        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
-
-        return {
-            path: urlPath,
-            method: 'DELETE',
-            headers: headerParameters,
-            query: queryParameters,
-        };
-    }
-
-    /**
-     * Desactivar destino
-     */
-    async desactivarDestinoRaw(requestParameters: DesactivarDestinoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
-        const requestOptions = await this.desactivarDestinoRequestOpts(requestParameters);
-        const response = await this.request(requestOptions, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
-    }
-
-    /**
-     * Desactivar destino
-     */
-    async desactivarDestino(requestParameters: DesactivarDestinoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
-        const response = await this.desactivarDestinoRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
      * Creates request options for listarDestinos without sending the request
      */
     async listarDestinosRequestOpts(requestParameters: ListarDestinosRequest): Promise<runtime.RequestOpts> {
@@ -255,10 +193,6 @@ export class DestinosApi extends runtime.BaseAPI {
 
         if (requestParameters['nombre'] != null) {
             queryParameters['nombre'] = requestParameters['nombre'];
-        }
-
-        if (requestParameters['estado'] != null) {
-            queryParameters['estado'] = requestParameters['estado'];
         }
 
         if (requestParameters['pagina'] != null) {
@@ -305,59 +239,6 @@ export class DestinosApi extends runtime.BaseAPI {
      */
     async listarDestinos(requestParameters: ListarDestinosRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageDestinoResponse> {
         const response = await this.listarDestinosRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Creates request options for obtenerDestino without sending the request
-     */
-    async obtenerDestinoRequestOpts(requestParameters: ObtenerDestinoRequest): Promise<runtime.RequestOpts> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling obtenerDestino().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("bearerAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-
-        let urlPath = `/api/v1/catalogos/destinos/{id}`;
-        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
-
-        return {
-            path: urlPath,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        };
-    }
-
-    /**
-     * Obtener destino por ID
-     */
-    async obtenerDestinoRaw(requestParameters: ObtenerDestinoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
-        const requestOptions = await this.obtenerDestinoRequestOpts(requestParameters);
-        const response = await this.request(requestOptions, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
-    }
-
-    /**
-     * Obtener destino por ID
-     */
-    async obtenerDestino(requestParameters: ObtenerDestinoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
-        const response = await this.obtenerDestinoRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

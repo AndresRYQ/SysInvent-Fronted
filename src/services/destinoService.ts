@@ -29,13 +29,20 @@ function mapearRespuestaDestino(response: CustomPageDestinoResponse): CatalogoPa
       nombre: destino.nombre ?? '',
       descripcion: destino.descripcion ?? '',
       activo: destino.activo ? 1 : 0,
-      fechaRegistro: destino.fechaRegistro?.toISOString().slice(0, 10),
+      fechaRegistro: formatearFechaRegistro(destino.fechaRegistro),
     })),
     paginacion: response.paginacion ?? {},
   }
 
   destinosEnMemoria = resultado.datos
   return resultado
+}
+
+function formatearFechaRegistro(fecha?: Date): string | undefined {
+  if (!fecha || Number.isNaN(fecha.getTime())) return undefined
+  const dia = String(fecha.getUTCDate()).padStart(2, '0')
+  const mes = String(fecha.getUTCMonth() + 1).padStart(2, '0')
+  return `${dia}/${mes}/${fecha.getUTCFullYear()}`
 }
 
 export async function listarDestinos(

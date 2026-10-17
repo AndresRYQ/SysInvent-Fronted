@@ -6,9 +6,7 @@ All URIs are relative to *http://localhost:8080*
 |------------- | ------------- | -------------|
 | [**actualizarDestino**](DestinosApi.md#actualizardestino) | **PUT** /api/v1/catalogos/destinos/{id} | Actualizar destino |
 | [**cambiarEstadoDestino**](DestinosApi.md#cambiarestadodestino) | **PUT** /api/v1/catalogos/destinos/{id}/estado | Cambiar estado del destino |
-| [**desactivarDestino**](DestinosApi.md#desactivardestino) | **DELETE** /api/v1/catalogos/destinos/{id} | Desactivar destino |
 | [**listarDestinos**](DestinosApi.md#listardestinos) | **GET** /api/v1/catalogos/destinos | Listar destinos |
-| [**obtenerDestino**](DestinosApi.md#obtenerdestino) | **GET** /api/v1/catalogos/destinos/{id} | Obtener destino por ID |
 | [**registrarDestino**](DestinosApi.md#registrardestino) | **POST** /api/v1/catalogos/destinos | Registrar destino |
 
 
@@ -157,75 +155,6 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## desactivarDestino
-
-> MessageResponse desactivarDestino(id)
-
-Desactivar destino
-
-### Example
-
-```ts
-import {
-  Configuration,
-  DestinosApi,
-} from '';
-import type { DesactivarDestinoRequest } from '';
-
-async function example() {
-  console.log("🚀 Testing  SDK...");
-  const config = new Configuration({ 
-    // Configure HTTP bearer authorization: bearerAuth
-    accessToken: "YOUR BEARER TOKEN",
-  });
-  const api = new DestinosApi(config);
-
-  const body = {
-    // number
-    id: 56,
-  } satisfies DesactivarDestinoRequest;
-
-  try {
-    const data = await api.desactivarDestino(body);
-    console.log(data);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-// Run the test
-example().catch(console.error);
-```
-
-### Parameters
-
-
-| Name | Type | Description  | Notes |
-|------------- | ------------- | ------------- | -------------|
-| **id** | `number` |  | [Defaults to `undefined`] |
-
-### Return type
-
-[**MessageResponse**](MessageResponse.md)
-
-### Authorization
-
-[bearerAuth](../README.md#bearerAuth)
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: `*/*`
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-| **200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
-
-
 ## listarDestinos
 
 > CustomPageDestinoResponse listarDestinos(nombre, pagina, tamPagina)
@@ -282,75 +211,6 @@ example().catch(console.error);
 ### Return type
 
 [**CustomPageDestinoResponse**](CustomPageDestinoResponse.md)
-
-### Authorization
-
-[bearerAuth](../README.md#bearerAuth)
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: `*/*`
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-| **200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
-
-
-## obtenerDestino
-
-> MessageResponse obtenerDestino(id)
-
-Obtener destino por ID
-
-### Example
-
-```ts
-import {
-  Configuration,
-  DestinosApi,
-} from '';
-import type { ObtenerDestinoRequest } from '';
-
-async function example() {
-  console.log("🚀 Testing  SDK...");
-  const config = new Configuration({ 
-    // Configure HTTP bearer authorization: bearerAuth
-    accessToken: "YOUR BEARER TOKEN",
-  });
-  const api = new DestinosApi(config);
-
-  const body = {
-    // number
-    id: 56,
-  } satisfies ObtenerDestinoRequest;
-
-  try {
-    const data = await api.obtenerDestino(body);
-    console.log(data);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-// Run the test
-example().catch(console.error);
-```
-
-### Parameters
-
-
-| Name | Type | Description  | Notes |
-|------------- | ------------- | ------------- | -------------|
-| **id** | `number` |  | [Defaults to `undefined`] |
-
-### Return type
-
-[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 

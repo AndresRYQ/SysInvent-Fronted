@@ -27,17 +27,18 @@ export function TablaDestinos({ destinos, totalItems, page, pageSize, onAgregar,
         </div>
         <div className="table-responsive">
           <table className="table standard-table align-middle mb-0">
-            <thead><tr><th>N°</th><th>Nombre de destino</th><th>Descripción</th><th>Estado</th><th className="text-center">Acciones</th></tr></thead>
+            <thead><tr><th>N°</th><th>Nombre de destino</th><th>Descripción</th><th>Fecha registro</th><th>Estado</th><th className="text-center">Acciones</th></tr></thead>
             <tbody>
               {destinos.length ? destinos.map((item, index) => (
                 <tr key={item.id}>
                   <td><span className="table-id-chip">{((page - 1) * pageSize) + index + 1}</span></td>
                   <td><div className="table-cell-main"><span className="table-cell-icon"><MapPin size={16} /></span>{item.nombre}</div></td>
                   <td>{item.descripcion}</td>
+                  <td>{item.fechaRegistro ?? '—'}</td>
                   <td><span className={item.activo === 1 ? 'status-label status-label--active' : 'status-label status-label--inactive'}><span className="status-label__dot" aria-hidden="true" />{item.activo === 1 ? 'Activo' : 'Inactivo'}</span></td>
                   <td><div className="table-actions">{item.activo === 1 ? <><button type="button" className="btn table-action-btn" onClick={() => onEditar(item)} title="Editar"><Pencil size={16} /></button><button type="button" className="btn table-action-btn table-action-btn--danger" onClick={() => onEliminar(item)} title="Desactivar"><Trash2 size={16} /></button></> : <><button type="button" className="btn table-action-btn" onClick={() => onVisualizar(item)} title="Visualizar"><Eye size={16} /></button><button type="button" className="btn table-action-btn" onClick={() => onReactivar(item)} title="Reactivar"><RotateCcw size={16} /></button></>}</div></td>
                 </tr>
-              )) : <tr><td colSpan={5}><EmptyState icon={FolderKanban} iconSize={28} title="No se encontraron destinos" description="Ajusta los filtros o limpia la búsqueda." /></td></tr>}
+              )) : <tr><td colSpan={6}><EmptyState icon={FolderKanban} iconSize={28} title="No se encontraron destinos" description="Ajusta los filtros o limpia la búsqueda." /></td></tr>}
             </tbody>
           </table>
         </div>
