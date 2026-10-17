@@ -3,7 +3,7 @@ import {
   DestinosApi,
   ParteEquipoControllerApi,
   ProveedorControllerApi,
-  TipoDocumentoControllerApi,
+  TiposDeDocumentoApi,
   TipoProductoControllerApi,
   UnidadesDeMedidaApi,
 } from '../api/generated'
@@ -20,15 +20,15 @@ type RegistroApi = Record<string, unknown>
 
 const catalogoApis = {
   '/api/v1/catalogos/centros-costo': () =>
-    new CentroCostoControllerApi(apiConfiguration).listar5(),
+    new CentroCostoControllerApi(apiConfiguration).listar4(),
   '/api/v1/catalogos/destinos': () =>
     new DestinosApi(apiConfiguration).listarDestinos(),
   '/api/v1/catalogos/partes-equipo': () =>
-    new ParteEquipoControllerApi(apiConfiguration).listar3(),
+    new ParteEquipoControllerApi(apiConfiguration).listar2(),
   '/api/v1/catalogos/proveedores': () =>
-    new ProveedorControllerApi(apiConfiguration).listar2(),
+    new ProveedorControllerApi(apiConfiguration).listar1(),
   '/api/v1/catalogos/tipos-documento': () =>
-    new TipoDocumentoControllerApi(apiConfiguration).listar1(),
+    new TiposDeDocumentoApi(apiConfiguration).listarTiposDocumento(),
   '/api/v1/catalogos/tipos-producto': () =>
     new TipoProductoControllerApi(apiConfiguration).listar(),
   '/api/v1/catalogos/unidades-medida': () =>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import Select from 'react-select'
 import { obtenerProveedores } from '../../services/proveedorService'
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
+import { listarUnidadesMedida } from '../../services/unidadMedidaService'
 import type { Producto, ProductoFormData } from '../../types/producto'
 import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
@@ -22,13 +23,6 @@ const CATEGORIAS: Opcion[] = [
   { id: 'CAT-003', nombre: 'Ferretería' },
   { id: 'CAT-004', nombre: 'Repuestos' },
   { id: 'CAT-005', nombre: 'Limpieza' },
-]
-const UNIDADES: Opcion[] = [
-  { id: 'UM-001', nombre: 'Unidad' },
-  { id: 'UM-002', nombre: 'Kilogramo' },
-  { id: 'UM-003', nombre: 'Litro' },
-  { id: 'UM-004', nombre: 'Metro' },
-  { id: 'UM-005', nombre: 'Caja' },
 ]
 const INICIAL: ProductoFormData = { codigo: '', nombre: '', descripcion: '', tipoProductoId: '', categoriaId: '', unidadMedidaId: '', proveedorId: '', stockMinimo: 0, precioUnitario: 0, estado: true }
 const SIN_ERRORES: Errores = { codigo: '', nombre: '', descripcion: '', tipoProductoId: '', categoriaId: '', unidadMedidaId: '', proveedorId: '', precioUnitario: '' }
@@ -54,10 +48,17 @@ function opcionesSelect(items: Opcion[]) {
 export function FormularioProducto({ producto, soloLectura = false, error, onSubmit, onCancelar }: Props) {
   const [form, setForm] = useState<ProductoFormData>(INICIAL)
   const [errores, setErrores] = useState<Errores>(SIN_ERRORES)
+  const [unidadesMedida, setUnidadesMedida] = useState<Opcion[]>([])
   const tipos = useMemo(() => obtenerTiposProducto().filter((item) => item.activo === 1 || idCompatible(String(producto?.tipoProductoId ?? ''), item.id, 'TP-')), [producto])
   const proveedores = useMemo(() => obtenerProveedores().filter((item) => item.activo === 1 || idCompatible(String(producto?.proveedorId ?? ''), item.id, 'PROV-')), [producto])
   const categorias = useMemo(() => opcionesLocales('agrihusac_categorias', CATEGORIAS).filter((item) => item.estado !== false && item.activo !== 0 || String(item.id) === String(producto?.categoriaId)), [producto])
-  const unidades = useMemo(() => opcionesLocales('agrihusac_unidades_medida', UNIDADES).filter((item) => item.estado !== false && item.activo !== 0 || String(item.id) === String(producto?.unidadMedidaId)), [producto])
+  const unidades = useMemo(() => unidadesMedida.filter((item) => item.estado !== false && item.activo !== 0 || String(item.id) === String(producto?.unidadMedidaId)), [producto, unidadesMedida])
+
+  useEffect(() => {
+    listarUnidadesMedida({ pagina: 1, tamPagina: 100 })
+      .then((resultado) => setUnidadesMedida(resultado.datos))
+      .catch(() => setUnidadesMedida([]))
+  }, [])
 
   useEffect(() => {
     setForm(producto ? { codigo: producto.codigo, nombre: producto.nombre, descripcion: producto.descripcion, tipoProductoId: String(producto.tipoProductoId), categoriaId: String(producto.categoriaId), unidadMedidaId: String(producto.unidadMedidaId), proveedorId: String(producto.proveedorId), stockMinimo: producto.stockMinimo, precioUnitario: producto.precioUnitario, estado: producto.estado } : INICIAL)

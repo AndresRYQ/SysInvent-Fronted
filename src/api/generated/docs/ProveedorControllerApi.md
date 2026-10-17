@@ -4,18 +4,18 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**actualizar2**](ProveedorControllerApi.md#actualizar2) | **PUT** /api/v1/catalogos/proveedores/{id} |  |
-| [**cambiarEstado2**](ProveedorControllerApi.md#cambiarestado2) | **PUT** /api/v1/catalogos/proveedores/{id}/estado |  |
-| [**crear2**](ProveedorControllerApi.md#crear2) | **POST** /api/v1/catalogos/proveedores |  |
-| [**desactivar2**](ProveedorControllerApi.md#desactivar2) | **DELETE** /api/v1/catalogos/proveedores/{id} |  |
-| [**listar2**](ProveedorControllerApi.md#listar2) | **GET** /api/v1/catalogos/proveedores |  |
-| [**obtener2**](ProveedorControllerApi.md#obtener2) | **GET** /api/v1/catalogos/proveedores/{id} |  |
+| [**actualizar1**](ProveedorControllerApi.md#actualizar1) | **PUT** /api/v1/catalogos/proveedores/{id} |  |
+| [**cambiarEstado1**](ProveedorControllerApi.md#cambiarestado1) | **PUT** /api/v1/catalogos/proveedores/{id}/estado |  |
+| [**crear1**](ProveedorControllerApi.md#crear1) | **POST** /api/v1/catalogos/proveedores |  |
+| [**desactivar1**](ProveedorControllerApi.md#desactivar1) | **DELETE** /api/v1/catalogos/proveedores/{id} |  |
+| [**listar1**](ProveedorControllerApi.md#listar1) | **GET** /api/v1/catalogos/proveedores |  |
+| [**obtener1**](ProveedorControllerApi.md#obtener1) | **GET** /api/v1/catalogos/proveedores/{id} |  |
 
 
 
-## actualizar2
+## actualizar1
 
-> MessageResponse actualizar2(id, proveedorRequest)
+> MessageResponse actualizar1(id, proveedorRequest)
 
 
 
@@ -26,7 +26,7 @@ import {
   Configuration,
   ProveedorControllerApi,
 } from '';
-import type { Actualizar2Request } from '';
+import type { Actualizar1Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -41,10 +41,10 @@ async function example() {
     id: 56,
     // ProveedorRequest
     proveedorRequest: ...,
-  } satisfies Actualizar2Request;
+  } satisfies Actualizar1Request;
 
   try {
-    const data = await api.actualizar2(body);
+    const data = await api.actualizar1(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -85,9 +85,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## cambiarEstado2
+## cambiarEstado1
 
-> MessageResponse cambiarEstado2(id, estadoCatalogoRequest)
+> MessageResponse cambiarEstado1(id, estadoCatalogoRequest)
 
 
 
@@ -98,7 +98,7 @@ import {
   Configuration,
   ProveedorControllerApi,
 } from '';
-import type { CambiarEstado2Request } from '';
+import type { CambiarEstado1Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -113,10 +113,10 @@ async function example() {
     id: 56,
     // EstadoCatalogoRequest
     estadoCatalogoRequest: ...,
-  } satisfies CambiarEstado2Request;
+  } satisfies CambiarEstado1Request;
 
   try {
-    const data = await api.cambiarEstado2(body);
+    const data = await api.cambiarEstado1(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -157,9 +157,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## crear2
+## crear1
 
-> MessageResponse crear2(proveedorRequest)
+> MessageResponse crear1(proveedorRequest)
 
 
 
@@ -170,7 +170,7 @@ import {
   Configuration,
   ProveedorControllerApi,
 } from '';
-import type { Crear2Request } from '';
+import type { Crear1Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -183,10 +183,10 @@ async function example() {
   const body = {
     // ProveedorRequest
     proveedorRequest: ...,
-  } satisfies Crear2Request;
+  } satisfies Crear1Request;
 
   try {
-    const data = await api.crear2(body);
+    const data = await api.crear1(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -226,9 +226,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## desactivar2
+## desactivar1
 
-> MessageResponse desactivar2(id)
+> MessageResponse desactivar1(id)
 
 
 
@@ -239,7 +239,7 @@ import {
   Configuration,
   ProveedorControllerApi,
 } from '';
-import type { Desactivar2Request } from '';
+import type { Desactivar1Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -252,10 +252,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Desactivar2Request;
+  } satisfies Desactivar1Request;
 
   try {
-    const data = await api.desactivar2(body);
+    const data = await api.desactivar1(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -295,9 +295,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## listar2
+## listar1
 
-> CustomPageProveedorResponse listar2(nombre, pagina, tamPagina)
+> CustomPageProveedorResponse listar1(nombre, pagina, tamPagina)
 
 
 
@@ -308,7 +308,7 @@ import {
   Configuration,
   ProveedorControllerApi,
 } from '';
-import type { Listar2Request } from '';
+import type { Listar1Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -325,10 +325,10 @@ async function example() {
     pagina: 56,
     // number (optional)
     tamPagina: 56,
-  } satisfies Listar2Request;
+  } satisfies Listar1Request;
 
   try {
-    const data = await api.listar2(body);
+    const data = await api.listar1(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -370,9 +370,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## obtener2
+## obtener1
 
-> MessageResponse obtener2(id)
+> MessageResponse obtener1(id)
 
 
 
@@ -383,7 +383,7 @@ import {
   Configuration,
   ProveedorControllerApi,
 } from '';
-import type { Obtener2Request } from '';
+import type { Obtener1Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -396,10 +396,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Obtener2Request;
+  } satisfies Obtener1Request;
 
   try {
-    const data = await api.obtener2(body);
+    const data = await api.obtener1(body);
     console.log(data);
   } catch (error) {
     console.error(error);

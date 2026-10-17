@@ -33,6 +33,7 @@ import {
 
 import { obtenerProveedores } from '../../services/proveedorService'
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
+import { listarUnidadesMedida } from '../../services/unidadMedidaService'
 
 import type { Producto } from '../../types/producto'
 import { coincidenIds } from '../../utils/identificadores'
@@ -56,14 +57,6 @@ const CATEGORIAS_INICIALES: OpcionFiltroProducto[] = [
   { id: 'CAT-003', nombre: 'Ferretería' },
   { id: 'CAT-004', nombre: 'Repuestos' },
   { id: 'CAT-005', nombre: 'Limpieza' },
-]
-
-const UNIDADES_INICIALES: OpcionFiltroProducto[] = [
-  { id: 'UM-001', nombre: 'Unidad' },
-  { id: 'UM-002', nombre: 'Kilogramo' },
-  { id: 'UM-003', nombre: 'Litro' },
-  { id: 'UM-004', nombre: 'Metro' },
-  { id: 'UM-005', nombre: 'Caja' },
 ]
 
 interface EstadoNavegacion {
@@ -132,12 +125,16 @@ export function ProductosPage() {
     ),
   )
 
-  const [unidadesMedida] = useState(() =>
-    obtenerOpcionesLocales(
-      'agrihusac_unidades_medida',
-      UNIDADES_INICIALES,
-    ),
-  )
+  const [unidadesMedida, setUnidadesMedida] = useState<OpcionFiltroProducto[]>([])
+
+  useEffect(() => {
+    listarUnidadesMedida({ pagina: 1, tamPagina: 100 })
+      .then((resultado) => setUnidadesMedida(resultado.datos.map((unidad) => ({
+        id: unidad.id,
+        nombre: unidad.nombre,
+      }))))
+      .catch(() => setUnidadesMedida([]))
+  }, [])
 
   const [filtros, setFiltros] =
     useState<FiltrosProductosValores>(

@@ -21,11 +21,8 @@ export function obtenerUnidadesMedida(): UnidadMedida[] {
   return unidadesEnMemoria.map((unidad) => ({ ...unidad }))
 }
 
-function formatearFechaRegistro(fecha?: Date): string | undefined {
-  if (!fecha || Number.isNaN(fecha.getTime())) return undefined
-  const dia = String(fecha.getUTCDate()).padStart(2, '0')
-  const mes = String(fecha.getUTCMonth() + 1).padStart(2, '0')
-  return `${dia}/${mes}/${fecha.getUTCFullYear()}`
+function formatearFechaRegistro(fecha?: string): string | undefined {
+  return fecha?.trim() || undefined
 }
 
 function mapearRespuestaUnidad(response: CustomPageUnidadMedidaResponse): CatalogoPaginado<UnidadMedida> {

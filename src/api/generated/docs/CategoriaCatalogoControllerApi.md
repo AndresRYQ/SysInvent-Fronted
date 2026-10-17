@@ -4,18 +4,18 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**actualizar6**](CategoriaCatalogoControllerApi.md#actualizar6) | **PUT** /api/v1/catalogos/categorias/{id} |  |
-| [**cambiarEstado6**](CategoriaCatalogoControllerApi.md#cambiarestado6) | **PUT** /api/v1/catalogos/categorias/{id}/estado |  |
-| [**crear6**](CategoriaCatalogoControllerApi.md#crear6) | **POST** /api/v1/catalogos/categorias |  |
-| [**desactivar6**](CategoriaCatalogoControllerApi.md#desactivar6) | **DELETE** /api/v1/catalogos/categorias/{id} |  |
-| [**listar6**](CategoriaCatalogoControllerApi.md#listar6) | **GET** /api/v1/catalogos/categorias |  |
-| [**obtener6**](CategoriaCatalogoControllerApi.md#obtener6) | **GET** /api/v1/catalogos/categorias/{id} |  |
+| [**actualizar5**](CategoriaCatalogoControllerApi.md#actualizar5) | **PUT** /api/v1/catalogos/categorias/{id} |  |
+| [**cambiarEstado5**](CategoriaCatalogoControllerApi.md#cambiarestado5) | **PUT** /api/v1/catalogos/categorias/{id}/estado |  |
+| [**crear5**](CategoriaCatalogoControllerApi.md#crear5) | **POST** /api/v1/catalogos/categorias |  |
+| [**desactivar5**](CategoriaCatalogoControllerApi.md#desactivar5) | **DELETE** /api/v1/catalogos/categorias/{id} |  |
+| [**listar5**](CategoriaCatalogoControllerApi.md#listar5) | **GET** /api/v1/catalogos/categorias |  |
+| [**obtener5**](CategoriaCatalogoControllerApi.md#obtener5) | **GET** /api/v1/catalogos/categorias/{id} |  |
 
 
 
-## actualizar6
+## actualizar5
 
-> MessageResponse actualizar6(id, categoriaCatalogoRequest)
+> MessageResponse actualizar5(id, categoriaCatalogoRequest)
 
 
 
@@ -26,7 +26,7 @@ import {
   Configuration,
   CategoriaCatalogoControllerApi,
 } from '';
-import type { Actualizar6Request } from '';
+import type { Actualizar5Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -41,10 +41,10 @@ async function example() {
     id: 56,
     // CategoriaCatalogoRequest
     categoriaCatalogoRequest: ...,
-  } satisfies Actualizar6Request;
+  } satisfies Actualizar5Request;
 
   try {
-    const data = await api.actualizar6(body);
+    const data = await api.actualizar5(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -85,9 +85,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## cambiarEstado6
+## cambiarEstado5
 
-> MessageResponse cambiarEstado6(id, estadoCatalogoRequest)
+> MessageResponse cambiarEstado5(id, estadoCatalogoRequest)
 
 
 
@@ -98,7 +98,7 @@ import {
   Configuration,
   CategoriaCatalogoControllerApi,
 } from '';
-import type { CambiarEstado6Request } from '';
+import type { CambiarEstado5Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -113,10 +113,10 @@ async function example() {
     id: 56,
     // EstadoCatalogoRequest
     estadoCatalogoRequest: ...,
-  } satisfies CambiarEstado6Request;
+  } satisfies CambiarEstado5Request;
 
   try {
-    const data = await api.cambiarEstado6(body);
+    const data = await api.cambiarEstado5(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -157,9 +157,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## crear6
+## crear5
 
-> MessageResponse crear6(categoriaCatalogoRequest)
+> MessageResponse crear5(categoriaCatalogoRequest)
 
 
 
@@ -170,7 +170,7 @@ import {
   Configuration,
   CategoriaCatalogoControllerApi,
 } from '';
-import type { Crear6Request } from '';
+import type { Crear5Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -183,10 +183,10 @@ async function example() {
   const body = {
     // CategoriaCatalogoRequest
     categoriaCatalogoRequest: ...,
-  } satisfies Crear6Request;
+  } satisfies Crear5Request;
 
   try {
-    const data = await api.crear6(body);
+    const data = await api.crear5(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -226,9 +226,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## desactivar6
+## desactivar5
 
-> MessageResponse desactivar6(id)
+> MessageResponse desactivar5(id)
 
 
 
@@ -239,7 +239,7 @@ import {
   Configuration,
   CategoriaCatalogoControllerApi,
 } from '';
-import type { Desactivar6Request } from '';
+import type { Desactivar5Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -252,10 +252,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Desactivar6Request;
+  } satisfies Desactivar5Request;
 
   try {
-    const data = await api.desactivar6(body);
+    const data = await api.desactivar5(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -295,9 +295,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## listar6
+## listar5
 
-> CustomPageCategoriaCatalogoResponse listar6(nombre, pagina, tamPagina)
+> CustomPageCategoriaCatalogoResponse listar5(nombre, pagina, tamPagina)
 
 
 
@@ -308,7 +308,7 @@ import {
   Configuration,
   CategoriaCatalogoControllerApi,
 } from '';
-import type { Listar6Request } from '';
+import type { Listar5Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -325,10 +325,10 @@ async function example() {
     pagina: 56,
     // number (optional)
     tamPagina: 56,
-  } satisfies Listar6Request;
+  } satisfies Listar5Request;
 
   try {
-    const data = await api.listar6(body);
+    const data = await api.listar5(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -370,9 +370,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## obtener6
+## obtener5
 
-> MessageResponse obtener6(id)
+> MessageResponse obtener5(id)
 
 
 
@@ -383,7 +383,7 @@ import {
   Configuration,
   CategoriaCatalogoControllerApi,
 } from '';
-import type { Obtener6Request } from '';
+import type { Obtener5Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -396,10 +396,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Obtener6Request;
+  } satisfies Obtener5Request;
 
   try {
-    const data = await api.obtener6(body);
+    const data = await api.obtener5(body);
     console.log(data);
   } catch (error) {
     console.error(error);

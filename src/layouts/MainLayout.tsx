@@ -26,6 +26,9 @@ export function MainLayout() {
   }
 
   useEffect(() => {
+    localStorage.removeItem('agrihusac_tipos_documento')
+    localStorage.removeItem('agrihusac_unidades_medida')
+
     if (window.matchMedia('(max-width: 1024px)').matches) {
       setMenuAbierto(false)
       localStorage.setItem('agrihusac_menu_abierto', 'false')

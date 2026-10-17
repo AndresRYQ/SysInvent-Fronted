@@ -4,18 +4,18 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**actualizar4**](ContactoControllerApi.md#actualizar4) | **PUT** /api/v1/catalogos/contactos/{id} |  |
-| [**cambiarEstado4**](ContactoControllerApi.md#cambiarestado4) | **PUT** /api/v1/catalogos/contactos/{id}/estado |  |
-| [**crear4**](ContactoControllerApi.md#crear4) | **POST** /api/v1/catalogos/contactos |  |
-| [**desactivar4**](ContactoControllerApi.md#desactivar4) | **DELETE** /api/v1/catalogos/contactos/{id} |  |
-| [**listar4**](ContactoControllerApi.md#listar4) | **GET** /api/v1/catalogos/contactos |  |
-| [**obtener4**](ContactoControllerApi.md#obtener4) | **GET** /api/v1/catalogos/contactos/{id} |  |
+| [**actualizar3**](ContactoControllerApi.md#actualizar3) | **PUT** /api/v1/catalogos/contactos/{id} |  |
+| [**cambiarEstado3**](ContactoControllerApi.md#cambiarestado3) | **PUT** /api/v1/catalogos/contactos/{id}/estado |  |
+| [**crear3**](ContactoControllerApi.md#crear3) | **POST** /api/v1/catalogos/contactos |  |
+| [**desactivar3**](ContactoControllerApi.md#desactivar3) | **DELETE** /api/v1/catalogos/contactos/{id} |  |
+| [**listar3**](ContactoControllerApi.md#listar3) | **GET** /api/v1/catalogos/contactos |  |
+| [**obtener3**](ContactoControllerApi.md#obtener3) | **GET** /api/v1/catalogos/contactos/{id} |  |
 
 
 
-## actualizar4
+## actualizar3
 
-> MessageResponse actualizar4(id, contactoRequest)
+> MessageResponse actualizar3(id, contactoRequest)
 
 
 
@@ -26,7 +26,7 @@ import {
   Configuration,
   ContactoControllerApi,
 } from '';
-import type { Actualizar4Request } from '';
+import type { Actualizar3Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -41,10 +41,10 @@ async function example() {
     id: 56,
     // ContactoRequest
     contactoRequest: ...,
-  } satisfies Actualizar4Request;
+  } satisfies Actualizar3Request;
 
   try {
-    const data = await api.actualizar4(body);
+    const data = await api.actualizar3(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -85,9 +85,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## cambiarEstado4
+## cambiarEstado3
 
-> MessageResponse cambiarEstado4(id, estadoCatalogoRequest)
+> MessageResponse cambiarEstado3(id, estadoCatalogoRequest)
 
 
 
@@ -98,7 +98,7 @@ import {
   Configuration,
   ContactoControllerApi,
 } from '';
-import type { CambiarEstado4Request } from '';
+import type { CambiarEstado3Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -113,10 +113,10 @@ async function example() {
     id: 56,
     // EstadoCatalogoRequest
     estadoCatalogoRequest: ...,
-  } satisfies CambiarEstado4Request;
+  } satisfies CambiarEstado3Request;
 
   try {
-    const data = await api.cambiarEstado4(body);
+    const data = await api.cambiarEstado3(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -157,9 +157,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## crear4
+## crear3
 
-> MessageResponse crear4(contactoRequest)
+> MessageResponse crear3(contactoRequest)
 
 
 
@@ -170,7 +170,7 @@ import {
   Configuration,
   ContactoControllerApi,
 } from '';
-import type { Crear4Request } from '';
+import type { Crear3Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -183,10 +183,10 @@ async function example() {
   const body = {
     // ContactoRequest
     contactoRequest: ...,
-  } satisfies Crear4Request;
+  } satisfies Crear3Request;
 
   try {
-    const data = await api.crear4(body);
+    const data = await api.crear3(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -226,9 +226,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## desactivar4
+## desactivar3
 
-> MessageResponse desactivar4(id)
+> MessageResponse desactivar3(id)
 
 
 
@@ -239,7 +239,7 @@ import {
   Configuration,
   ContactoControllerApi,
 } from '';
-import type { Desactivar4Request } from '';
+import type { Desactivar3Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -252,10 +252,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Desactivar4Request;
+  } satisfies Desactivar3Request;
 
   try {
-    const data = await api.desactivar4(body);
+    const data = await api.desactivar3(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -295,9 +295,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## listar4
+## listar3
 
-> CustomPageContactoResponse listar4(nombre, pagina, tamPagina)
+> CustomPageContactoResponse listar3(nombre, pagina, tamPagina)
 
 
 
@@ -308,7 +308,7 @@ import {
   Configuration,
   ContactoControllerApi,
 } from '';
-import type { Listar4Request } from '';
+import type { Listar3Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -325,10 +325,10 @@ async function example() {
     pagina: 56,
     // number (optional)
     tamPagina: 56,
-  } satisfies Listar4Request;
+  } satisfies Listar3Request;
 
   try {
-    const data = await api.listar4(body);
+    const data = await api.listar3(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -370,9 +370,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## obtener4
+## obtener3
 
-> MessageResponse obtener4(id)
+> MessageResponse obtener3(id)
 
 
 
@@ -383,7 +383,7 @@ import {
   Configuration,
   ContactoControllerApi,
 } from '';
-import type { Obtener4Request } from '';
+import type { Obtener3Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -396,10 +396,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Obtener4Request;
+  } satisfies Obtener3Request;
 
   try {
-    const data = await api.obtener4(body);
+    const data = await api.obtener3(body);
     console.log(data);
   } catch (error) {
     console.error(error);
