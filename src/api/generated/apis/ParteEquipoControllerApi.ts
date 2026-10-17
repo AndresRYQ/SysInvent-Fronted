@@ -24,12 +24,17 @@ import {
     EstadoCatalogoRequestToJSON,
 } from '../models/EstadoCatalogoRequest';
 import {
+    type MessageResponse,
+    MessageResponseFromJSON,
+    MessageResponseToJSON,
+} from '../models/MessageResponse';
+import {
     type ParteEquipoRequest,
     ParteEquipoRequestFromJSON,
     ParteEquipoRequestToJSON,
 } from '../models/ParteEquipoRequest';
 
-export interface Actualizar5Request {
+export interface Actualizar4Request {
     id: number;
     parteEquipoRequest: ParteEquipoRequest;
 }
@@ -39,7 +44,7 @@ export interface CambiarEstado4Request {
     estadoCatalogoRequest: EstadoCatalogoRequest;
 }
 
-export interface Crear5Request {
+export interface Crear4Request {
     parteEquipoRequest: ParteEquipoRequest;
 }
 
@@ -47,13 +52,13 @@ export interface Desactivar4Request {
     id: number;
 }
 
-export interface Listar5Request {
+export interface Listar4Request {
     nombre?: string;
     pagina?: number;
     tamPagina?: number;
 }
 
-export interface Obtener5Request {
+export interface Obtener4Request {
     id: number;
 }
 
@@ -63,20 +68,20 @@ export interface Obtener5Request {
 export class ParteEquipoControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for actualizar5 without sending the request
+     * Creates request options for actualizar4 without sending the request
      */
-    async actualizar5RequestOpts(requestParameters: Actualizar5Request): Promise<runtime.RequestOpts> {
+    async actualizar4RequestOpts(requestParameters: Actualizar4Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling actualizar5().'
+                'Required parameter "id" was null or undefined when calling actualizar4().'
             );
         }
 
         if (requestParameters['parteEquipoRequest'] == null) {
             throw new runtime.RequiredError(
                 'parteEquipoRequest',
-                'Required parameter "parteEquipoRequest" was null or undefined when calling actualizar5().'
+                'Required parameter "parteEquipoRequest" was null or undefined when calling actualizar4().'
             );
         }
 
@@ -109,17 +114,17 @@ export class ParteEquipoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async actualizar5Raw(requestParameters: Actualizar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.actualizar5RequestOpts(requestParameters);
+    async actualizar4Raw(requestParameters: Actualizar4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.actualizar4RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async actualizar5(requestParameters: Actualizar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.actualizar5Raw(requestParameters, initOverrides);
+    async actualizar4(requestParameters: Actualizar4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.actualizar4Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -170,28 +175,28 @@ export class ParteEquipoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async cambiarEstado4Raw(requestParameters: CambiarEstado4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async cambiarEstado4Raw(requestParameters: CambiarEstado4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
         const requestOptions = await this.cambiarEstado4RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async cambiarEstado4(requestParameters: CambiarEstado4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async cambiarEstado4(requestParameters: CambiarEstado4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
         const response = await this.cambiarEstado4Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for crear5 without sending the request
+     * Creates request options for crear4 without sending the request
      */
-    async crear5RequestOpts(requestParameters: Crear5Request): Promise<runtime.RequestOpts> {
+    async crear4RequestOpts(requestParameters: Crear4Request): Promise<runtime.RequestOpts> {
         if (requestParameters['parteEquipoRequest'] == null) {
             throw new runtime.RequiredError(
                 'parteEquipoRequest',
-                'Required parameter "parteEquipoRequest" was null or undefined when calling crear5().'
+                'Required parameter "parteEquipoRequest" was null or undefined when calling crear4().'
             );
         }
 
@@ -223,17 +228,17 @@ export class ParteEquipoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async crear5Raw(requestParameters: Crear5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.crear5RequestOpts(requestParameters);
+    async crear4Raw(requestParameters: Crear4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.crear4RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async crear5(requestParameters: Crear5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.crear5Raw(requestParameters, initOverrides);
+    async crear4(requestParameters: Crear4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.crear4Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -274,24 +279,24 @@ export class ParteEquipoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async desactivar4Raw(requestParameters: Desactivar4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async desactivar4Raw(requestParameters: Desactivar4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
         const requestOptions = await this.desactivar4RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async desactivar4(requestParameters: Desactivar4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async desactivar4(requestParameters: Desactivar4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
         const response = await this.desactivar4Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for listar5 without sending the request
+     * Creates request options for listar4 without sending the request
      */
-    async listar5RequestOpts(requestParameters: Listar5Request): Promise<runtime.RequestOpts> {
+    async listar4RequestOpts(requestParameters: Listar4Request): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['nombre'] != null) {
@@ -329,8 +334,8 @@ export class ParteEquipoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar5Raw(requestParameters: Listar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageParteEquipoResponse>> {
-        const requestOptions = await this.listar5RequestOpts(requestParameters);
+    async listar4Raw(requestParameters: Listar4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageParteEquipoResponse>> {
+        const requestOptions = await this.listar4RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageParteEquipoResponseFromJSON(jsonValue));
@@ -338,19 +343,19 @@ export class ParteEquipoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar5(requestParameters: Listar5Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageParteEquipoResponse> {
-        const response = await this.listar5Raw(requestParameters, initOverrides);
+    async listar4(requestParameters: Listar4Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageParteEquipoResponse> {
+        const response = await this.listar4Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for obtener5 without sending the request
+     * Creates request options for obtener4 without sending the request
      */
-    async obtener5RequestOpts(requestParameters: Obtener5Request): Promise<runtime.RequestOpts> {
+    async obtener4RequestOpts(requestParameters: Obtener4Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling obtener5().'
+                'Required parameter "id" was null or undefined when calling obtener4().'
             );
         }
 
@@ -380,17 +385,17 @@ export class ParteEquipoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async obtener5Raw(requestParameters: Obtener5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.obtener5RequestOpts(requestParameters);
+    async obtener4Raw(requestParameters: Obtener4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.obtener4RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async obtener5(requestParameters: Obtener5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.obtener5Raw(requestParameters, initOverrides);
+    async obtener4(requestParameters: Obtener4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.obtener4Raw(requestParameters, initOverrides);
         return await response.value();
     }
 

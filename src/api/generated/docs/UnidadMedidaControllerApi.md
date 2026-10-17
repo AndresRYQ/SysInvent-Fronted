@@ -4,18 +4,18 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**actualizar1**](UnidadMedidaControllerApi.md#actualizar1) | **PUT** /api/v1/catalogos/unidades-medida/{id} |  |
+| [**actualizar**](UnidadMedidaControllerApi.md#actualizar) | **PUT** /api/v1/catalogos/unidades-medida/{id} |  |
 | [**cambiarEstado**](UnidadMedidaControllerApi.md#cambiarestado) | **PUT** /api/v1/catalogos/unidades-medida/{id}/estado |  |
-| [**crear1**](UnidadMedidaControllerApi.md#crear1) | **POST** /api/v1/catalogos/unidades-medida |  |
+| [**crear**](UnidadMedidaControllerApi.md#crear) | **POST** /api/v1/catalogos/unidades-medida |  |
 | [**desactivar**](UnidadMedidaControllerApi.md#desactivar) | **DELETE** /api/v1/catalogos/unidades-medida/{id} |  |
-| [**listar1**](UnidadMedidaControllerApi.md#listar1) | **GET** /api/v1/catalogos/unidades-medida |  |
-| [**obtener1**](UnidadMedidaControllerApi.md#obtener1) | **GET** /api/v1/catalogos/unidades-medida/{id} |  |
+| [**listar**](UnidadMedidaControllerApi.md#listar) | **GET** /api/v1/catalogos/unidades-medida |  |
+| [**obtener**](UnidadMedidaControllerApi.md#obtener) | **GET** /api/v1/catalogos/unidades-medida/{id} |  |
 
 
 
-## actualizar1
+## actualizar
 
-> object actualizar1(id, unidadMedidaRequest)
+> MessageResponse actualizar(id, unidadMedidaRequest)
 
 
 
@@ -26,7 +26,7 @@ import {
   Configuration,
   UnidadMedidaControllerApi,
 } from '';
-import type { Actualizar1Request } from '';
+import type { ActualizarRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -41,10 +41,10 @@ async function example() {
     id: 56,
     // UnidadMedidaRequest
     unidadMedidaRequest: ...,
-  } satisfies Actualizar1Request;
+  } satisfies ActualizarRequest;
 
   try {
-    const data = await api.actualizar1(body);
+    const data = await api.actualizar(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -65,7 +65,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -87,7 +87,7 @@ example().catch(console.error);
 
 ## cambiarEstado
 
-> object cambiarEstado(id, estadoCatalogoRequest)
+> MessageResponse cambiarEstado(id, estadoCatalogoRequest)
 
 
 
@@ -137,7 +137,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -157,9 +157,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## crear1
+## crear
 
-> object crear1(unidadMedidaRequest)
+> MessageResponse crear(unidadMedidaRequest)
 
 
 
@@ -170,7 +170,7 @@ import {
   Configuration,
   UnidadMedidaControllerApi,
 } from '';
-import type { Crear1Request } from '';
+import type { CrearRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -183,10 +183,10 @@ async function example() {
   const body = {
     // UnidadMedidaRequest
     unidadMedidaRequest: ...,
-  } satisfies Crear1Request;
+  } satisfies CrearRequest;
 
   try {
-    const data = await api.crear1(body);
+    const data = await api.crear(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -206,7 +206,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -228,7 +228,7 @@ example().catch(console.error);
 
 ## desactivar
 
-> object desactivar(id)
+> MessageResponse desactivar(id)
 
 
 
@@ -275,7 +275,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -295,9 +295,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## listar1
+## listar
 
-> CustomPageUnidadMedidaResponse listar1(nombre, pagina, tamPagina)
+> CustomPageUnidadMedidaResponse listar(nombre, pagina, tamPagina)
 
 
 
@@ -308,7 +308,7 @@ import {
   Configuration,
   UnidadMedidaControllerApi,
 } from '';
-import type { Listar1Request } from '';
+import type { ListarRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -325,10 +325,10 @@ async function example() {
     pagina: 56,
     // number (optional)
     tamPagina: 56,
-  } satisfies Listar1Request;
+  } satisfies ListarRequest;
 
   try {
-    const data = await api.listar1(body);
+    const data = await api.listar(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -370,9 +370,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## obtener1
+## obtener
 
-> object obtener1(id)
+> MessageResponse obtener(id)
 
 
 
@@ -383,7 +383,7 @@ import {
   Configuration,
   UnidadMedidaControllerApi,
 } from '';
-import type { Obtener1Request } from '';
+import type { ObtenerRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -396,10 +396,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Obtener1Request;
+  } satisfies ObtenerRequest;
 
   try {
-    const data = await api.obtener1(body);
+    const data = await api.obtener(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -419,7 +419,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 

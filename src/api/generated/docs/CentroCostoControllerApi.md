@@ -4,18 +4,18 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**actualizar8**](CentroCostoControllerApi.md#actualizar8) | **PUT** /api/v1/catalogos/centros-costo/{id} |  |
-| [**cambiarEstado7**](CentroCostoControllerApi.md#cambiarestado7) | **PUT** /api/v1/catalogos/centros-costo/{id}/estado |  |
-| [**crear8**](CentroCostoControllerApi.md#crear8) | **POST** /api/v1/catalogos/centros-costo |  |
-| [**desactivar7**](CentroCostoControllerApi.md#desactivar7) | **DELETE** /api/v1/catalogos/centros-costo/{id} |  |
-| [**listar8**](CentroCostoControllerApi.md#listar8) | **GET** /api/v1/catalogos/centros-costo |  |
-| [**obtener8**](CentroCostoControllerApi.md#obtener8) | **GET** /api/v1/catalogos/centros-costo/{id} |  |
+| [**actualizar6**](CentroCostoControllerApi.md#actualizar6) | **PUT** /api/v1/catalogos/centros-costo/{id} |  |
+| [**cambiarEstado6**](CentroCostoControllerApi.md#cambiarestado6) | **PUT** /api/v1/catalogos/centros-costo/{id}/estado |  |
+| [**crear6**](CentroCostoControllerApi.md#crear6) | **POST** /api/v1/catalogos/centros-costo |  |
+| [**desactivar6**](CentroCostoControllerApi.md#desactivar6) | **DELETE** /api/v1/catalogos/centros-costo/{id} |  |
+| [**listar6**](CentroCostoControllerApi.md#listar6) | **GET** /api/v1/catalogos/centros-costo |  |
+| [**obtener6**](CentroCostoControllerApi.md#obtener6) | **GET** /api/v1/catalogos/centros-costo/{id} |  |
 
 
 
-## actualizar8
+## actualizar6
 
-> object actualizar8(id, centroCostoRequest)
+> MessageResponse actualizar6(id, centroCostoRequest)
 
 
 
@@ -26,7 +26,7 @@ import {
   Configuration,
   CentroCostoControllerApi,
 } from '';
-import type { Actualizar8Request } from '';
+import type { Actualizar6Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -41,10 +41,10 @@ async function example() {
     id: 56,
     // CentroCostoRequest
     centroCostoRequest: ...,
-  } satisfies Actualizar8Request;
+  } satisfies Actualizar6Request;
 
   try {
-    const data = await api.actualizar8(body);
+    const data = await api.actualizar6(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -65,7 +65,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -85,9 +85,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## cambiarEstado7
+## cambiarEstado6
 
-> object cambiarEstado7(id, estadoCatalogoRequest)
+> MessageResponse cambiarEstado6(id, estadoCatalogoRequest)
 
 
 
@@ -98,7 +98,7 @@ import {
   Configuration,
   CentroCostoControllerApi,
 } from '';
-import type { CambiarEstado7Request } from '';
+import type { CambiarEstado6Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -113,10 +113,10 @@ async function example() {
     id: 56,
     // EstadoCatalogoRequest
     estadoCatalogoRequest: ...,
-  } satisfies CambiarEstado7Request;
+  } satisfies CambiarEstado6Request;
 
   try {
-    const data = await api.cambiarEstado7(body);
+    const data = await api.cambiarEstado6(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -137,7 +137,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -157,9 +157,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## crear8
+## crear6
 
-> object crear8(centroCostoRequest)
+> MessageResponse crear6(centroCostoRequest)
 
 
 
@@ -170,7 +170,7 @@ import {
   Configuration,
   CentroCostoControllerApi,
 } from '';
-import type { Crear8Request } from '';
+import type { Crear6Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -183,10 +183,10 @@ async function example() {
   const body = {
     // CentroCostoRequest
     centroCostoRequest: ...,
-  } satisfies Crear8Request;
+  } satisfies Crear6Request;
 
   try {
-    const data = await api.crear8(body);
+    const data = await api.crear6(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -206,7 +206,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -226,9 +226,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## desactivar7
+## desactivar6
 
-> object desactivar7(id)
+> MessageResponse desactivar6(id)
 
 
 
@@ -239,7 +239,7 @@ import {
   Configuration,
   CentroCostoControllerApi,
 } from '';
-import type { Desactivar7Request } from '';
+import type { Desactivar6Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -252,10 +252,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Desactivar7Request;
+  } satisfies Desactivar6Request;
 
   try {
-    const data = await api.desactivar7(body);
+    const data = await api.desactivar6(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -275,7 +275,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -295,9 +295,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## listar8
+## listar6
 
-> CustomPageCentroCostoResponse listar8(nombre, pagina, tamPagina)
+> CustomPageCentroCostoResponse listar6(nombre, pagina, tamPagina)
 
 
 
@@ -308,7 +308,7 @@ import {
   Configuration,
   CentroCostoControllerApi,
 } from '';
-import type { Listar8Request } from '';
+import type { Listar6Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -325,10 +325,10 @@ async function example() {
     pagina: 56,
     // number (optional)
     tamPagina: 56,
-  } satisfies Listar8Request;
+  } satisfies Listar6Request;
 
   try {
-    const data = await api.listar8(body);
+    const data = await api.listar6(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -370,9 +370,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## obtener8
+## obtener6
 
-> object obtener8(id)
+> MessageResponse obtener6(id)
 
 
 
@@ -383,7 +383,7 @@ import {
   Configuration,
   CentroCostoControllerApi,
 } from '';
-import type { Obtener8Request } from '';
+import type { Obtener6Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -396,10 +396,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Obtener8Request;
+  } satisfies Obtener6Request;
 
   try {
-    const data = await api.obtener8(body);
+    const data = await api.obtener6(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -419,7 +419,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 

@@ -4,18 +4,18 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**actualizar9**](CategoriaCatalogoControllerApi.md#actualizar9) | **PUT** /api/v1/catalogos/categorias/{id} |  |
-| [**cambiarEstado8**](CategoriaCatalogoControllerApi.md#cambiarestado8) | **PUT** /api/v1/catalogos/categorias/{id}/estado |  |
-| [**crear9**](CategoriaCatalogoControllerApi.md#crear9) | **POST** /api/v1/catalogos/categorias |  |
-| [**desactivar8**](CategoriaCatalogoControllerApi.md#desactivar8) | **DELETE** /api/v1/catalogos/categorias/{id} |  |
-| [**listar9**](CategoriaCatalogoControllerApi.md#listar9) | **GET** /api/v1/catalogos/categorias |  |
-| [**obtener9**](CategoriaCatalogoControllerApi.md#obtener9) | **GET** /api/v1/catalogos/categorias/{id} |  |
+| [**actualizar7**](CategoriaCatalogoControllerApi.md#actualizar7) | **PUT** /api/v1/catalogos/categorias/{id} |  |
+| [**cambiarEstado7**](CategoriaCatalogoControllerApi.md#cambiarestado7) | **PUT** /api/v1/catalogos/categorias/{id}/estado |  |
+| [**crear7**](CategoriaCatalogoControllerApi.md#crear7) | **POST** /api/v1/catalogos/categorias |  |
+| [**desactivar7**](CategoriaCatalogoControllerApi.md#desactivar7) | **DELETE** /api/v1/catalogos/categorias/{id} |  |
+| [**listar7**](CategoriaCatalogoControllerApi.md#listar7) | **GET** /api/v1/catalogos/categorias |  |
+| [**obtener7**](CategoriaCatalogoControllerApi.md#obtener7) | **GET** /api/v1/catalogos/categorias/{id} |  |
 
 
 
-## actualizar9
+## actualizar7
 
-> object actualizar9(id, categoriaCatalogoRequest)
+> MessageResponse actualizar7(id, categoriaCatalogoRequest)
 
 
 
@@ -26,7 +26,7 @@ import {
   Configuration,
   CategoriaCatalogoControllerApi,
 } from '';
-import type { Actualizar9Request } from '';
+import type { Actualizar7Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -41,10 +41,10 @@ async function example() {
     id: 56,
     // CategoriaCatalogoRequest
     categoriaCatalogoRequest: ...,
-  } satisfies Actualizar9Request;
+  } satisfies Actualizar7Request;
 
   try {
-    const data = await api.actualizar9(body);
+    const data = await api.actualizar7(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -65,7 +65,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -85,9 +85,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## cambiarEstado8
+## cambiarEstado7
 
-> object cambiarEstado8(id, estadoCatalogoRequest)
+> MessageResponse cambiarEstado7(id, estadoCatalogoRequest)
 
 
 
@@ -98,7 +98,7 @@ import {
   Configuration,
   CategoriaCatalogoControllerApi,
 } from '';
-import type { CambiarEstado8Request } from '';
+import type { CambiarEstado7Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -113,10 +113,10 @@ async function example() {
     id: 56,
     // EstadoCatalogoRequest
     estadoCatalogoRequest: ...,
-  } satisfies CambiarEstado8Request;
+  } satisfies CambiarEstado7Request;
 
   try {
-    const data = await api.cambiarEstado8(body);
+    const data = await api.cambiarEstado7(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -137,7 +137,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -157,9 +157,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## crear9
+## crear7
 
-> object crear9(categoriaCatalogoRequest)
+> MessageResponse crear7(categoriaCatalogoRequest)
 
 
 
@@ -170,7 +170,7 @@ import {
   Configuration,
   CategoriaCatalogoControllerApi,
 } from '';
-import type { Crear9Request } from '';
+import type { Crear7Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -183,10 +183,10 @@ async function example() {
   const body = {
     // CategoriaCatalogoRequest
     categoriaCatalogoRequest: ...,
-  } satisfies Crear9Request;
+  } satisfies Crear7Request;
 
   try {
-    const data = await api.crear9(body);
+    const data = await api.crear7(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -206,7 +206,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -226,9 +226,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## desactivar8
+## desactivar7
 
-> object desactivar8(id)
+> MessageResponse desactivar7(id)
 
 
 
@@ -239,7 +239,7 @@ import {
   Configuration,
   CategoriaCatalogoControllerApi,
 } from '';
-import type { Desactivar8Request } from '';
+import type { Desactivar7Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -252,10 +252,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Desactivar8Request;
+  } satisfies Desactivar7Request;
 
   try {
-    const data = await api.desactivar8(body);
+    const data = await api.desactivar7(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -275,7 +275,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -295,9 +295,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## listar9
+## listar7
 
-> CustomPageCategoriaCatalogoResponse listar9(nombre, pagina, tamPagina)
+> CustomPageCategoriaCatalogoResponse listar7(nombre, pagina, tamPagina)
 
 
 
@@ -308,7 +308,7 @@ import {
   Configuration,
   CategoriaCatalogoControllerApi,
 } from '';
-import type { Listar9Request } from '';
+import type { Listar7Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -325,10 +325,10 @@ async function example() {
     pagina: 56,
     // number (optional)
     tamPagina: 56,
-  } satisfies Listar9Request;
+  } satisfies Listar7Request;
 
   try {
-    const data = await api.listar9(body);
+    const data = await api.listar7(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -370,9 +370,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## obtener9
+## obtener7
 
-> object obtener9(id)
+> MessageResponse obtener7(id)
 
 
 
@@ -383,7 +383,7 @@ import {
   Configuration,
   CategoriaCatalogoControllerApi,
 } from '';
-import type { Obtener9Request } from '';
+import type { Obtener7Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -396,10 +396,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Obtener9Request;
+  } satisfies Obtener7Request;
 
   try {
-    const data = await api.obtener9(body);
+    const data = await api.obtener7(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -419,7 +419,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 

@@ -28,32 +28,37 @@ import {
     EstadoCatalogoRequestFromJSON,
     EstadoCatalogoRequestToJSON,
 } from '../models/EstadoCatalogoRequest';
+import {
+    type MessageResponse,
+    MessageResponseFromJSON,
+    MessageResponseToJSON,
+} from '../models/MessageResponse';
 
-export interface Actualizar7Request {
+export interface Actualizar5Request {
     id: number;
     contactoRequest: ContactoRequest;
 }
 
-export interface CambiarEstado6Request {
+export interface CambiarEstado5Request {
     id: number;
     estadoCatalogoRequest: EstadoCatalogoRequest;
 }
 
-export interface Crear7Request {
+export interface Crear5Request {
     contactoRequest: ContactoRequest;
 }
 
-export interface Desactivar6Request {
+export interface Desactivar5Request {
     id: number;
 }
 
-export interface Listar7Request {
+export interface Listar5Request {
     nombre?: string;
     pagina?: number;
     tamPagina?: number;
 }
 
-export interface Obtener7Request {
+export interface Obtener5Request {
     id: number;
 }
 
@@ -63,20 +68,20 @@ export interface Obtener7Request {
 export class ContactoControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for actualizar7 without sending the request
+     * Creates request options for actualizar5 without sending the request
      */
-    async actualizar7RequestOpts(requestParameters: Actualizar7Request): Promise<runtime.RequestOpts> {
+    async actualizar5RequestOpts(requestParameters: Actualizar5Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling actualizar7().'
+                'Required parameter "id" was null or undefined when calling actualizar5().'
             );
         }
 
         if (requestParameters['contactoRequest'] == null) {
             throw new runtime.RequiredError(
                 'contactoRequest',
-                'Required parameter "contactoRequest" was null or undefined when calling actualizar7().'
+                'Required parameter "contactoRequest" was null or undefined when calling actualizar5().'
             );
         }
 
@@ -109,35 +114,35 @@ export class ContactoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async actualizar7Raw(requestParameters: Actualizar7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.actualizar7RequestOpts(requestParameters);
+    async actualizar5Raw(requestParameters: Actualizar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.actualizar5RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async actualizar7(requestParameters: Actualizar7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.actualizar7Raw(requestParameters, initOverrides);
+    async actualizar5(requestParameters: Actualizar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.actualizar5Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for cambiarEstado6 without sending the request
+     * Creates request options for cambiarEstado5 without sending the request
      */
-    async cambiarEstado6RequestOpts(requestParameters: CambiarEstado6Request): Promise<runtime.RequestOpts> {
+    async cambiarEstado5RequestOpts(requestParameters: CambiarEstado5Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling cambiarEstado6().'
+                'Required parameter "id" was null or undefined when calling cambiarEstado5().'
             );
         }
 
         if (requestParameters['estadoCatalogoRequest'] == null) {
             throw new runtime.RequiredError(
                 'estadoCatalogoRequest',
-                'Required parameter "estadoCatalogoRequest" was null or undefined when calling cambiarEstado6().'
+                'Required parameter "estadoCatalogoRequest" was null or undefined when calling cambiarEstado5().'
             );
         }
 
@@ -170,28 +175,28 @@ export class ContactoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async cambiarEstado6Raw(requestParameters: CambiarEstado6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.cambiarEstado6RequestOpts(requestParameters);
+    async cambiarEstado5Raw(requestParameters: CambiarEstado5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.cambiarEstado5RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async cambiarEstado6(requestParameters: CambiarEstado6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.cambiarEstado6Raw(requestParameters, initOverrides);
+    async cambiarEstado5(requestParameters: CambiarEstado5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.cambiarEstado5Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for crear7 without sending the request
+     * Creates request options for crear5 without sending the request
      */
-    async crear7RequestOpts(requestParameters: Crear7Request): Promise<runtime.RequestOpts> {
+    async crear5RequestOpts(requestParameters: Crear5Request): Promise<runtime.RequestOpts> {
         if (requestParameters['contactoRequest'] == null) {
             throw new runtime.RequiredError(
                 'contactoRequest',
-                'Required parameter "contactoRequest" was null or undefined when calling crear7().'
+                'Required parameter "contactoRequest" was null or undefined when calling crear5().'
             );
         }
 
@@ -223,28 +228,28 @@ export class ContactoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async crear7Raw(requestParameters: Crear7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.crear7RequestOpts(requestParameters);
+    async crear5Raw(requestParameters: Crear5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.crear5RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async crear7(requestParameters: Crear7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.crear7Raw(requestParameters, initOverrides);
+    async crear5(requestParameters: Crear5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.crear5Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for desactivar6 without sending the request
+     * Creates request options for desactivar5 without sending the request
      */
-    async desactivar6RequestOpts(requestParameters: Desactivar6Request): Promise<runtime.RequestOpts> {
+    async desactivar5RequestOpts(requestParameters: Desactivar5Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling desactivar6().'
+                'Required parameter "id" was null or undefined when calling desactivar5().'
             );
         }
 
@@ -274,24 +279,24 @@ export class ContactoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async desactivar6Raw(requestParameters: Desactivar6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.desactivar6RequestOpts(requestParameters);
+    async desactivar5Raw(requestParameters: Desactivar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.desactivar5RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async desactivar6(requestParameters: Desactivar6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.desactivar6Raw(requestParameters, initOverrides);
+    async desactivar5(requestParameters: Desactivar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.desactivar5Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for listar7 without sending the request
+     * Creates request options for listar5 without sending the request
      */
-    async listar7RequestOpts(requestParameters: Listar7Request): Promise<runtime.RequestOpts> {
+    async listar5RequestOpts(requestParameters: Listar5Request): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['nombre'] != null) {
@@ -329,8 +334,8 @@ export class ContactoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar7Raw(requestParameters: Listar7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageContactoResponse>> {
-        const requestOptions = await this.listar7RequestOpts(requestParameters);
+    async listar5Raw(requestParameters: Listar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageContactoResponse>> {
+        const requestOptions = await this.listar5RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageContactoResponseFromJSON(jsonValue));
@@ -338,19 +343,19 @@ export class ContactoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar7(requestParameters: Listar7Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageContactoResponse> {
-        const response = await this.listar7Raw(requestParameters, initOverrides);
+    async listar5(requestParameters: Listar5Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageContactoResponse> {
+        const response = await this.listar5Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for obtener7 without sending the request
+     * Creates request options for obtener5 without sending the request
      */
-    async obtener7RequestOpts(requestParameters: Obtener7Request): Promise<runtime.RequestOpts> {
+    async obtener5RequestOpts(requestParameters: Obtener5Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling obtener7().'
+                'Required parameter "id" was null or undefined when calling obtener5().'
             );
         }
 
@@ -380,17 +385,17 @@ export class ContactoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async obtener7Raw(requestParameters: Obtener7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.obtener7RequestOpts(requestParameters);
+    async obtener5Raw(requestParameters: Obtener5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.obtener5RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async obtener7(requestParameters: Obtener7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.obtener7Raw(requestParameters, initOverrides);
+    async obtener5(requestParameters: Obtener5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.obtener5Raw(requestParameters, initOverrides);
         return await response.value();
     }
 

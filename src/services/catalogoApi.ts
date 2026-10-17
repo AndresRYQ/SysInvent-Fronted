@@ -1,37 +1,38 @@
 import {
   CentroCostoControllerApi,
-  DestinoControllerApi,
+  DestinosApi,
   ParteEquipoControllerApi,
   ProveedorControllerApi,
   TipoDocumentoControllerApi,
   TipoProductoControllerApi,
   UnidadMedidaControllerApi,
 } from '../api/generated'
+import type { CustomPageable } from '../api/generated'
 import { apiConfiguration } from '../api/client'
 import { apiFetch } from './api'
 
 export interface CatalogoPaginado<T> {
   datos: T[]
-  paginacion: Record<string, unknown>
+  paginacion: CustomPageable
 }
 
 type RegistroApi = Record<string, unknown>
 
 const catalogoApis = {
   '/api/v1/catalogos/centros-costo': () =>
-    new CentroCostoControllerApi(apiConfiguration).listar8(),
+    new CentroCostoControllerApi(apiConfiguration).listar6(),
   '/api/v1/catalogos/destinos': () =>
-    new DestinoControllerApi(apiConfiguration).listar6(),
+    new DestinosApi(apiConfiguration).listarDestinos(),
   '/api/v1/catalogos/partes-equipo': () =>
-    new ParteEquipoControllerApi(apiConfiguration).listar5(),
+    new ParteEquipoControllerApi(apiConfiguration).listar4(),
   '/api/v1/catalogos/proveedores': () =>
-    new ProveedorControllerApi(apiConfiguration).listar4(),
+    new ProveedorControllerApi(apiConfiguration).listar3(),
   '/api/v1/catalogos/tipos-documento': () =>
-    new TipoDocumentoControllerApi(apiConfiguration).listar3(),
+    new TipoDocumentoControllerApi(apiConfiguration).listar2(),
   '/api/v1/catalogos/tipos-producto': () =>
-    new TipoProductoControllerApi(apiConfiguration).listar2(),
+    new TipoProductoControllerApi(apiConfiguration).listar1(),
   '/api/v1/catalogos/unidades-medida': () =>
-    new UnidadMedidaControllerApi(apiConfiguration).listar1(),
+    new UnidadMedidaControllerApi(apiConfiguration).listar(),
 } as const
 
 export async function listarCatalogo<T>(
@@ -116,7 +117,7 @@ export async function listarCatalogo<T>(
 
   return {
     datos,
-    paginacion: response.paginacion as Record<string, unknown>,
+    paginacion: response.paginacion as CustomPageable,
   }
 }
 

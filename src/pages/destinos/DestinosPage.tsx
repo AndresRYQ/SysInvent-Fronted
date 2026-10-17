@@ -7,7 +7,7 @@ import { DestinoDeleteModal } from '../../components/destinos/DestinoDeleteModal
 import { DestinoFormModal } from '../../components/destinos/DestinoFormModal'
 import { FiltrosDestinos, type FiltrosDestinosValores } from '../../components/destinos/FiltrosDestinos'
 import { TablaDestinos } from '../../components/destinos/TablaDestinos'
-import { actualizarDestino, crearDestino, eliminarDestino, obtenerDestinos, reactivarDestino } from '../../services/destinoService'
+import { actualizarDestino, crearDestino, eliminarDestino, listarDestinos, reactivarDestino } from '../../services/destinoService'
 import type { Destino, DestinoFormData } from '../../types/destino'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
@@ -23,7 +23,9 @@ function filtrar(lista: Destino[], filtros: FiltrosDestinosValores) {
 }
 
 export function DestinosPage() {
-  const [lista, setLista] = useState<Destino[]>(() => obtenerDestinos())
+  const [lista, setLista] = useState<Destino[]>([])
+  const [totalItems, setTotalItems] = useState(0)
+  const [recarga, setRecarga] = useState(0)
   const [filtros, setFiltros] = useState(INICIALES)
   const [aplicados, setAplicados] = useState(INICIALES)
   const [page, setPage] = useState(1)
@@ -39,18 +41,36 @@ export function DestinosPage() {
   const [alertaAbierta, setAlertaAbierta] = useState(false)
 
   const filtrados = useMemo(() => filtrar(lista, aplicados), [lista, aplicados])
-  const paginados = useMemo(() => filtrados.slice((page - 1) * pageSize, page * pageSize), [filtrados, page, pageSize])
 
   useEffect(() => {
-    setPage((actual) => Math.min(actual, Math.max(1, Math.ceil(filtrados.length / pageSize))))
-  }, [filtrados.length, pageSize])
+    let activo = true
+    listarDestinos({
+      nombre: aplicados.nombre,
+      estado: aplicados.estado,
+      pagina: page,
+      tamPagina: pageSize,
+    })
+      .then((resultado) => {
+        if (!activo) return
+        setLista(resultado.datos)
+        setTotalItems(resultado.paginacion.totalElementos ?? resultado.datos.length)
+      })
+      .catch((e) => {
+        if (!activo) return
+        mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar los destinos.')
+      })
+    return () => { activo = false }
+  }, [aplicados.nombre, aplicados.estado, page, pageSize, recarga])
 
   const mostrarAlerta = (tipo: 'success' | 'error', texto: string) => {
     setMensaje({ tipo, texto })
     setAlertaAbierta(true)
   }
 
-  const recargar = () => setLista(obtenerDestinos())
+  const recargar = () => {
+    setPage(1)
+    setRecarga((actual) => actual + 1)
+  }
   const cerrarForm = () => {
     setFormOpen(false)
     setSeleccionado(null)
@@ -58,14 +78,19 @@ export function DestinosPage() {
     setError('')
   }
 
-  const guardar = (datos: DestinoFormData) => {
+  const guardar = async (datos: DestinoFormData) => {
     try {
       const editando = Boolean(seleccionado)
-      editando ? actualizarDestino(seleccionado!.id, datos) : crearDestino(datos)
+      const respuesta = editando
+        ? await actualizarDestino(seleccionado!.id, datos)
+        : await crearDestino(datos)
       recargar()
       cerrarForm()
       setPage(1)
-      mostrarAlerta('success', editando ? 'Destino actualizado correctamente.' : 'Destino registrado correctamente.')
+      mostrarAlerta(
+        'success',
+        respuesta.message ?? (editando ? 'Destino actualizado correctamente.' : 'Destino registrado correctamente.'),
+      )
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Ocurrió un error inesperado.')
     }
@@ -81,14 +106,15 @@ export function DestinosPage() {
     if (!objetivo) return
     const reactivando = reactivarOpen
     try {
-      if (reactivando) {
-        reactivarDestino(objetivo.id)
-      } else {
-        await eliminarDestino(objetivo.id)
-      }
+      const respuesta = reactivando
+        ? await reactivarDestino(objetivo.id)
+        : await eliminarDestino(objetivo.id)
       recargar()
       setPage(1)
-      mostrarAlerta('success', reactivando ? 'Destino reactivado correctamente.' : 'Destino eliminado correctamente.')
+      mostrarAlerta(
+        'success',
+        respuesta.message ?? (reactivando ? 'Destino reactivado correctamente.' : 'Destino eliminado correctamente.'),
+      )
     } catch (e) {
       mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudo actualizar el destino.')
     } finally {
@@ -118,8 +144,8 @@ export function DestinosPage() {
 
           <div className="maestro-panel">
             <TablaDestinos
-              destinos={paginados}
-              totalItems={filtrados.length}
+              destinos={filtrados}
+              totalItems={aplicados.estado ? filtrados.length : totalItems}
               page={page}
               pageSize={pageSize}
               onAgregar={() => { setSeleccionado(null); setSoloLectura(false); setError(''); setFormOpen(true) }}

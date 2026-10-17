@@ -19,11 +19,6 @@ import {
     ActualizarUsuarioRequestToJSON,
 } from '../models/ActualizarUsuarioRequest';
 import {
-    type CustomPageUsuarioResponse,
-    CustomPageUsuarioResponseFromJSON,
-    CustomPageUsuarioResponseToJSON,
-} from '../models/CustomPageUsuarioResponse';
-import {
     type UsuarioRequest,
     UsuarioRequestFromJSON,
     UsuarioRequestToJSON,
@@ -36,14 +31,6 @@ export interface ActualizarEstadoUsuarioRequest {
 
 export interface ActualizarUsuarioOperationRequest {
     actualizarUsuarioRequest: ActualizarUsuarioRequest;
-}
-
-export interface ListarUsuariosRequest {
-    usuario?: string;
-    rol?: string;
-    estado?: boolean;
-    pagina?: number;
-    tamPagina?: number;
 }
 
 export interface RegistrarUsuarioRequest {
@@ -94,7 +81,7 @@ export class UsuariosApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/api/usuarios`;
+        let urlPath = `/api/usuarios/estado`;
 
         return {
             path: urlPath,
@@ -182,73 +169,6 @@ export class UsuariosApi extends runtime.BaseAPI {
     }
 
     /**
-     * Creates request options for listarUsuarios without sending the request
-     */
-    async listarUsuariosRequestOpts(requestParameters: ListarUsuariosRequest): Promise<runtime.RequestOpts> {
-        const queryParameters: any = {};
-
-        if (requestParameters['usuario'] != null) {
-            queryParameters['usuario'] = requestParameters['usuario'];
-        }
-
-        if (requestParameters['rol'] != null) {
-            queryParameters['rol'] = requestParameters['rol'];
-        }
-
-        if (requestParameters['estado'] != null) {
-            queryParameters['estado'] = requestParameters['estado'];
-        }
-
-        if (requestParameters['pagina'] != null) {
-            queryParameters['pagina'] = requestParameters['pagina'];
-        }
-
-        if (requestParameters['tamPagina'] != null) {
-            queryParameters['tamPagina'] = requestParameters['tamPagina'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("bearerAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-
-        let urlPath = `/api/usuarios`;
-
-        return {
-            path: urlPath,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        };
-    }
-
-    /**
-     * Lista los usuarios registrados con paginación
-     * Listar usuarios
-     */
-    async listarUsuariosRaw(requestParameters: ListarUsuariosRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageUsuarioResponse>> {
-        const requestOptions = await this.listarUsuariosRequestOpts(requestParameters);
-        const response = await this.request(requestOptions, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageUsuarioResponseFromJSON(jsonValue));
-    }
-
-    /**
-     * Lista los usuarios registrados con paginación
-     * Listar usuarios
-     */
-    async listarUsuarios(requestParameters: ListarUsuariosRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageUsuarioResponse> {
-        const response = await this.listarUsuariosRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
      * Creates request options for registrarUsuario without sending the request
      */
     async registrarUsuarioRequestOpts(requestParameters: RegistrarUsuarioRequest): Promise<runtime.RequestOpts> {
@@ -286,7 +206,7 @@ export class UsuariosApi extends runtime.BaseAPI {
     }
 
     /**
-     * Registra un usuario con una contraseña proporcionada
+     * Registra un usuario con una contraseña generada
      * Registrar usuario
      */
     async registrarUsuarioRaw(requestParameters: RegistrarUsuarioRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
@@ -297,7 +217,7 @@ export class UsuariosApi extends runtime.BaseAPI {
     }
 
     /**
-     * Registra un usuario con una contraseña proporcionada
+     * Registra un usuario con una contraseña generada
      * Registrar usuario
      */
     async registrarUsuario(requestParameters: RegistrarUsuarioRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {

@@ -7,7 +7,7 @@ export * from './CentroCostoControllerApi';
 export * from './ContactoControllerApi';
 export * from './ControlAlmacenControllerApi';
 export * from './DashboardControllerApi';
-export * from './DestinoControllerApi';
+export * from './DestinosApi';
 export * from './IngresoAlmacenControllerApi';
 export * from './LoginApi';
 export * from './ParteEquipoControllerApi';

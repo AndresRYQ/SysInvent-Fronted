@@ -20,9 +20,9 @@ import * as runtime from '../runtime';
 export class BitacoraControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for plantilla9 without sending the request
+     * Creates request options for plantilla10 without sending the request
      */
-    async plantilla9RequestOpts(): Promise<runtime.RequestOpts> {
+    async plantilla10RequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -48,8 +48,8 @@ export class BitacoraControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async plantilla9Raw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const requestOptions = await this.plantilla9RequestOpts();
+    async plantilla10Raw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.plantilla10RequestOpts();
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -57,8 +57,8 @@ export class BitacoraControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async plantilla9(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.plantilla9Raw(initOverrides);
+    async plantilla10(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.plantilla10Raw(initOverrides);
     }
 
 }

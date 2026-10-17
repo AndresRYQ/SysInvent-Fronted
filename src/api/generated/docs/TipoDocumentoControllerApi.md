@@ -4,18 +4,18 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**actualizar3**](TipoDocumentoControllerApi.md#actualizar3) | **PUT** /api/v1/catalogos/tipos-documento/{id} |  |
+| [**actualizar2**](TipoDocumentoControllerApi.md#actualizar2) | **PUT** /api/v1/catalogos/tipos-documento/{id} |  |
 | [**cambiarEstado2**](TipoDocumentoControllerApi.md#cambiarestado2) | **PUT** /api/v1/catalogos/tipos-documento/{id}/estado |  |
-| [**crear3**](TipoDocumentoControllerApi.md#crear3) | **POST** /api/v1/catalogos/tipos-documento |  |
+| [**crear2**](TipoDocumentoControllerApi.md#crear2) | **POST** /api/v1/catalogos/tipos-documento |  |
 | [**desactivar2**](TipoDocumentoControllerApi.md#desactivar2) | **DELETE** /api/v1/catalogos/tipos-documento/{id} |  |
-| [**listar3**](TipoDocumentoControllerApi.md#listar3) | **GET** /api/v1/catalogos/tipos-documento |  |
-| [**obtener3**](TipoDocumentoControllerApi.md#obtener3) | **GET** /api/v1/catalogos/tipos-documento/{id} |  |
+| [**listar2**](TipoDocumentoControllerApi.md#listar2) | **GET** /api/v1/catalogos/tipos-documento |  |
+| [**obtener2**](TipoDocumentoControllerApi.md#obtener2) | **GET** /api/v1/catalogos/tipos-documento/{id} |  |
 
 
 
-## actualizar3
+## actualizar2
 
-> object actualizar3(id, tipoDocumentoRequest)
+> MessageResponse actualizar2(id, tipoDocumentoRequest)
 
 
 
@@ -26,7 +26,7 @@ import {
   Configuration,
   TipoDocumentoControllerApi,
 } from '';
-import type { Actualizar3Request } from '';
+import type { Actualizar2Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -41,10 +41,10 @@ async function example() {
     id: 56,
     // TipoDocumentoRequest
     tipoDocumentoRequest: ...,
-  } satisfies Actualizar3Request;
+  } satisfies Actualizar2Request;
 
   try {
-    const data = await api.actualizar3(body);
+    const data = await api.actualizar2(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -65,7 +65,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -87,7 +87,7 @@ example().catch(console.error);
 
 ## cambiarEstado2
 
-> object cambiarEstado2(id, estadoCatalogoRequest)
+> MessageResponse cambiarEstado2(id, estadoCatalogoRequest)
 
 
 
@@ -137,7 +137,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -157,9 +157,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## crear3
+## crear2
 
-> object crear3(tipoDocumentoRequest)
+> MessageResponse crear2(tipoDocumentoRequest)
 
 
 
@@ -170,7 +170,7 @@ import {
   Configuration,
   TipoDocumentoControllerApi,
 } from '';
-import type { Crear3Request } from '';
+import type { Crear2Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -183,10 +183,10 @@ async function example() {
   const body = {
     // TipoDocumentoRequest
     tipoDocumentoRequest: ...,
-  } satisfies Crear3Request;
+  } satisfies Crear2Request;
 
   try {
-    const data = await api.crear3(body);
+    const data = await api.crear2(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -206,7 +206,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -228,7 +228,7 @@ example().catch(console.error);
 
 ## desactivar2
 
-> object desactivar2(id)
+> MessageResponse desactivar2(id)
 
 
 
@@ -275,7 +275,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -295,9 +295,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## listar3
+## listar2
 
-> CustomPageTipoDocumentoResponse listar3(nombre, pagina, tamPagina)
+> CustomPageTipoDocumentoResponse listar2(nombre, pagina, tamPagina)
 
 
 
@@ -308,7 +308,7 @@ import {
   Configuration,
   TipoDocumentoControllerApi,
 } from '';
-import type { Listar3Request } from '';
+import type { Listar2Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -325,10 +325,10 @@ async function example() {
     pagina: 56,
     // number (optional)
     tamPagina: 56,
-  } satisfies Listar3Request;
+  } satisfies Listar2Request;
 
   try {
-    const data = await api.listar3(body);
+    const data = await api.listar2(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -370,9 +370,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## obtener3
+## obtener2
 
-> object obtener3(id)
+> MessageResponse obtener2(id)
 
 
 
@@ -383,7 +383,7 @@ import {
   Configuration,
   TipoDocumentoControllerApi,
 } from '';
-import type { Obtener3Request } from '';
+import type { Obtener2Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -396,10 +396,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Obtener3Request;
+  } satisfies Obtener2Request;
 
   try {
-    const data = await api.obtener3(body);
+    const data = await api.obtener2(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -419,7 +419,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 

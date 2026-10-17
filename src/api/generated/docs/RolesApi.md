@@ -4,20 +4,19 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**actualizarEstadoRol**](RolesApi.md#actualizarestadorol) | **DELETE** /api/roles | Actualizar estado del rol |
-| [**actualizarRol**](RolesApi.md#actualizarroloperation) | **PUT** /api/roles | Actualizar rol |
+| [**desactivarRol**](RolesApi.md#desactivarrol) | **DELETE** /api/roles | Desactivar rol |
 | [**listarRoles**](RolesApi.md#listarroles) | **GET** /api/roles | Listar roles |
 | [**registrarRol**](RolesApi.md#registrarrol) | **POST** /api/roles | Registrar rol |
 
 
 
-## actualizarEstadoRol
+## desactivarRol
 
-> MessageResponse actualizarEstadoRol(rolId, activo)
+> object desactivarRol(rolId)
 
-Actualizar estado del rol
+Desactivar rol
 
-Activa o desactiva un rol
+Desactiva un rol por su identificador
 
 ### Example
 
@@ -26,7 +25,7 @@ import {
   Configuration,
   RolesApi,
 } from '';
-import type { ActualizarEstadoRolRequest } from '';
+import type { DesactivarRolRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -39,12 +38,10 @@ async function example() {
   const body = {
     // number
     rolId: 56,
-    // boolean
-    activo: true,
-  } satisfies ActualizarEstadoRolRequest;
+  } satisfies DesactivarRolRequest;
 
   try {
-    const data = await api.actualizarEstadoRol(body);
+    const data = await api.desactivarRol(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -61,11 +58,10 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **rolId** | `number` |  | [Defaults to `undefined`] |
-| **activo** | `boolean` |  | [Defaults to `undefined`] |
 
 ### Return type
 
-[**MessageResponse**](MessageResponse.md)
+**object**
 
 ### Authorization
 
@@ -74,77 +70,6 @@ example().catch(console.error);
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: `*/*`
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-| **200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
-
-
-## actualizarRol
-
-> MessageResponse actualizarRol(actualizarRolRequest)
-
-Actualizar rol
-
-Actualiza el rol y sus módulos asociados
-
-### Example
-
-```ts
-import {
-  Configuration,
-  RolesApi,
-} from '';
-import type { ActualizarRolOperationRequest } from '';
-
-async function example() {
-  console.log("🚀 Testing  SDK...");
-  const config = new Configuration({ 
-    // Configure HTTP bearer authorization: bearerAuth
-    accessToken: "YOUR BEARER TOKEN",
-  });
-  const api = new RolesApi(config);
-
-  const body = {
-    // ActualizarRolRequest
-    actualizarRolRequest: ...,
-  } satisfies ActualizarRolOperationRequest;
-
-  try {
-    const data = await api.actualizarRol(body);
-    console.log(data);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-// Run the test
-example().catch(console.error);
-```
-
-### Parameters
-
-
-| Name | Type | Description  | Notes |
-|------------- | ------------- | ------------- | -------------|
-| **actualizarRolRequest** | [ActualizarRolRequest](ActualizarRolRequest.md) |  | |
-
-### Return type
-
-[**MessageResponse**](MessageResponse.md)
-
-### Authorization
-
-[bearerAuth](../README.md#bearerAuth)
-
-### HTTP request headers
-
-- **Content-Type**: `application/json`
 - **Accept**: `*/*`
 
 
@@ -235,7 +160,7 @@ example().catch(console.error);
 
 ## registrarRol
 
-> MessageResponse registrarRol(rolRequest)
+> object registrarRol(rolRequest)
 
 Registrar rol
 
@@ -284,7 +209,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**MessageResponse**](MessageResponse.md)
+**object**
 
 ### Authorization
 

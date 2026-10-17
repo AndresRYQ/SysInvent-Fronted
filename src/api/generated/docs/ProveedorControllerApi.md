@@ -4,18 +4,18 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**actualizar4**](ProveedorControllerApi.md#actualizar4) | **PUT** /api/v1/catalogos/proveedores/{id} |  |
+| [**actualizar3**](ProveedorControllerApi.md#actualizar3) | **PUT** /api/v1/catalogos/proveedores/{id} |  |
 | [**cambiarEstado3**](ProveedorControllerApi.md#cambiarestado3) | **PUT** /api/v1/catalogos/proveedores/{id}/estado |  |
-| [**crear4**](ProveedorControllerApi.md#crear4) | **POST** /api/v1/catalogos/proveedores |  |
+| [**crear3**](ProveedorControllerApi.md#crear3) | **POST** /api/v1/catalogos/proveedores |  |
 | [**desactivar3**](ProveedorControllerApi.md#desactivar3) | **DELETE** /api/v1/catalogos/proveedores/{id} |  |
-| [**listar4**](ProveedorControllerApi.md#listar4) | **GET** /api/v1/catalogos/proveedores |  |
-| [**obtener4**](ProveedorControllerApi.md#obtener4) | **GET** /api/v1/catalogos/proveedores/{id} |  |
+| [**listar3**](ProveedorControllerApi.md#listar3) | **GET** /api/v1/catalogos/proveedores |  |
+| [**obtener3**](ProveedorControllerApi.md#obtener3) | **GET** /api/v1/catalogos/proveedores/{id} |  |
 
 
 
-## actualizar4
+## actualizar3
 
-> object actualizar4(id, proveedorRequest)
+> MessageResponse actualizar3(id, proveedorRequest)
 
 
 
@@ -26,7 +26,7 @@ import {
   Configuration,
   ProveedorControllerApi,
 } from '';
-import type { Actualizar4Request } from '';
+import type { Actualizar3Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -41,10 +41,10 @@ async function example() {
     id: 56,
     // ProveedorRequest
     proveedorRequest: ...,
-  } satisfies Actualizar4Request;
+  } satisfies Actualizar3Request;
 
   try {
-    const data = await api.actualizar4(body);
+    const data = await api.actualizar3(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -65,7 +65,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -87,7 +87,7 @@ example().catch(console.error);
 
 ## cambiarEstado3
 
-> object cambiarEstado3(id, estadoCatalogoRequest)
+> MessageResponse cambiarEstado3(id, estadoCatalogoRequest)
 
 
 
@@ -137,7 +137,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -157,9 +157,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## crear4
+## crear3
 
-> object crear4(proveedorRequest)
+> MessageResponse crear3(proveedorRequest)
 
 
 
@@ -170,7 +170,7 @@ import {
   Configuration,
   ProveedorControllerApi,
 } from '';
-import type { Crear4Request } from '';
+import type { Crear3Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -183,10 +183,10 @@ async function example() {
   const body = {
     // ProveedorRequest
     proveedorRequest: ...,
-  } satisfies Crear4Request;
+  } satisfies Crear3Request;
 
   try {
-    const data = await api.crear4(body);
+    const data = await api.crear3(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -206,7 +206,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -228,7 +228,7 @@ example().catch(console.error);
 
 ## desactivar3
 
-> object desactivar3(id)
+> MessageResponse desactivar3(id)
 
 
 
@@ -275,7 +275,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -295,9 +295,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## listar4
+## listar3
 
-> CustomPageProveedorResponse listar4(nombre, pagina, tamPagina)
+> CustomPageProveedorResponse listar3(nombre, pagina, tamPagina)
 
 
 
@@ -308,7 +308,7 @@ import {
   Configuration,
   ProveedorControllerApi,
 } from '';
-import type { Listar4Request } from '';
+import type { Listar3Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -325,10 +325,10 @@ async function example() {
     pagina: 56,
     // number (optional)
     tamPagina: 56,
-  } satisfies Listar4Request;
+  } satisfies Listar3Request;
 
   try {
-    const data = await api.listar4(body);
+    const data = await api.listar3(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -370,9 +370,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## obtener4
+## obtener3
 
-> object obtener4(id)
+> MessageResponse obtener3(id)
 
 
 
@@ -383,7 +383,7 @@ import {
   Configuration,
   ProveedorControllerApi,
 } from '';
-import type { Obtener4Request } from '';
+import type { Obtener3Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -396,10 +396,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Obtener4Request;
+  } satisfies Obtener3Request;
 
   try {
-    const data = await api.obtener4(body);
+    const data = await api.obtener3(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -419,7 +419,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 

@@ -24,12 +24,17 @@ import {
     EstadoCatalogoRequestToJSON,
 } from '../models/EstadoCatalogoRequest';
 import {
+    type MessageResponse,
+    MessageResponseFromJSON,
+    MessageResponseToJSON,
+} from '../models/MessageResponse';
+import {
     type UnidadMedidaRequest,
     UnidadMedidaRequestFromJSON,
     UnidadMedidaRequestToJSON,
 } from '../models/UnidadMedidaRequest';
 
-export interface Actualizar1Request {
+export interface ActualizarRequest {
     id: number;
     unidadMedidaRequest: UnidadMedidaRequest;
 }
@@ -39,7 +44,7 @@ export interface CambiarEstadoRequest {
     estadoCatalogoRequest: EstadoCatalogoRequest;
 }
 
-export interface Crear1Request {
+export interface CrearRequest {
     unidadMedidaRequest: UnidadMedidaRequest;
 }
 
@@ -47,13 +52,13 @@ export interface DesactivarRequest {
     id: number;
 }
 
-export interface Listar1Request {
+export interface ListarRequest {
     nombre?: string;
     pagina?: number;
     tamPagina?: number;
 }
 
-export interface Obtener1Request {
+export interface ObtenerRequest {
     id: number;
 }
 
@@ -63,20 +68,20 @@ export interface Obtener1Request {
 export class UnidadMedidaControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for actualizar1 without sending the request
+     * Creates request options for actualizar without sending the request
      */
-    async actualizar1RequestOpts(requestParameters: Actualizar1Request): Promise<runtime.RequestOpts> {
+    async actualizarRequestOpts(requestParameters: ActualizarRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling actualizar1().'
+                'Required parameter "id" was null or undefined when calling actualizar().'
             );
         }
 
         if (requestParameters['unidadMedidaRequest'] == null) {
             throw new runtime.RequiredError(
                 'unidadMedidaRequest',
-                'Required parameter "unidadMedidaRequest" was null or undefined when calling actualizar1().'
+                'Required parameter "unidadMedidaRequest" was null or undefined when calling actualizar().'
             );
         }
 
@@ -109,17 +114,17 @@ export class UnidadMedidaControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async actualizar1Raw(requestParameters: Actualizar1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.actualizar1RequestOpts(requestParameters);
+    async actualizarRaw(requestParameters: ActualizarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.actualizarRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async actualizar1(requestParameters: Actualizar1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.actualizar1Raw(requestParameters, initOverrides);
+    async actualizar(requestParameters: ActualizarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.actualizarRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -170,28 +175,28 @@ export class UnidadMedidaControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async cambiarEstadoRaw(requestParameters: CambiarEstadoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async cambiarEstadoRaw(requestParameters: CambiarEstadoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
         const requestOptions = await this.cambiarEstadoRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async cambiarEstado(requestParameters: CambiarEstadoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async cambiarEstado(requestParameters: CambiarEstadoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
         const response = await this.cambiarEstadoRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for crear1 without sending the request
+     * Creates request options for crear without sending the request
      */
-    async crear1RequestOpts(requestParameters: Crear1Request): Promise<runtime.RequestOpts> {
+    async crearRequestOpts(requestParameters: CrearRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['unidadMedidaRequest'] == null) {
             throw new runtime.RequiredError(
                 'unidadMedidaRequest',
-                'Required parameter "unidadMedidaRequest" was null or undefined when calling crear1().'
+                'Required parameter "unidadMedidaRequest" was null or undefined when calling crear().'
             );
         }
 
@@ -223,17 +228,17 @@ export class UnidadMedidaControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async crear1Raw(requestParameters: Crear1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.crear1RequestOpts(requestParameters);
+    async crearRaw(requestParameters: CrearRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.crearRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async crear1(requestParameters: Crear1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.crear1Raw(requestParameters, initOverrides);
+    async crear(requestParameters: CrearRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.crearRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -274,24 +279,24 @@ export class UnidadMedidaControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async desactivarRaw(requestParameters: DesactivarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async desactivarRaw(requestParameters: DesactivarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
         const requestOptions = await this.desactivarRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async desactivar(requestParameters: DesactivarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async desactivar(requestParameters: DesactivarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
         const response = await this.desactivarRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for listar1 without sending the request
+     * Creates request options for listar without sending the request
      */
-    async listar1RequestOpts(requestParameters: Listar1Request): Promise<runtime.RequestOpts> {
+    async listarRequestOpts(requestParameters: ListarRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['nombre'] != null) {
@@ -329,8 +334,8 @@ export class UnidadMedidaControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar1Raw(requestParameters: Listar1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageUnidadMedidaResponse>> {
-        const requestOptions = await this.listar1RequestOpts(requestParameters);
+    async listarRaw(requestParameters: ListarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageUnidadMedidaResponse>> {
+        const requestOptions = await this.listarRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageUnidadMedidaResponseFromJSON(jsonValue));
@@ -338,19 +343,19 @@ export class UnidadMedidaControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar1(requestParameters: Listar1Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageUnidadMedidaResponse> {
-        const response = await this.listar1Raw(requestParameters, initOverrides);
+    async listar(requestParameters: ListarRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageUnidadMedidaResponse> {
+        const response = await this.listarRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for obtener1 without sending the request
+     * Creates request options for obtener without sending the request
      */
-    async obtener1RequestOpts(requestParameters: Obtener1Request): Promise<runtime.RequestOpts> {
+    async obtenerRequestOpts(requestParameters: ObtenerRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling obtener1().'
+                'Required parameter "id" was null or undefined when calling obtener().'
             );
         }
 
@@ -380,17 +385,17 @@ export class UnidadMedidaControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async obtener1Raw(requestParameters: Obtener1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.obtener1RequestOpts(requestParameters);
+    async obtenerRaw(requestParameters: ObtenerRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.obtenerRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async obtener1(requestParameters: Obtener1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.obtener1Raw(requestParameters, initOverrides);
+    async obtener(requestParameters: ObtenerRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.obtenerRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

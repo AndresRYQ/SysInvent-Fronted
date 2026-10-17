@@ -4,13 +4,13 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**plantilla1**](ReporteValeControllerApi.md#plantilla1) | **GET** /api/reportes/vales/_plantilla |  |
+| [**plantilla2**](ReporteValeControllerApi.md#plantilla2) | **GET** /api/reportes/vales/_plantilla |  |
 
 
 
-## plantilla1
+## plantilla2
 
-> plantilla1()
+> plantilla2()
 
 
 
@@ -21,7 +21,7 @@ import {
   Configuration,
   ReporteValeControllerApi,
 } from '';
-import type { Plantilla1Request } from '';
+import type { Plantilla2Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -32,7 +32,7 @@ async function example() {
   const api = new ReporteValeControllerApi(config);
 
   try {
-    const data = await api.plantilla1();
+    const data = await api.plantilla2();
     console.log(data);
   } catch (error) {
     console.error(error);

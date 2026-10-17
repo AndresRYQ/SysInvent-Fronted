@@ -24,12 +24,17 @@ import {
     EstadoCatalogoRequestToJSON,
 } from '../models/EstadoCatalogoRequest';
 import {
+    type MessageResponse,
+    MessageResponseFromJSON,
+    MessageResponseToJSON,
+} from '../models/MessageResponse';
+import {
     type ProveedorRequest,
     ProveedorRequestFromJSON,
     ProveedorRequestToJSON,
 } from '../models/ProveedorRequest';
 
-export interface Actualizar4Request {
+export interface Actualizar3Request {
     id: number;
     proveedorRequest: ProveedorRequest;
 }
@@ -39,7 +44,7 @@ export interface CambiarEstado3Request {
     estadoCatalogoRequest: EstadoCatalogoRequest;
 }
 
-export interface Crear4Request {
+export interface Crear3Request {
     proveedorRequest: ProveedorRequest;
 }
 
@@ -47,13 +52,13 @@ export interface Desactivar3Request {
     id: number;
 }
 
-export interface Listar4Request {
+export interface Listar3Request {
     nombre?: string;
     pagina?: number;
     tamPagina?: number;
 }
 
-export interface Obtener4Request {
+export interface Obtener3Request {
     id: number;
 }
 
@@ -63,20 +68,20 @@ export interface Obtener4Request {
 export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for actualizar4 without sending the request
+     * Creates request options for actualizar3 without sending the request
      */
-    async actualizar4RequestOpts(requestParameters: Actualizar4Request): Promise<runtime.RequestOpts> {
+    async actualizar3RequestOpts(requestParameters: Actualizar3Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling actualizar4().'
+                'Required parameter "id" was null or undefined when calling actualizar3().'
             );
         }
 
         if (requestParameters['proveedorRequest'] == null) {
             throw new runtime.RequiredError(
                 'proveedorRequest',
-                'Required parameter "proveedorRequest" was null or undefined when calling actualizar4().'
+                'Required parameter "proveedorRequest" was null or undefined when calling actualizar3().'
             );
         }
 
@@ -109,17 +114,17 @@ export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async actualizar4Raw(requestParameters: Actualizar4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.actualizar4RequestOpts(requestParameters);
+    async actualizar3Raw(requestParameters: Actualizar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.actualizar3RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async actualizar4(requestParameters: Actualizar4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.actualizar4Raw(requestParameters, initOverrides);
+    async actualizar3(requestParameters: Actualizar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.actualizar3Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -170,28 +175,28 @@ export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async cambiarEstado3Raw(requestParameters: CambiarEstado3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async cambiarEstado3Raw(requestParameters: CambiarEstado3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
         const requestOptions = await this.cambiarEstado3RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async cambiarEstado3(requestParameters: CambiarEstado3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async cambiarEstado3(requestParameters: CambiarEstado3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
         const response = await this.cambiarEstado3Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for crear4 without sending the request
+     * Creates request options for crear3 without sending the request
      */
-    async crear4RequestOpts(requestParameters: Crear4Request): Promise<runtime.RequestOpts> {
+    async crear3RequestOpts(requestParameters: Crear3Request): Promise<runtime.RequestOpts> {
         if (requestParameters['proveedorRequest'] == null) {
             throw new runtime.RequiredError(
                 'proveedorRequest',
-                'Required parameter "proveedorRequest" was null or undefined when calling crear4().'
+                'Required parameter "proveedorRequest" was null or undefined when calling crear3().'
             );
         }
 
@@ -223,17 +228,17 @@ export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async crear4Raw(requestParameters: Crear4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.crear4RequestOpts(requestParameters);
+    async crear3Raw(requestParameters: Crear3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.crear3RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async crear4(requestParameters: Crear4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.crear4Raw(requestParameters, initOverrides);
+    async crear3(requestParameters: Crear3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.crear3Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -274,24 +279,24 @@ export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async desactivar3Raw(requestParameters: Desactivar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async desactivar3Raw(requestParameters: Desactivar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
         const requestOptions = await this.desactivar3RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async desactivar3(requestParameters: Desactivar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async desactivar3(requestParameters: Desactivar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
         const response = await this.desactivar3Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for listar4 without sending the request
+     * Creates request options for listar3 without sending the request
      */
-    async listar4RequestOpts(requestParameters: Listar4Request): Promise<runtime.RequestOpts> {
+    async listar3RequestOpts(requestParameters: Listar3Request): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['nombre'] != null) {
@@ -329,8 +334,8 @@ export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar4Raw(requestParameters: Listar4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageProveedorResponse>> {
-        const requestOptions = await this.listar4RequestOpts(requestParameters);
+    async listar3Raw(requestParameters: Listar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageProveedorResponse>> {
+        const requestOptions = await this.listar3RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageProveedorResponseFromJSON(jsonValue));
@@ -338,19 +343,19 @@ export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar4(requestParameters: Listar4Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageProveedorResponse> {
-        const response = await this.listar4Raw(requestParameters, initOverrides);
+    async listar3(requestParameters: Listar3Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageProveedorResponse> {
+        const response = await this.listar3Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for obtener4 without sending the request
+     * Creates request options for obtener3 without sending the request
      */
-    async obtener4RequestOpts(requestParameters: Obtener4Request): Promise<runtime.RequestOpts> {
+    async obtener3RequestOpts(requestParameters: Obtener3Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling obtener4().'
+                'Required parameter "id" was null or undefined when calling obtener3().'
             );
         }
 
@@ -380,17 +385,17 @@ export class ProveedorControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async obtener4Raw(requestParameters: Obtener4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.obtener4RequestOpts(requestParameters);
+    async obtener3Raw(requestParameters: Obtener3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.obtener3RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async obtener4(requestParameters: Obtener4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.obtener4Raw(requestParameters, initOverrides);
+    async obtener3(requestParameters: Obtener3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.obtener3Raw(requestParameters, initOverrides);
         return await response.value();
     }
 

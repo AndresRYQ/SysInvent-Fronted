@@ -13,28 +13,6 @@
  */
 
 import * as runtime from '../runtime';
-import {
-    type ValeConsumoRequest,
-    ValeConsumoRequestFromJSON,
-    ValeConsumoRequestToJSON,
-} from '../models/ValeConsumoRequest';
-
-export interface ActualizarRequest {
-    id: number;
-    valeConsumoRequest: ValeConsumoRequest;
-}
-
-export interface AnularRequest {
-    id: number;
-}
-
-export interface CrearRequest {
-    valeConsumoRequest: ValeConsumoRequest;
-}
-
-export interface ObtenerRequest {
-    id: number;
-}
 
 /**
  * 
@@ -42,77 +20,9 @@ export interface ObtenerRequest {
 export class ValeConsumoControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for actualizar without sending the request
+     * Creates request options for plantilla without sending the request
      */
-    async actualizarRequestOpts(requestParameters: ActualizarRequest): Promise<runtime.RequestOpts> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling actualizar().'
-            );
-        }
-
-        if (requestParameters['valeConsumoRequest'] == null) {
-            throw new runtime.RequiredError(
-                'valeConsumoRequest',
-                'Required parameter "valeConsumoRequest" was null or undefined when calling actualizar().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("bearerAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-
-        let urlPath = `/api/vales-consumo/{id}`;
-        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
-
-        return {
-            path: urlPath,
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-            body: ValeConsumoRequestToJSON(requestParameters['valeConsumoRequest']),
-        };
-    }
-
-    /**
-     */
-    async actualizarRaw(requestParameters: ActualizarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.actualizarRequestOpts(requestParameters);
-        const response = await this.request(requestOptions, initOverrides);
-
-        return new runtime.JSONApiResponse<any>(response);
-    }
-
-    /**
-     */
-    async actualizar(requestParameters: ActualizarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.actualizarRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Creates request options for anular without sending the request
-     */
-    async anularRequestOpts(requestParameters: AnularRequest): Promise<runtime.RequestOpts> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling anular().'
-            );
-        }
-
+    async plantillaRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -126,104 +36,7 @@ export class ValeConsumoControllerApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/api/vales-consumo/{id}/anular`;
-        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
-
-        return {
-            path: urlPath,
-            method: 'PATCH',
-            headers: headerParameters,
-            query: queryParameters,
-        };
-    }
-
-    /**
-     */
-    async anularRaw(requestParameters: AnularRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.anularRequestOpts(requestParameters);
-        const response = await this.request(requestOptions, initOverrides);
-
-        return new runtime.JSONApiResponse<any>(response);
-    }
-
-    /**
-     */
-    async anular(requestParameters: AnularRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.anularRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Creates request options for crear without sending the request
-     */
-    async crearRequestOpts(requestParameters: CrearRequest): Promise<runtime.RequestOpts> {
-        if (requestParameters['valeConsumoRequest'] == null) {
-            throw new runtime.RequiredError(
-                'valeConsumoRequest',
-                'Required parameter "valeConsumoRequest" was null or undefined when calling crear().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("bearerAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-
-        let urlPath = `/api/vales-consumo`;
-
-        return {
-            path: urlPath,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: ValeConsumoRequestToJSON(requestParameters['valeConsumoRequest']),
-        };
-    }
-
-    /**
-     */
-    async crearRaw(requestParameters: CrearRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.crearRequestOpts(requestParameters);
-        const response = await this.request(requestOptions, initOverrides);
-
-        return new runtime.JSONApiResponse<any>(response);
-    }
-
-    /**
-     */
-    async crear(requestParameters: CrearRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.crearRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Creates request options for listar without sending the request
-     */
-    async listarRequestOpts(): Promise<runtime.RequestOpts> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("bearerAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-
-        let urlPath = `/api/vales-consumo`;
+        let urlPath = `/api/vales-consumo/_plantilla`;
 
         return {
             path: urlPath,
@@ -235,69 +48,17 @@ export class ValeConsumoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listarRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.listarRequestOpts();
+    async plantillaRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.plantillaRequestOpts();
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.VoidApiResponse(response);
     }
 
     /**
      */
-    async listar(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.listarRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Creates request options for obtener without sending the request
-     */
-    async obtenerRequestOpts(requestParameters: ObtenerRequest): Promise<runtime.RequestOpts> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling obtener().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("bearerAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-
-        let urlPath = `/api/vales-consumo/{id}`;
-        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
-
-        return {
-            path: urlPath,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        };
-    }
-
-    /**
-     */
-    async obtenerRaw(requestParameters: ObtenerRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.obtenerRequestOpts(requestParameters);
-        const response = await this.request(requestOptions, initOverrides);
-
-        return new runtime.JSONApiResponse<any>(response);
-    }
-
-    /**
-     */
-    async obtener(requestParameters: ObtenerRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.obtenerRaw(requestParameters, initOverrides);
-        return await response.value();
+    async plantilla(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.plantillaRaw(initOverrides);
     }
 
 }
