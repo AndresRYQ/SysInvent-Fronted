@@ -34,31 +34,31 @@ import {
     MessageResponseToJSON,
 } from '../models/MessageResponse';
 
-export interface Actualizar7Request {
+export interface Actualizar6Request {
     id: number;
     categoriaCatalogoRequest: CategoriaCatalogoRequest;
 }
 
-export interface CambiarEstado7Request {
+export interface CambiarEstado6Request {
     id: number;
     estadoCatalogoRequest: EstadoCatalogoRequest;
 }
 
-export interface Crear7Request {
+export interface Crear6Request {
     categoriaCatalogoRequest: CategoriaCatalogoRequest;
 }
 
-export interface Desactivar7Request {
+export interface Desactivar6Request {
     id: number;
 }
 
-export interface Listar7Request {
+export interface Listar6Request {
     nombre?: string;
     pagina?: number;
     tamPagina?: number;
 }
 
-export interface Obtener7Request {
+export interface Obtener6Request {
     id: number;
 }
 
@@ -68,20 +68,20 @@ export interface Obtener7Request {
 export class CategoriaCatalogoControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for actualizar7 without sending the request
+     * Creates request options for actualizar6 without sending the request
      */
-    async actualizar7RequestOpts(requestParameters: Actualizar7Request): Promise<runtime.RequestOpts> {
+    async actualizar6RequestOpts(requestParameters: Actualizar6Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling actualizar7().'
+                'Required parameter "id" was null or undefined when calling actualizar6().'
             );
         }
 
         if (requestParameters['categoriaCatalogoRequest'] == null) {
             throw new runtime.RequiredError(
                 'categoriaCatalogoRequest',
-                'Required parameter "categoriaCatalogoRequest" was null or undefined when calling actualizar7().'
+                'Required parameter "categoriaCatalogoRequest" was null or undefined when calling actualizar6().'
             );
         }
 
@@ -114,8 +114,8 @@ export class CategoriaCatalogoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async actualizar7Raw(requestParameters: Actualizar7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
-        const requestOptions = await this.actualizar7RequestOpts(requestParameters);
+    async actualizar6Raw(requestParameters: Actualizar6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.actualizar6RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
@@ -123,26 +123,26 @@ export class CategoriaCatalogoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async actualizar7(requestParameters: Actualizar7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
-        const response = await this.actualizar7Raw(requestParameters, initOverrides);
+    async actualizar6(requestParameters: Actualizar6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.actualizar6Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for cambiarEstado7 without sending the request
+     * Creates request options for cambiarEstado6 without sending the request
      */
-    async cambiarEstado7RequestOpts(requestParameters: CambiarEstado7Request): Promise<runtime.RequestOpts> {
+    async cambiarEstado6RequestOpts(requestParameters: CambiarEstado6Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling cambiarEstado7().'
+                'Required parameter "id" was null or undefined when calling cambiarEstado6().'
             );
         }
 
         if (requestParameters['estadoCatalogoRequest'] == null) {
             throw new runtime.RequiredError(
                 'estadoCatalogoRequest',
-                'Required parameter "estadoCatalogoRequest" was null or undefined when calling cambiarEstado7().'
+                'Required parameter "estadoCatalogoRequest" was null or undefined when calling cambiarEstado6().'
             );
         }
 
@@ -175,8 +175,8 @@ export class CategoriaCatalogoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async cambiarEstado7Raw(requestParameters: CambiarEstado7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
-        const requestOptions = await this.cambiarEstado7RequestOpts(requestParameters);
+    async cambiarEstado6Raw(requestParameters: CambiarEstado6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.cambiarEstado6RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
@@ -184,19 +184,19 @@ export class CategoriaCatalogoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async cambiarEstado7(requestParameters: CambiarEstado7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
-        const response = await this.cambiarEstado7Raw(requestParameters, initOverrides);
+    async cambiarEstado6(requestParameters: CambiarEstado6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.cambiarEstado6Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for crear7 without sending the request
+     * Creates request options for crear6 without sending the request
      */
-    async crear7RequestOpts(requestParameters: Crear7Request): Promise<runtime.RequestOpts> {
+    async crear6RequestOpts(requestParameters: Crear6Request): Promise<runtime.RequestOpts> {
         if (requestParameters['categoriaCatalogoRequest'] == null) {
             throw new runtime.RequiredError(
                 'categoriaCatalogoRequest',
-                'Required parameter "categoriaCatalogoRequest" was null or undefined when calling crear7().'
+                'Required parameter "categoriaCatalogoRequest" was null or undefined when calling crear6().'
             );
         }
 
@@ -228,8 +228,8 @@ export class CategoriaCatalogoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async crear7Raw(requestParameters: Crear7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
-        const requestOptions = await this.crear7RequestOpts(requestParameters);
+    async crear6Raw(requestParameters: Crear6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.crear6RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
@@ -237,19 +237,19 @@ export class CategoriaCatalogoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async crear7(requestParameters: Crear7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
-        const response = await this.crear7Raw(requestParameters, initOverrides);
+    async crear6(requestParameters: Crear6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.crear6Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for desactivar7 without sending the request
+     * Creates request options for desactivar6 without sending the request
      */
-    async desactivar7RequestOpts(requestParameters: Desactivar7Request): Promise<runtime.RequestOpts> {
+    async desactivar6RequestOpts(requestParameters: Desactivar6Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling desactivar7().'
+                'Required parameter "id" was null or undefined when calling desactivar6().'
             );
         }
 
@@ -279,8 +279,8 @@ export class CategoriaCatalogoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async desactivar7Raw(requestParameters: Desactivar7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
-        const requestOptions = await this.desactivar7RequestOpts(requestParameters);
+    async desactivar6Raw(requestParameters: Desactivar6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.desactivar6RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
@@ -288,15 +288,15 @@ export class CategoriaCatalogoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async desactivar7(requestParameters: Desactivar7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
-        const response = await this.desactivar7Raw(requestParameters, initOverrides);
+    async desactivar6(requestParameters: Desactivar6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.desactivar6Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for listar7 without sending the request
+     * Creates request options for listar6 without sending the request
      */
-    async listar7RequestOpts(requestParameters: Listar7Request): Promise<runtime.RequestOpts> {
+    async listar6RequestOpts(requestParameters: Listar6Request): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['nombre'] != null) {
@@ -334,8 +334,8 @@ export class CategoriaCatalogoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar7Raw(requestParameters: Listar7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageCategoriaCatalogoResponse>> {
-        const requestOptions = await this.listar7RequestOpts(requestParameters);
+    async listar6Raw(requestParameters: Listar6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageCategoriaCatalogoResponse>> {
+        const requestOptions = await this.listar6RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageCategoriaCatalogoResponseFromJSON(jsonValue));
@@ -343,19 +343,19 @@ export class CategoriaCatalogoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar7(requestParameters: Listar7Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageCategoriaCatalogoResponse> {
-        const response = await this.listar7Raw(requestParameters, initOverrides);
+    async listar6(requestParameters: Listar6Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageCategoriaCatalogoResponse> {
+        const response = await this.listar6Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for obtener7 without sending the request
+     * Creates request options for obtener6 without sending the request
      */
-    async obtener7RequestOpts(requestParameters: Obtener7Request): Promise<runtime.RequestOpts> {
+    async obtener6RequestOpts(requestParameters: Obtener6Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling obtener7().'
+                'Required parameter "id" was null or undefined when calling obtener6().'
             );
         }
 
@@ -385,8 +385,8 @@ export class CategoriaCatalogoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async obtener7Raw(requestParameters: Obtener7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
-        const requestOptions = await this.obtener7RequestOpts(requestParameters);
+    async obtener6Raw(requestParameters: Obtener6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.obtener6RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
@@ -394,8 +394,8 @@ export class CategoriaCatalogoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async obtener7(requestParameters: Obtener7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
-        const response = await this.obtener7Raw(requestParameters, initOverrides);
+    async obtener6(requestParameters: Obtener6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.obtener6Raw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -72,16 +72,8 @@ export function DestinoResponseFromJSONTyped(json: any, ignoreDiscriminator: boo
         'nombre': json['nombre'] == null ? undefined : json['nombre'],
         'descripcion': json['descripcion'] == null ? undefined : json['descripcion'],
         'activo': json['activo'] == null ? undefined : json['activo'],
-        'fechaRegistro': json['fechaRegistro'] == null ? undefined : parseFechaRegistro(json['fechaRegistro']),
+        'fechaRegistro': json['fechaRegistro'] == null ? undefined : (new Date(json['fechaRegistro'])),
     };
-}
-
-function parseFechaRegistro(value: string): Date {
-    const fecha = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-    if (fecha) {
-        return new Date(Date.UTC(Number(fecha[3]), Number(fecha[2]) - 1, Number(fecha[1])));
-    }
-    return new Date(value);
 }
 
 export function DestinoResponseToJSON(json: any): DestinoResponse {

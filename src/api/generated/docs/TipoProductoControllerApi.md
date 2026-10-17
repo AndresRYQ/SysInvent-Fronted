@@ -4,18 +4,18 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**actualizar1**](TipoProductoControllerApi.md#actualizar1) | **PUT** /api/v1/catalogos/tipos-producto/{id} |  |
-| [**cambiarEstado1**](TipoProductoControllerApi.md#cambiarestado1) | **PUT** /api/v1/catalogos/tipos-producto/{id}/estado |  |
-| [**crear1**](TipoProductoControllerApi.md#crear1) | **POST** /api/v1/catalogos/tipos-producto |  |
-| [**desactivar1**](TipoProductoControllerApi.md#desactivar1) | **DELETE** /api/v1/catalogos/tipos-producto/{id} |  |
-| [**listar1**](TipoProductoControllerApi.md#listar1) | **GET** /api/v1/catalogos/tipos-producto |  |
-| [**obtener1**](TipoProductoControllerApi.md#obtener1) | **GET** /api/v1/catalogos/tipos-producto/{id} |  |
+| [**actualizar**](TipoProductoControllerApi.md#actualizar) | **PUT** /api/v1/catalogos/tipos-producto/{id} |  |
+| [**cambiarEstado**](TipoProductoControllerApi.md#cambiarestado) | **PUT** /api/v1/catalogos/tipos-producto/{id}/estado |  |
+| [**crear**](TipoProductoControllerApi.md#crear) | **POST** /api/v1/catalogos/tipos-producto |  |
+| [**desactivar**](TipoProductoControllerApi.md#desactivar) | **DELETE** /api/v1/catalogos/tipos-producto/{id} |  |
+| [**listar**](TipoProductoControllerApi.md#listar) | **GET** /api/v1/catalogos/tipos-producto |  |
+| [**obtener**](TipoProductoControllerApi.md#obtener) | **GET** /api/v1/catalogos/tipos-producto/{id} |  |
 
 
 
-## actualizar1
+## actualizar
 
-> MessageResponse actualizar1(id, tipoProductoRequest)
+> MessageResponse actualizar(id, tipoProductoRequest)
 
 
 
@@ -26,7 +26,7 @@ import {
   Configuration,
   TipoProductoControllerApi,
 } from '';
-import type { Actualizar1Request } from '';
+import type { ActualizarRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -41,10 +41,10 @@ async function example() {
     id: 56,
     // TipoProductoRequest
     tipoProductoRequest: ...,
-  } satisfies Actualizar1Request;
+  } satisfies ActualizarRequest;
 
   try {
-    const data = await api.actualizar1(body);
+    const data = await api.actualizar(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -85,9 +85,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## cambiarEstado1
+## cambiarEstado
 
-> MessageResponse cambiarEstado1(id, estadoCatalogoRequest)
+> MessageResponse cambiarEstado(id, estadoCatalogoRequest)
 
 
 
@@ -98,7 +98,7 @@ import {
   Configuration,
   TipoProductoControllerApi,
 } from '';
-import type { CambiarEstado1Request } from '';
+import type { CambiarEstadoRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -113,10 +113,10 @@ async function example() {
     id: 56,
     // EstadoCatalogoRequest
     estadoCatalogoRequest: ...,
-  } satisfies CambiarEstado1Request;
+  } satisfies CambiarEstadoRequest;
 
   try {
-    const data = await api.cambiarEstado1(body);
+    const data = await api.cambiarEstado(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -157,9 +157,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## crear1
+## crear
 
-> MessageResponse crear1(tipoProductoRequest)
+> MessageResponse crear(tipoProductoRequest)
 
 
 
@@ -170,7 +170,7 @@ import {
   Configuration,
   TipoProductoControllerApi,
 } from '';
-import type { Crear1Request } from '';
+import type { CrearRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -183,10 +183,10 @@ async function example() {
   const body = {
     // TipoProductoRequest
     tipoProductoRequest: ...,
-  } satisfies Crear1Request;
+  } satisfies CrearRequest;
 
   try {
-    const data = await api.crear1(body);
+    const data = await api.crear(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -226,9 +226,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## desactivar1
+## desactivar
 
-> MessageResponse desactivar1(id)
+> MessageResponse desactivar(id)
 
 
 
@@ -239,7 +239,7 @@ import {
   Configuration,
   TipoProductoControllerApi,
 } from '';
-import type { Desactivar1Request } from '';
+import type { DesactivarRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -252,10 +252,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Desactivar1Request;
+  } satisfies DesactivarRequest;
 
   try {
-    const data = await api.desactivar1(body);
+    const data = await api.desactivar(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -295,9 +295,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## listar1
+## listar
 
-> CustomPageTipoProductoResponse listar1(nombre, pagina, tamPagina)
+> CustomPageTipoProductoResponse listar(nombre, pagina, tamPagina)
 
 
 
@@ -308,7 +308,7 @@ import {
   Configuration,
   TipoProductoControllerApi,
 } from '';
-import type { Listar1Request } from '';
+import type { ListarRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -325,10 +325,10 @@ async function example() {
     pagina: 56,
     // number (optional)
     tamPagina: 56,
-  } satisfies Listar1Request;
+  } satisfies ListarRequest;
 
   try {
-    const data = await api.listar1(body);
+    const data = await api.listar(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -370,9 +370,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## obtener1
+## obtener
 
-> MessageResponse obtener1(id)
+> MessageResponse obtener(id)
 
 
 
@@ -383,7 +383,7 @@ import {
   Configuration,
   TipoProductoControllerApi,
 } from '';
-import type { Obtener1Request } from '';
+import type { ObtenerRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -396,10 +396,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Obtener1Request;
+  } satisfies ObtenerRequest;
 
   try {
-    const data = await api.obtener1(body);
+    const data = await api.obtener(body);
     console.log(data);
   } catch (error) {
     console.error(error);

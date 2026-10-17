@@ -20,7 +20,7 @@ apis/ReporteValeControllerApi.ts
 apis/RolesApi.ts
 apis/TipoDocumentoControllerApi.ts
 apis/TipoProductoControllerApi.ts
-apis/UnidadMedidaControllerApi.ts
+apis/UnidadesDeMedidaApi.ts
 apis/UsuariosApi.ts
 apis/ValeConsumoControllerApi.ts
 apis/index.ts
@@ -83,9 +83,9 @@ docs/TipoDocumentoResponse.md
 docs/TipoProductoControllerApi.md
 docs/TipoProductoRequest.md
 docs/TipoProductoResponse.md
-docs/UnidadMedidaControllerApi.md
 docs/UnidadMedidaRequest.md
 docs/UnidadMedidaResponse.md
+docs/UnidadesDeMedidaApi.md
 docs/UsuarioRequest.md
 docs/UsuariosApi.md
 docs/ValeConsumoControllerApi.md

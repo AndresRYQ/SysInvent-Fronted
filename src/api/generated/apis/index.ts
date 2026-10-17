@@ -22,6 +22,6 @@ export * from './ReporteValeControllerApi';
 export * from './RolesApi';
 export * from './TipoDocumentoControllerApi';
 export * from './TipoProductoControllerApi';
-export * from './UnidadMedidaControllerApi';
+export * from './UnidadesDeMedidaApi';
 export * from './UsuariosApi';
 export * from './ValeConsumoControllerApi';

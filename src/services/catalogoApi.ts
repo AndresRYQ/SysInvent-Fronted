@@ -5,7 +5,7 @@ import {
   ProveedorControllerApi,
   TipoDocumentoControllerApi,
   TipoProductoControllerApi,
-  UnidadMedidaControllerApi,
+  UnidadesDeMedidaApi,
 } from '../api/generated'
 import type { CustomPageable } from '../api/generated'
 import { apiConfiguration } from '../api/client'
@@ -20,19 +20,19 @@ type RegistroApi = Record<string, unknown>
 
 const catalogoApis = {
   '/api/v1/catalogos/centros-costo': () =>
-    new CentroCostoControllerApi(apiConfiguration).listar6(),
+    new CentroCostoControllerApi(apiConfiguration).listar5(),
   '/api/v1/catalogos/destinos': () =>
     new DestinosApi(apiConfiguration).listarDestinos(),
   '/api/v1/catalogos/partes-equipo': () =>
-    new ParteEquipoControllerApi(apiConfiguration).listar4(),
+    new ParteEquipoControllerApi(apiConfiguration).listar3(),
   '/api/v1/catalogos/proveedores': () =>
-    new ProveedorControllerApi(apiConfiguration).listar3(),
+    new ProveedorControllerApi(apiConfiguration).listar2(),
   '/api/v1/catalogos/tipos-documento': () =>
-    new TipoDocumentoControllerApi(apiConfiguration).listar2(),
+    new TipoDocumentoControllerApi(apiConfiguration).listar1(),
   '/api/v1/catalogos/tipos-producto': () =>
-    new TipoProductoControllerApi(apiConfiguration).listar1(),
+    new TipoProductoControllerApi(apiConfiguration).listar(),
   '/api/v1/catalogos/unidades-medida': () =>
-    new UnidadMedidaControllerApi(apiConfiguration).listar(),
+    new UnidadesDeMedidaApi(apiConfiguration).listarUnidadesMedida(),
 } as const
 
 export async function listarCatalogo<T>(
