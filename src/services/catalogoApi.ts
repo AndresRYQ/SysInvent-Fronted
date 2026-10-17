@@ -4,7 +4,7 @@ import {
   ParteEquipoControllerApi,
   ProveedorControllerApi,
   TiposDeDocumentoApi,
-  TipoProductoControllerApi,
+  TiposDeProductoApi,
   UnidadesDeMedidaApi,
 } from '../api/generated'
 import type { CustomPageable } from '../api/generated'
@@ -20,17 +20,17 @@ type RegistroApi = Record<string, unknown>
 
 const catalogoApis = {
   '/api/v1/catalogos/centros-costo': () =>
-    new CentroCostoControllerApi(apiConfiguration).listar4(),
+    new CentroCostoControllerApi(apiConfiguration).listar3(),
   '/api/v1/catalogos/destinos': () =>
     new DestinosApi(apiConfiguration).listarDestinos(),
   '/api/v1/catalogos/partes-equipo': () =>
-    new ParteEquipoControllerApi(apiConfiguration).listar2(),
+    new ParteEquipoControllerApi(apiConfiguration).listar1(),
   '/api/v1/catalogos/proveedores': () =>
-    new ProveedorControllerApi(apiConfiguration).listar1(),
+    new ProveedorControllerApi(apiConfiguration).listar(),
   '/api/v1/catalogos/tipos-documento': () =>
     new TiposDeDocumentoApi(apiConfiguration).listarTiposDocumento(),
   '/api/v1/catalogos/tipos-producto': () =>
-    new TipoProductoControllerApi(apiConfiguration).listar(),
+    new TiposDeProductoApi(apiConfiguration).listarTiposProducto(),
   '/api/v1/catalogos/unidades-medida': () =>
     new UnidadesDeMedidaApi(apiConfiguration).listarUnidadesMedida(),
 } as const

@@ -18,8 +18,8 @@ apis/ReporteKardexControllerApi.ts
 apis/ReporteProductoMasPedidoControllerApi.ts
 apis/ReporteValeControllerApi.ts
 apis/RolesApi.ts
-apis/TipoProductoControllerApi.ts
 apis/TiposDeDocumentoApi.ts
+apis/TiposDeProductoApi.ts
 apis/UnidadesDeMedidaApi.ts
 apis/UsuariosApi.ts
 apis/ValeConsumoControllerApi.ts
@@ -79,10 +79,10 @@ docs/RolResponse.md
 docs/RolesApi.md
 docs/TipoDocumentoRequest.md
 docs/TipoDocumentoResponse.md
-docs/TipoProductoControllerApi.md
 docs/TipoProductoRequest.md
 docs/TipoProductoResponse.md
 docs/TiposDeDocumentoApi.md
+docs/TiposDeProductoApi.md
 docs/UnidadMedidaRequest.md
 docs/UnidadMedidaResponse.md
 docs/UnidadesDeMedidaApi.md
