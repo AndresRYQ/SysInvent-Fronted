@@ -1,5 +1,9 @@
 import { toApiError } from './api'
-import { LoginApi, type LoginRequest } from '../api/generated'
+import {
+  LoginApi,
+  type LoginRequest,
+  type LoginResponse,
+} from '../api/generated'
 import { apiConfiguration } from '../api/client'
 
 import type {
@@ -10,13 +14,6 @@ import type {
 } from '../types/auth'
 
 export const AUTH_TOKEN_KEY = 'sysinvent_token'
-
-interface LoginBackendResponse {
-  success: boolean
-  message: string
-  status: number
-  data: string
-}
 
 interface JwtPayload {
   sub?: string
@@ -35,9 +32,9 @@ const loginApi = new LoginApi(apiConfiguration)
 async function requestLogin(
   usuario: string,
   contrasena: string,
-): Promise<LoginBackendResponse> {
+): Promise<LoginResponse> {
   const request: LoginRequest = { usuario, contrasena }
-  return (await loginApi.login({ loginRequest: request })) as LoginBackendResponse
+  return await loginApi.login({ loginRequest: request })
 }
 
 function decodeBase64Url(value: string): string {
@@ -103,7 +100,7 @@ export async function login(
   try {
     const response = await requestLogin(usuario, contrasena)
 
-    if (response.success === true && response.data) {
+    if (response.success === true && typeof response.data === 'string') {
       localStorage.setItem(AUTH_TOKEN_KEY, response.data)
 
       return {

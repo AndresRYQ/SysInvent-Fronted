@@ -28,8 +28,13 @@ import {
     EstadoCatalogoRequestFromJSON,
     EstadoCatalogoRequestToJSON,
 } from '../models/EstadoCatalogoRequest';
+import {
+    type MessageResponse,
+    MessageResponseFromJSON,
+    MessageResponseToJSON,
+} from '../models/MessageResponse';
 
-export interface Actualizar6Request {
+export interface Actualizar5Request {
     id: number;
     destinoRequest: DestinoRequest;
 }
@@ -39,7 +44,7 @@ export interface CambiarEstado5Request {
     estadoCatalogoRequest: EstadoCatalogoRequest;
 }
 
-export interface Crear6Request {
+export interface Crear5Request {
     destinoRequest: DestinoRequest;
 }
 
@@ -47,13 +52,14 @@ export interface Desactivar5Request {
     id: number;
 }
 
-export interface Listar6Request {
+export interface Listar5Request {
     nombre?: string;
+    estado?: boolean;
     pagina?: number;
     tamPagina?: number;
 }
 
-export interface Obtener6Request {
+export interface Obtener5Request {
     id: number;
 }
 
@@ -63,20 +69,20 @@ export interface Obtener6Request {
 export class DestinoControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for actualizar6 without sending the request
+     * Creates request options for actualizar5 without sending the request
      */
-    async actualizar6RequestOpts(requestParameters: Actualizar6Request): Promise<runtime.RequestOpts> {
+    async actualizar5RequestOpts(requestParameters: Actualizar5Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling actualizar6().'
+                'Required parameter "id" was null or undefined when calling actualizar5().'
             );
         }
 
         if (requestParameters['destinoRequest'] == null) {
             throw new runtime.RequiredError(
                 'destinoRequest',
-                'Required parameter "destinoRequest" was null or undefined when calling actualizar6().'
+                'Required parameter "destinoRequest" was null or undefined when calling actualizar5().'
             );
         }
 
@@ -109,17 +115,17 @@ export class DestinoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async actualizar6Raw(requestParameters: Actualizar6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.actualizar6RequestOpts(requestParameters);
+    async actualizar5Raw(requestParameters: Actualizar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.actualizar5RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async actualizar6(requestParameters: Actualizar6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.actualizar6Raw(requestParameters, initOverrides);
+    async actualizar5(requestParameters: Actualizar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.actualizar5Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -170,28 +176,28 @@ export class DestinoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async cambiarEstado5Raw(requestParameters: CambiarEstado5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async cambiarEstado5Raw(requestParameters: CambiarEstado5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
         const requestOptions = await this.cambiarEstado5RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async cambiarEstado5(requestParameters: CambiarEstado5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async cambiarEstado5(requestParameters: CambiarEstado5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
         const response = await this.cambiarEstado5Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for crear6 without sending the request
+     * Creates request options for crear5 without sending the request
      */
-    async crear6RequestOpts(requestParameters: Crear6Request): Promise<runtime.RequestOpts> {
+    async crear5RequestOpts(requestParameters: Crear5Request): Promise<runtime.RequestOpts> {
         if (requestParameters['destinoRequest'] == null) {
             throw new runtime.RequiredError(
                 'destinoRequest',
-                'Required parameter "destinoRequest" was null or undefined when calling crear6().'
+                'Required parameter "destinoRequest" was null or undefined when calling crear5().'
             );
         }
 
@@ -223,17 +229,17 @@ export class DestinoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async crear6Raw(requestParameters: Crear6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.crear6RequestOpts(requestParameters);
+    async crear5Raw(requestParameters: Crear5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.crear5RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async crear6(requestParameters: Crear6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.crear6Raw(requestParameters, initOverrides);
+    async crear5(requestParameters: Crear5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.crear5Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -274,28 +280,32 @@ export class DestinoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async desactivar5Raw(requestParameters: Desactivar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async desactivar5Raw(requestParameters: Desactivar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
         const requestOptions = await this.desactivar5RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async desactivar5(requestParameters: Desactivar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async desactivar5(requestParameters: Desactivar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
         const response = await this.desactivar5Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for listar6 without sending the request
+     * Creates request options for listar5 without sending the request
      */
-    async listar6RequestOpts(requestParameters: Listar6Request): Promise<runtime.RequestOpts> {
+    async listar5RequestOpts(requestParameters: Listar5Request): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['nombre'] != null) {
             queryParameters['nombre'] = requestParameters['nombre'];
+        }
+
+        if (requestParameters['estado'] != null) {
+            queryParameters['estado'] = requestParameters['estado'];
         }
 
         if (requestParameters['pagina'] != null) {
@@ -329,8 +339,8 @@ export class DestinoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar6Raw(requestParameters: Listar6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageDestinoResponse>> {
-        const requestOptions = await this.listar6RequestOpts(requestParameters);
+    async listar5Raw(requestParameters: Listar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageDestinoResponse>> {
+        const requestOptions = await this.listar5RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageDestinoResponseFromJSON(jsonValue));
@@ -338,19 +348,19 @@ export class DestinoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar6(requestParameters: Listar6Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageDestinoResponse> {
-        const response = await this.listar6Raw(requestParameters, initOverrides);
+    async listar5(requestParameters: Listar5Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageDestinoResponse> {
+        const response = await this.listar5Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for obtener6 without sending the request
+     * Creates request options for obtener5 without sending the request
      */
-    async obtener6RequestOpts(requestParameters: Obtener6Request): Promise<runtime.RequestOpts> {
+    async obtener5RequestOpts(requestParameters: Obtener5Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling obtener6().'
+                'Required parameter "id" was null or undefined when calling obtener5().'
             );
         }
 
@@ -380,18 +390,42 @@ export class DestinoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async obtener6Raw(requestParameters: Obtener6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.obtener6RequestOpts(requestParameters);
+    async obtener5Raw(requestParameters: Obtener5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.obtener5RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async obtener6(requestParameters: Obtener6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.obtener6Raw(requestParameters, initOverrides);
+    async obtener5(requestParameters: Obtener5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.obtener5Raw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    async listarDestinos(requestParameters: Listar5Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageDestinoResponse> {
+        return this.listar5(requestParameters, initOverrides);
+    }
+
+    async registrarDestino(requestParameters: Crear5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        return this.crear5(requestParameters, initOverrides);
+    }
+
+    async actualizarDestino(requestParameters: Actualizar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        return this.actualizar5(requestParameters, initOverrides);
+    }
+
+    async cambiarEstadoDestino(requestParameters: CambiarEstado5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        return this.cambiarEstado5(requestParameters, initOverrides);
+    }
+
+    async desactivarDestino(requestParameters: Desactivar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        return this.desactivar5(requestParameters, initOverrides);
+    }
+
+    async obtenerDestino(requestParameters: Obtener5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        return this.obtener5(requestParameters, initOverrides);
     }
 
 }

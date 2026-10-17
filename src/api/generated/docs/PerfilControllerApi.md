@@ -4,13 +4,13 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**plantilla**](PerfilControllerApi.md#plantilla) | **GET** /api/usuarios/perfil/_plantilla |  |
+| [**plantilla1**](PerfilControllerApi.md#plantilla1) | **GET** /api/usuarios/perfil/_plantilla |  |
 
 
 
-## plantilla
+## plantilla1
 
-> plantilla()
+> plantilla1()
 
 
 
@@ -21,7 +21,7 @@ import {
   Configuration,
   PerfilControllerApi,
 } from '';
-import type { PlantillaRequest } from '';
+import type { Plantilla1Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -32,7 +32,7 @@ async function example() {
   const api = new PerfilControllerApi(config);
 
   try {
-    const data = await api.plantilla();
+    const data = await api.plantilla1();
     console.log(data);
   } catch (error) {
     console.error(error);

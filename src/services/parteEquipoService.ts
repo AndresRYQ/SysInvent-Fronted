@@ -1,421 +1,129 @@
-import type {
-  ParteEquipo,
-  ParteEquipoFormData,
-} from '../types/parteEquipo'
-
-import { registrarEventoBitacora } from './bitacoraService'
+import type { ParteEquipo, ParteEquipoFormData } from '../types/parteEquipo'
 import {
-  listarCatalogo,
-  obtenerEstadoActivo,
-  obtenerIdCatalogo,
-  type CatalogoPaginado,
-} from './catalogoApi'
+  PartesDeEquipoApi,
+  type CustomPageParteEquipoResponse,
+  type MessageResponse,
+} from '../api/generated'
+import { apiConfiguration } from '../api/client'
+import type { CatalogoPaginado } from './catalogoApi'
 
-const STORAGE_KEY =
-  'agrihusac_partes_equipo'
+let partesEnMemoria: ParteEquipo[] = []
+const parteEquipoApi = new PartesDeEquipoApi(apiConfiguration)
+const solicitudesEnCurso = new Map<string, Promise<CatalogoPaginado<ParteEquipo>>>()
 
-type RegistroGuardado = Partial<ParteEquipo> & { id?: number | string }
-
-const PARTES_INICIALES:
-  ParteEquipo[] = [
-    {
-      id: 1,
-      codigo: 'MOT-001',
-      nombre: 'Motor principal',
-      descripcion:
-        'Motor principal utilizado en equipos de producción.',
-      estado: true,
-      fechaRegistro: '10/08/2026',
-    },
-    {
-      id: 2,
-      codigo: 'SIS-HID-001',
-      nombre: 'Sistema hidráulico',
-      descripcion:
-        'Componentes hidráulicos para maquinaria industrial.',
-      estado: true,
-      fechaRegistro: '11/08/2026',
-    },
-    {
-      id: 3,
-      codigo: 'TAB-ELE-001',
-      nombre: 'Tablero eléctrico',
-      descripcion:
-        'Tablero de control y distribución eléctrica.',
-      estado: true,
-      fechaRegistro: '12/08/2026',
-    },
-    {
-      id: 4,
-      codigo: 'BOM-001',
-      nombre: 'Bomba de agua',
-      descripcion:
-        'Bomba utilizada para circulación y suministro de agua.',
-      estado: true,
-      fechaRegistro: '13/08/2026',
-    },
-    {
-      id: 5,
-      codigo: 'TRA-001',
-      nombre: 'Sistema de transmisión',
-      descripcion:
-        'Conjunto de piezas para transmisión de movimiento.',
-      estado: false,
-      fechaRegistro: '14/08/2026',
-    },
-  ]
-
-function copiarPartes(
-  partes: ParteEquipo[],
-): ParteEquipo[] {
-  return partes.map((parte) => ({ ...parte })).sort((a, b) => a.id - b.id)
+export interface ListarPartesEquipoParams {
+  nombre?: string
+  pagina?: number
+  tamPagina?: number
 }
 
-function normalizarParte(registro: RegistroGuardado): ParteEquipo | null {
-  const id = typeof registro.id === 'number'
-    ? registro.id
-    : Number(String(registro.id ?? '').match(/\d+/)?.[0] ?? '')
-  if (!Number.isInteger(id) || id <= 0 || !registro.nombre) return null
-  return {
-    id,
-    codigo: String(registro.codigo ?? '').trim(),
-    nombre: String(registro.nombre).trim(),
-    descripcion: String(registro.descripcion ?? '').trim(),
-    estado: registro.estado !== false,
-    fechaRegistro: String(registro.fechaRegistro ?? ''),
+export function obtenerPartesEquipo(): ParteEquipo[] {
+  return partesEnMemoria.map((parte) => ({ ...parte }))
+}
+
+function formatearFechaRegistro(fecha?: string | Date): string {
+  if (typeof fecha === 'string') return fecha.trim()
+  if (!fecha || Number.isNaN(fecha.getTime())) return ''
+  return fecha.toISOString().slice(0, 10)
+}
+
+function mapearRespuestaParte(response: CustomPageParteEquipoResponse): CatalogoPaginado<ParteEquipo> {
+  const resultado: CatalogoPaginado<ParteEquipo> = {
+    datos: (response.datos ?? []).map((parte) => ({
+      id: parte.parteEquipoId ?? 0,
+      codigo: parte.codigo ?? '',
+      nombre: parte.nombre ?? '',
+      descripcion: parte.descripcion ?? '',
+      estado: parte.activo ?? false,
+      fechaRegistro: formatearFechaRegistro(parte.fechaRegistro),
+    })),
+    paginacion: response.paginacion ?? {},
   }
+
+  partesEnMemoria = resultado.datos
+  return resultado
 }
 
-function guardarPartes(
-  partes: ParteEquipo[],
-): void {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(partes),
-  )
+export async function listarPartesEquipo(
+  params: ListarPartesEquipoParams = {},
+): Promise<CatalogoPaginado<ParteEquipo>> {
+  const parametros = {
+    nombre: params.nombre?.trim() || undefined,
+    pagina: params.pagina,
+    tamPagina: params.tamPagina,
+  }
+  const clave = JSON.stringify(parametros)
+  const solicitudExistente = solicitudesEnCurso.get(clave)
+
+  if (solicitudExistente) return solicitudExistente
+
+  const solicitud = parteEquipoApi
+    .listarPartesEquipo(parametros)
+    .then(mapearRespuestaParte)
+    .finally(() => solicitudesEnCurso.delete(clave))
+
+  solicitudesEnCurso.set(clave, solicitud)
+  return solicitud
 }
 
-function normalizarTexto(
-  valor: string | null | undefined,
-): string {
-  return (valor ?? '')
-    .trim()
-    .toLowerCase()
+export const listarPartesEquipoApi = listarPartesEquipo
+
+export function obtenerParteEquipoPorId(id: number): ParteEquipo | null {
+  const parte = partesEnMemoria.find((item) => item.id === id)
+  return parte ? { ...parte } : null
 }
 
-function crearFechaActual(): string {
-  return new Intl.DateTimeFormat(
-    'es-PE',
-  ).format(new Date())
-}
-
-function crearSiguienteId(
-  partes: ParteEquipo[],
-): number {
-  return partes.reduce((mayor, parte) => Math.max(mayor, parte.id), 0) + 1
-}
-
-function validarDatos(
-  datos: ParteEquipoFormData,
-): void {
-  const codigo = datos.codigo
-    .trim()
-    .toUpperCase()
-
+function validar(datos: ParteEquipoFormData): void {
+  const codigo = datos.codigo.trim().toUpperCase()
   const nombre = datos.nombre.trim()
-  const descripcion =
-    datos.descripcion.trim()
-
-  if (
-    !/^[A-Z0-9-]{3,30}$/.test(codigo)
-  ) {
-    throw new Error(
-      'El código debe tener entre 3 y 30 caracteres y solo puede contener letras, números y guiones.',
-    )
-  }
-
-  if (nombre.length < 2) {
-    throw new Error(
-      'El nombre debe tener al menos 2 caracteres.',
-    )
-  }
-
-  if (nombre.length > 120) {
-    throw new Error(
-      'El nombre no puede superar los 120 caracteres.',
-    )
-  }
-
-  if (descripcion.length < 5) {
-    throw new Error(
-      'La descripción debe tener al menos 5 caracteres.',
-    )
-  }
-
-  if (descripcion.length > 250) {
-    throw new Error(
-      'La descripción no puede superar los 250 caracteres.',
-    )
-  }
+  const descripcion = datos.descripcion.trim()
+  if (!/^[A-Z0-9-]{3,50}$/.test(codigo)) throw new Error('El código debe tener entre 3 y 50 caracteres y solo puede contener letras, números y guiones.')
+  if (!nombre) throw new Error('El nombre de la parte de equipo es obligatorio.')
+  if (nombre.length > 150) throw new Error('El nombre no puede superar los 150 caracteres.')
+  if (descripcion.length > 255) throw new Error('La descripción no puede superar los 255 caracteres.')
 }
 
-export function obtenerPartesEquipo():
-  ParteEquipo[] {
-  const datosGuardados =
-    localStorage.getItem(STORAGE_KEY)
-
-  if (!datosGuardados) {
-    guardarPartes(
-      PARTES_INICIALES,
-    )
-
-    return copiarPartes(
-      PARTES_INICIALES,
-    )
+function validarRespuesta(response: MessageResponse): MessageResponse {
+  if (response.success === false) {
+    throw new Error(response.message ?? 'La operación de partes de equipo no fue completada.')
   }
-
-  try {
-    const datos = JSON.parse(
-      datosGuardados,
-    )
-
-    if (!Array.isArray(datos)) {
-      throw new Error(
-        'Formato inválido',
-      )
-    }
-
-    const normalizados = datos
-      .map((registro) => normalizarParte(registro as RegistroGuardado))
-      .filter((parte): parte is ParteEquipo => Boolean(parte))
-    guardarPartes(normalizados)
-    return copiarPartes(normalizados)
-  } catch {
-    guardarPartes(
-      PARTES_INICIALES,
-    )
-
-    return copiarPartes(
-      PARTES_INICIALES,
-    )
-  }
+  return response
 }
 
-export function listarPartesEquipoApi():
-  Promise<CatalogoPaginado<ParteEquipo>> {
-  return listarCatalogo(
-    '/api/v1/catalogos/partes-equipo',
-    (registro) => ({
-      id: obtenerIdCatalogo(registro, 'parteEquipoId', 'id'),
-      codigo: String(registro.codigo ?? ''),
-      nombre: String(registro.nombre ?? ''),
-      descripcion: String(registro.descripcion ?? ''),
-      estado: obtenerEstadoActivo(registro),
-      fechaRegistro: String(registro.fechaRegistro ?? ''),
-    }),
-  )
-}
-
-export function obtenerParteEquipoPorId(
-  id: number,
-): ParteEquipo | null {
-  const parte =
-    obtenerPartesEquipo().find(
-      (item) => item.id === id,
-    )
-
-  return parte
-    ? { ...parte }
-    : null
-}
-
-export function crearParteEquipo(
-  datos: ParteEquipoFormData,
-): ParteEquipo {
-  validarDatos(datos)
-
-  const partes =
-    obtenerPartesEquipo()
-
-  const codigo = datos.codigo
-    .trim()
-    .toUpperCase()
-
-  const codigoDuplicado =
-    partes.some(
-      (parte) =>
-        parte.codigo
-          .trim()
-          .toUpperCase() === codigo,
-    )
-
-  if (codigoDuplicado) {
-    throw new Error(
-      'Ya existe una parte de equipo con ese código.',
-    )
-  }
-
-  const nombreDuplicado =
-    partes.some(
-      (parte) =>
-        normalizarTexto(
-          parte.nombre,
-        ) ===
-        normalizarTexto(datos.nombre),
-    )
-
-  if (nombreDuplicado) {
-    throw new Error(
-      'Ya existe una parte de equipo con ese nombre.',
-    )
-  }
-
-  const nuevaParte: ParteEquipo = {
-    id: crearSiguienteId(partes),
-    codigo,
-    nombre: datos.nombre.trim(),
-    descripcion:
-      datos.descripcion.trim(),
-    estado: true,
-    fechaRegistro:
-      crearFechaActual(),
-  }
-
-  guardarPartes([
-    nuevaParte,
-    ...partes,
-  ])
-
-  registrarEventoBitacora({
-    modulo: 'Partes de equipo',
-    accion: 'CREAR',
-    detalle:
-      `Se creó la parte de equipo "${nuevaParte.nombre}" con código ${nuevaParte.codigo}.`,
-    registroId: String(nuevaParte.id),
-  })
-
-  return { ...nuevaParte }
-}
-
-export function actualizarParteEquipo(
-  id: number,
-  datos: ParteEquipoFormData,
-): ParteEquipo {
-  validarDatos(datos)
-
-  const partes =
-    obtenerPartesEquipo()
-
-  const parteActual = partes.find(
-    (parte) => parte.id === id,
-  )
-
-  if (!parteActual) {
-    throw new Error(
-      'La parte de equipo no existe.',
-    )
-  }
-
-  const codigo = datos.codigo
-    .trim()
-    .toUpperCase()
-
-  const codigoDuplicado =
-    partes.some(
-      (parte) =>
-        parte.id !== id &&
-        parte.codigo
-          .trim()
-          .toUpperCase() === codigo,
-    )
-
-  if (codigoDuplicado) {
-    throw new Error(
-      'Ya existe otra parte de equipo con ese código.',
-    )
-  }
-
-  const nombreDuplicado =
-    partes.some(
-      (parte) =>
-        parte.id !== id &&
-        normalizarTexto(
-          parte.nombre,
-        ) ===
-          normalizarTexto(
-            datos.nombre,
-          ),
-    )
-
-  if (nombreDuplicado) {
-    throw new Error(
-      'Ya existe otra parte de equipo con ese nombre.',
-    )
-  }
-
-  const parteActualizada:
-    ParteEquipo = {
-      ...parteActual,
-      codigo,
+export async function crearParteEquipo(datos: ParteEquipoFormData): Promise<MessageResponse> {
+  validar(datos)
+  return validarRespuesta(await parteEquipoApi.registrarParteEquipo({
+    parteEquipoRequest: {
+      codigo: datos.codigo.trim().toUpperCase(),
       nombre: datos.nombre.trim(),
-      descripcion:
-        datos.descripcion.trim(),
-      estado: parteActual.estado,
-    }
-
-  guardarPartes(
-    partes.map((parte) =>
-      parte.id === id
-        ? parteActualizada
-        : parte,
-    ),
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Partes de equipo',
-    accion: 'EDITAR',
-    detalle:
-      `Se actualizó la parte de equipo "${parteActualizada.nombre}".`,
-    registroId: String(parteActualizada.id),
-  })
-
-  return { ...parteActualizada }
+      descripcion: datos.descripcion.trim(),
+    },
+  }))
 }
 
-export function eliminarParteEquipo(
-  id: number,
-): void {
-  const partes =
-    obtenerPartesEquipo()
-
-  const parte = partes.find(
-    (item) => item.id === id,
-  )
-
-  if (!parte) {
-    throw new Error(
-      'La parte de equipo no existe.',
-    )
-  }
-
-  guardarPartes(
-    partes.map((item) =>
-      item.id === id ? { ...item, estado: false } : item,
-    ),
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Partes de equipo',
-    accion: 'EDITAR',
-    detalle:
-      `Se desactivó la parte de equipo "${parte.nombre}".`,
-    registroId: String(parte.id),
-  })
+export async function actualizarParteEquipo(id: number, datos: ParteEquipoFormData): Promise<MessageResponse> {
+  validar(datos)
+  return validarRespuesta(await parteEquipoApi.actualizarParteEquipo({
+    id,
+    parteEquipoRequest: {
+      codigo: datos.codigo.trim().toUpperCase(),
+      nombre: datos.nombre.trim(),
+      descripcion: datos.descripcion.trim(),
+    },
+  }))
 }
 
-export function reactivarParteEquipo(id: number): void {
-  const partes = obtenerPartesEquipo()
-  const parte = partes.find((item) => item.id === id)
-  if (!parte) throw new Error('La parte de equipo no existe.')
-  guardarPartes(partes.map((item) => item.id === id ? { ...item, estado: true } : item))
+export async function cambiarEstadoParteEquipo(id: number, activo: boolean): Promise<MessageResponse> {
+  return validarRespuesta(await parteEquipoApi.cambiarEstadoParteEquipo({
+    id,
+    estadoCatalogoRequest: { activo },
+  }))
+}
+
+export function eliminarParteEquipo(id: number): Promise<MessageResponse> {
+  return cambiarEstadoParteEquipo(id, false)
+}
+
+export function reactivarParteEquipo(id: number): Promise<MessageResponse> {
+  return cambiarEstadoParteEquipo(id, true)
 }

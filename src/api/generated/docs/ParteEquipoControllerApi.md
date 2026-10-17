@@ -4,18 +4,18 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**actualizar5**](ParteEquipoControllerApi.md#actualizar5) | **PUT** /api/v1/catalogos/partes-equipo/{id} |  |
-| [**cambiarEstado4**](ParteEquipoControllerApi.md#cambiarestado4) | **PUT** /api/v1/catalogos/partes-equipo/{id}/estado |  |
-| [**crear5**](ParteEquipoControllerApi.md#crear5) | **POST** /api/v1/catalogos/partes-equipo |  |
-| [**desactivar4**](ParteEquipoControllerApi.md#desactivar4) | **DELETE** /api/v1/catalogos/partes-equipo/{id} |  |
-| [**listar5**](ParteEquipoControllerApi.md#listar5) | **GET** /api/v1/catalogos/partes-equipo |  |
-| [**obtener5**](ParteEquipoControllerApi.md#obtener5) | **GET** /api/v1/catalogos/partes-equipo/{id} |  |
+| [**actualizar1**](ParteEquipoControllerApi.md#actualizar1) | **PUT** /api/v1/catalogos/partes-equipo/{id} |  |
+| [**cambiarEstado1**](ParteEquipoControllerApi.md#cambiarestado1) | **PUT** /api/v1/catalogos/partes-equipo/{id}/estado |  |
+| [**crear1**](ParteEquipoControllerApi.md#crear1) | **POST** /api/v1/catalogos/partes-equipo |  |
+| [**desactivar1**](ParteEquipoControllerApi.md#desactivar1) | **DELETE** /api/v1/catalogos/partes-equipo/{id} |  |
+| [**listar1**](ParteEquipoControllerApi.md#listar1) | **GET** /api/v1/catalogos/partes-equipo |  |
+| [**obtener1**](ParteEquipoControllerApi.md#obtener1) | **GET** /api/v1/catalogos/partes-equipo/{id} |  |
 
 
 
-## actualizar5
+## actualizar1
 
-> object actualizar5(id, parteEquipoRequest)
+> MessageResponse actualizar1(id, parteEquipoRequest)
 
 
 
@@ -26,7 +26,7 @@ import {
   Configuration,
   ParteEquipoControllerApi,
 } from '';
-import type { Actualizar5Request } from '';
+import type { Actualizar1Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -41,10 +41,10 @@ async function example() {
     id: 56,
     // ParteEquipoRequest
     parteEquipoRequest: ...,
-  } satisfies Actualizar5Request;
+  } satisfies Actualizar1Request;
 
   try {
-    const data = await api.actualizar5(body);
+    const data = await api.actualizar1(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -65,7 +65,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -85,9 +85,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## cambiarEstado4
+## cambiarEstado1
 
-> object cambiarEstado4(id, estadoCatalogoRequest)
+> MessageResponse cambiarEstado1(id, estadoCatalogoRequest)
 
 
 
@@ -98,7 +98,7 @@ import {
   Configuration,
   ParteEquipoControllerApi,
 } from '';
-import type { CambiarEstado4Request } from '';
+import type { CambiarEstado1Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -113,10 +113,10 @@ async function example() {
     id: 56,
     // EstadoCatalogoRequest
     estadoCatalogoRequest: ...,
-  } satisfies CambiarEstado4Request;
+  } satisfies CambiarEstado1Request;
 
   try {
-    const data = await api.cambiarEstado4(body);
+    const data = await api.cambiarEstado1(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -137,7 +137,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -157,9 +157,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## crear5
+## crear1
 
-> object crear5(parteEquipoRequest)
+> MessageResponse crear1(parteEquipoRequest)
 
 
 
@@ -170,7 +170,7 @@ import {
   Configuration,
   ParteEquipoControllerApi,
 } from '';
-import type { Crear5Request } from '';
+import type { Crear1Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -183,10 +183,10 @@ async function example() {
   const body = {
     // ParteEquipoRequest
     parteEquipoRequest: ...,
-  } satisfies Crear5Request;
+  } satisfies Crear1Request;
 
   try {
-    const data = await api.crear5(body);
+    const data = await api.crear1(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -206,7 +206,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -226,9 +226,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## desactivar4
+## desactivar1
 
-> object desactivar4(id)
+> MessageResponse desactivar1(id)
 
 
 
@@ -239,7 +239,7 @@ import {
   Configuration,
   ParteEquipoControllerApi,
 } from '';
-import type { Desactivar4Request } from '';
+import type { Desactivar1Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -252,10 +252,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Desactivar4Request;
+  } satisfies Desactivar1Request;
 
   try {
-    const data = await api.desactivar4(body);
+    const data = await api.desactivar1(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -275,7 +275,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 
@@ -295,9 +295,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## listar5
+## listar1
 
-> CustomPageParteEquipoResponse listar5(nombre, pagina, tamPagina)
+> CustomPageParteEquipoResponse listar1(nombre, pagina, tamPagina)
 
 
 
@@ -308,7 +308,7 @@ import {
   Configuration,
   ParteEquipoControllerApi,
 } from '';
-import type { Listar5Request } from '';
+import type { Listar1Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -325,10 +325,10 @@ async function example() {
     pagina: 56,
     // number (optional)
     tamPagina: 56,
-  } satisfies Listar5Request;
+  } satisfies Listar1Request;
 
   try {
-    const data = await api.listar5(body);
+    const data = await api.listar1(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -370,9 +370,9 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## obtener5
+## obtener1
 
-> object obtener5(id)
+> MessageResponse obtener1(id)
 
 
 
@@ -383,7 +383,7 @@ import {
   Configuration,
   ParteEquipoControllerApi,
 } from '';
-import type { Obtener5Request } from '';
+import type { Obtener1Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -396,10 +396,10 @@ async function example() {
   const body = {
     // number
     id: 56,
-  } satisfies Obtener5Request;
+  } satisfies Obtener1Request;
 
   try {
-    const data = await api.obtener5(body);
+    const data = await api.obtener1(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -419,7 +419,7 @@ example().catch(console.error);
 
 ### Return type
 
-**object**
+[**MessageResponse**](MessageResponse.md)
 
 ### Authorization
 

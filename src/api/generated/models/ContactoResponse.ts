@@ -63,10 +63,10 @@ export interface ContactoResponse {
     activo?: boolean;
     /**
      * 
-     * @type {Date}
+     * @type {string}
      * @memberof ContactoResponse
      */
-    fechaRegistro?: Date;
+    fechaRegistro?: string;
 }
 
 /**
@@ -93,7 +93,7 @@ export function ContactoResponseFromJSONTyped(json: any, ignoreDiscriminator: bo
         'telefono': json['telefono'] == null ? undefined : json['telefono'],
         'correo': json['correo'] == null ? undefined : json['correo'],
         'activo': json['activo'] == null ? undefined : json['activo'],
-        'fechaRegistro': json['fechaRegistro'] == null ? undefined : (new Date(json['fechaRegistro'])),
+        'fechaRegistro': json['fechaRegistro'] == null ? undefined : String(json['fechaRegistro']),
     };
 }
 
@@ -115,7 +115,7 @@ export function ContactoResponseToJSONTyped(value?: ContactoResponse | null, ign
         'telefono': value['telefono'],
         'correo': value['correo'],
         'activo': value['activo'],
-        'fechaRegistro': value['fechaRegistro'] == null ? value['fechaRegistro'] : value['fechaRegistro'].toISOString().substring(0,10),
+        'fechaRegistro': value['fechaRegistro'],
     };
 }
 

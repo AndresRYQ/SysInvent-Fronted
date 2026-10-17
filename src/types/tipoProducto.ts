@@ -5,6 +5,7 @@ export interface TipoProducto {
   activo: 0 | 1
   /** Compatibilidad con consumidores antiguos. */
   estado?: boolean
+  fechaRegistro?: string
 }
 
 export interface TipoProductoFormData {

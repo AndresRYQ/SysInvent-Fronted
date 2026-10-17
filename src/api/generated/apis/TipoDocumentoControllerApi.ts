@@ -24,36 +24,41 @@ import {
     EstadoCatalogoRequestToJSON,
 } from '../models/EstadoCatalogoRequest';
 import {
+    type MessageResponse,
+    MessageResponseFromJSON,
+    MessageResponseToJSON,
+} from '../models/MessageResponse';
+import {
     type TipoDocumentoRequest,
     TipoDocumentoRequestFromJSON,
     TipoDocumentoRequestToJSON,
 } from '../models/TipoDocumentoRequest';
 
-export interface Actualizar3Request {
+export interface Actualizar1Request {
     id: number;
     tipoDocumentoRequest: TipoDocumentoRequest;
 }
 
-export interface CambiarEstado2Request {
+export interface CambiarEstado1Request {
     id: number;
     estadoCatalogoRequest: EstadoCatalogoRequest;
 }
 
-export interface Crear3Request {
+export interface Crear1Request {
     tipoDocumentoRequest: TipoDocumentoRequest;
 }
 
-export interface Desactivar2Request {
+export interface Desactivar1Request {
     id: number;
 }
 
-export interface Listar3Request {
+export interface Listar1Request {
     nombre?: string;
     pagina?: number;
     tamPagina?: number;
 }
 
-export interface Obtener3Request {
+export interface Obtener1Request {
     id: number;
 }
 
@@ -63,20 +68,20 @@ export interface Obtener3Request {
 export class TipoDocumentoControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for actualizar3 without sending the request
+     * Creates request options for actualizar1 without sending the request
      */
-    async actualizar3RequestOpts(requestParameters: Actualizar3Request): Promise<runtime.RequestOpts> {
+    async actualizar1RequestOpts(requestParameters: Actualizar1Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling actualizar3().'
+                'Required parameter "id" was null or undefined when calling actualizar1().'
             );
         }
 
         if (requestParameters['tipoDocumentoRequest'] == null) {
             throw new runtime.RequiredError(
                 'tipoDocumentoRequest',
-                'Required parameter "tipoDocumentoRequest" was null or undefined when calling actualizar3().'
+                'Required parameter "tipoDocumentoRequest" was null or undefined when calling actualizar1().'
             );
         }
 
@@ -109,35 +114,35 @@ export class TipoDocumentoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async actualizar3Raw(requestParameters: Actualizar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.actualizar3RequestOpts(requestParameters);
+    async actualizar1Raw(requestParameters: Actualizar1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.actualizar1RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async actualizar3(requestParameters: Actualizar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.actualizar3Raw(requestParameters, initOverrides);
+    async actualizar1(requestParameters: Actualizar1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.actualizar1Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for cambiarEstado2 without sending the request
+     * Creates request options for cambiarEstado1 without sending the request
      */
-    async cambiarEstado2RequestOpts(requestParameters: CambiarEstado2Request): Promise<runtime.RequestOpts> {
+    async cambiarEstado1RequestOpts(requestParameters: CambiarEstado1Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling cambiarEstado2().'
+                'Required parameter "id" was null or undefined when calling cambiarEstado1().'
             );
         }
 
         if (requestParameters['estadoCatalogoRequest'] == null) {
             throw new runtime.RequiredError(
                 'estadoCatalogoRequest',
-                'Required parameter "estadoCatalogoRequest" was null or undefined when calling cambiarEstado2().'
+                'Required parameter "estadoCatalogoRequest" was null or undefined when calling cambiarEstado1().'
             );
         }
 
@@ -170,28 +175,28 @@ export class TipoDocumentoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async cambiarEstado2Raw(requestParameters: CambiarEstado2Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.cambiarEstado2RequestOpts(requestParameters);
+    async cambiarEstado1Raw(requestParameters: CambiarEstado1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.cambiarEstado1RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async cambiarEstado2(requestParameters: CambiarEstado2Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.cambiarEstado2Raw(requestParameters, initOverrides);
+    async cambiarEstado1(requestParameters: CambiarEstado1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.cambiarEstado1Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for crear3 without sending the request
+     * Creates request options for crear1 without sending the request
      */
-    async crear3RequestOpts(requestParameters: Crear3Request): Promise<runtime.RequestOpts> {
+    async crear1RequestOpts(requestParameters: Crear1Request): Promise<runtime.RequestOpts> {
         if (requestParameters['tipoDocumentoRequest'] == null) {
             throw new runtime.RequiredError(
                 'tipoDocumentoRequest',
-                'Required parameter "tipoDocumentoRequest" was null or undefined when calling crear3().'
+                'Required parameter "tipoDocumentoRequest" was null or undefined when calling crear1().'
             );
         }
 
@@ -223,28 +228,28 @@ export class TipoDocumentoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async crear3Raw(requestParameters: Crear3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.crear3RequestOpts(requestParameters);
+    async crear1Raw(requestParameters: Crear1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.crear1RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async crear3(requestParameters: Crear3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.crear3Raw(requestParameters, initOverrides);
+    async crear1(requestParameters: Crear1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.crear1Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for desactivar2 without sending the request
+     * Creates request options for desactivar1 without sending the request
      */
-    async desactivar2RequestOpts(requestParameters: Desactivar2Request): Promise<runtime.RequestOpts> {
+    async desactivar1RequestOpts(requestParameters: Desactivar1Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling desactivar2().'
+                'Required parameter "id" was null or undefined when calling desactivar1().'
             );
         }
 
@@ -274,24 +279,24 @@ export class TipoDocumentoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async desactivar2Raw(requestParameters: Desactivar2Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.desactivar2RequestOpts(requestParameters);
+    async desactivar1Raw(requestParameters: Desactivar1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.desactivar1RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async desactivar2(requestParameters: Desactivar2Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.desactivar2Raw(requestParameters, initOverrides);
+    async desactivar1(requestParameters: Desactivar1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.desactivar1Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for listar3 without sending the request
+     * Creates request options for listar1 without sending the request
      */
-    async listar3RequestOpts(requestParameters: Listar3Request): Promise<runtime.RequestOpts> {
+    async listar1RequestOpts(requestParameters: Listar1Request): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['nombre'] != null) {
@@ -329,8 +334,8 @@ export class TipoDocumentoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar3Raw(requestParameters: Listar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageTipoDocumentoResponse>> {
-        const requestOptions = await this.listar3RequestOpts(requestParameters);
+    async listar1Raw(requestParameters: Listar1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageTipoDocumentoResponse>> {
+        const requestOptions = await this.listar1RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageTipoDocumentoResponseFromJSON(jsonValue));
@@ -338,19 +343,19 @@ export class TipoDocumentoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar3(requestParameters: Listar3Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageTipoDocumentoResponse> {
-        const response = await this.listar3Raw(requestParameters, initOverrides);
+    async listar1(requestParameters: Listar1Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageTipoDocumentoResponse> {
+        const response = await this.listar1Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for obtener3 without sending the request
+     * Creates request options for obtener1 without sending the request
      */
-    async obtener3RequestOpts(requestParameters: Obtener3Request): Promise<runtime.RequestOpts> {
+    async obtener1RequestOpts(requestParameters: Obtener1Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling obtener3().'
+                'Required parameter "id" was null or undefined when calling obtener1().'
             );
         }
 
@@ -380,17 +385,17 @@ export class TipoDocumentoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async obtener3Raw(requestParameters: Obtener3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.obtener3RequestOpts(requestParameters);
+    async obtener1Raw(requestParameters: Obtener1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.obtener1RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async obtener3(requestParameters: Obtener3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.obtener3Raw(requestParameters, initOverrides);
+    async obtener1(requestParameters: Obtener1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.obtener1Raw(requestParameters, initOverrides);
         return await response.value();
     }
 

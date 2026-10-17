@@ -3,6 +3,7 @@ export interface CentroCosto {
   nombre: string
   descripcion: string
   activo: 0 | 1
+  fechaRegistro?: string
 }
 
 export interface CentroCostoFormData {

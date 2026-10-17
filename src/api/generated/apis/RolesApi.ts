@@ -14,33 +14,18 @@
 
 import * as runtime from '../runtime';
 import {
-    type ActualizarRolRequest,
-    ActualizarRolRequestFromJSON,
-    ActualizarRolRequestToJSON,
-} from '../models/ActualizarRolRequest';
-import {
     type CustomPageRolResponse,
     CustomPageRolResponseFromJSON,
     CustomPageRolResponseToJSON,
 } from '../models/CustomPageRolResponse';
-import {
-    type MessageResponse,
-    MessageResponseFromJSON,
-    MessageResponseToJSON,
-} from '../models/MessageResponse';
 import {
     type RolRequest,
     RolRequestFromJSON,
     RolRequestToJSON,
 } from '../models/RolRequest';
 
-export interface ActualizarEstadoRolRequest {
+export interface DesactivarRolRequest {
     rolId: number;
-    activo: boolean;
-}
-
-export interface ActualizarRolOperationRequest {
-    actualizarRolRequest: ActualizarRolRequest;
 }
 
 export interface ListarRolesRequest {
@@ -59,20 +44,13 @@ export interface RegistrarRolRequest {
 export class RolesApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for actualizarEstadoRol without sending the request
+     * Creates request options for desactivarRol without sending the request
      */
-    async actualizarEstadoRolRequestOpts(requestParameters: ActualizarEstadoRolRequest): Promise<runtime.RequestOpts> {
+    async desactivarRolRequestOpts(requestParameters: DesactivarRolRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['rolId'] == null) {
             throw new runtime.RequiredError(
                 'rolId',
-                'Required parameter "rolId" was null or undefined when calling actualizarEstadoRol().'
-            );
-        }
-
-        if (requestParameters['activo'] == null) {
-            throw new runtime.RequiredError(
-                'activo',
-                'Required parameter "activo" was null or undefined when calling actualizarEstadoRol().'
+                'Required parameter "rolId" was null or undefined when calling desactivarRol().'
             );
         }
 
@@ -80,10 +58,6 @@ export class RolesApi extends runtime.BaseAPI {
 
         if (requestParameters['rolId'] != null) {
             queryParameters['rolId'] = requestParameters['rolId'];
-        }
-
-        if (requestParameters['activo'] != null) {
-            queryParameters['activo'] = requestParameters['activo'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -108,79 +82,22 @@ export class RolesApi extends runtime.BaseAPI {
     }
 
     /**
-     * Activa o desactiva un rol
-     * Actualizar estado del rol
+     * Desactiva un rol por su identificador
+     * Desactivar rol
      */
-    async actualizarEstadoRolRaw(requestParameters: ActualizarEstadoRolRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
-        const requestOptions = await this.actualizarEstadoRolRequestOpts(requestParameters);
+    async desactivarRolRaw(requestParameters: DesactivarRolRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        const requestOptions = await this.desactivarRolRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse<any>(response);
     }
 
     /**
-     * Activa o desactiva un rol
-     * Actualizar estado del rol
+     * Desactiva un rol por su identificador
+     * Desactivar rol
      */
-    async actualizarEstadoRol(requestParameters: ActualizarEstadoRolRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
-        const response = await this.actualizarEstadoRolRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Creates request options for actualizarRol without sending the request
-     */
-    async actualizarRolRequestOpts(requestParameters: ActualizarRolOperationRequest): Promise<runtime.RequestOpts> {
-        if (requestParameters['actualizarRolRequest'] == null) {
-            throw new runtime.RequiredError(
-                'actualizarRolRequest',
-                'Required parameter "actualizarRolRequest" was null or undefined when calling actualizarRol().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("bearerAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-
-        let urlPath = `/api/roles`;
-
-        return {
-            path: urlPath,
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-            body: ActualizarRolRequestToJSON(requestParameters['actualizarRolRequest']),
-        };
-    }
-
-    /**
-     * Actualiza el rol y sus módulos asociados
-     * Actualizar rol
-     */
-    async actualizarRolRaw(requestParameters: ActualizarRolOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
-        const requestOptions = await this.actualizarRolRequestOpts(requestParameters);
-        const response = await this.request(requestOptions, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
-    }
-
-    /**
-     * Actualiza el rol y sus módulos asociados
-     * Actualizar rol
-     */
-    async actualizarRol(requestParameters: ActualizarRolOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
-        const response = await this.actualizarRolRaw(requestParameters, initOverrides);
+    async desactivarRol(requestParameters: DesactivarRolRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.desactivarRolRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -284,18 +201,18 @@ export class RolesApi extends runtime.BaseAPI {
      * Registra un nuevo rol
      * Registrar rol
      */
-    async registrarRolRaw(requestParameters: RegistrarRolRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+    async registrarRolRaw(requestParameters: RegistrarRolRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
         const requestOptions = await this.registrarRolRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse<any>(response);
     }
 
     /**
      * Registra un nuevo rol
      * Registrar rol
      */
-    async registrarRol(requestParameters: RegistrarRolRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+    async registrarRol(requestParameters: RegistrarRolRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.registrarRolRaw(requestParameters, initOverrides);
         return await response.value();
     }

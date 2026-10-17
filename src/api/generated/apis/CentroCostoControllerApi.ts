@@ -28,32 +28,37 @@ import {
     EstadoCatalogoRequestFromJSON,
     EstadoCatalogoRequestToJSON,
 } from '../models/EstadoCatalogoRequest';
+import {
+    type MessageResponse,
+    MessageResponseFromJSON,
+    MessageResponseToJSON,
+} from '../models/MessageResponse';
 
-export interface Actualizar8Request {
+export interface Actualizar3Request {
     id: number;
     centroCostoRequest: CentroCostoRequest;
 }
 
-export interface CambiarEstado7Request {
+export interface CambiarEstado3Request {
     id: number;
     estadoCatalogoRequest: EstadoCatalogoRequest;
 }
 
-export interface Crear8Request {
+export interface Crear3Request {
     centroCostoRequest: CentroCostoRequest;
 }
 
-export interface Desactivar7Request {
+export interface Desactivar3Request {
     id: number;
 }
 
-export interface Listar8Request {
+export interface Listar3Request {
     nombre?: string;
     pagina?: number;
     tamPagina?: number;
 }
 
-export interface Obtener8Request {
+export interface Obtener3Request {
     id: number;
 }
 
@@ -63,20 +68,20 @@ export interface Obtener8Request {
 export class CentroCostoControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for actualizar8 without sending the request
+     * Creates request options for actualizar3 without sending the request
      */
-    async actualizar8RequestOpts(requestParameters: Actualizar8Request): Promise<runtime.RequestOpts> {
+    async actualizar3RequestOpts(requestParameters: Actualizar3Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling actualizar8().'
+                'Required parameter "id" was null or undefined when calling actualizar3().'
             );
         }
 
         if (requestParameters['centroCostoRequest'] == null) {
             throw new runtime.RequiredError(
                 'centroCostoRequest',
-                'Required parameter "centroCostoRequest" was null or undefined when calling actualizar8().'
+                'Required parameter "centroCostoRequest" was null or undefined when calling actualizar3().'
             );
         }
 
@@ -109,35 +114,35 @@ export class CentroCostoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async actualizar8Raw(requestParameters: Actualizar8Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.actualizar8RequestOpts(requestParameters);
+    async actualizar3Raw(requestParameters: Actualizar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.actualizar3RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async actualizar8(requestParameters: Actualizar8Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.actualizar8Raw(requestParameters, initOverrides);
+    async actualizar3(requestParameters: Actualizar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.actualizar3Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for cambiarEstado7 without sending the request
+     * Creates request options for cambiarEstado3 without sending the request
      */
-    async cambiarEstado7RequestOpts(requestParameters: CambiarEstado7Request): Promise<runtime.RequestOpts> {
+    async cambiarEstado3RequestOpts(requestParameters: CambiarEstado3Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling cambiarEstado7().'
+                'Required parameter "id" was null or undefined when calling cambiarEstado3().'
             );
         }
 
         if (requestParameters['estadoCatalogoRequest'] == null) {
             throw new runtime.RequiredError(
                 'estadoCatalogoRequest',
-                'Required parameter "estadoCatalogoRequest" was null or undefined when calling cambiarEstado7().'
+                'Required parameter "estadoCatalogoRequest" was null or undefined when calling cambiarEstado3().'
             );
         }
 
@@ -170,28 +175,28 @@ export class CentroCostoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async cambiarEstado7Raw(requestParameters: CambiarEstado7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.cambiarEstado7RequestOpts(requestParameters);
+    async cambiarEstado3Raw(requestParameters: CambiarEstado3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.cambiarEstado3RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async cambiarEstado7(requestParameters: CambiarEstado7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.cambiarEstado7Raw(requestParameters, initOverrides);
+    async cambiarEstado3(requestParameters: CambiarEstado3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.cambiarEstado3Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for crear8 without sending the request
+     * Creates request options for crear3 without sending the request
      */
-    async crear8RequestOpts(requestParameters: Crear8Request): Promise<runtime.RequestOpts> {
+    async crear3RequestOpts(requestParameters: Crear3Request): Promise<runtime.RequestOpts> {
         if (requestParameters['centroCostoRequest'] == null) {
             throw new runtime.RequiredError(
                 'centroCostoRequest',
-                'Required parameter "centroCostoRequest" was null or undefined when calling crear8().'
+                'Required parameter "centroCostoRequest" was null or undefined when calling crear3().'
             );
         }
 
@@ -223,28 +228,28 @@ export class CentroCostoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async crear8Raw(requestParameters: Crear8Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.crear8RequestOpts(requestParameters);
+    async crear3Raw(requestParameters: Crear3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.crear3RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async crear8(requestParameters: Crear8Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.crear8Raw(requestParameters, initOverrides);
+    async crear3(requestParameters: Crear3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.crear3Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for desactivar7 without sending the request
+     * Creates request options for desactivar3 without sending the request
      */
-    async desactivar7RequestOpts(requestParameters: Desactivar7Request): Promise<runtime.RequestOpts> {
+    async desactivar3RequestOpts(requestParameters: Desactivar3Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling desactivar7().'
+                'Required parameter "id" was null or undefined when calling desactivar3().'
             );
         }
 
@@ -274,24 +279,24 @@ export class CentroCostoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async desactivar7Raw(requestParameters: Desactivar7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.desactivar7RequestOpts(requestParameters);
+    async desactivar3Raw(requestParameters: Desactivar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.desactivar3RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async desactivar7(requestParameters: Desactivar7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.desactivar7Raw(requestParameters, initOverrides);
+    async desactivar3(requestParameters: Desactivar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.desactivar3Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for listar8 without sending the request
+     * Creates request options for listar3 without sending the request
      */
-    async listar8RequestOpts(requestParameters: Listar8Request): Promise<runtime.RequestOpts> {
+    async listar3RequestOpts(requestParameters: Listar3Request): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['nombre'] != null) {
@@ -329,8 +334,8 @@ export class CentroCostoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar8Raw(requestParameters: Listar8Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageCentroCostoResponse>> {
-        const requestOptions = await this.listar8RequestOpts(requestParameters);
+    async listar3Raw(requestParameters: Listar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageCentroCostoResponse>> {
+        const requestOptions = await this.listar3RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageCentroCostoResponseFromJSON(jsonValue));
@@ -338,19 +343,19 @@ export class CentroCostoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listar8(requestParameters: Listar8Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageCentroCostoResponse> {
-        const response = await this.listar8Raw(requestParameters, initOverrides);
+    async listar3(requestParameters: Listar3Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageCentroCostoResponse> {
+        const response = await this.listar3Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Creates request options for obtener8 without sending the request
+     * Creates request options for obtener3 without sending the request
      */
-    async obtener8RequestOpts(requestParameters: Obtener8Request): Promise<runtime.RequestOpts> {
+    async obtener3RequestOpts(requestParameters: Obtener3Request): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling obtener8().'
+                'Required parameter "id" was null or undefined when calling obtener3().'
             );
         }
 
@@ -380,17 +385,17 @@ export class CentroCostoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async obtener8Raw(requestParameters: Obtener8Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.obtener8RequestOpts(requestParameters);
+    async obtener3Raw(requestParameters: Obtener3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.obtener3RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async obtener8(requestParameters: Obtener8Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.obtener8Raw(requestParameters, initOverrides);
+    async obtener3(requestParameters: Obtener3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.obtener3Raw(requestParameters, initOverrides);
         return await response.value();
     }
 

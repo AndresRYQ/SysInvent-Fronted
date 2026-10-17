@@ -4,13 +4,13 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**plantilla3**](ReporteKardexControllerApi.md#plantilla3) | **GET** /api/reportes/kardex/_plantilla |  |
+| [**plantilla4**](ReporteKardexControllerApi.md#plantilla4) | **GET** /api/reportes/kardex/_plantilla |  |
 
 
 
-## plantilla3
+## plantilla4
 
-> plantilla3()
+> plantilla4()
 
 
 
@@ -21,7 +21,7 @@ import {
   Configuration,
   ReporteKardexControllerApi,
 } from '';
-import type { Plantilla3Request } from '';
+import type { Plantilla4Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -32,7 +32,7 @@ async function example() {
   const api = new ReporteKardexControllerApi(config);
 
   try {
-    const data = await api.plantilla3();
+    const data = await api.plantilla4();
     console.log(data);
   } catch (error) {
     console.error(error);
