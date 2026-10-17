@@ -63,10 +63,10 @@ export interface ProveedorResponse {
     activo?: boolean;
     /**
      * 
-     * @type {Date}
+     * @type {string}
      * @memberof ProveedorResponse
      */
-    fechaRegistro?: Date;
+    fechaRegistro?: string;
 }
 
 /**
@@ -93,7 +93,7 @@ export function ProveedorResponseFromJSONTyped(json: any, ignoreDiscriminator: b
         'telefono': json['telefono'] == null ? undefined : json['telefono'],
         'direccion': json['direccion'] == null ? undefined : json['direccion'],
         'activo': json['activo'] == null ? undefined : json['activo'],
-        'fechaRegistro': json['fechaRegistro'] == null ? undefined : (new Date(json['fechaRegistro'])),
+        'fechaRegistro': json['fechaRegistro'] == null ? undefined : String(json['fechaRegistro']),
     };
 }
 
@@ -115,7 +115,7 @@ export function ProveedorResponseToJSONTyped(value?: ProveedorResponse | null, i
         'telefono': value['telefono'],
         'direccion': value['direccion'],
         'activo': value['activo'],
-        'fechaRegistro': value['fechaRegistro'] == null ? value['fechaRegistro'] : value['fechaRegistro'].toISOString().substring(0,10),
+        'fechaRegistro': value['fechaRegistro'],
     };
 }
 
