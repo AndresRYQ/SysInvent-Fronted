@@ -4,13 +4,13 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**plantilla11**](ControlAlmacenControllerApi.md#plantilla11) | **GET** /api/almacen/_plantilla |  |
+| [**plantilla10**](ControlAlmacenControllerApi.md#plantilla10) | **GET** /api/almacen/_plantilla |  |
 
 
 
-## plantilla11
+## plantilla10
 
-> plantilla11()
+> plantilla10()
 
 
 
@@ -21,7 +21,7 @@ import {
   Configuration,
   ControlAlmacenControllerApi,
 } from '';
-import type { Plantilla11Request } from '';
+import type { Plantilla10Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -32,7 +32,7 @@ async function example() {
   const api = new ControlAlmacenControllerApi(config);
 
   try {
-    const data = await api.plantilla11();
+    const data = await api.plantilla10();
     console.log(data);
   } catch (error) {
     console.error(error);

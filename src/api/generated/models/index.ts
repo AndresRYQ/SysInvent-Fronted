@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './ActualizarRolRequest';
 export * from './ActualizarUsuarioRequest';
 export * from './CategoriaCatalogoRequest';
 export * from './CategoriaCatalogoResponse';
@@ -20,9 +21,12 @@ export * from './CustomPageRolResponse';
 export * from './CustomPageTipoDocumentoResponse';
 export * from './CustomPageTipoProductoResponse';
 export * from './CustomPageUnidadMedidaResponse';
+export * from './CustomPageUsuarioResponse';
 export * from './CustomPageable';
 export * from './DestinoRequest';
 export * from './DestinoResponse';
+export * from './DetalleValeConsumoRequest';
+export * from './DistribucionValeConsumoRequest';
 export * from './EstadoCatalogoRequest';
 export * from './LoginRequest';
 export * from './LoginResponse';
@@ -40,3 +44,5 @@ export * from './TipoProductoResponse';
 export * from './UnidadMedidaRequest';
 export * from './UnidadMedidaResponse';
 export * from './UsuarioRequest';
+export * from './UsuarioResponse';
+export * from './ValeConsumoRequest';

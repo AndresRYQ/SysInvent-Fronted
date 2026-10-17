@@ -51,6 +51,12 @@ export interface UsuarioRequest {
     email: string;
     /**
      * 
+     * @type {string}
+     * @memberof UsuarioRequest
+     */
+    contrasena: string;
+    /**
+     * 
      * @type {Array<number>}
      * @memberof UsuarioRequest
      */
@@ -66,6 +72,7 @@ export function instanceOfUsuarioRequest(value: object): value is UsuarioRequest
     if (!('apePaterno' in value) || value['apePaterno'] === undefined) return false;
     if (!('apeMaterno' in value) || value['apeMaterno'] === undefined) return false;
     if (!('email' in value) || value['email'] === undefined) return false;
+    if (!('contrasena' in value) || value['contrasena'] === undefined) return false;
     if (!('rolesIds' in value) || value['rolesIds'] === undefined) return false;
     return true;
 }
@@ -85,6 +92,7 @@ export function UsuarioRequestFromJSONTyped(json: any, ignoreDiscriminator: bool
         'apePaterno': json['apePaterno'],
         'apeMaterno': json['apeMaterno'],
         'email': json['email'],
+        'contrasena': json['contrasena'],
         'rolesIds': json['rolesIds'],
     };
 }
@@ -105,6 +113,7 @@ export function UsuarioRequestToJSONTyped(value?: UsuarioRequest | null, ignoreD
         'apePaterno': value['apePaterno'],
         'apeMaterno': value['apeMaterno'],
         'email': value['email'],
+        'contrasena': value['contrasena'],
         'rolesIds': value['rolesIds'],
     };
 }

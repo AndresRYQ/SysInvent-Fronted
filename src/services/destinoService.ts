@@ -38,7 +38,8 @@ function mapearRespuestaDestino(response: CustomPageDestinoResponse): CatalogoPa
   return resultado
 }
 
-function formatearFechaRegistro(fecha?: Date): string | undefined {
+function formatearFechaRegistro(fecha?: string | Date): string | undefined {
+  if (typeof fecha === 'string') return fecha.trim() || undefined
   if (!fecha || Number.isNaN(fecha.getTime())) return undefined
   const dia = String(fecha.getUTCDate()).padStart(2, '0')
   const mes = String(fecha.getUTCMonth() + 1).padStart(2, '0')

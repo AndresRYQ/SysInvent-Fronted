@@ -4,8 +4,9 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**actualizarEstadoUsuario**](UsuariosApi.md#actualizarestadousuario) | **DELETE** /api/usuarios/estado | Actualizar estado del usuario |
+| [**actualizarEstadoUsuario**](UsuariosApi.md#actualizarestadousuario) | **DELETE** /api/usuarios | Actualizar estado del usuario |
 | [**actualizarUsuario**](UsuariosApi.md#actualizarusuariooperation) | **PUT** /api/usuarios | Actualizar usuario |
+| [**listarUsuarios**](UsuariosApi.md#listarusuarios) | **GET** /api/usuarios | Listar usuarios |
 | [**registrarUsuario**](UsuariosApi.md#registrarusuario) | **POST** /api/usuarios | Registrar usuario |
 
 
@@ -155,13 +156,96 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
+## listarUsuarios
+
+> CustomPageUsuarioResponse listarUsuarios(usuario, rol, estado, pagina, tamPagina)
+
+Listar usuarios
+
+Lista los usuarios registrados con paginación
+
+### Example
+
+```ts
+import {
+  Configuration,
+  UsuariosApi,
+} from '';
+import type { ListarUsuariosRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new UsuariosApi(config);
+
+  const body = {
+    // string (optional)
+    usuario: usuario_example,
+    // string (optional)
+    rol: rol_example,
+    // boolean (optional)
+    estado: true,
+    // number (optional)
+    pagina: 56,
+    // number (optional)
+    tamPagina: 56,
+  } satisfies ListarUsuariosRequest;
+
+  try {
+    const data = await api.listarUsuarios(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **usuario** | `string` |  | [Optional] [Defaults to `undefined`] |
+| **rol** | `string` |  | [Optional] [Defaults to `undefined`] |
+| **estado** | `boolean` |  | [Optional] [Defaults to `undefined`] |
+| **pagina** | `number` |  | [Optional] [Defaults to `1`] |
+| **tamPagina** | `number` |  | [Optional] [Defaults to `10`] |
+
+### Return type
+
+[**CustomPageUsuarioResponse**](CustomPageUsuarioResponse.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `*/*`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
 ## registrarUsuario
 
 > object registrarUsuario(usuarioRequest)
 
 Registrar usuario
 
-Registra un usuario con una contraseña generada
+Registra un usuario con una contraseña proporcionada
 
 ### Example
 

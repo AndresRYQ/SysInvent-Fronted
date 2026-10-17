@@ -45,7 +45,7 @@ export interface CentroCostoResponse {
     activo?: boolean;
     /**
      * 
-     * @type {Date}
+     * @type {string}
      * @memberof CentroCostoResponse
      */
     fechaRegistro?: string;

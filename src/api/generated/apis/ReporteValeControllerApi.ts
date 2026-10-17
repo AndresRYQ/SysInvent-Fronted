@@ -20,9 +20,9 @@ import * as runtime from '../runtime';
 export class ReporteValeControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for plantilla2 without sending the request
+     * Creates request options for plantilla1 without sending the request
      */
-    async plantilla2RequestOpts(): Promise<runtime.RequestOpts> {
+    async plantilla1RequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -48,8 +48,8 @@ export class ReporteValeControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async plantilla2Raw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const requestOptions = await this.plantilla2RequestOpts();
+    async plantilla1Raw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.plantilla1RequestOpts();
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -57,8 +57,8 @@ export class ReporteValeControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async plantilla2(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.plantilla2Raw(initOverrides);
+    async plantilla1(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.plantilla1Raw(initOverrides);
     }
 
 }
