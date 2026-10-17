@@ -4,13 +4,13 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**plantilla9**](DashboardControllerApi.md#plantilla9) | **GET** /api/dashboard/_plantilla |  |
+| [**plantilla8**](DashboardControllerApi.md#plantilla8) | **GET** /api/dashboard/_plantilla |  |
 
 
 
-## plantilla9
+## plantilla8
 
-> plantilla9()
+> plantilla8()
 
 
 
@@ -21,7 +21,7 @@ import {
   Configuration,
   DashboardControllerApi,
 } from '';
-import type { Plantilla9Request } from '';
+import type { Plantilla8Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -32,7 +32,7 @@ async function example() {
   const api = new DashboardControllerApi(config);
 
   try {
-    const data = await api.plantilla9();
+    const data = await api.plantilla8();
     console.log(data);
   } catch (error) {
     console.error(error);

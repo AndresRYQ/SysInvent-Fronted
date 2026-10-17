@@ -20,9 +20,9 @@ import * as runtime from '../runtime';
 export class ReporteProductoMasPedidoControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for plantilla3 without sending the request
+     * Creates request options for plantilla2 without sending the request
      */
-    async plantilla3RequestOpts(): Promise<runtime.RequestOpts> {
+    async plantilla2RequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -48,8 +48,8 @@ export class ReporteProductoMasPedidoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async plantilla3Raw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const requestOptions = await this.plantilla3RequestOpts();
+    async plantilla2Raw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.plantilla2RequestOpts();
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -57,8 +57,8 @@ export class ReporteProductoMasPedidoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async plantilla3(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.plantilla3Raw(initOverrides);
+    async plantilla2(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.plantilla2Raw(initOverrides);
     }
 
 }

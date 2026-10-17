@@ -23,6 +23,7 @@ apis/UnidadesDeMedidaApi.ts
 apis/UsuariosApi.ts
 apis/ValeConsumoControllerApi.ts
 apis/index.ts
+docs/ActualizarRolRequest.md
 docs/ActualizarUsuarioRequest.md
 docs/BitacoraControllerApi.md
 docs/CategorasApi.md
@@ -48,11 +49,14 @@ docs/CustomPageRolResponse.md
 docs/CustomPageTipoDocumentoResponse.md
 docs/CustomPageTipoProductoResponse.md
 docs/CustomPageUnidadMedidaResponse.md
+docs/CustomPageUsuarioResponse.md
 docs/CustomPageable.md
 docs/DashboardControllerApi.md
 docs/DestinoRequest.md
 docs/DestinoResponse.md
 docs/DestinosApi.md
+docs/DetalleValeConsumoRequest.md
+docs/DistribucionValeConsumoRequest.md
 docs/EstadoCatalogoRequest.md
 docs/IngresoAlmacenControllerApi.md
 docs/LoginApi.md
@@ -85,9 +89,12 @@ docs/UnidadMedidaRequest.md
 docs/UnidadMedidaResponse.md
 docs/UnidadesDeMedidaApi.md
 docs/UsuarioRequest.md
+docs/UsuarioResponse.md
 docs/UsuariosApi.md
 docs/ValeConsumoControllerApi.md
+docs/ValeConsumoRequest.md
 index.ts
+models/ActualizarRolRequest.ts
 models/ActualizarUsuarioRequest.ts
 models/CategoriaCatalogoRequest.ts
 models/CategoriaCatalogoResponse.ts
@@ -108,9 +115,12 @@ models/CustomPageRolResponse.ts
 models/CustomPageTipoDocumentoResponse.ts
 models/CustomPageTipoProductoResponse.ts
 models/CustomPageUnidadMedidaResponse.ts
+models/CustomPageUsuarioResponse.ts
 models/CustomPageable.ts
 models/DestinoRequest.ts
 models/DestinoResponse.ts
+models/DetalleValeConsumoRequest.ts
+models/DistribucionValeConsumoRequest.ts
 models/EstadoCatalogoRequest.ts
 models/LoginRequest.ts
 models/LoginResponse.ts
@@ -128,5 +138,7 @@ models/TipoProductoResponse.ts
 models/UnidadMedidaRequest.ts
 models/UnidadMedidaResponse.ts
 models/UsuarioRequest.ts
+models/UsuarioResponse.ts
+models/ValeConsumoRequest.ts
 models/index.ts
 runtime.ts

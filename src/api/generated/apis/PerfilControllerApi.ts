@@ -20,9 +20,9 @@ import * as runtime from '../runtime';
 export class PerfilControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for plantilla1 without sending the request
+     * Creates request options for plantilla without sending the request
      */
-    async plantilla1RequestOpts(): Promise<runtime.RequestOpts> {
+    async plantillaRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -48,8 +48,8 @@ export class PerfilControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async plantilla1Raw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const requestOptions = await this.plantilla1RequestOpts();
+    async plantillaRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.plantillaRequestOpts();
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -57,8 +57,8 @@ export class PerfilControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async plantilla1(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.plantilla1Raw(initOverrides);
+    async plantilla(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.plantillaRaw(initOverrides);
     }
 
 }
