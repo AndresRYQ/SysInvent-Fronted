@@ -1,6 +1,5 @@
 import type { Proveedor, ProveedorFormData } from '../types/proveedor'
 import { registrarEventoBitacora } from './bitacoraService'
-const STORAGE_KEY = 'agrihusac_proveedores'
 const PROVEEDORES_INICIALES: Proveedor[] = [
   {
     id: 1,
@@ -43,10 +42,11 @@ const PROVEEDORES_INICIALES: Proveedor[] = [
     fechaRegistro: '13/08/2026',
   },
 ]
+let proveedoresEnMemoria: Proveedor[] = []
 type Registro = Partial<Proveedor> & { id?: number | string; estado?: boolean }
 function normalizarRegistro(r: Registro): Proveedor | null { const id = typeof r.id === 'number' ? r.id : Number(String(r.id ?? '').replace(/^PROV-/, '')); if (!Number.isInteger(id) || id <= 0 || !r.ruc || !r.razonSocial) return null; return { id, ruc: String(r.ruc), razonSocial: String(r.razonSocial).trim(), correo: String(r.correo ?? '').trim().toLowerCase(), telefono: String(r.telefono ?? '').trim(), direccion: String(r.direccion ?? '').trim(), activo: r.activo === 0 || r.activo === 1 ? r.activo : r.estado === false ? 0 : 1, fechaRegistro: r.fechaRegistro ?? '' } }
-function leer(): Proveedor[] { try { const datos: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]'); return Array.isArray(datos) ? datos.map((x) => normalizarRegistro(x as Registro)).filter((x): x is Proveedor => x !== null) : [] } catch { return [] } }
-function guardar(datos: Proveedor[]): void { localStorage.setItem(STORAGE_KEY, JSON.stringify(datos)) }
+function leer(): Proveedor[] { return proveedoresEnMemoria.map((proveedor) => ({ ...proveedor })) }
+function guardar(datos: Proveedor[]): void { proveedoresEnMemoria = datos.map((proveedor) => ({ ...proveedor })) }
 function texto(v: string): string { return v.trim().toLowerCase() }
 function validar(d: ProveedorFormData): void { if (!/^\d{11}$/.test(d.ruc.trim())) throw new Error('El RUC debe contener exactamente 11 números.'); if (d.razonSocial.trim().length < 2) throw new Error('La razón social debe tener al menos 2 caracteres.'); if (d.razonSocial.trim().length > 120) throw new Error('La razón social no puede superar los 120 caracteres.'); if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.correo.trim())) throw new Error('Ingresa un correo electrónico válido.'); const t = d.telefono.replace(/\D/g, ''); if (t.length !== 9) throw new Error('El teléfono debe contener exactamente 9 dígitos.'); if (d.direccion.trim().length < 5) throw new Error('La dirección debe tener al menos 5 caracteres.'); if (d.direccion.trim().length > 200) throw new Error('La dirección no puede superar los 200 caracteres.') }
 export function obtenerProveedores(): Proveedor[] { const datos = leer(); const proveedores = datos.length > 0 ? datos.sort((a, b) => a.id - b.id) : PROVEEDORES_INICIALES.map((x) => ({ ...x })); guardar(proveedores); return proveedores.map((x) => ({ ...x })) }

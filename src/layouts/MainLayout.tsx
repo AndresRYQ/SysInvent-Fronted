@@ -28,6 +28,13 @@ export function MainLayout() {
   useEffect(() => {
     localStorage.removeItem('agrihusac_tipos_documento')
     localStorage.removeItem('agrihusac_unidades_medida')
+    localStorage.removeItem('agrihusac_categorias')
+    localStorage.removeItem('agrihusac_centros_costo')
+    localStorage.removeItem('agrihusac_contactos')
+    localStorage.removeItem('agrihusac_partes_equipo')
+    localStorage.removeItem('agrihusac_proveedores')
+    localStorage.removeItem('agrihusac_productos')
+    localStorage.removeItem('agrihusac_tipos_producto')
 
     if (window.matchMedia('(max-width: 1024px)').matches) {
       setMenuAbierto(false)

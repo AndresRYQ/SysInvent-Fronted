@@ -11,7 +11,6 @@ import {
   type CatalogoPaginado,
 } from './catalogoApi'
 
-const STORAGE_KEY = 'agrihusac_productos'
 
 const PRODUCTOS_INICIALES: Producto[] = [
   {
@@ -88,13 +87,12 @@ function copiarProductos(
   }))
 }
 
+let productosEnMemoria: Producto[] = []
+
 function guardarProductos(
   productos: Producto[],
 ): void {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(productos),
-  )
+  productosEnMemoria = copiarProductos(productos)
 }
 
 function normalizarTexto(
@@ -255,8 +253,9 @@ function crearFechaActual(): string {
 
 export function obtenerProductos():
   Producto[] {
-  const datosGuardados =
-    localStorage.getItem(STORAGE_KEY)
+  const datosGuardados = productosEnMemoria.length
+    ? JSON.stringify(productosEnMemoria)
+    : ''
 
   if (!datosGuardados) {
     guardarProductos(PRODUCTOS_INICIALES)

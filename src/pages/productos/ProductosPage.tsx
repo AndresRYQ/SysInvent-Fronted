@@ -34,6 +34,7 @@ import {
 import { obtenerProveedores } from '../../services/proveedorService'
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
 import { listarUnidadesMedida } from '../../services/unidadMedidaService'
+import { listarCategorias } from '../../services/categoriaService'
 
 import type { Producto } from '../../types/producto'
 import { coincidenIds } from '../../utils/identificadores'
@@ -68,8 +69,7 @@ function obtenerOpcionesLocales(
   valoresIniciales: OpcionFiltroProducto[],
 ): OpcionFiltroProducto[] {
   try {
-    const datosGuardados =
-      localStorage.getItem(storageKey)
+    const datosGuardados = ''
 
     if (!datosGuardados) {
       return valoresIniciales
@@ -118,12 +118,13 @@ export function ProductosPage() {
     obtenerProveedores(),
   )
 
-  const [categorias] = useState(() =>
-    obtenerOpcionesLocales(
-      'agrihusac_categorias',
-      CATEGORIAS_INICIALES,
-    ),
-  )
+  const [categorias, setCategorias] = useState<OpcionFiltroProducto[]>([])
+
+  useEffect(() => {
+    listarCategorias({ pagina: 1, tamPagina: 100 })
+      .then((resultado) => setCategorias(resultado.datos.map((categoria) => ({ id: categoria.id, nombre: categoria.nombre }))))
+      .catch(() => setCategorias([]))
+  }, [])
 
   const [unidadesMedida, setUnidadesMedida] = useState<OpcionFiltroProducto[]>([])
 

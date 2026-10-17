@@ -3,6 +3,7 @@ import Select from 'react-select'
 import { obtenerProveedores } from '../../services/proveedorService'
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
 import { listarUnidadesMedida } from '../../services/unidadMedidaService'
+import { listarCategorias } from '../../services/categoriaService'
 import type { Producto, ProductoFormData } from '../../types/producto'
 import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
@@ -29,7 +30,7 @@ const SIN_ERRORES: Errores = { codigo: '', nombre: '', descripcion: '', tipoProd
 
 function opcionesLocales(clave: string, iniciales: Opcion[]): Opcion[] {
   try {
-    const valor = localStorage.getItem(clave)
+    const valor = ''
     if (!valor) return iniciales
     const datos = JSON.parse(valor)
     return Array.isArray(datos) ? datos : iniciales
@@ -49,10 +50,17 @@ export function FormularioProducto({ producto, soloLectura = false, error, onSub
   const [form, setForm] = useState<ProductoFormData>(INICIAL)
   const [errores, setErrores] = useState<Errores>(SIN_ERRORES)
   const [unidadesMedida, setUnidadesMedida] = useState<Opcion[]>([])
+  const [categoriasDisponibles, setCategoriasDisponibles] = useState<Opcion[]>([])
   const tipos = useMemo(() => obtenerTiposProducto().filter((item) => item.activo === 1 || idCompatible(String(producto?.tipoProductoId ?? ''), item.id, 'TP-')), [producto])
   const proveedores = useMemo(() => obtenerProveedores().filter((item) => item.activo === 1 || idCompatible(String(producto?.proveedorId ?? ''), item.id, 'PROV-')), [producto])
-  const categorias = useMemo(() => opcionesLocales('agrihusac_categorias', CATEGORIAS).filter((item) => item.estado !== false && item.activo !== 0 || String(item.id) === String(producto?.categoriaId)), [producto])
+  const categorias = useMemo(() => categoriasDisponibles.filter((item) => item.estado !== false && item.activo !== 0 || String(item.id) === String(producto?.categoriaId)), [producto, categoriasDisponibles])
   const unidades = useMemo(() => unidadesMedida.filter((item) => item.estado !== false && item.activo !== 0 || String(item.id) === String(producto?.unidadMedidaId)), [producto, unidadesMedida])
+
+  useEffect(() => {
+    listarCategorias({ pagina: 1, tamPagina: 100 })
+      .then((resultado) => setCategoriasDisponibles(resultado.datos))
+      .catch(() => setCategoriasDisponibles([]))
+  }, [])
 
   useEffect(() => {
     listarUnidadesMedida({ pagina: 1, tamPagina: 100 })
