@@ -63,7 +63,7 @@ export function obtenerFilasReporteVales(
           const producto =
             productos.find(
               (item) =>
-                coincidenIds(item.id, detalle.productoId, 'PROD-'),
+                coincidenIds(item.productoId, detalle.productoId, 'PROD-'),
             )
 
           const tipoProducto =

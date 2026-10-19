@@ -1,6 +1,7 @@
 apis/BitacoraControllerApi.ts
 apis/CategorasApi.ts
 apis/CentrosDeCostoApi.ts
+apis/CombosComunesApi.ts
 apis/ContactosApi.ts
 apis/ControlAlmacenControllerApi.ts
 apis/DashboardControllerApi.ts
@@ -34,6 +35,8 @@ docs/CategoriaResponse.md
 docs/CentroCostoRequest.md
 docs/CentroCostoResponse.md
 docs/CentrosDeCostoApi.md
+docs/CombosComunesApi.md
+docs/ComunResponse.md
 docs/ContactoRequest.md
 docs/ContactoResponse.md
 docs/ContactosApi.md
@@ -105,6 +108,7 @@ models/CategoriaRequest.ts
 models/CategoriaResponse.ts
 models/CentroCostoRequest.ts
 models/CentroCostoResponse.ts
+models/ComunResponse.ts
 models/ContactoRequest.ts
 models/ContactoResponse.ts
 models/CustomPageCategoriaCatalogoResponse.ts

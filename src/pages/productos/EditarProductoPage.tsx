@@ -43,9 +43,9 @@ export function EditarProductoPage() {
       'Editar producto | AGRIHUSAC'
   }, [])
 
-  function guardarCambios(
+  async function guardarCambios(
     datos: ProductoFormData,
-  ): void {
+  ): Promise<void> {
     if (!id) {
       setError(
         'No se encontró el identificador del producto.',
@@ -54,7 +54,7 @@ export function EditarProductoPage() {
     }
 
     try {
-      actualizarProducto(Number(id), datos)
+      await actualizarProducto(Number(id), datos)
 
       navigate('/productos', {
         replace: true,

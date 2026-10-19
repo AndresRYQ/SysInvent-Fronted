@@ -50,7 +50,7 @@ export function CentroCostoFormModal({ abierto, centroCosto, error, soloLectura 
           setErrores(nuevosErrores)
           if (!nuevosErrores.nombre && !nuevosErrores.descripcion) onSubmit({ nombre: form.nombre.trim(), descripcion: form.descripcion.trim() })
         }}>
-          <div className="maestro-modal-body">
+          <div className={`maestro-modal-body${soloLectura ? ' modo-visualizacion' : ''}`}>
             {error && <div className="alert alert-danger py-2" role="alert">{error}</div>}
             <div className="mb-3">
               <label className="form-label required" htmlFor="centroCostoNombreModal">Nombre de centro de costo</label>

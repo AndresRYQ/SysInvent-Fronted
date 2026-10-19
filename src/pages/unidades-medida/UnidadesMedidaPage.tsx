@@ -19,7 +19,7 @@ function filtrar(lista: UnidadMedida[], filtros: FiltrosUnidadesMedidaValores) {
 
 export function UnidadesMedidaPage() {
   const [lista, setLista] = useState<UnidadMedida[]>([])
-  const [totalItems, setTotalItems] = useState(0)
+  const [totalItems, setTotalItems] = useState(-1)
   const [recarga, setRecarga] = useState(0)
   const [filtros, setFiltros] = useState(INICIALES)
   const [aplicados, setAplicados] = useState(INICIALES)
@@ -38,6 +38,7 @@ export function UnidadesMedidaPage() {
 
   useEffect(() => {
     let activo = true
+    setTotalItems(-1)
     listarUnidadesMedida({
       nombre: aplicados.nombre,
       pagina: page,

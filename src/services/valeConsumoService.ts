@@ -68,7 +68,7 @@ function mapearVale(response: ValeConsumoResponse): ValeConsumo {
       precioUnitario:
         detalle.precioUnitario ??
         obtenerProductos().find(
-          (producto) => producto.id === Number(detalle.productoId),
+          (producto) => producto.productoId === Number(detalle.productoId),
         )?.precioUnitario ??
         0,
       distribuciones: detalle.distribuciones.map(
@@ -247,7 +247,7 @@ function obtenerProductosConStockInsuficiente(
           : undefined),
     )
     return (
-      catalogo.find((registro) => registro.id === id)?.nombre ??
+      catalogo.find((registro) => registro.productoId === id)?.nombre ??
       (Number.isFinite(id) ? `Producto ${id}` : '')
     )
   }).filter(Boolean)

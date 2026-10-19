@@ -1,5 +1,5 @@
 export interface Producto {
-  id: number
+  productoId: number
   codigo: string
   nombre: string
   descripcion: string
@@ -10,8 +10,12 @@ export interface Producto {
   stockActual: number
   stockMinimo: number
   precioUnitario: number
-  estado: boolean
+  activo: boolean
   fechaRegistro: string
+  tipoProductoNombre?: string
+  categoriaNombre?: string
+  unidadMedidaNombre?: string
+  proveedorRazonSocial?: string
 }
 
 export interface ProductoFormData {

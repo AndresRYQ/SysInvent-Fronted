@@ -13,6 +13,7 @@ import type { Proveedor } from '../../types/proveedor'
 
 import { EmptyState } from '../common/EmptyState'
 import { TablePagination } from '../ui/TablePagination'
+import { TableLoadingState } from '../ui/TableLoadingState'
 import { coincidenIds } from '../../utils/identificadores'
 
 interface TablaContactosProps {
@@ -40,6 +41,7 @@ interface TablaContactosProps {
   onPageSizeChange: (
     pageSize: number,
   ) => void
+  loading?: boolean
 }
 
 export function TablaContactos({
@@ -55,6 +57,7 @@ export function TablaContactos({
   onReactivar,
   onPageChange,
   onPageSizeChange,
+  loading = totalItems < 0,
 }: TablaContactosProps) {
   function obtenerProveedor(
     proveedorId: number,
@@ -87,7 +90,7 @@ export function TablaContactos({
           </button>
         </div>
 
-        <div className="table-responsive">
+        <div className="table-responsive"><TableLoadingState visible={loading} />
           <table className="table standard-table align-middle mb-0">
             <thead>
               <tr>
@@ -170,6 +173,7 @@ export function TablaContactos({
                       <td>
                         <div className="table-actions">
                           {contacto.activo === 1 ? <>
+                            <button type="button" className="btn table-action-btn" title="Visualizar" aria-label={`Visualizar ${contacto.nombreCompleto}`} onClick={() => onVisualizar(contacto)}><Eye size={16} /></button>
                             <button type="button" className="btn table-action-btn" title="Editar" aria-label={`Editar ${contacto.nombreCompleto}`} onClick={() => onEditar(contacto)}><Pencil size={16} /></button>
                             <button type="button" className="btn table-action-btn table-action-btn--danger" title="Desactivar" aria-label={`Desactivar ${contacto.nombreCompleto}`} onClick={() => onEliminar(contacto)}><Trash2 size={16} /></button>
                           </> : <>

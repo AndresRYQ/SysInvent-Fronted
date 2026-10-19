@@ -8,6 +8,7 @@ export * from './CategoriaRequest';
 export * from './CategoriaResponse';
 export * from './CentroCostoRequest';
 export * from './CentroCostoResponse';
+export * from './ComunResponse';
 export * from './ContactoRequest';
 export * from './ContactoResponse';
 export * from './CustomPageCategoriaCatalogoResponse';

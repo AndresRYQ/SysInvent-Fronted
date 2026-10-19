@@ -3,6 +3,7 @@
 export * from './BitacoraControllerApi';
 export * from './CategorasApi';
 export * from './CentrosDeCostoApi';
+export * from './CombosComunesApi';
 export * from './ContactosApi';
 export * from './ControlAlmacenControllerApi';
 export * from './DashboardControllerApi';

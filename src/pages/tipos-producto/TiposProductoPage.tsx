@@ -19,7 +19,7 @@ function filtrarTiposProducto(tiposProducto: TipoProducto[], filtros: FiltrosTip
 
 export function TiposProductoPage() {
   const [tiposProducto, setTiposProducto] = useState<TipoProducto[]>([])
-  const [totalItems, setTotalItems] = useState(0)
+  const [totalItems, setTotalItems] = useState(-1)
   const [recarga, setRecarga] = useState(0)
   const [filtros, setFiltros] = useState(FILTROS_INICIALES)
   const [filtrosAplicados, setFiltrosAplicados] = useState(FILTROS_INICIALES)
@@ -39,6 +39,7 @@ export function TiposProductoPage() {
 
   useEffect(() => {
     let activo = true
+    setTotalItems(-1)
     listarTiposProducto({
       nombre: filtrosAplicados.nombre,
       pagina: page,

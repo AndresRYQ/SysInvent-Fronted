@@ -207,7 +207,7 @@ export function ValesConsumoPage() {
             (detalle) =>
               productos.find(
                 (producto) =>
-                  producto.id ===
+                  producto.productoId ===
                   detalle.productoId,
               )?.nombre ??
               'Producto no disponible',

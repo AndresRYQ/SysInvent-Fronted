@@ -5,12 +5,22 @@ import { obtenerTiposProducto } from '../../services/tipoProductoService'
 import { listarUnidadesMedida } from '../../services/unidadMedidaService'
 import { listarCategorias } from '../../services/categoriaService'
 import type { Producto, ProductoFormData } from '../../types/producto'
+import type { Categoria } from '../../types/categoria'
+import type { Proveedor } from '../../types/proveedor'
+import type { TipoProducto } from '../../types/tipoProducto'
+import type { UnidadMedida } from '../../types/unidadMedida'
 import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
 interface Props {
   producto?: Producto | null
   soloLectura?: boolean
   error: string
+  catalogos?: {
+    categorias: Categoria[]
+    tiposProducto: TipoProducto[]
+    unidadesMedida: UnidadMedida[]
+    proveedores: Proveedor[]
+  }
   onSubmit: (datos: ProductoFormData) => void
   onCancelar: () => void
 }
@@ -46,30 +56,36 @@ function opcionesSelect(items: Opcion[]) {
   return items.map((item) => ({ value: String(item.id), label: item.nombre }))
 }
 
-export function FormularioProducto({ producto, soloLectura = false, error, onSubmit, onCancelar }: Props) {
+export function FormularioProducto({ producto, soloLectura = false, error, catalogos, onSubmit, onCancelar }: Props) {
   const [form, setForm] = useState<ProductoFormData>(INICIAL)
   const [errores, setErrores] = useState<Errores>(SIN_ERRORES)
   const [unidadesMedida, setUnidadesMedida] = useState<Opcion[]>([])
   const [categoriasDisponibles, setCategoriasDisponibles] = useState<Opcion[]>([])
-  const tipos = useMemo(() => obtenerTiposProducto().filter((item) => item.activo === 1 || idCompatible(String(producto?.tipoProductoId ?? ''), item.id, 'TP-')), [producto])
-  const proveedores = useMemo(() => obtenerProveedores().filter((item) => item.activo === 1 || idCompatible(String(producto?.proveedorId ?? ''), item.id, 'PROV-')), [producto])
-  const categorias = useMemo(() => categoriasDisponibles.filter((item) => item.estado !== false && item.activo !== 0 || String(item.id) === String(producto?.categoriaId)), [producto, categoriasDisponibles])
-  const unidades = useMemo(() => unidadesMedida.filter((item) => item.estado !== false && item.activo !== 0 || String(item.id) === String(producto?.unidadMedidaId)), [producto, unidadesMedida])
+  const tiposDisponibles = catalogos?.tiposProducto ?? obtenerTiposProducto()
+  const proveedoresDisponibles = catalogos?.proveedores ?? obtenerProveedores()
+  const categoriasBase = catalogos?.categorias ?? categoriasDisponibles
+  const unidadesBase = catalogos?.unidadesMedida ?? unidadesMedida
+  const tipos = useMemo(() => tiposDisponibles.filter((item) => item.activo === 1 || idCompatible(String(producto?.tipoProductoId ?? ''), item.id, 'TP-')), [producto, tiposDisponibles])
+  const proveedores = useMemo(() => proveedoresDisponibles.filter((item) => item.activo === 1 || idCompatible(String(producto?.proveedorId ?? ''), item.id, 'PROV-')), [producto, proveedoresDisponibles])
+  const categorias = useMemo(() => categoriasBase.filter((item) => item.estado !== false && item.activo !== 0 || String(item.id) === String(producto?.categoriaId)), [producto, categoriasBase])
+  const unidades = useMemo(() => unidadesBase.filter((item) => item.estado !== false && item.activo !== 0 || String(item.id) === String(producto?.unidadMedidaId)), [producto, unidadesBase])
 
   useEffect(() => {
+    if (catalogos) return
     listarCategorias({ pagina: 1, tamPagina: 100 })
       .then((resultado) => setCategoriasDisponibles(resultado.datos))
       .catch(() => setCategoriasDisponibles([]))
-  }, [])
+  }, [catalogos])
 
   useEffect(() => {
+    if (catalogos) return
     listarUnidadesMedida({ pagina: 1, tamPagina: 100 })
       .then((resultado) => setUnidadesMedida(resultado.datos))
       .catch(() => setUnidadesMedida([]))
-  }, [])
+  }, [catalogos])
 
   useEffect(() => {
-    setForm(producto ? { codigo: producto.codigo, nombre: producto.nombre, descripcion: producto.descripcion, tipoProductoId: String(producto.tipoProductoId), categoriaId: String(producto.categoriaId), unidadMedidaId: String(producto.unidadMedidaId), proveedorId: String(producto.proveedorId), stockMinimo: producto.stockMinimo, precioUnitario: producto.precioUnitario, estado: producto.estado } : INICIAL)
+    setForm(producto ? { codigo: producto.codigo, nombre: producto.nombre, descripcion: producto.descripcion, tipoProductoId: String(producto.tipoProductoId), categoriaId: String(producto.categoriaId), unidadMedidaId: String(producto.unidadMedidaId), proveedorId: String(producto.proveedorId), stockMinimo: producto.stockMinimo, precioUnitario: producto.precioUnitario, estado: producto.activo } : INICIAL)
     setErrores(SIN_ERRORES)
   }, [producto])
 
@@ -103,14 +119,14 @@ export function FormularioProducto({ producto, soloLectura = false, error, onSub
     <form className="card border-0 shadow-sm" noValidate onSubmit={enviar}>
       <div className="maestro-modal-body">
         {error && <div className="alert alert-danger" role="alert">{error}</div>}
-        <fieldset disabled={soloLectura}>
+        <fieldset disabled={soloLectura} className={soloLectura ? 'modo-visualizacion' : undefined}>
           <div className="row g-4">
             <div className="col-12 col-lg-4"><label className="form-label maestro-label required" htmlFor="productoCodigo">Código</label><input id="productoCodigo" className={`form-control maestro-control${errores.codigo ? ' maestro-control--error' : ''}`} maxLength={30} placeholder="Ej. HER-001" value={form.codigo} onChange={(e) => cambiar('codigo', e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, ''))} />{errores.codigo && <div className="maestro-field-error">{errores.codigo}</div>}</div>
             <div className="col-12 col-lg-8"><label className="form-label maestro-label required" htmlFor="productoNombre">Nombre</label><input id="productoNombre" className={`form-control maestro-control${errores.nombre ? ' maestro-control--error' : ''}`} maxLength={120} placeholder="Nombre del producto" value={form.nombre} onChange={(e) => cambiar('nombre', e.target.value)} />{errores.nombre && <div className="maestro-field-error">{errores.nombre}</div>}</div>
-            <div className="col-12 col-md-4"><label className="form-label maestro-label required" htmlFor="productoTipo">Tipo de producto</label><Select inputId="productoTipo" classNamePrefix="maestro-select" options={opcionesSelect(tipos)} value={opcionesSelect(tipos).find((item) => item.value === String(form.tipoProductoId)) ?? null} onChange={(item) => cambiar('tipoProductoId', item?.value ?? '')} placeholder="Seleccionar" isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ tieneError: Boolean(errores.tipoProductoId), zIndex: 1300 })} />{errores.tipoProductoId && <div className="maestro-field-error">{errores.tipoProductoId}</div>}</div>
-            <div className="col-12 col-md-4"><label className="form-label maestro-label required" htmlFor="productoCategoria">Categoría</label><Select inputId="productoCategoria" classNamePrefix="maestro-select" options={opcionesSelect(categorias)} value={opcionesSelect(categorias).find((item) => item.value === String(form.categoriaId)) ?? null} onChange={(item) => cambiar('categoriaId', item?.value ?? '')} placeholder="Seleccionar" isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ tieneError: Boolean(errores.categoriaId), zIndex: 1300 })} />{errores.categoriaId && <div className="maestro-field-error">{errores.categoriaId}</div>}</div>
-            <div className="col-12 col-md-4"><label className="form-label maestro-label required" htmlFor="productoUnidad">Unidad de medida</label><Select inputId="productoUnidad" classNamePrefix="maestro-select" options={opcionesSelect(unidades)} value={opcionesSelect(unidades).find((item) => item.value === String(form.unidadMedidaId)) ?? null} onChange={(item) => cambiar('unidadMedidaId', item?.value ?? '')} placeholder="Seleccionar" isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ tieneError: Boolean(errores.unidadMedidaId), zIndex: 1300 })} />{errores.unidadMedidaId && <div className="maestro-field-error">{errores.unidadMedidaId}</div>}</div>
-            <div className="col-12 col-md-4"><label className="form-label maestro-label required" htmlFor="productoProveedor">Proveedor</label><Select inputId="productoProveedor" classNamePrefix="maestro-select" options={proveedores.map((item) => ({ value: String(item.id), label: item.razonSocial }))} value={proveedores.map((item) => ({ value: String(item.id), label: item.razonSocial })).find((item) => item.value === String(form.proveedorId) || idCompatible(String(form.proveedorId), item.value, 'PROV-')) ?? null} onChange={(item) => cambiar('proveedorId', item?.value ?? '')} placeholder="Seleccionar" isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ tieneError: Boolean(errores.proveedorId), zIndex: 1300 })} />{errores.proveedorId && <div className="maestro-field-error">{errores.proveedorId}</div>}</div>
+            <div className="col-12 col-md-4"><label className="form-label maestro-label required" htmlFor="productoTipo">Tipo de producto</label><Select inputId="productoTipo" classNamePrefix="maestro-select" options={opcionesSelect(tipos)} value={opcionesSelect(tipos).find((item) => item.value === String(form.tipoProductoId)) ?? null} onChange={(item) => cambiar('tipoProductoId', item?.value ?? '')} placeholder="Seleccionar" isDisabled={soloLectura} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ tieneError: Boolean(errores.tipoProductoId), zIndex: 1300 })} />{errores.tipoProductoId && <div className="maestro-field-error">{errores.tipoProductoId}</div>}</div>
+            <div className="col-12 col-md-4"><label className="form-label maestro-label required" htmlFor="productoCategoria">Categoría</label><Select inputId="productoCategoria" classNamePrefix="maestro-select" options={opcionesSelect(categorias)} value={opcionesSelect(categorias).find((item) => item.value === String(form.categoriaId)) ?? null} onChange={(item) => cambiar('categoriaId', item?.value ?? '')} placeholder="Seleccionar" isDisabled={soloLectura} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ tieneError: Boolean(errores.categoriaId), zIndex: 1300 })} />{errores.categoriaId && <div className="maestro-field-error">{errores.categoriaId}</div>}</div>
+            <div className="col-12 col-md-4"><label className="form-label maestro-label required" htmlFor="productoUnidad">Unidad de medida</label><Select inputId="productoUnidad" classNamePrefix="maestro-select" options={opcionesSelect(unidades)} value={opcionesSelect(unidades).find((item) => item.value === String(form.unidadMedidaId)) ?? null} onChange={(item) => cambiar('unidadMedidaId', item?.value ?? '')} placeholder="Seleccionar" isDisabled={soloLectura} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ tieneError: Boolean(errores.unidadMedidaId), zIndex: 1300 })} />{errores.unidadMedidaId && <div className="maestro-field-error">{errores.unidadMedidaId}</div>}</div>
+            <div className="col-12 col-md-4"><label className="form-label maestro-label required" htmlFor="productoProveedor">Proveedor</label><Select inputId="productoProveedor" classNamePrefix="maestro-select" options={proveedores.map((item) => ({ value: String(item.id), label: item.razonSocial }))} value={proveedores.map((item) => ({ value: String(item.id), label: item.razonSocial })).find((item) => item.value === String(form.proveedorId) || idCompatible(String(form.proveedorId), item.value, 'PROV-')) ?? null} onChange={(item) => cambiar('proveedorId', item?.value ?? '')} placeholder="Seleccionar" isDisabled={soloLectura} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ tieneError: Boolean(errores.proveedorId), zIndex: 1300 })} />{errores.proveedorId && <div className="maestro-field-error">{errores.proveedorId}</div>}</div>
             <div className="col-12 col-lg-4"><label className="form-label maestro-label required" htmlFor="productoPrecio">Precio unitario</label><div className="input-group"><span className="input-group-text">S/</span><input id="productoPrecio" className={`form-control maestro-control${errores.precioUnitario ? ' maestro-control--error' : ''}`} type="number" min="0" step="0.01" value={form.precioUnitario} onChange={(e) => cambiar('precioUnitario', e.target.value === '' ? 0 : Number(e.target.value))} /></div>{errores.precioUnitario && <div className="maestro-field-error">{errores.precioUnitario}</div>}</div>
             <div className="col-12"><label className="form-label maestro-label required" htmlFor="productoDescripcion">Descripción</label><textarea id="productoDescripcion" className={`form-control maestro-control${errores.descripcion ? ' maestro-control--error' : ''}`} rows={4} maxLength={250} placeholder="Descripción del producto" value={form.descripcion} onChange={(e) => cambiar('descripcion', e.target.value)} />{errores.descripcion && <div className="maestro-field-error">{errores.descripcion}</div>}</div>
           </div>

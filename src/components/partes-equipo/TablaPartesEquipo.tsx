@@ -11,6 +11,7 @@ import type { ParteEquipo } from '../../types/parteEquipo'
 
 import { EmptyState } from '../common/EmptyState'
 import { TablePagination } from '../ui/TablePagination'
+import { TableLoadingState } from '../ui/TableLoadingState'
 
 interface TablaPartesEquipoProps {
   partesEquipo: ParteEquipo[]
@@ -36,6 +37,7 @@ interface TablaPartesEquipoProps {
   onPageSizeChange: (
     pageSize: number,
   ) => void
+  loading?: boolean
 }
 
 export function TablaPartesEquipo({
@@ -50,6 +52,7 @@ export function TablaPartesEquipo({
   onVisualizar,
   onPageChange,
   onPageSizeChange,
+  loading = totalItems < 0,
 }: TablaPartesEquipoProps) {
   return (
     <section className="table-card card border-0 shadow-sm">
@@ -70,7 +73,7 @@ export function TablaPartesEquipo({
           </button>
         </div>
 
-        <div className="table-responsive">
+        <div className="table-responsive"><TableLoadingState visible={loading} />
           <table className="table standard-table align-middle mb-0">
             <thead>
               <tr>
@@ -144,7 +147,7 @@ export function TablaPartesEquipo({
 
                       <td>
                         <div className="table-actions">
-                          {parte.estado ? <button
+                          {parte.estado ? <><button type="button" className="btn table-action-btn" title="Visualizar" aria-label={`Visualizar ${parte.nombre}`} onClick={() => onVisualizar(parte)}><Eye size={16} /></button><button
                             type="button"
                             className="btn table-action-btn"
                             title="Editar"
@@ -156,7 +159,7 @@ export function TablaPartesEquipo({
                             <Pencil
                               size={16}
                             />
-                          </button> : <><button type="button" className="btn table-action-btn" title="Visualizar" aria-label={`Visualizar ${parte.nombre}`} onClick={() => onVisualizar(parte)}><Eye size={16} /></button><button type="button" className="btn table-action-btn" title="Reactivar" aria-label={`Reactivar ${parte.nombre}`} onClick={() => onReactivar(parte)}><RotateCcw size={16} /></button></>}
+                          </button></> : <><button type="button" className="btn table-action-btn" title="Visualizar" aria-label={`Visualizar ${parte.nombre}`} onClick={() => onVisualizar(parte)}><Eye size={16} /></button><button type="button" className="btn table-action-btn" title="Reactivar" aria-label={`Reactivar ${parte.nombre}`} onClick={() => onReactivar(parte)}><RotateCcw size={16} /></button></>}
 
                           {parte.estado && <button
                             type="button"

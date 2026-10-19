@@ -17,7 +17,7 @@ import {
   reactivarContacto,
 } from '../../services/contactoService'
 
-import { obtenerProveedores } from '../../services/proveedorService'
+import { listarProveedores } from '../../services/proveedorService'
 import { coincidenIds } from '../../utils/identificadores'
 
 import type {
@@ -112,11 +112,9 @@ function obtenerMensajeError(
 
 export function ContactosPage() {
   const [contactos, setContactos] = useState<Contacto[]>([])
-  const [totalItems, setTotalItems] = useState(0)
+  const [totalItems, setTotalItems] = useState(-1)
 
-  const [proveedores] = useState<
-    Proveedor[]
-  >(() => obtenerProveedores())
+  const [proveedores, setProveedores] = useState<Proveedor[]>([])
 
   const [filtros, setFiltros] =
     useState<FiltrosContactosValores>({
@@ -158,6 +156,22 @@ export function ContactosPage() {
     setErrorFormulario,
   ] = useState('')
   const { mensaje, abierta, mostrarAlerta, cerrarAlerta, limpiarAlerta } = useSnackbar()
+
+  useEffect(() => {
+    let cancelado = false
+
+    listarProveedores({ pagina: 1, tamPagina: 100 })
+      .then((respuesta) => {
+        if (!cancelado) setProveedores(respuesta.datos)
+      })
+      .catch((error) => {
+        if (!cancelado) mostrarAlerta('error', obtenerMensajeError(error))
+      })
+
+    return () => {
+      cancelado = true
+    }
+  }, [mostrarAlerta])
 
   const [
     modalEliminarAbierto,

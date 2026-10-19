@@ -166,7 +166,7 @@ export function ReporteValesPage() {
     () =>
       obtenerProductos()
         .map((producto) => ({
-          id: String(producto.id),
+          id: String(producto.productoId),
           codigo: producto.codigo,
           nombre: producto.nombre,
           tipoProductoId: String(

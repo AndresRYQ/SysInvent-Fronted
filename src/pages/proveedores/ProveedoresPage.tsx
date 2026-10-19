@@ -25,7 +25,7 @@ function filtrarEstado(lista: Proveedor[], estado: string): Proveedor[] {
 
 export function ProveedoresPage() {
   const [lista, setLista] = useState<Proveedor[]>([])
-  const [totalItems, setTotalItems] = useState(0)
+  const [totalItems, setTotalItems] = useState(-1)
   const [filtros, setFiltros] = useState(INICIALES)
   const [aplicados, setAplicados] = useState(INICIALES)
   const [page, setPage] = useState(1)
