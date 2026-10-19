@@ -11,7 +11,7 @@ Name | Type
 `nombre` | string
 `descripcion` | string
 `activo` | boolean
-`fechaRegistro` | Date
+`fechaRegistro` | string
 
 ## Example
 

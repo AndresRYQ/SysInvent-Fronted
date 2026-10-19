@@ -1,14 +1,17 @@
 import {
   Boxes,
   Building2,
+  Eye,
   Pencil,
   Plus,
+  RotateCcw,
   Trash2,
 } from 'lucide-react'
 
 import type { Producto } from '../../types/producto'
 import { EmptyState } from '../common/EmptyState'
 import { TablePagination } from '../ui/TablePagination'
+import { TableLoadingState } from '../ui/TableLoadingState'
 
 export interface ProductoFila extends Producto {
   tipoProductoNombre: string
@@ -24,7 +27,10 @@ interface Props {
   pageSize: number
   onAgregar: () => void
   onEditar: (producto: Producto) => void
+  onVisualizar: (producto: Producto) => void
   onEliminar: (producto: Producto) => void
+  onReactivar: (producto: Producto) => void
+  loading?: boolean
   onPageChange: (page: number) => void
   onPageSizeChange: (size: number) => void
 }
@@ -43,7 +49,10 @@ export function TablaProductos({
   pageSize,
   onAgregar,
   onEditar,
+  onVisualizar,
   onEliminar,
+  onReactivar,
+  loading = totalItems < 0,
   onPageChange,
   onPageSizeChange,
 }: Props) {
@@ -58,6 +67,7 @@ export function TablaProductos({
         </div>
 
         <div className="table-responsive">
+          <TableLoadingState visible={loading} />
           <table className="table standard-table align-middle mb-0">
             <thead>
               <tr>
@@ -73,12 +83,12 @@ export function TablaProductos({
             </thead>
             <tbody>
               {productos.length > 0 ? productos.map((producto) => (
-                <tr key={producto.id}>
+                <tr key={producto.productoId}>
                   <td><span className="table-id-chip">{producto.codigo}</span></td>
                   <td>
                     <div className="table-cell-main">
                       <span className="table-cell-icon"><Boxes size={16} /></span>
-                      <div><strong>{producto.nombre}</strong><div className="small text-muted">{producto.id}</div></div>
+                      <div><strong>{producto.nombre}</strong><div className="small text-muted">{producto.productoId}</div></div>
                     </div>
                   </td>
                   <td><div>{producto.tipoProductoNombre}</div><small className="text-muted">{producto.categoriaNombre}</small></td>
@@ -86,15 +96,21 @@ export function TablaProductos({
                   <td><span className="d-flex align-items-center gap-2"><Building2 size={14} />{producto.proveedorNombre}</span></td>
                   <td>{moneda(producto.precioUnitario)}</td>
                   <td>
-                    <span className={producto.estado ? 'status-label status-label--active' : 'status-label status-label--inactive'}>
+                    <span className={producto.activo ? 'status-label status-label--active' : 'status-label status-label--inactive'}>
                       <span className="status-label__dot" aria-hidden="true" />
-                      {producto.estado ? 'Activo' : 'Inactivo'}
+                      {producto.activo ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
                   <td>
                     <div className="table-actions">
-                      <button type="button" className="btn table-action-btn" title="Editar" onClick={() => onEditar(producto)}><Pencil size={16} /></button>
-                      <button type="button" className="btn table-action-btn table-action-btn--danger" title="Eliminar" onClick={() => onEliminar(producto)}><Trash2 size={16} /></button>
+                      {producto.activo ? <>
+                        <button type="button" className="btn table-action-btn" title="Visualizar" onClick={() => onVisualizar(producto)}><Eye size={16} /></button>
+                        <button type="button" className="btn table-action-btn" title="Editar" onClick={() => onEditar(producto)}><Pencil size={16} /></button>
+                        <button type="button" className="btn table-action-btn table-action-btn--danger" title="Desactivar" onClick={() => onEliminar(producto)}><Trash2 size={16} /></button>
+                      </> : <>
+                        <button type="button" className="btn table-action-btn" title="Visualizar" onClick={() => onVisualizar(producto)}><Eye size={16} /></button>
+                        <button type="button" className="btn table-action-btn" title="Reactivar" onClick={() => onReactivar(producto)}><RotateCcw size={16} /></button>
+                      </>}
                     </div>
                   </td>
                 </tr>

@@ -21,12 +21,6 @@ export function obtenerUnidadesMedida(): UnidadMedida[] {
   return unidadesEnMemoria.map((unidad) => ({ ...unidad }))
 }
 
-function formatearFechaRegistro(fecha?: string | Date): string | undefined {
-  if (typeof fecha === 'string') return fecha.trim() || undefined
-  if (!fecha || Number.isNaN(fecha.getTime())) return undefined
-  return fecha.toISOString().slice(0, 10)
-}
-
 function mapearRespuestaUnidad(response: CustomPageUnidadMedidaResponse): CatalogoPaginado<UnidadMedida> {
   const resultado: CatalogoPaginado<UnidadMedida> = {
     datos: (response.datos ?? []).map((unidad) => ({
@@ -34,7 +28,7 @@ function mapearRespuestaUnidad(response: CustomPageUnidadMedidaResponse): Catalo
       nombre: unidad.nombre ?? '',
       descripcion: unidad.descripcion ?? '',
       activo: unidad.activo ? 1 : 0,
-      fechaRegistro: formatearFechaRegistro(unidad.fechaRegistro),
+      fechaRegistro: unidad.fechaRegistro,
     })),
     paginacion: response.paginacion ?? {},
   }

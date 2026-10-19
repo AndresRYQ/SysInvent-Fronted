@@ -227,7 +227,7 @@ export function IngresoAlmacenForm({
       () =>
         productos.filter(
           (producto) =>
-            producto.estado &&
+            producto.activo &&
             coincidenIds(
               producto.proveedorId,
               proveedorId,
@@ -251,7 +251,7 @@ export function IngresoAlmacenForm({
       () =>
         productos.find(
           (producto) =>
-            String(producto.id) ===
+            String(producto.productoId) ===
             detalle.productoId,
         ) ?? null,
       [productos, detalle.productoId],
@@ -314,7 +314,7 @@ export function IngresoAlmacenForm({
     productoId: string,
   ): void {
     const producto = productos.find(
-      (item) => String(item.id) === productoId,
+      (item) => String(item.productoId) === productoId,
     )
 
     setDetalle((actual) => ({
@@ -785,8 +785,8 @@ export function IngresoAlmacenForm({
             {productosFiltrados.map(
               (producto) => (
                 <option
-                  key={producto.id}
-                  value={producto.id}
+                  key={producto.productoId}
+                  value={producto.productoId}
                 >
                   {producto.codigo} -{' '}
                   {producto.nombre}
@@ -912,7 +912,7 @@ export function IngresoAlmacenForm({
               const producto =
                 productos.find(
                   (productoActual) =>
-                    productoActual.id ===
+                    productoActual.productoId ===
                     item.productoId,
                 )
 

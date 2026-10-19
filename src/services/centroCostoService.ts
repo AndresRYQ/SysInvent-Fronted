@@ -21,12 +21,6 @@ export function obtenerCentrosCosto(): CentroCosto[] {
   return centrosEnMemoria.map((centro) => ({ ...centro }))
 }
 
-function formatearFechaRegistro(fecha?: string | Date): string | undefined {
-  if (typeof fecha === 'string') return fecha.trim() || undefined
-  if (!fecha || Number.isNaN(fecha.getTime())) return undefined
-  return fecha.toISOString().slice(0, 10)
-}
-
 function mapearRespuestaCentro(response: CustomPageCentroCostoResponse): CatalogoPaginado<CentroCosto> {
   const resultado: CatalogoPaginado<CentroCosto> = {
     datos: (response.datos ?? []).map((centro) => ({
@@ -34,7 +28,7 @@ function mapearRespuestaCentro(response: CustomPageCentroCostoResponse): Catalog
       nombre: centro.nombre ?? '',
       descripcion: centro.descripcion ?? '',
       activo: centro.activo ? 1 : 0,
-      fechaRegistro: formatearFechaRegistro(centro.fechaRegistro),
+      fechaRegistro: centro.fechaRegistro,
     })),
     paginacion: response.paginacion ?? {},
   }

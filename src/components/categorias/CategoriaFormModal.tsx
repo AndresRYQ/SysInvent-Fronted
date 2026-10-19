@@ -60,7 +60,7 @@ export function CategoriaFormModal({ abierto, categoria, error, soloLectura = fa
           event.preventDefault()
           if (!soloLectura && validar()) onSubmit({ nombre: form.nombre.trim(), descripcion: form.descripcion.trim() })
         }}>
-          <div className="maestro-modal-body">
+          <div className={`maestro-modal-body${soloLectura ? ' modo-visualizacion' : ''}`}>
             {error && <div className="alert alert-danger py-2" role="alert">{error}</div>}
             <div className="mb-3">
               <label className="form-label required" htmlFor="categoriaNombreModal">Nombre de la categoría</label>

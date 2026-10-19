@@ -321,7 +321,7 @@ function validarDatosIngreso(
 
       const producto = productos.find(
         (item) =>
-          coincidenIds(item.id, detalle.productoId, 'PROD-'),
+          coincidenIds(item.productoId, detalle.productoId, 'PROD-'),
       )
 
       if (!producto) {
@@ -330,7 +330,7 @@ function validarDatosIngreso(
         )
       }
 
-      if (!producto.estado) {
+      if (!producto.activo) {
         throw new Error(
           `El producto "${producto.nombre}" está inactivo.`,
         )
@@ -481,7 +481,7 @@ function validarAjustesStock(
 
       const producto = productos.find(
         (item) =>
-          item.id === productoId,
+          item.productoId === productoId,
       )
 
       if (!producto) {

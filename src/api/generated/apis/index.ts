@@ -3,6 +3,7 @@
 export * from './BitacoraControllerApi';
 export * from './CategorasApi';
 export * from './CentrosDeCostoApi';
+export * from './CombosComunesApi';
 export * from './ContactosApi';
 export * from './ControlAlmacenControllerApi';
 export * from './DashboardControllerApi';
@@ -12,7 +13,7 @@ export * from './LoginApi';
 export * from './PartesDeEquipoApi';
 export * from './PerfilControllerApi';
 export * from './PermisoControllerApi';
-export * from './ProductoControllerApi';
+export * from './ProductosApi';
 export * from './ProveedoresApi';
 export * from './ReporteIngresoControllerApi';
 export * from './ReporteKardexControllerApi';

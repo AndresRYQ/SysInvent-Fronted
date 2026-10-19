@@ -1,6 +1,7 @@
 apis/BitacoraControllerApi.ts
 apis/CategorasApi.ts
 apis/CentrosDeCostoApi.ts
+apis/CombosComunesApi.ts
 apis/ContactosApi.ts
 apis/ControlAlmacenControllerApi.ts
 apis/DashboardControllerApi.ts
@@ -10,7 +11,7 @@ apis/LoginApi.ts
 apis/PartesDeEquipoApi.ts
 apis/PerfilControllerApi.ts
 apis/PermisoControllerApi.ts
-apis/ProductoControllerApi.ts
+apis/ProductosApi.ts
 apis/ProveedoresApi.ts
 apis/ReporteIngresoControllerApi.ts
 apis/ReporteKardexControllerApi.ts
@@ -34,6 +35,8 @@ docs/CategoriaResponse.md
 docs/CentroCostoRequest.md
 docs/CentroCostoResponse.md
 docs/CentrosDeCostoApi.md
+docs/CombosComunesApi.md
+docs/ComunResponse.md
 docs/ContactoRequest.md
 docs/ContactoResponse.md
 docs/ContactosApi.md
@@ -44,6 +47,7 @@ docs/CustomPageCentroCostoResponse.md
 docs/CustomPageContactoResponse.md
 docs/CustomPageDestinoResponse.md
 docs/CustomPageParteEquipoResponse.md
+docs/CustomPageProductoResponse.md
 docs/CustomPageProveedorResponse.md
 docs/CustomPageRolResponse.md
 docs/CustomPageTipoDocumentoResponse.md
@@ -68,7 +72,9 @@ docs/ParteEquipoResponse.md
 docs/PartesDeEquipoApi.md
 docs/PerfilControllerApi.md
 docs/PermisoControllerApi.md
-docs/ProductoControllerApi.md
+docs/ProductoRequest.md
+docs/ProductoResponse.md
+docs/ProductosApi.md
 docs/ProveedorRequest.md
 docs/ProveedorResponse.md
 docs/ProveedoresApi.md
@@ -102,6 +108,7 @@ models/CategoriaRequest.ts
 models/CategoriaResponse.ts
 models/CentroCostoRequest.ts
 models/CentroCostoResponse.ts
+models/ComunResponse.ts
 models/ContactoRequest.ts
 models/ContactoResponse.ts
 models/CustomPageCategoriaCatalogoResponse.ts
@@ -110,6 +117,7 @@ models/CustomPageCentroCostoResponse.ts
 models/CustomPageContactoResponse.ts
 models/CustomPageDestinoResponse.ts
 models/CustomPageParteEquipoResponse.ts
+models/CustomPageProductoResponse.ts
 models/CustomPageProveedorResponse.ts
 models/CustomPageRolResponse.ts
 models/CustomPageTipoDocumentoResponse.ts
@@ -127,6 +135,8 @@ models/LoginResponse.ts
 models/MessageResponse.ts
 models/ParteEquipoRequest.ts
 models/ParteEquipoResponse.ts
+models/ProductoRequest.ts
+models/ProductoResponse.ts
 models/ProveedorRequest.ts
 models/ProveedorResponse.ts
 models/RolRequest.ts

@@ -19,7 +19,7 @@ function filtrarCentrosCosto(centros: CentroCosto[], filtros: FiltrosCentrosCost
 
 export function CentrosCostoPage() {
   const [centros, setCentros] = useState<CentroCosto[]>([])
-  const [totalItems, setTotalItems] = useState(0)
+  const [totalItems, setTotalItems] = useState(-1)
   const [recarga, setRecarga] = useState(0)
   const [filtros, setFiltros] = useState(FILTROS_INICIALES)
   const [aplicados, setAplicados] = useState(FILTROS_INICIALES)

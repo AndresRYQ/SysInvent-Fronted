@@ -19,7 +19,7 @@ function filtrarCategorias(categorias: Categoria[], filtros: FiltrosCategoriasVa
 
 export function CategoriasPage() {
   const [categorias, setCategorias] = useState<Categoria[]>([])
-  const [totalItems, setTotalItems] = useState(0)
+  const [totalItems, setTotalItems] = useState(-1)
   const [recarga, setRecarga] = useState(0)
   const [filtros, setFiltros] = useState(FILTROS_INICIALES)
   const [filtrosAplicados, setFiltrosAplicados] = useState(FILTROS_INICIALES)
@@ -39,6 +39,7 @@ export function CategoriasPage() {
 
   useEffect(() => {
     let activo = true
+    setTotalItems(-1)
     listarCategorias({ nombre: filtrosAplicados.nombre, pagina: page, tamPagina: pageSize })
       .then((resultado) => {
         if (!activo) return

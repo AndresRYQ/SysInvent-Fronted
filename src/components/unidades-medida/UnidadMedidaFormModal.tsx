@@ -46,7 +46,7 @@ export function UnidadMedidaFormModal({ abierto, unidadMedida, error, soloLectur
           <button type="button" className="btn maestro-modal-close" onClick={onClose} aria-label="Cerrar modal"><X size={18} /></button>
         </div>
         <form noValidate onSubmit={(event) => { event.preventDefault(); if (!soloLectura && validar()) onSubmit({ nombre: form.nombre.trim(), descripcion: form.descripcion.trim() }) }}>
-          <div className="maestro-modal-body">
+          <div className={`maestro-modal-body${soloLectura ? ' modo-visualizacion' : ''}`}>
             {error && <div className="alert alert-danger py-2">{error}</div>}
             <div className="mb-3">
               <label className="form-label required" htmlFor="unidadMedidaNombreModal">Nombre de la unidad</label>

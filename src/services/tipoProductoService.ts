@@ -21,12 +21,6 @@ export function obtenerTiposProducto(): TipoProducto[] {
   return tiposProductoEnMemoria.map((tipo) => ({ ...tipo }))
 }
 
-function formatearFechaRegistro(fecha?: string | Date): string | undefined {
-  if (typeof fecha === 'string') return fecha.trim() || undefined
-  if (!fecha || Number.isNaN(fecha.getTime())) return undefined
-  return fecha.toISOString().slice(0, 10)
-}
-
 function mapearRespuestaTipoProducto(response: CustomPageTipoProductoResponse): CatalogoPaginado<TipoProducto> {
   const resultado: CatalogoPaginado<TipoProducto> = {
     datos: (response.datos ?? []).map((tipo) => ({
@@ -34,7 +28,7 @@ function mapearRespuestaTipoProducto(response: CustomPageTipoProductoResponse): 
       nombre: tipo.nombre ?? '',
       descripcion: tipo.descripcion ?? '',
       activo: tipo.activo ? 1 : 0,
-      fechaRegistro: formatearFechaRegistro(tipo.fechaRegistro),
+      fechaRegistro: tipo.fechaRegistro,
     })),
     paginacion: response.paginacion ?? {},
   }

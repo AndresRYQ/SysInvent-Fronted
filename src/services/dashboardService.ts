@@ -97,14 +97,14 @@ export async function obtenerResumenDashboard():
   const productosActivos =
     productos.filter(
       (producto) =>
-        producto.estado,
+        producto.activo,
     )
 
   const productosActivosIds =
     new Set(
       productosActivos.map(
         (producto) =>
-          producto.id,
+          producto.productoId,
       ),
     )
 
@@ -128,7 +128,7 @@ export async function obtenerResumenDashboard():
         const producto =
           productos.find(
             (item) =>
-              item.id ===
+              item.productoId ===
               control.productoId,
           )
 
@@ -186,7 +186,7 @@ export async function obtenerResumenDashboard():
         const producto =
           productos.find(
             (item) =>
-              item.id ===
+              item.productoId ===
               movimiento.productoId,
           )
 

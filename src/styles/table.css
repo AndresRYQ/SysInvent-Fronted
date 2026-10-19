@@ -242,3 +242,20 @@
   color: var(--brand-green-dark) !important;
   box-shadow: none !important;
 }
+.table-responsive {
+  position: relative;
+}
+
+.table-loading-state {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 180px;
+  color: var(--brand-green-dark);
+  background: rgb(255 255 255 / 82%);
+  font-weight: 700;
+}

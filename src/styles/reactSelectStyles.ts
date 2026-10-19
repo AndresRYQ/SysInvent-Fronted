@@ -19,7 +19,9 @@ export function crearEstilosSelect({
       minHeight: altura,
       height: altura,
       borderRadius: 8,
-      backgroundColor: 'var(--color-select-bg)',
+      backgroundColor: state.isDisabled
+        ? 'var(--bs-secondary-bg, #e9ecef)'
+        : 'var(--color-select-bg)',
       borderColor: state.isFocused
         ? 'var(--color-green-focus)'
         : colorBorde,
@@ -29,12 +31,15 @@ export function crearEstilosSelect({
           ? '0 0 0 0.22rem var(--color-green-outline)'
           : 'none',
       '&:hover': {
-        borderColor: tieneError
+        borderColor: state.isDisabled
+          ? colorBorde
+          : tieneError
           ? 'var(--color-red-danger)'
           : state.isFocused
             ? 'var(--color-green-focus)'
             : 'var(--color-border)',
       },
+      cursor: state.isDisabled ? 'not-allowed' : 'default',
     }),
     valueContainer: (base: any) => ({
       ...base,
@@ -48,9 +53,11 @@ export function crearEstilosSelect({
       margin: 0,
       padding: 0,
     }),
-    singleValue: (base: any) => ({
+    singleValue: (base: any, state: any) => ({
       ...base,
-      color: 'var(--color-text-secondary)',
+      color: state.isDisabled
+        ? 'var(--bs-secondary-color, #6c757d)'
+        : 'var(--color-text-secondary)',
       fontSize: 'var(--form-control-font-size)',
     }),
     placeholder: (base: any) => ({

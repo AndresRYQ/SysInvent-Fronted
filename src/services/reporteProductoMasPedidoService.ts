@@ -65,7 +65,7 @@ function filtrarDistribuciones(
       const producto =
         productos.find(
           (item) =>
-            coincidenIds(item.id, fila.productoId, 'PROD-'),
+            coincidenIds(item.productoId, fila.productoId, 'PROD-'),
         )
 
       const coincideBusqueda =
@@ -134,7 +134,7 @@ export function obtenerProductosMasPedidos(
     const producto =
       productos.find(
         (item) =>
-          coincidenIds(item.id, fila.productoId, 'PROD-'),
+          coincidenIds(item.productoId, fila.productoId, 'PROD-'),
       )
 
     const existente =
