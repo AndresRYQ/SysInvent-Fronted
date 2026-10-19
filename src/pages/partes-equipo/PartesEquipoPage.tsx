@@ -19,7 +19,7 @@ function filtrarPartesEquipo(partes: ParteEquipo[], filtros: FiltrosPartesEquipo
 
 export function PartesEquipoPage() {
   const [partes, setPartes] = useState<ParteEquipo[]>([])
-  const [totalItems, setTotalItems] = useState(0)
+  const [totalItems, setTotalItems] = useState(-1)
   const [recarga, setRecarga] = useState(0)
   const [filtros, setFiltros] = useState(FILTROS_INICIALES)
   const [aplicados, setAplicados] = useState(FILTROS_INICIALES)

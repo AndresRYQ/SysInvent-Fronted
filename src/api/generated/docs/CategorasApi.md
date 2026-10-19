@@ -6,7 +6,8 @@ All URIs are relative to *http://localhost:8080*
 |------------- | ------------- | -------------|
 | [**actualizarCategoria**](CategorasApi.md#actualizarcategoria) | **PUT** /api/v1/catalogos/categorias/{id} | Actualizar categoría |
 | [**cambiarEstadoCategoria**](CategorasApi.md#cambiarestadocategoria) | **PUT** /api/v1/catalogos/categorias/{id}/estado | Cambiar estado de categoría |
-| [**eliminarCategoria**](CategorasApi.md#eliminarcategoria) | **DELETE** /api/categorias | Eliminar categoría |
+| [**eliminarCategoria**](CategorasApi.md#eliminarcategoria) | **DELETE** /api/v1/catalogos/categorias/{id} | Desactivar categoría |
+| [**eliminarCategoria1**](CategorasApi.md#eliminarcategoria1) | **DELETE** /api/categorias | Eliminar categoría |
 | [**listarCategorias**](CategorasApi.md#listarcategorias) | **GET** /api/categorias | Listar categorías |
 | [**listarCategoriasCatalogo**](CategorasApi.md#listarcategoriascatalogo) | **GET** /api/v1/catalogos/categorias | Listar categorías |
 | [**registrarActualizarCategoria**](CategorasApi.md#registraractualizarcategoria) | **POST** /api/categorias | Registrar o actualizar categoría |
@@ -160,11 +161,9 @@ example().catch(console.error);
 
 ## eliminarCategoria
 
-> object eliminarCategoria(categoriaId)
+> MessageResponse eliminarCategoria(id)
 
-Eliminar categoría
-
-Desactiva lógicamente una categoría
+Desactivar categoría
 
 ### Example
 
@@ -185,11 +184,82 @@ async function example() {
 
   const body = {
     // number
-    categoriaId: 56,
+    id: 56,
   } satisfies EliminarCategoriaRequest;
 
   try {
     const data = await api.eliminarCategoria(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` |  | [Defaults to `undefined`] |
+
+### Return type
+
+[**MessageResponse**](MessageResponse.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `*/*`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## eliminarCategoria1
+
+> object eliminarCategoria1(categoriaId)
+
+Eliminar categoría
+
+Desactiva lógicamente una categoría
+
+### Example
+
+```ts
+import {
+  Configuration,
+  CategorasApi,
+} from '';
+import type { EliminarCategoria1Request } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new CategorasApi(config);
+
+  const body = {
+    // number
+    categoriaId: 56,
+  } satisfies EliminarCategoria1Request;
+
+  try {
+    const data = await api.eliminarCategoria1(body);
     console.log(data);
   } catch (error) {
     console.error(error);

@@ -24,7 +24,7 @@ function filtrar(lista: Destino[], filtros: FiltrosDestinosValores) {
 
 export function DestinosPage() {
   const [lista, setLista] = useState<Destino[]>([])
-  const [totalItems, setTotalItems] = useState(0)
+  const [totalItems, setTotalItems] = useState(-1)
   const [recarga, setRecarga] = useState(0)
   const [filtros, setFiltros] = useState(INICIALES)
   const [aplicados, setAplicados] = useState(INICIALES)

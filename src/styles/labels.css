@@ -12,6 +12,14 @@
   content: '*';
 }
 
+.modo-visualizacion .form-label.required::after {
+  display: none;
+}
+
+.maestro-modal-card:has(input:disabled) .form-label.required::after {
+  display: none;
+}
+
 .status-label {
   display: inline-flex;
   align-items: center;

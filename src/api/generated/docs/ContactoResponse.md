@@ -13,7 +13,7 @@ Name | Type
 `telefono` | string
 `correo` | string
 `activo` | boolean
-`fechaRegistro` | Date
+`fechaRegistro` | string
 
 ## Example
 

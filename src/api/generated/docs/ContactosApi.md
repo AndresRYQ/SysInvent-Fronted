@@ -157,7 +157,7 @@ example().catch(console.error);
 
 ## listarContactos
 
-> CustomPageContactoResponse listarContactos(nombre, pagina, tamPagina)
+> CustomPageContactoResponse listarContactos(nombre, proveedorId, pagina, tamPagina)
 
 Listar contactos
 
@@ -182,6 +182,8 @@ async function example() {
     // string (optional)
     nombre: nombre_example,
     // number (optional)
+    proveedorId: 56,
+    // number (optional)
     pagina: 56,
     // number (optional)
     tamPagina: 56,
@@ -205,6 +207,7 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **nombre** | `string` |  | [Optional] [Defaults to `undefined`] |
+| **proveedorId** | `number` |  | [Optional] [Defaults to `undefined`] |
 | **pagina** | `number` |  | [Optional] [Defaults to `1`] |
 | **tamPagina** | `number` |  | [Optional] [Defaults to `10`] |
 

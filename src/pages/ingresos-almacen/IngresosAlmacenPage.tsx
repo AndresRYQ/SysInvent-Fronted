@@ -247,7 +247,7 @@ export function IngresosAlmacenPage() {
         ingreso.detalles.map((detalle) => {
           const producto = productos.find(
             (item) =>
-              item.id === detalle.productoId,
+              item.productoId === detalle.productoId,
           )
 
           const unidad = unidadesMedida.find(

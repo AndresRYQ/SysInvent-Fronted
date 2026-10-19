@@ -12,6 +12,7 @@ import {
 import type { Proveedor } from '../../types/proveedor'
 import { EmptyState } from '../common/EmptyState'
 import { TablePagination } from '../ui/TablePagination'
+import { TableLoadingState } from '../ui/TableLoadingState'
 
 interface TablaProveedoresProps {
   proveedores: Proveedor[]
@@ -27,6 +28,7 @@ interface TablaProveedoresProps {
   onPageSizeChange: (
     pageSize: number,
   ) => void
+  loading?: boolean
 }
 
 export function TablaProveedores({
@@ -41,6 +43,7 @@ export function TablaProveedores({
   onReactivar,
   onPageChange,
   onPageSizeChange,
+  loading = totalItems < 0,
 }: TablaProveedoresProps) {
   return (
     <section className="table-card card border-0 shadow-sm">
@@ -61,7 +64,7 @@ export function TablaProveedores({
           </button>
         </div>
 
-        <div className="table-responsive">
+        <div className="table-responsive"><TableLoadingState visible={loading} />
           <table className="table standard-table align-middle mb-0">
             <thead>
               <tr>
@@ -138,7 +141,7 @@ export function TablaProveedores({
 
                       <td>
                         <div className="table-actions">
-                        {proveedor.activo === 1 ? <><button
+                        {proveedor.activo === 1 ? <><button type="button" className="btn table-action-btn" title="Visualizar" aria-label={`Visualizar ${proveedor.razonSocial}`} onClick={() => onVisualizar(proveedor)}><Eye size={16} /></button><button
                             type="button"
                             className="btn table-action-btn"
                             title="Editar"

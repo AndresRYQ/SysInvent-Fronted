@@ -170,7 +170,7 @@ export async function obtenerControlAlmacen(
         movimientos.filter(
           (movimiento) =>
             movimiento.productoId ===
-            producto.id,
+            producto.productoId,
         )
 
       const totalEntradas =
@@ -210,7 +210,7 @@ export async function obtenerControlAlmacen(
 
       const control:
         ControlAlmacenProducto = {
-          productoId: producto.id,
+          productoId: producto.productoId,
           codigo: producto.codigo,
           nombre: producto.nombre,
           tipoProductoId:
@@ -287,7 +287,7 @@ export function obtenerDiferenciasStock(
       .map((control) => {
         const producto = productos.find(
           (item) =>
-            String(item.id) === String(control.productoId),
+            String(item.productoId) === String(control.productoId),
         )
 
         const stockRegistrado =

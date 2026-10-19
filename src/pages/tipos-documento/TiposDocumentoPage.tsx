@@ -19,7 +19,7 @@ function filtrar(lista: TipoDocumento[], filtros: FiltrosTiposDocumentoValores) 
 
 export function TiposDocumentoPage() {
   const [lista, setLista] = useState<TipoDocumento[]>([])
-  const [totalItems, setTotalItems] = useState(0)
+  const [totalItems, setTotalItems] = useState(-1)
   const [recarga, setRecarga] = useState(0)
   const [filtros, setFiltros] = useState(INICIALES)
   const [aplicados, setAplicados] = useState(INICIALES)

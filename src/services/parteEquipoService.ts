@@ -21,12 +21,6 @@ export function obtenerPartesEquipo(): ParteEquipo[] {
   return partesEnMemoria.map((parte) => ({ ...parte }))
 }
 
-function formatearFechaRegistro(fecha?: string | Date): string {
-  if (typeof fecha === 'string') return fecha.trim()
-  if (!fecha || Number.isNaN(fecha.getTime())) return ''
-  return fecha.toISOString().slice(0, 10)
-}
-
 function mapearRespuestaParte(response: CustomPageParteEquipoResponse): CatalogoPaginado<ParteEquipo> {
   const resultado: CatalogoPaginado<ParteEquipo> = {
     datos: (response.datos ?? []).map((parte) => ({
@@ -35,7 +29,7 @@ function mapearRespuestaParte(response: CustomPageParteEquipoResponse): Catalogo
       nombre: parte.nombre ?? '',
       descripcion: parte.descripcion ?? '',
       estado: parte.activo ?? false,
-      fechaRegistro: formatearFechaRegistro(parte.fechaRegistro),
+      fechaRegistro: parte.fechaRegistro ?? '',
     })),
     paginacion: response.paginacion ?? {},
   }

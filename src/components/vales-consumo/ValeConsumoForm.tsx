@@ -291,7 +291,7 @@ export function ValeConsumoForm({
       () =>
         productos.filter((producto) => {
           if (
-            !producto.estado ||
+            !producto.activo ||
             !coincidenIds(
               producto.tipoProductoId,
               borrador.tipoProductoId,
@@ -346,7 +346,7 @@ export function ValeConsumoForm({
       () =>
         productos.find(
           (producto) =>
-            String(producto.id) ===
+            String(producto.productoId) ===
             borrador.productoId,
         ) ?? null,
       [productos, borrador.productoId],
@@ -511,7 +511,7 @@ export function ValeConsumoForm({
       detalles.some(
         (detalle) =>
           detalle.productoId ===
-          productoSeleccionado.id,
+          productoSeleccionado.productoId,
       )
 
     if (productoRepetido) {
@@ -525,7 +525,7 @@ export function ValeConsumoForm({
       ...actuales,
       {
         productoId:
-          productoSeleccionado.id,
+          productoSeleccionado.productoId,
         precioUnitario:
           productoSeleccionado
             .precioUnitario,
@@ -549,7 +549,7 @@ export function ValeConsumoForm({
   ): void {
     const producto = productos.find(
       (item) =>
-        item.id === detalle.productoId,
+        item.productoId === detalle.productoId,
     )
 
     if (!producto) {
@@ -570,7 +570,7 @@ export function ValeConsumoForm({
     setBorrador({
       tipoProductoId:
         String(producto.tipoProductoId),
-      productoId: String(producto.id),
+      productoId: String(producto.productoId),
       destinoId: '',
       parteEquipoId: '',
       cantidad: '',
@@ -878,8 +878,8 @@ export function ValeConsumoForm({
             {productosFiltrados.map(
               (producto) => (
                 <option
-                  key={producto.id}
-                  value={producto.id}
+                  key={producto.productoId}
+                  value={producto.productoId}
                 >
                   {producto.codigo} -{' '}
                   {producto.nombre}
@@ -1143,7 +1143,7 @@ export function ValeConsumoForm({
               const producto =
                 productos.find(
                   (item) =>
-                    item.id ===
+                    item.productoId ===
                     detalle.productoId,
                 )
 

@@ -1,562 +1,152 @@
-import type {
-  Producto,
-  ProductoFormData,
-} from '../types/producto'
-
-import { registrarEventoBitacora } from './bitacoraService'
+import type { Producto, ProductoFormData } from '../types/producto'
 import {
-  listarCatalogo,
-  obtenerEstadoActivo,
-  obtenerIdCatalogo,
-  type CatalogoPaginado,
-} from './catalogoApi'
-
-
-const PRODUCTOS_INICIALES: Producto[] = [
-  {
-    id: 1,
-    codigo: 'HER-001',
-    nombre: 'Taladro industrial',
-    descripcion:
-      'Taladro eléctrico para trabajos de mantenimiento.',
-    tipoProductoId: 2,
-    categoriaId: 1,
-    unidadMedidaId: 1,
-    proveedorId: 1,
-    stockActual: 0,
-    stockMinimo: 0,
-    precioUnitario: 350,
-    estado: true,
-    fechaRegistro: '10/08/2026',
-  },
-  {
-    id: 2,
-    codigo: 'SEG-001',
-    nombre: 'Guantes de nitrilo',
-    descripcion:
-      'Guantes para protección durante operaciones.',
-    tipoProductoId: 1,
-    categoriaId: 2,
-    unidadMedidaId: 5,
-    proveedorId: 2,
-    stockActual: 0,
-    stockMinimo: 0,
-    precioUnitario: 28.5,
-    estado: true,
-    fechaRegistro: '11/08/2026',
-  },
-  {
-    id: 3,
-    codigo: 'FER-001',
-    nombre: 'Aceite lubricante',
-    descripcion:
-      'Lubricante para equipos y maquinaria.',
-    tipoProductoId: 1,
-    categoriaId: 3,
-    unidadMedidaId: 3,
-    proveedorId: 3,
-    stockActual: 0,
-    stockMinimo: 0,
-    precioUnitario: 45.9,
-    estado: true,
-    fechaRegistro: '12/08/2026',
-  },
-  {
-    id: 4,
-    codigo: 'REP-001',
-    nombre: 'Rodamiento industrial',
-    descripcion:
-      'Repuesto para mantenimiento de maquinaria.',
-    tipoProductoId: 4,
-    categoriaId: 4,
-    unidadMedidaId: 1,
-    proveedorId: 3,
-    stockActual: 0,
-    stockMinimo: 0,
-    precioUnitario: 85,
-    estado: true,
-    fechaRegistro: '13/08/2026',
-  },
-]
-
-function copiarProductos(
-  productos: Producto[],
-): Producto[] {
-  return productos.map((producto) => ({
-    ...producto,
-  }))
-}
+  ProductosApi,
+  type CustomPageProductoResponse,
+  type MessageResponse,
+} from '../api/generated'
+import { apiConfiguration } from '../api/client'
+import type { CatalogoPaginado } from './catalogoApi'
 
 let productosEnMemoria: Producto[] = []
+const productosApi = new ProductosApi(apiConfiguration)
+const solicitudesEnCurso = new Map<string, Promise<CatalogoPaginado<Producto>>>()
 
-function guardarProductos(
-  productos: Producto[],
-): void {
-  productosEnMemoria = copiarProductos(productos)
+export interface ListarProductosParams {
+  nombre?: string
+  pagina?: number
+  tamPagina?: number
 }
 
-function normalizarTexto(
-  valor: string | null | undefined,
-): string {
-  return (valor ?? '').trim().toLowerCase()
+export function obtenerProductos(): Producto[] {
+  return productosEnMemoria.map((producto) => ({ ...producto }))
 }
 
-function validarDatos(
-  datos: ProductoFormData,
-): void {
-  const codigo = datos.codigo
-    .trim()
-    .toUpperCase()
-  const nombre = datos.nombre.trim()
-  const descripcion =
-    datos.descripcion.trim()
-
-  if (!/^[A-Z0-9-]{3,30}$/.test(codigo)) {
-    throw new Error(
-      'El código debe tener entre 3 y 30 caracteres y solo puede contener letras, números y guiones.',
-    )
+function mapearRespuesta(response: CustomPageProductoResponse): CatalogoPaginado<Producto> {
+  const resultado: CatalogoPaginado<Producto> = {
+    datos: (response.datos ?? []).map((producto) => ({
+      productoId: producto.productoId ?? 0,
+      codigo: producto.codigo ?? '',
+      nombre: producto.nombre ?? '',
+      descripcion: producto.descripcion ?? '',
+      tipoProductoId: producto.tipoProductoId ?? 0,
+      categoriaId: producto.categoriaId ?? 0,
+      unidadMedidaId: producto.unidadMedidaId ?? 0,
+      proveedorId: producto.proveedorId ?? 0,
+      stockActual: Number(producto.stockActual ?? 0),
+      stockMinimo: Number(producto.stockMinimo ?? 0),
+      precioUnitario: Number(producto.precioUnitario ?? 0),
+      activo: producto.activo ?? true,
+      fechaRegistro: producto.fechaRegistro ?? '',
+      tipoProductoNombre: producto.tipoProductoNombre,
+      categoriaNombre: producto.categoriaNombre,
+      unidadMedidaNombre: producto.unidadMedidaNombre,
+      proveedorRazonSocial: producto.proveedorRazonSocial,
+    })),
+    paginacion: response.paginacion ?? {},
   }
 
-  if (nombre.length < 2) {
-    throw new Error(
-      'El nombre debe tener al menos 2 caracteres.',
-    )
-  }
-
-  if (nombre.length > 120) {
-    throw new Error(
-      'El nombre no puede superar los 120 caracteres.',
-    )
-  }
-
-  if (descripcion.length < 5) {
-    throw new Error(
-      'La descripción debe tener al menos 5 caracteres.',
-    )
-  }
-
-  if (descripcion.length > 250) {
-    throw new Error(
-      'La descripción no puede superar los 250 caracteres.',
-    )
-  }
-
-  if (!datos.tipoProductoId) {
-    throw new Error(
-      'Selecciona un tipo de producto.',
-    )
-  }
-
-  if (!datos.categoriaId) {
-    throw new Error(
-      'Selecciona una categoría.',
-    )
-  }
-
-  if (!datos.unidadMedidaId) {
-    throw new Error(
-      'Selecciona una unidad de medida.',
-    )
-  }
-
-  if (!datos.proveedorId) {
-    throw new Error(
-      'Selecciona un proveedor.',
-    )
-  }
-
-  if (
-    !Number.isFinite(datos.stockMinimo) ||
-    datos.stockMinimo < 0
-  ) {
-    throw new Error(
-      'El stock mínimo debe ser igual o mayor que cero.',
-    )
-  }
-
-  if (
-    !Number.isFinite(datos.precioUnitario) ||
-    datos.precioUnitario < 0
-  ) {
-    throw new Error(
-      'El precio unitario debe ser igual o mayor que cero.',
-    )
-  }
+  productosEnMemoria = resultado.datos
+  return resultado
 }
 
-function normalizarIdProducto(
-  id: unknown,
-): number | null {
-  const texto = String(id ?? '').trim()
-  const numero = Number(
-    texto.replace(/^PROD-0*/i, ''),
-  )
-
-  return Number.isInteger(numero) && numero > 0
-    ? numero
-    : null
-}
-
-function normalizarIdForaneo(
-  id: unknown,
-  prefijo: string,
-): number {
-  return Number(
-    String(id ?? '').replace(
-      new RegExp(`^${prefijo}-0*`, 'i'),
-      '',
-    ),
-  )
-}
-
-function normalizarProducto(
-  registro: Partial<Producto>,
-): Producto | null {
-  const id = normalizarIdProducto(registro.id)
-
-  if (!id || !registro.codigo || !registro.nombre) {
-    return null
+export async function listarProductosApi(
+  params: ListarProductosParams = {},
+): Promise<CatalogoPaginado<Producto>> {
+  const parametros = {
+    nombre: params.nombre?.trim() || undefined,
+    pagina: params.pagina,
+    tamPagina: params.tamPagina,
   }
+  const clave = JSON.stringify(parametros)
+  const solicitudExistente = solicitudesEnCurso.get(clave)
+  if (solicitudExistente) return solicitudExistente
 
-  return {
-    ...registro,
-    id,
-    codigo: String(registro.codigo),
-    nombre: String(registro.nombre),
-    descripcion: String(registro.descripcion ?? ''),
-    tipoProductoId: normalizarIdForaneo(registro.tipoProductoId, 'TP'),
-    categoriaId: normalizarIdForaneo(registro.categoriaId, 'CAT'),
-    unidadMedidaId: normalizarIdForaneo(registro.unidadMedidaId, 'UM'),
-    proveedorId: normalizarIdForaneo(registro.proveedorId, 'PROV'),
-    stockActual: Number(registro.stockActual ?? 0),
-    stockMinimo: Number(registro.stockMinimo ?? 0),
-    precioUnitario: Number(registro.precioUnitario ?? 0),
-    estado: registro.estado !== false,
-    fechaRegistro: String(registro.fechaRegistro ?? ''),
-  }
+  const solicitud = productosApi
+    .listarProductos(parametros)
+    .then(mapearRespuesta)
+    .finally(() => solicitudesEnCurso.delete(clave))
+
+  solicitudesEnCurso.set(clave, solicitud)
+  return solicitud
 }
 
-function crearSiguienteId(
-  productos: Producto[],
-): number {
-  return productos.reduce(
-    (mayor, producto) => Math.max(mayor, producto.id),
-    0,
-  ) + 1
-}
-
-function crearFechaActual(): string {
-  return new Intl.DateTimeFormat(
-    'es-PE',
-  ).format(new Date())
-}
-
-export function obtenerProductos():
-  Producto[] {
-  const datosGuardados = productosEnMemoria.length
-    ? JSON.stringify(productosEnMemoria)
-    : ''
-
-  if (!datosGuardados) {
-    guardarProductos(PRODUCTOS_INICIALES)
-
-    return copiarProductos(
-      PRODUCTOS_INICIALES,
-    )
-  }
-
-  try {
-    const datos = JSON.parse(datosGuardados)
-
-    if (!Array.isArray(datos)) {
-      throw new Error('Formato inválido')
-    }
-
-    const productos = datos
-      .map((item) => normalizarProducto(item as Partial<Producto>))
-      .filter((item): item is Producto => item !== null)
-
-    guardarProductos(productos)
-
-    return copiarProductos(productos)
-  } catch {
-    guardarProductos(PRODUCTOS_INICIALES)
-
-    return copiarProductos(
-      PRODUCTOS_INICIALES,
-    )
-  }
-}
-
-export function listarProductosApi(): Promise<CatalogoPaginado<Producto>> {
-  return listarCatalogo('/api/v1/productos', (registro) => ({
-    id: obtenerIdCatalogo(registro, 'productoId', 'id'),
-    codigo: String(registro.codigo ?? ''),
-    nombre: String(registro.nombre ?? ''),
-    descripcion: String(registro.descripcion ?? ''),
-    tipoProductoId: Number(registro.tipoProductoId),
-    categoriaId: Number(registro.categoriaId ?? 0),
-    unidadMedidaId: Number(registro.unidadMedidaId),
-    proveedorId: Number(registro.proveedorId ?? 0),
-    stockActual: Number(registro.stockActual ?? 0),
-    stockMinimo: Number(registro.stockMinimo ?? 0),
-    precioUnitario: Number(registro.precioUnitario ?? 0),
-    estado: obtenerEstadoActivo(registro),
-    fechaRegistro: String(registro.fechaRegistro ?? ''),
-  }))
-}
-
-export function obtenerProductoPorId(
-  id: string | number,
-): Producto | null {
-  const producto = obtenerProductos().find(
-    (item) => item.id === Number(id),
-  )
-
+export function obtenerProductoPorId(id: string | number): Producto | null {
+  const producto = productosEnMemoria.find((item) => item.productoId === Number(id))
   return producto ? { ...producto } : null
 }
 
-export function crearProducto(
-  datos: ProductoFormData,
-): Producto {
-  validarDatos(datos)
+function validarDatos(datos: ProductoFormData): void {
+  const codigo = datos.codigo.trim().toUpperCase()
+  const nombre = datos.nombre.trim()
+  const descripcion = datos.descripcion.trim()
 
-  const productos = obtenerProductos()
-  const codigo = datos.codigo
-    .trim()
-    .toUpperCase()
+  if (!/^[A-Z0-9-]{3,30}$/.test(codigo)) throw new Error('El código debe tener entre 3 y 30 caracteres y solo puede contener letras, números y guiones.')
+  if (nombre.length < 2 || nombre.length > 120) throw new Error('El nombre debe tener entre 2 y 120 caracteres.')
+  if (descripcion.length < 5 || descripcion.length > 250) throw new Error('La descripción debe tener entre 5 y 250 caracteres.')
+  if (!datos.tipoProductoId) throw new Error('Selecciona un tipo de producto.')
+  if (!datos.categoriaId) throw new Error('Selecciona una categoría.')
+  if (!datos.unidadMedidaId) throw new Error('Selecciona una unidad de medida.')
+  if (!datos.proveedorId) throw new Error('Selecciona un proveedor.')
+  if (!Number.isFinite(datos.stockMinimo) || datos.stockMinimo < 0) throw new Error('El stock mínimo debe ser igual o mayor que cero.')
+  if (!Number.isFinite(datos.precioUnitario) || datos.precioUnitario < 0) throw new Error('El precio unitario debe ser igual o mayor que cero.')
+}
 
-  const codigoDuplicado = productos.some(
-    (producto) =>
-      producto.codigo.toUpperCase() ===
-      codigo,
-  )
+function convertirId(valor: string | number): number {
+  const id = Number(String(valor).replace(/^[A-Z]+-0*/i, ''))
+  if (!Number.isInteger(id) || id <= 0) throw new Error('El identificador del catálogo no es válido.')
+  return id
+}
 
-  if (codigoDuplicado) {
-    throw new Error(
-      'Ya existe un producto con ese código.',
-    )
-  }
-
-  const nombreDuplicado = productos.some(
-    (producto) =>
-      normalizarTexto(producto.nombre) ===
-      normalizarTexto(datos.nombre),
-  )
-
-  if (nombreDuplicado) {
-    throw new Error(
-      'Ya existe un producto con ese nombre.',
-    )
-  }
-
-  const nuevoProducto: Producto = {
-    id: crearSiguienteId(productos),
-    codigo,
+function construirRequest(datos: ProductoFormData) {
+  return {
+    codigo: datos.codigo.trim().toUpperCase(),
     nombre: datos.nombre.trim(),
-    descripcion: datos.descripcion.trim(),
-    tipoProductoId: normalizarIdForaneo(datos.tipoProductoId, 'TP'),
-    categoriaId: normalizarIdForaneo(datos.categoriaId, 'CAT'),
-    unidadMedidaId: normalizarIdForaneo(datos.unidadMedidaId, 'UM'),
-    proveedorId: normalizarIdForaneo(datos.proveedorId, 'PROV'),
+    descripcion: datos.descripcion.trim() || undefined,
+    tipoProductoId: convertirId(datos.tipoProductoId),
+    categoriaId: convertirId(datos.categoriaId),
+    unidadMedidaId: convertirId(datos.unidadMedidaId),
+    proveedorId: convertirId(datos.proveedorId),
     stockActual: 0,
     stockMinimo: datos.stockMinimo,
-    precioUnitario:
-      datos.precioUnitario,
-    estado: true,
-    fechaRegistro: crearFechaActual(),
+    precioUnitario: datos.precioUnitario,
   }
-
-  guardarProductos([
-    nuevoProducto,
-    ...productos,
-  ])
-
-  registrarEventoBitacora({
-    modulo: 'Productos',
-    accion: 'CREAR',
-    detalle:
-      `Se creó el producto "${nuevoProducto.nombre}" con código ${nuevoProducto.codigo}.`,
-    registroId: String(nuevoProducto.id),
-  })
-
-  return { ...nuevoProducto }
 }
 
-export function actualizarProducto(
-  id: number,
-  datos: ProductoFormData,
-): Producto {
+function validarRespuesta(response: MessageResponse): MessageResponse {
+  if (response.success === false) throw new Error(response.message ?? 'La operación de productos no fue completada.')
+  return response
+}
+
+export async function crearProducto(datos: ProductoFormData): Promise<MessageResponse> {
   validarDatos(datos)
-
-  const productos = obtenerProductos()
-
-  const productoActual = productos.find(
-    (producto) => producto.id === id,
-  )
-
-  if (!productoActual) {
-    throw new Error(
-      'El producto no existe.',
-    )
-  }
-
-  const codigo = datos.codigo
-    .trim()
-    .toUpperCase()
-
-  const codigoDuplicado = productos.some(
-    (producto) =>
-      producto.id !== id &&
-      producto.codigo.toUpperCase() ===
-        codigo,
-  )
-
-  if (codigoDuplicado) {
-    throw new Error(
-      'Ya existe otro producto con ese código.',
-    )
-  }
-
-  const nombreDuplicado = productos.some(
-    (producto) =>
-      producto.id !== id &&
-      normalizarTexto(producto.nombre) ===
-        normalizarTexto(datos.nombre),
-  )
-
-  if (nombreDuplicado) {
-    throw new Error(
-      'Ya existe otro producto con ese nombre.',
-    )
-  }
-
-  const productoActualizado: Producto = {
-    ...productoActual,
-    codigo,
-    nombre: datos.nombre.trim(),
-    descripcion: datos.descripcion.trim(),
-    tipoProductoId: normalizarIdForaneo(datos.tipoProductoId, 'TP'),
-    categoriaId: normalizarIdForaneo(datos.categoriaId, 'CAT'),
-    unidadMedidaId: normalizarIdForaneo(datos.unidadMedidaId, 'UM'),
-    proveedorId: normalizarIdForaneo(datos.proveedorId, 'PROV'),
-    stockMinimo: datos.stockMinimo,
-    precioUnitario:
-      datos.precioUnitario,
-    estado: productoActual.estado,
-  }
-
-  guardarProductos(
-    productos.map((producto) =>
-      producto.id === id
-        ? productoActualizado
-        : producto,
-    ),
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Productos',
-    accion: 'EDITAR',
-    detalle:
-      `Se actualizó el producto "${productoActualizado.nombre}" con código ${productoActualizado.codigo}.`,
-    registroId:
-      String(productoActualizado.id),
-  })
-
-  return { ...productoActualizado }
+  return validarRespuesta(await productosApi.registrarProducto({ productoRequest: construirRequest(datos) }))
 }
 
-export function ajustarStockProducto(
-  id: number,
-  cantidad: number,
-): Producto {
-  if (!Number.isFinite(cantidad)) {
-    throw new Error(
-      'La cantidad de stock no es válida.',
-    )
-  }
-
-  const productos = obtenerProductos()
-
-  const productoActual = productos.find(
-    (producto) => producto.id === id,
-  )
-
-  if (!productoActual) {
-    throw new Error(
-      'El producto no existe.',
-    )
-  }
-
-  const nuevoStock =
-    productoActual.stockActual + cantidad
-
-  if (nuevoStock < 0) {
-    throw new Error(
-      'La operación dejaría el producto sin stock suficiente.',
-    )
-  }
-
-  const productoActualizado: Producto = {
-    ...productoActual,
-    stockActual: Number(
-      nuevoStock.toFixed(3),
-    ),
-  }
-
-  guardarProductos(
-    productos.map((producto) =>
-      producto.id === id
-        ? productoActualizado
-        : producto,
-    ),
-  )
-
-  return { ...productoActualizado }
+export async function actualizarProducto(id: number, datos: ProductoFormData): Promise<MessageResponse> {
+  validarDatos(datos)
+  return validarRespuesta(await productosApi.actualizarProducto({ id, productoRequest: construirRequest(datos) }))
 }
 
-export function obtenerProductosBajoStock():
-  Producto[] {
-  return obtenerProductos().filter(
-    (producto) =>
-      producto.estado &&
-      producto.stockActual <=
-        producto.stockMinimo,
-  )
+export async function ajustarStockProducto(id: number, cantidad: number): Promise<Producto | null> {
+  if (!Number.isFinite(cantidad)) throw new Error('La cantidad de stock no es válida.')
+  const producto = obtenerProductoPorId(id)
+  if (!producto) throw new Error('El producto no existe.')
+  producto.stockActual = Number((producto.stockActual + cantidad).toFixed(3))
+  productosEnMemoria = productosEnMemoria.map((item) => item.productoId === id ? producto : item)
+  return { ...producto }
 }
 
-export function eliminarProducto(
-  id: number,
-): void {
-  const productos = obtenerProductos()
+export function obtenerProductosBajoStock(): Producto[] {
+  return obtenerProductos().filter((producto) => producto.activo && producto.stockActual <= producto.stockMinimo)
+}
 
-  const producto = productos.find(
-    (item) => item.id === id,
-  )
+export async function eliminarProducto(id: number): Promise<MessageResponse> {
+  return validarRespuesta(await productosApi.eliminarProducto({ id }))
+}
 
-  if (!producto) {
-    throw new Error(
-      'El producto no existe.',
-    )
-  }
-
-  if (producto.stockActual > 0) {
-    throw new Error(
-      'No puedes eliminar un producto con stock. Primero debe quedar sin existencias o puedes desactivarlo.',
-    )
-  }
-
-  guardarProductos(
-    productos.filter(
-      (item) => item.id !== id,
-    ),
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Productos',
-    accion: 'ELIMINAR',
-    detalle:
-      `Se eliminó el producto "${producto.nombre}" con código ${producto.codigo}.`,
-    registroId: String(producto.id),
-  })
+export async function reactivarProducto(id: number): Promise<MessageResponse> {
+  return validarRespuesta(await productosApi.cambiarEstadoProducto({
+    id,
+    estadoCatalogoRequest: { activo: true },
+  }))
 }

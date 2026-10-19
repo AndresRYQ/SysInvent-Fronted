@@ -24,11 +24,11 @@ export function NuevoProductoPage() {
       'Nuevo producto | AGRIHUSAC'
   }, [])
 
-  function guardarProducto(
+  async function guardarProducto(
     datos: ProductoFormData,
-  ): void {
+  ): Promise<void> {
     try {
-      crearProducto(datos)
+      await crearProducto(datos)
 
       navigate('/productos', {
         replace: true,

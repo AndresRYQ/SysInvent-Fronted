@@ -1,7 +1,7 @@
 import Alert from '@mui/material/Alert'
 import Snackbar from '@mui/material/Snackbar'
 import { CheckCircle2, Info, TriangleAlert, XCircle } from 'lucide-react'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 export type SnackbarTipo = 'success' | 'error' | 'warning' | 'info'
 
@@ -14,18 +14,18 @@ export function useSnackbar() {
   const [mensaje, setMensaje] = useState<SnackbarMensaje | null>(null)
   const [abierta, setAbierta] = useState(false)
 
-  function mostrarAlerta(tipo: SnackbarTipo, texto: string) {
+  const mostrarAlerta = useCallback((tipo: SnackbarTipo, texto: string) => {
     setMensaje({ tipo, texto })
     setAbierta(true)
-  }
+  }, [])
 
-  function cerrarAlerta() {
+  const cerrarAlerta = useCallback(() => {
     setAbierta(false)
-  }
+  }, [])
 
-  function limpiarAlerta() {
+  const limpiarAlerta = useCallback(() => {
     setMensaje(null)
-  }
+  }, [])
 
   return { mensaje, abierta, mostrarAlerta, cerrarAlerta, limpiarAlerta }
 }

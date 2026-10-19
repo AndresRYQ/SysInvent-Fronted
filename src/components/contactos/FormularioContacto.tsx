@@ -17,6 +17,7 @@ import type {
 } from '../../types/contacto'
 
 import type { Proveedor } from '../../types/proveedor'
+import { coincidenIds } from '../../utils/identificadores'
 
 interface FormularioContactoProps {
   abierto: boolean
@@ -258,7 +259,7 @@ export function FormularioContacto({
 
             <div className="mb-3">
               <label
-                className="form-label required"
+                className={`form-label${soloLectura ? '' : ' required'}`}
                 htmlFor="contactoProveedor"
               >
                 Proveedor
@@ -277,7 +278,7 @@ export function FormularioContacto({
                     value: String(proveedor.id),
                     label: proveedor.razonSocial,
                   }))
-                  .find((opcion) => opcion.value === form.proveedorId) ?? null}
+                  .find((opcion) => coincidenIds(opcion.value, form.proveedorId, 'PROV-')) ?? null}
                 onChange={(opcion) => {
                   setForm((actual) => ({
                     ...actual,
@@ -291,6 +292,7 @@ export function FormularioContacto({
                 }))
                 }}
                 placeholder={Placeholder.Seleccionar}
+                isDisabled={soloLectura}
                 isClearable
                 isSearchable
                 menuPortalTarget={document.body}
@@ -307,7 +309,7 @@ export function FormularioContacto({
             <div className="row g-3">
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label required"
+                  className={`form-label${soloLectura ? '' : ' required'}`}
                   htmlFor="contactoNombre"
                 >
                   Nombre completo
@@ -354,7 +356,7 @@ export function FormularioContacto({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label required"
+                  className={`form-label${soloLectura ? '' : ' required'}`}
                   htmlFor="contactoCargo"
                 >
                   Cargo
@@ -397,7 +399,7 @@ export function FormularioContacto({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label required"
+                  className={`form-label${soloLectura ? '' : ' required'}`}
                   htmlFor="contactoTelefono"
                 >
                   Teléfono
@@ -440,7 +442,7 @@ export function FormularioContacto({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label required"
+                  className={`form-label${soloLectura ? '' : ' required'}`}
                   htmlFor="contactoCorreo"
                 >
                   Correo

@@ -2,6 +2,7 @@ import { Eye, FolderKanban, Pencil, Plus, Ruler, RotateCcw, Trash2 } from 'lucid
 import { EmptyState } from '../common/EmptyState'
 import type { UnidadMedida } from '../../types/unidadMedida'
 import { TablePagination } from '../ui/TablePagination'
+import { TableLoadingState } from '../ui/TableLoadingState'
 
 interface Props {
   unidades: UnidadMedida[]
@@ -13,11 +14,12 @@ interface Props {
   onVisualizar: (item: UnidadMedida) => void
   onEliminar: (item: UnidadMedida) => void
   onReactivar: (item: UnidadMedida) => void
+  loading?: boolean
   onPageChange: (page: number) => void
   onPageSizeChange: (size: number) => void
 }
 
-export function TablaUnidadesMedida({ unidades, totalItems, page, pageSize, onAgregar, onEditar, onVisualizar, onEliminar, onReactivar, onPageChange, onPageSizeChange }: Props) {
+export function TablaUnidadesMedida({ unidades, totalItems, page, pageSize, onAgregar, onEditar, onVisualizar, onEliminar, onReactivar, onPageChange, onPageSizeChange, loading = totalItems < 0 }: Props) {
   return (
     <section className="table-card card border-0 shadow-sm">
       <div className="card-body p-0">
@@ -25,7 +27,7 @@ export function TablaUnidadesMedida({ unidades, totalItems, page, pageSize, onAg
           <span className="maestro-kicker"><FolderKanban size={16} />Listado de unidades de medida</span>
           <button type="button" className="btn table-toolbar-btn" onClick={onAgregar}><Plus size={18} />Agregar unidad de medida</button>
         </div>
-        <div className="table-responsive">
+        <div className="table-responsive"><TableLoadingState visible={loading} />
           <table className="table standard-table align-middle mb-0">
             <thead><tr><th>N°</th><th>Nombre de unidad de medida</th><th>Descripción</th><th>Fecha registro</th><th>Estado</th><th className="text-center">Acciones</th></tr></thead>
             <tbody>
@@ -36,7 +38,7 @@ export function TablaUnidadesMedida({ unidades, totalItems, page, pageSize, onAg
                   <td>{item.descripcion}</td>
                   <td>{item.fechaRegistro ?? '—'}</td>
                   <td><span className={item.activo === 1 ? 'status-label status-label--active' : 'status-label status-label--inactive'}><span className="status-label__dot" aria-hidden="true" />{item.activo === 1 ? 'Activo' : 'Inactivo'}</span></td>
-                  <td><div className="table-actions">{item.activo === 1 ? <><button type="button" className="btn table-action-btn" onClick={() => onEditar(item)} title="Editar"><Pencil size={16} /></button><button type="button" className="btn table-action-btn table-action-btn--danger" onClick={() => onEliminar(item)} title="Desactivar"><Trash2 size={16} /></button></> : <><button type="button" className="btn table-action-btn" onClick={() => onVisualizar(item)} title="Visualizar"><Eye size={16} /></button><button type="button" className="btn table-action-btn" onClick={() => onReactivar(item)} title="Reactivar"><RotateCcw size={16} /></button></>}</div></td>
+                  <td><div className="table-actions">{item.activo === 1 ? <><button type="button" className="btn table-action-btn" onClick={() => onVisualizar(item)} title="Visualizar"><Eye size={16} /></button><button type="button" className="btn table-action-btn" onClick={() => onEditar(item)} title="Editar"><Pencil size={16} /></button><button type="button" className="btn table-action-btn table-action-btn--danger" onClick={() => onEliminar(item)} title="Desactivar"><Trash2 size={16} /></button></> : <><button type="button" className="btn table-action-btn" onClick={() => onVisualizar(item)} title="Visualizar"><Eye size={16} /></button><button type="button" className="btn table-action-btn" onClick={() => onReactivar(item)} title="Reactivar"><RotateCcw size={16} /></button></>}</div></td>
                 </tr>
               )) : <tr><td colSpan={6}><EmptyState icon={FolderKanban} iconSize={28} title="No se encontraron unidades de medida" description="Ajusta los filtros o limpia la búsqueda." /></td></tr>}
             </tbody>
