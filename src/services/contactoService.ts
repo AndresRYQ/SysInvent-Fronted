@@ -26,12 +26,6 @@ export function obtenerContactoPorId(id: number): Contacto | null {
   return contacto ? { ...contacto } : null
 }
 
-function formatearFechaRegistro(fecha?: string | Date): string {
-  if (typeof fecha === 'string') return fecha.trim()
-  if (!fecha || Number.isNaN(fecha.getTime())) return ''
-  return fecha.toISOString().slice(0, 10)
-}
-
 function mapearContacto(contacto: NonNullable<CustomPageContactoResponse['datos']>[number]): Contacto {
   return {
     id: contacto.contactoId ?? 0,
@@ -41,7 +35,7 @@ function mapearContacto(contacto: NonNullable<CustomPageContactoResponse['datos'
     telefono: contacto.telefono ?? '',
     correo: contacto.correo ?? '',
     activo: contacto.activo ? 1 : 0,
-    fechaRegistro: formatearFechaRegistro(contacto.fechaRegistro),
+    fechaRegistro: contacto.fechaRegistro ?? '',
   }
 }
 

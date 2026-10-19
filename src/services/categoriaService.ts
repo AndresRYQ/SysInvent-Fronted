@@ -21,12 +21,6 @@ export function obtenerCategorias(): Categoria[] {
   return categoriasEnMemoria.map((categoria) => ({ ...categoria }))
 }
 
-function formatearFechaRegistro(fecha?: string | Date): string | undefined {
-  if (typeof fecha === 'string') return fecha.trim() || undefined
-  if (!fecha || Number.isNaN(fecha.getTime())) return undefined
-  return fecha.toISOString().slice(0, 10)
-}
-
 function mapearRespuestaCategoria(response: CustomPageCategoriaCatalogoResponse): CatalogoPaginado<Categoria> {
   const resultado: CatalogoPaginado<Categoria> = {
     datos: (response.datos ?? []).map((categoria) => ({
@@ -34,7 +28,7 @@ function mapearRespuestaCategoria(response: CustomPageCategoriaCatalogoResponse)
       nombre: categoria.nombre ?? '',
       descripcion: categoria.descripcion ?? '',
       activo: categoria.activo ? 1 : 0,
-      fechaRegistro: formatearFechaRegistro(categoria.fechaRegistro),
+      fechaRegistro: categoria.fechaRegistro,
     })),
     paginacion: response.paginacion ?? {},
   }

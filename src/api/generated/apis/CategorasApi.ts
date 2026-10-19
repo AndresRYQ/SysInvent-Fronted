@@ -55,6 +55,10 @@ export interface CambiarEstadoCategoriaRequest {
 }
 
 export interface EliminarCategoriaRequest {
+    id: number;
+}
+
+export interface EliminarCategoria1Request {
     categoriaId: number;
 }
 
@@ -213,10 +217,63 @@ export class CategorasApi extends runtime.BaseAPI {
      * Creates request options for eliminarCategoria without sending the request
      */
     async eliminarCategoriaRequestOpts(requestParameters: EliminarCategoriaRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling eliminarCategoria().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/v1/catalogos/categorias/{id}`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Desactivar categoría
+     */
+    async eliminarCategoriaRaw(requestParameters: EliminarCategoriaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.eliminarCategoriaRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Desactivar categoría
+     */
+    async eliminarCategoria(requestParameters: EliminarCategoriaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.eliminarCategoriaRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for eliminarCategoria1 without sending the request
+     */
+    async eliminarCategoria1RequestOpts(requestParameters: EliminarCategoria1Request): Promise<runtime.RequestOpts> {
         if (requestParameters['categoriaId'] == null) {
             throw new runtime.RequiredError(
                 'categoriaId',
-                'Required parameter "categoriaId" was null or undefined when calling eliminarCategoria().'
+                'Required parameter "categoriaId" was null or undefined when calling eliminarCategoria1().'
             );
         }
 
@@ -251,8 +308,8 @@ export class CategorasApi extends runtime.BaseAPI {
      * Desactiva lógicamente una categoría
      * Eliminar categoría
      */
-    async eliminarCategoriaRaw(requestParameters: EliminarCategoriaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.eliminarCategoriaRequestOpts(requestParameters);
+    async eliminarCategoria1Raw(requestParameters: EliminarCategoria1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        const requestOptions = await this.eliminarCategoria1RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
@@ -262,8 +319,8 @@ export class CategorasApi extends runtime.BaseAPI {
      * Desactiva lógicamente una categoría
      * Eliminar categoría
      */
-    async eliminarCategoria(requestParameters: EliminarCategoriaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.eliminarCategoriaRaw(requestParameters, initOverrides);
+    async eliminarCategoria1(requestParameters: EliminarCategoria1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.eliminarCategoria1Raw(requestParameters, initOverrides);
         return await response.value();
     }
 

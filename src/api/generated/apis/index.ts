@@ -12,7 +12,7 @@ export * from './LoginApi';
 export * from './PartesDeEquipoApi';
 export * from './PerfilControllerApi';
 export * from './PermisoControllerApi';
-export * from './ProductoControllerApi';
+export * from './ProductosApi';
 export * from './ProveedoresApi';
 export * from './ReporteIngresoControllerApi';
 export * from './ReporteKardexControllerApi';

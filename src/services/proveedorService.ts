@@ -27,12 +27,6 @@ export function obtenerProveedorPorId(id: number | string): Proveedor | null {
   return proveedor ? { ...proveedor } : null
 }
 
-function formatearFechaRegistro(fecha?: string | Date): string {
-  if (typeof fecha === 'string') return fecha.trim()
-  if (!fecha || Number.isNaN(fecha.getTime())) return ''
-  return fecha.toISOString().slice(0, 10)
-}
-
 function mapearProveedor(proveedor: NonNullable<CustomPageProveedorResponse['datos']>[number]): Proveedor {
   return {
     id: proveedor.proveedorId ?? 0,
@@ -42,7 +36,7 @@ function mapearProveedor(proveedor: NonNullable<CustomPageProveedorResponse['dat
     telefono: proveedor.telefono ?? '',
     direccion: proveedor.direccion ?? '',
     activo: proveedor.activo ? 1 : 0,
-    fechaRegistro: formatearFechaRegistro(proveedor.fechaRegistro),
+    fechaRegistro: proveedor.fechaRegistro ?? '',
   }
 }
 

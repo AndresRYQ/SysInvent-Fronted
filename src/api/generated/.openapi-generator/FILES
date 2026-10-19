@@ -10,7 +10,7 @@ apis/LoginApi.ts
 apis/PartesDeEquipoApi.ts
 apis/PerfilControllerApi.ts
 apis/PermisoControllerApi.ts
-apis/ProductoControllerApi.ts
+apis/ProductosApi.ts
 apis/ProveedoresApi.ts
 apis/ReporteIngresoControllerApi.ts
 apis/ReporteKardexControllerApi.ts
@@ -44,6 +44,7 @@ docs/CustomPageCentroCostoResponse.md
 docs/CustomPageContactoResponse.md
 docs/CustomPageDestinoResponse.md
 docs/CustomPageParteEquipoResponse.md
+docs/CustomPageProductoResponse.md
 docs/CustomPageProveedorResponse.md
 docs/CustomPageRolResponse.md
 docs/CustomPageTipoDocumentoResponse.md
@@ -68,7 +69,9 @@ docs/ParteEquipoResponse.md
 docs/PartesDeEquipoApi.md
 docs/PerfilControllerApi.md
 docs/PermisoControllerApi.md
-docs/ProductoControllerApi.md
+docs/ProductoRequest.md
+docs/ProductoResponse.md
+docs/ProductosApi.md
 docs/ProveedorRequest.md
 docs/ProveedorResponse.md
 docs/ProveedoresApi.md
@@ -110,6 +113,7 @@ models/CustomPageCentroCostoResponse.ts
 models/CustomPageContactoResponse.ts
 models/CustomPageDestinoResponse.ts
 models/CustomPageParteEquipoResponse.ts
+models/CustomPageProductoResponse.ts
 models/CustomPageProveedorResponse.ts
 models/CustomPageRolResponse.ts
 models/CustomPageTipoDocumentoResponse.ts
@@ -127,6 +131,8 @@ models/LoginResponse.ts
 models/MessageResponse.ts
 models/ParteEquipoRequest.ts
 models/ParteEquipoResponse.ts
+models/ProductoRequest.ts
+models/ProductoResponse.ts
 models/ProveedorRequest.ts
 models/ProveedorResponse.ts
 models/RolRequest.ts

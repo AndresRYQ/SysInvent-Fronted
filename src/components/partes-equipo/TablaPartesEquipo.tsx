@@ -120,9 +120,7 @@ export function TablaPartesEquipo({
                       </td>
 
                       <td>
-                        {
-                          parte.fechaRegistro
-                        }
+                        {parte.fechaRegistro ?? '—'}
                       </td>
 
                       <td>

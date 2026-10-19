@@ -21,12 +21,6 @@ export function obtenerTiposDocumento(): TipoDocumento[] {
   return tiposDocumentoEnMemoria.map((tipo) => ({ ...tipo }))
 }
 
-function formatearFechaRegistro(fecha?: string | Date): string | undefined {
-  if (typeof fecha === 'string') return fecha.trim() || undefined
-  if (!fecha || Number.isNaN(fecha.getTime())) return undefined
-  return fecha.toISOString().slice(0, 10)
-}
-
 function mapearRespuestaTipoDocumento(response: CustomPageTipoDocumentoResponse): CatalogoPaginado<TipoDocumento> {
   const resultado: CatalogoPaginado<TipoDocumento> = {
     datos: (response.datos ?? []).map((tipo) => ({
@@ -34,7 +28,7 @@ function mapearRespuestaTipoDocumento(response: CustomPageTipoDocumentoResponse)
       nombre: tipo.nombre ?? '',
       descripcion: tipo.descripcion ?? '',
       activo: tipo.activo ? 1 : 0,
-      fechaRegistro: formatearFechaRegistro(tipo.fechaRegistro),
+      fechaRegistro: tipo.fechaRegistro,
     })),
     paginacion: response.paginacion ?? {},
   }

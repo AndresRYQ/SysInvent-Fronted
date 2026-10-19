@@ -79,7 +79,7 @@ export function ParteEquipoResponseFromJSONTyped(json: any, ignoreDiscriminator:
         'nombre': json['nombre'] == null ? undefined : json['nombre'],
         'descripcion': json['descripcion'] == null ? undefined : json['descripcion'],
         'activo': json['activo'] == null ? undefined : json['activo'],
-        'fechaRegistro': json['fechaRegistro'] == null ? undefined : String(json['fechaRegistro']),
+        'fechaRegistro': json['fechaRegistro'] == null ? undefined : json['fechaRegistro'],
     };
 }
 
