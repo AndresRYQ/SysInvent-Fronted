@@ -66,12 +66,6 @@ export interface ProductoRequest {
      * @type {number}
      * @memberof ProductoRequest
      */
-    stockActual: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof ProductoRequest
-     */
     stockMinimo: number;
     /**
      * 
@@ -91,7 +85,6 @@ export function instanceOfProductoRequest(value: object): value is ProductoReque
     if (!('categoriaId' in value) || value['categoriaId'] === undefined) return false;
     if (!('unidadMedidaId' in value) || value['unidadMedidaId'] === undefined) return false;
     if (!('proveedorId' in value) || value['proveedorId'] === undefined) return false;
-    if (!('stockActual' in value) || value['stockActual'] === undefined) return false;
     if (!('stockMinimo' in value) || value['stockMinimo'] === undefined) return false;
     if (!('precioUnitario' in value) || value['precioUnitario'] === undefined) return false;
     return true;
@@ -114,7 +107,6 @@ export function ProductoRequestFromJSONTyped(json: any, ignoreDiscriminator: boo
         'categoriaId': json['categoriaId'],
         'unidadMedidaId': json['unidadMedidaId'],
         'proveedorId': json['proveedorId'],
-        'stockActual': json['stockActual'],
         'stockMinimo': json['stockMinimo'],
         'precioUnitario': json['precioUnitario'],
     };
@@ -138,7 +130,6 @@ export function ProductoRequestToJSONTyped(value?: ProductoRequest | null, ignor
         'categoriaId': value['categoriaId'],
         'unidadMedidaId': value['unidadMedidaId'],
         'proveedorId': value['proveedorId'],
-        'stockActual': value['stockActual'],
         'stockMinimo': value['stockMinimo'],
         'precioUnitario': value['precioUnitario'],
     };

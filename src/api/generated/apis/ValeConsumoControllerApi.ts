@@ -14,6 +14,11 @@
 
 import * as runtime from '../runtime';
 import {
+    type CustomPageValeConsumoListadoResponse,
+    CustomPageValeConsumoListadoResponseFromJSON,
+    CustomPageValeConsumoListadoResponseToJSON,
+} from '../models/CustomPageValeConsumoListadoResponse';
+import {
     type ValeConsumoRequest,
     ValeConsumoRequestFromJSON,
     ValeConsumoRequestToJSON,
@@ -30,6 +35,16 @@ export interface AnularRequest {
 
 export interface CrearRequest {
     valeConsumoRequest: ValeConsumoRequest;
+}
+
+export interface ListarRequest {
+    busqueda?: string;
+    centroCostoId?: number;
+    estado?: string;
+    fechaDesde?: Date;
+    fechaHasta?: Date;
+    pagina?: number;
+    tamPagina?: number;
 }
 
 export interface ObtenerRequest {
@@ -209,8 +224,36 @@ export class ValeConsumoControllerApi extends runtime.BaseAPI {
     /**
      * Creates request options for listar without sending the request
      */
-    async listarRequestOpts(): Promise<runtime.RequestOpts> {
+    async listarRequestOpts(requestParameters: ListarRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
+
+        if (requestParameters['busqueda'] != null) {
+            queryParameters['busqueda'] = requestParameters['busqueda'];
+        }
+
+        if (requestParameters['centroCostoId'] != null) {
+            queryParameters['centroCostoId'] = requestParameters['centroCostoId'];
+        }
+
+        if (requestParameters['estado'] != null) {
+            queryParameters['estado'] = requestParameters['estado'];
+        }
+
+        if (requestParameters['fechaDesde'] != null) {
+            queryParameters['fechaDesde'] = (requestParameters['fechaDesde'] as any).toISOString().substring(0,10);
+        }
+
+        if (requestParameters['fechaHasta'] != null) {
+            queryParameters['fechaHasta'] = (requestParameters['fechaHasta'] as any).toISOString().substring(0,10);
+        }
+
+        if (requestParameters['pagina'] != null) {
+            queryParameters['pagina'] = requestParameters['pagina'];
+        }
+
+        if (requestParameters['tamPagina'] != null) {
+            queryParameters['tamPagina'] = requestParameters['tamPagina'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -235,17 +278,17 @@ export class ValeConsumoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async listarRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        const requestOptions = await this.listarRequestOpts();
+    async listarRaw(requestParameters: ListarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageValeConsumoListadoResponse>> {
+        const requestOptions = await this.listarRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageValeConsumoListadoResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async listar(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.listarRaw(initOverrides);
+    async listar(requestParameters: ListarRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageValeConsumoListadoResponse> {
+        const response = await this.listarRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

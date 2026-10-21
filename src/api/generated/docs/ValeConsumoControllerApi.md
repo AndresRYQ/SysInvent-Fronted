@@ -224,7 +224,7 @@ example().catch(console.error);
 
 ## listar
 
-> object listar()
+> CustomPageValeConsumoListadoResponse listar(busqueda, centroCostoId, estado, fechaDesde, fechaHasta, pagina, tamPagina)
 
 
 
@@ -245,8 +245,25 @@ async function example() {
   });
   const api = new ValeConsumoControllerApi(config);
 
+  const body = {
+    // string (optional)
+    busqueda: busqueda_example,
+    // number (optional)
+    centroCostoId: 56,
+    // string (optional)
+    estado: estado_example,
+    // Date (optional)
+    fechaDesde: 2013-10-20,
+    // Date (optional)
+    fechaHasta: 2013-10-20,
+    // number (optional)
+    pagina: 56,
+    // number (optional)
+    tamPagina: 56,
+  } satisfies ListarRequest;
+
   try {
-    const data = await api.listar();
+    const data = await api.listar(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -259,11 +276,20 @@ example().catch(console.error);
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **busqueda** | `string` |  | [Optional] [Defaults to `undefined`] |
+| **centroCostoId** | `number` |  | [Optional] [Defaults to `undefined`] |
+| **estado** | `string` |  | [Optional] [Defaults to `undefined`] |
+| **fechaDesde** | `Date` |  | [Optional] [Defaults to `undefined`] |
+| **fechaHasta** | `Date` |  | [Optional] [Defaults to `undefined`] |
+| **pagina** | `number` |  | [Optional] [Defaults to `1`] |
+| **tamPagina** | `number` |  | [Optional] [Defaults to `10`] |
 
 ### Return type
 
-**object**
+[**CustomPageValeConsumoListadoResponse**](CustomPageValeConsumoListadoResponse.md)
 
 ### Authorization
 

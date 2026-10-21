@@ -1,6 +1,7 @@
 import type {
   DetalleIngresoAlmacen,
   IngresoAlmacenFormData,
+  IngresoAlmacenListado,
   IngresoAlmacenRegistro,
 } from '../types/ingresoAlmacen'
 
@@ -13,9 +14,88 @@ import { obtenerProveedores } from './proveedorService'
 import { obtenerTiposDocumento } from './tipoDocumentoService'
 import { registrarEventoBitacora } from './bitacoraService'
 import { coincidenIds } from '../utils/identificadores'
+import {
+  IngresoAlmacenControllerApi,
+  type Listar4Request,
+  type IngresoAlmacenRequest,
+  type MessageResponse,
+} from '../api/generated'
+import { apiConfiguration } from '../api/client'
 
 const STORAGE_KEY =
   'agrihusac_ingresos_almacen'
+
+const ingresoAlmacenApi =
+  new IngresoAlmacenControllerApi(apiConfiguration)
+
+function convertirIdIngreso(valor: string | number): number {
+  const id = Number(String(valor).replace(/^[A-Z]+-0*/i, ''))
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new Error('El identificador del ingreso no es válido.')
+  }
+  return id
+}
+
+function construirRequestIngreso(
+  datos: IngresoAlmacenFormData,
+): IngresoAlmacenRequest {
+  return {
+    proveedorId: convertirIdIngreso(datos.proveedorId),
+    contactoId: convertirIdIngreso(datos.contactoId),
+    tipoDocumentoId: convertirIdIngreso(datos.tipoDocumentoId),
+    numeroDocumento: datos.numeroDocumento.trim().toUpperCase(),
+    fechaIngreso: datos.fechaIngreso
+      ? new Date(`${datos.fechaIngreso}T00:00:00Z`)
+      : undefined,
+    observacion: datos.observacion.trim() || undefined,
+    detalles: datos.detalles.map((detalle) => ({
+      productoId: convertirIdIngreso(detalle.productoId),
+      cantidad: Number(detalle.cantidad),
+      precioUnitario: Number(detalle.precioUnitario),
+    })),
+  }
+}
+
+export async function registrarIngresoAlmacen(
+  datos: IngresoAlmacenFormData,
+): Promise<MessageResponse> {
+  const response = await ingresoAlmacenApi.crear1({
+    ingresoAlmacenRequest: construirRequestIngreso(datos),
+  }) as MessageResponse
+
+  if (response.success === false) {
+    throw new Error(response.message ?? 'No se pudo registrar el ingreso.')
+  }
+
+  return response
+}
+
+export async function listarIngresosAlmacen(
+  parametros: Listar4Request = {},
+): Promise<{
+  datos: IngresoAlmacenListado[]
+  totalElementos: number
+}> {
+  const response = await ingresoAlmacenApi.listar4(parametros)
+
+  return {
+    datos: (response.datos ?? []).map((ingreso) => ({
+      id: ingreso.ingresoAlmacenId ?? 0,
+      numeroIngreso: ingreso.numeroIngreso ?? '',
+      fechaIngreso: ingreso.fechaIngreso ?? '',
+      proveedor: ingreso.proveedor ?? '',
+      contacto: ingreso.contacto ?? '',
+      documento: ingreso.documento ?? '',
+      productos: ingreso.productos ?? 0,
+      cantidadIngresada: ingreso.cantidadIngresada ?? '0',
+      total: Number(ingreso.total ?? 0),
+      estado: ingreso.estado === 'ANULADO'
+        ? 'ANULADO'
+        : 'REGISTRADO',
+    })),
+    totalElementos: Number(response.paginacion?.totalElementos ?? 0),
+  }
+}
 
 function normalizarProductoId(
   id: unknown,

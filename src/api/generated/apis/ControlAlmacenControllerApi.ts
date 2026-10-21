@@ -13,6 +13,33 @@
  */
 
 import * as runtime from '../runtime';
+import {
+    type CustomPageControlAlmacenListadoResponse,
+    CustomPageControlAlmacenListadoResponseFromJSON,
+    CustomPageControlAlmacenListadoResponseToJSON,
+} from '../models/CustomPageControlAlmacenListadoResponse';
+import {
+    type CustomPageControlAlmacenMovimientoResponse,
+    CustomPageControlAlmacenMovimientoResponseFromJSON,
+    CustomPageControlAlmacenMovimientoResponseToJSON,
+} from '../models/CustomPageControlAlmacenMovimientoResponse';
+
+export interface DetalleRequest {
+    productoId: number;
+    pagina?: number;
+    tamPagina?: number;
+}
+
+export interface Listar6Request {
+    busqueda?: string;
+    tipoProductoId?: number;
+    categoriaId?: number;
+    estado?: string;
+    fechaDesde?: Date;
+    fechaHasta?: Date;
+    pagina?: number;
+    tamPagina?: number;
+}
 
 /**
  * 
@@ -20,10 +47,25 @@ import * as runtime from '../runtime';
 export class ControlAlmacenControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for plantilla9 without sending the request
+     * Creates request options for detalle without sending the request
      */
-    async plantilla9RequestOpts(): Promise<runtime.RequestOpts> {
+    async detalleRequestOpts(requestParameters: DetalleRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['productoId'] == null) {
+            throw new runtime.RequiredError(
+                'productoId',
+                'Required parameter "productoId" was null or undefined when calling detalle().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['pagina'] != null) {
+            queryParameters['pagina'] = requestParameters['pagina'];
+        }
+
+        if (requestParameters['tamPagina'] != null) {
+            queryParameters['tamPagina'] = requestParameters['tamPagina'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -36,7 +78,8 @@ export class ControlAlmacenControllerApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/api/almacen/_plantilla`;
+        let urlPath = `/api/almacen/existencias/{productoId}/detalle`;
+        urlPath = urlPath.replace('{productoId}', encodeURIComponent(String(requestParameters['productoId'])));
 
         return {
             path: urlPath,
@@ -48,17 +91,93 @@ export class ControlAlmacenControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async plantilla9Raw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const requestOptions = await this.plantilla9RequestOpts();
+    async detalleRaw(requestParameters: DetalleRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageControlAlmacenMovimientoResponse>> {
+        const requestOptions = await this.detalleRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageControlAlmacenMovimientoResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async plantilla9(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.plantilla9Raw(initOverrides);
+    async detalle(requestParameters: DetalleRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageControlAlmacenMovimientoResponse> {
+        const response = await this.detalleRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for listar6 without sending the request
+     */
+    async listar6RequestOpts(requestParameters: Listar6Request): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        if (requestParameters['busqueda'] != null) {
+            queryParameters['busqueda'] = requestParameters['busqueda'];
+        }
+
+        if (requestParameters['tipoProductoId'] != null) {
+            queryParameters['tipoProductoId'] = requestParameters['tipoProductoId'];
+        }
+
+        if (requestParameters['categoriaId'] != null) {
+            queryParameters['categoriaId'] = requestParameters['categoriaId'];
+        }
+
+        if (requestParameters['estado'] != null) {
+            queryParameters['estado'] = requestParameters['estado'];
+        }
+
+        if (requestParameters['fechaDesde'] != null) {
+            queryParameters['fechaDesde'] = (requestParameters['fechaDesde'] as any).toISOString().substring(0,10);
+        }
+
+        if (requestParameters['fechaHasta'] != null) {
+            queryParameters['fechaHasta'] = (requestParameters['fechaHasta'] as any).toISOString().substring(0,10);
+        }
+
+        if (requestParameters['pagina'] != null) {
+            queryParameters['pagina'] = requestParameters['pagina'];
+        }
+
+        if (requestParameters['tamPagina'] != null) {
+            queryParameters['tamPagina'] = requestParameters['tamPagina'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/almacen/existencias`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     */
+    async listar6Raw(requestParameters: Listar6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageControlAlmacenListadoResponse>> {
+        const requestOptions = await this.listar6RequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageControlAlmacenListadoResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async listar6(requestParameters: Listar6Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageControlAlmacenListadoResponse> {
+        const response = await this.listar6Raw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

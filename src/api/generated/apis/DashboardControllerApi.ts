@@ -13,6 +13,11 @@
  */
 
 import * as runtime from '../runtime';
+import {
+    type DashboardResponse,
+    DashboardResponseFromJSON,
+    DashboardResponseToJSON,
+} from '../models/DashboardResponse';
 
 /**
  * 
@@ -20,9 +25,9 @@ import * as runtime from '../runtime';
 export class DashboardControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for plantilla7 without sending the request
+     * Creates request options for obtener3 without sending the request
      */
-    async plantilla7RequestOpts(): Promise<runtime.RequestOpts> {
+    async obtener3RequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -36,7 +41,7 @@ export class DashboardControllerApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/api/dashboard/_plantilla`;
+        let urlPath = `/api/dashboard`;
 
         return {
             path: urlPath,
@@ -48,17 +53,18 @@ export class DashboardControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async plantilla7Raw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const requestOptions = await this.plantilla7RequestOpts();
+    async obtener3Raw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DashboardResponse>> {
+        const requestOptions = await this.obtener3RequestOpts();
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => DashboardResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async plantilla7(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.plantilla7Raw(initOverrides);
+    async obtener3(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DashboardResponse> {
+        const response = await this.obtener3Raw(initOverrides);
+        return await response.value();
     }
 
 }

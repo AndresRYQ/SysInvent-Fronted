@@ -20,17 +20,13 @@ import { obtenerPartesEquipo } from '../../services/parteEquipoService'
 import { obtenerProductos } from '../../services/productoService'
 
 import {
-  filtrarReporteVales,
-  obtenerFilasReporteVales,
   obtenerResumenReporteVales,
 } from '../../services/reporteValeService'
-import {
-  listarVales,
-  obtenerMensajeErrorVale,
-} from '../../services/valeConsumoService'
+import { listarReporteValesApi } from '../../services/reportesApiService'
 
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
-import type { ValeConsumo } from '../../types/valeConsumo'
+import { REPORTE_VALES_MOCK } from '../../data/reporteValesMock'
+import type { FilaReporteVale } from '../../types/reporteVale'
 
 import type {
   FiltrosReporteVales as Filtros,
@@ -52,33 +48,10 @@ const FILTROS_INICIALES: Filtros = {
 }
 
 export function ReporteValesPage() {
-  const [vales, setVales] = useState<ValeConsumo[]>([])
+  const [filasApi, setFilasApi] = useState<FilaReporteVale[]>([])
+  const [totalApi, setTotalApi] = useState(0)
+  const [usarMock, setUsarMock] = useState(false)
   const [errorCarga, setErrorCarga] = useState<string | null>(null)
-
-  useEffect(() => {
-    let activo = true
-
-    listarVales()
-      .then((resultado) => {
-        if (activo) {
-          setVales(resultado)
-        }
-      })
-      .catch((error) => {
-        if (activo) {
-          setErrorCarga(obtenerMensajeErrorVale(error))
-        }
-      })
-
-    return () => {
-      activo = false
-    }
-  }, [])
-
-  const filas = useMemo(
-    () => obtenerFilasReporteVales(vales),
-    [vales],
-  )
 
   const [filtros, setFiltros] =
     useState<Filtros>({
@@ -96,6 +69,34 @@ export function ReporteValesPage() {
 
   const [pageSize, setPageSize] =
     useState(10)
+
+  useEffect(() => {
+    let activo = true
+
+    listarReporteValesApi({
+      ...filtrosAplicados,
+      pagina: page,
+      tamPagina: pageSize,
+    })
+      .then((resultado) => {
+        if (!activo) return
+        const filtrosVacios = Object.values(filtrosAplicados).every((valor) => !valor)
+        setUsarMock(filtrosVacios && resultado.datos.length === 0 && page === 1)
+        setFilasApi(resultado.datos)
+        setTotalApi(resultado.totalElementos)
+        setErrorCarga(null)
+      })
+      .catch((error: unknown) => {
+        if (!activo) return
+        const filtrosVacios = Object.values(filtrosAplicados).every((valor) => !valor)
+        setUsarMock(filtrosVacios && page === 1)
+        setErrorCarga(error instanceof Error ? error.message : 'No se pudo cargar el reporte de vales.')
+      })
+
+    return () => { activo = false }
+  }, [filtrosAplicados, page, pageSize])
+
+  const filas = usarMock ? REPORTE_VALES_MOCK : filasApi
 
   const centrosCosto = useMemo(
     () =>
@@ -182,14 +183,7 @@ export function ReporteValesPage() {
     [],
   )
 
-  const filasFiltradas = useMemo(
-    () =>
-      filtrarReporteVales(
-        filas,
-        filtrosAplicados,
-      ),
-    [filas, filtrosAplicados],
-  )
+  const filasFiltradas = filas
 
   const resumen = useMemo(
     () =>
@@ -199,23 +193,22 @@ export function ReporteValesPage() {
     [filasFiltradas],
   )
 
-  const totalItems =
-    filasFiltradas.length
+  const totalItems = usarMock ? filasFiltradas.length : totalApi
 
   const filasPaginadas = useMemo(
     () => {
       const inicio =
         (page - 1) * pageSize
 
-      return filasFiltradas.slice(
-        inicio,
-        inicio + pageSize,
-      )
+      return usarMock
+        ? filasFiltradas.slice(inicio, inicio + pageSize)
+        : filasFiltradas
     },
     [
       filasFiltradas,
       page,
       pageSize,
+      usarMock,
     ],
   )
 
@@ -292,6 +285,12 @@ export function ReporteValesPage() {
         {errorCarga && (
           <div className="alert alert-danger" role="alert">
             {errorCarga}
+          </div>
+        )}
+
+        {usarMock && (
+          <div className="alert alert-info" role="status">
+            Mostrando datos de demostración para validar las columnas del reporte.
           </div>
         )}
 
