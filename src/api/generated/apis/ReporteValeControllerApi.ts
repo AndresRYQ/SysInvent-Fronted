@@ -13,6 +13,25 @@
  */
 
 import * as runtime from '../runtime';
+import {
+    type CustomPageReporteValeListadoResponse,
+    CustomPageReporteValeListadoResponseFromJSON,
+    CustomPageReporteValeListadoResponseToJSON,
+} from '../models/CustomPageReporteValeListadoResponse';
+
+export interface Listar1Request {
+    busqueda?: string;
+    centroCostoId?: number;
+    destinoId?: number;
+    parteEquipoId?: number;
+    tipoProductoId?: number;
+    productoId?: number;
+    estado?: string;
+    fechaDesde?: Date;
+    fechaHasta?: Date;
+    pagina?: number;
+    tamPagina?: number;
+}
 
 /**
  * 
@@ -20,10 +39,54 @@ import * as runtime from '../runtime';
 export class ReporteValeControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for plantilla1 without sending the request
+     * Creates request options for listar1 without sending the request
      */
-    async plantilla1RequestOpts(): Promise<runtime.RequestOpts> {
+    async listar1RequestOpts(requestParameters: Listar1Request): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
+
+        if (requestParameters['busqueda'] != null) {
+            queryParameters['busqueda'] = requestParameters['busqueda'];
+        }
+
+        if (requestParameters['centroCostoId'] != null) {
+            queryParameters['centroCostoId'] = requestParameters['centroCostoId'];
+        }
+
+        if (requestParameters['destinoId'] != null) {
+            queryParameters['destinoId'] = requestParameters['destinoId'];
+        }
+
+        if (requestParameters['parteEquipoId'] != null) {
+            queryParameters['parteEquipoId'] = requestParameters['parteEquipoId'];
+        }
+
+        if (requestParameters['tipoProductoId'] != null) {
+            queryParameters['tipoProductoId'] = requestParameters['tipoProductoId'];
+        }
+
+        if (requestParameters['productoId'] != null) {
+            queryParameters['productoId'] = requestParameters['productoId'];
+        }
+
+        if (requestParameters['estado'] != null) {
+            queryParameters['estado'] = requestParameters['estado'];
+        }
+
+        if (requestParameters['fechaDesde'] != null) {
+            queryParameters['fechaDesde'] = (requestParameters['fechaDesde'] as any).toISOString().substring(0,10);
+        }
+
+        if (requestParameters['fechaHasta'] != null) {
+            queryParameters['fechaHasta'] = (requestParameters['fechaHasta'] as any).toISOString().substring(0,10);
+        }
+
+        if (requestParameters['pagina'] != null) {
+            queryParameters['pagina'] = requestParameters['pagina'];
+        }
+
+        if (requestParameters['tamPagina'] != null) {
+            queryParameters['tamPagina'] = requestParameters['tamPagina'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -36,7 +99,7 @@ export class ReporteValeControllerApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/api/reportes/vales/_plantilla`;
+        let urlPath = `/api/reportes/vales`;
 
         return {
             path: urlPath,
@@ -48,17 +111,18 @@ export class ReporteValeControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async plantilla1Raw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const requestOptions = await this.plantilla1RequestOpts();
+    async listar1Raw(requestParameters: Listar1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageReporteValeListadoResponse>> {
+        const requestOptions = await this.listar1RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageReporteValeListadoResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async plantilla1(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.plantilla1Raw(initOverrides);
+    async listar1(requestParameters: Listar1Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageReporteValeListadoResponse> {
+        const response = await this.listar1Raw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

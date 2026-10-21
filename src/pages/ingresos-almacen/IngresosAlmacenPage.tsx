@@ -15,8 +15,6 @@ import {
   RotateCcw,
   Search,
   ShieldCheck,
-  Trash2,
-  X,
 } from 'lucide-react'
 import Select from 'react-select'
 import DatePicker from 'react-datepicker'
@@ -28,21 +26,13 @@ import {
 
 import { TablePagination } from '../../components/ui/TablePagination'
 import { EmptyState } from '../../components/common/EmptyState'
+import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
 import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 import { ValidadorRangoFechas } from '../../utils/ValidadorRangoFechas'
 
-import {
-  anularIngresoAlmacen,
-  calcularTotalIngreso,
-  obtenerIngresosAlmacen,
-} from '../../services/ingresoAlmacenService'
+import { listarIngresosAlmacen } from '../../services/ingresoAlmacenService'
 
-import { obtenerContactos } from '../../services/contactoService'
-import { obtenerProductos } from '../../services/productoService'
 import { obtenerProveedores } from '../../services/proveedorService'
-import { obtenerTiposDocumento } from '../../services/tipoDocumentoService'
-import { obtenerUnidadesMedida } from '../../services/unidadMedidaService'
-import type { IngresoAlmacenRegistro } from '../../types/ingresoAlmacen'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
@@ -56,11 +46,6 @@ interface FiltrosIngresos {
 
 interface EstadoNavegacion {
   mensaje?: string
-}
-
-interface MensajePagina {
-  tipo: 'success' | 'danger'
-  texto: string
 }
 
 const FILTROS_INICIALES: FiltrosIngresos = {
@@ -141,10 +126,9 @@ export function IngresosAlmacenPage() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const [ingresos, setIngresos] =
-    useState<IngresoAlmacenRegistro[]>(
-      () => obtenerIngresosAlmacen(),
-    )
+  const [ingresos, setIngresos] = useState<Awaited<ReturnType<typeof listarIngresosAlmacen>>['datos']>([])
+  const [totalItems, setTotalItems] = useState(0)
+  const [cargando, setCargando] = useState(false)
 
   const [filtros, setFiltros] =
     useState<FiltrosIngresos>(
@@ -162,41 +146,13 @@ export function IngresosAlmacenPage() {
   const [pageSize, setPageSize] =
     useState(10)
 
-  const [
-    ingresoAAnular,
-    setIngresoAAnular,
-  ] =
-    useState<IngresoAlmacenRegistro | null>(
-      null,
-    )
-
-  const [mensaje, setMensaje] =
-    useState<MensajePagina | null>(null)
+  const { mensaje, abierta, mostrarAlerta, cerrarAlerta, limpiarAlerta } = useSnackbar()
 
   const proveedores = useMemo(
     () => obtenerProveedores(),
     [],
   )
 
-  const contactos = useMemo(
-    () => obtenerContactos(),
-    [],
-  )
-
-  const tiposDocumento = useMemo(
-    () => obtenerTiposDocumento(),
-    [],
-  )
-
-  const productos = useMemo(
-    () => obtenerProductos(),
-    [],
-  )
-
-  const unidadesMedida = useMemo(
-    () => obtenerUnidadesMedida(),
-    [],
-  )
   useEffect(() => {
     const estado =
       location.state as EstadoNavegacion | null
@@ -205,10 +161,7 @@ export function IngresosAlmacenPage() {
       return
     }
 
-    setMensaje({
-      tipo: 'success',
-      texto: estado.mensaje,
-    })
+    mostrarAlerta('success', estado.mensaje)
 
     navigate(location.pathname, {
       replace: true,
@@ -218,215 +171,47 @@ export function IngresosAlmacenPage() {
     location.pathname,
     location.state,
     navigate,
+    mostrarAlerta,
   ])
 
-  const ingresosConDetalle = useMemo(
-    () =>
-      ingresos.map((ingreso) => {
-        const proveedor =
-          proveedores.find(
-            (item) =>
-              String(item.id) ===
-              String(ingreso.proveedorId),
-          )
-
-        const contacto = contactos.find(
-          (item) =>
-            String(item.id) ===
-            String(ingreso.contactoId),
-        )
-
-        const tipoDocumento =
-          tiposDocumento.find(
-            (item) =>
-              String(item.id) ===
-              String(ingreso.tipoDocumentoId),
-          )
-
-        const detallesProductos =
-        ingreso.detalles.map((detalle) => {
-          const producto = productos.find(
-            (item) =>
-              item.productoId === detalle.productoId,
-          )
-
-          const unidad = unidadesMedida.find(
-            (item) =>
-              String(item.id) ===
-              String(producto?.unidadMedidaId),
-          )
-
-            return {
-              nombre:
-                producto?.nombre ??
-                'Producto no disponible',
-              cantidad: detalle.cantidad,
-              unidad:
-                unidad?.nombre ?? 'Sin unidad',
-            }
-          })
-
-        const nombresProductos =
-          detallesProductos.map(
-            (detalle) => detalle.nombre,
-          )
-
-        const cantidadesResumen =
-          detallesProductos
-            .map(
-              (detalle) =>
-                `${detalle.nombre}: ${detalle.cantidad} ${detalle.unidad}`,
-            )
-            .join(' | ')
-
-        return {
-          ...ingreso,
-          proveedorNombre:
-            proveedor?.razonSocial ??
-            'Proveedor no disponible',
-          contactoNombre:
-            contacto?.nombreCompleto ??
-            'Contacto no disponible',
-          tipoDocumentoNombre:
-            tipoDocumento?.nombre ??
-            'Documento no disponible',
-          productosResumen:
-            nombresProductos.join(', '),
-            cantidadesResumen,
-          total:
-            calcularTotalIngreso(ingreso),
-        }
-      }),
-    [
-      ingresos,
-      proveedores,
-      contactos,
-      tiposDocumento,
-      productos,
-      unidadesMedida,
-    ],
-  )
-
-  const ingresosFiltrados = useMemo(
-    () => {
-      const busqueda =
-        filtrosAplicados.busqueda
-          .trim()
-          .toLowerCase()
-
-      return ingresosConDetalle.filter(
-        (ingreso) => {
-          const coincideBusqueda =
-            !busqueda ||
-            ingreso.numeroIngreso
-              .toLowerCase()
-              .includes(busqueda) ||
-            ingreso.numeroDocumento
-              .toLowerCase()
-              .includes(busqueda) ||
-            ingreso.proveedorNombre
-              .toLowerCase()
-              .includes(busqueda) ||
-            ingreso.productosResumen
-              .toLowerCase()
-              .includes(busqueda)
-
-          const coincideProveedor =
-            !filtrosAplicados.proveedorId ||
-            ingreso.proveedorId ===
-              filtrosAplicados.proveedorId
-
-          const coincideEstado =
-            !filtrosAplicados.estado ||
-            ingreso.estado ===
-              filtrosAplicados.estado
-
-          const coincideDesde =
-            !filtrosAplicados.fechaDesde ||
-            ingreso.fechaIngreso >=
-              filtrosAplicados.fechaDesde
-
-          const coincideHasta =
-            !filtrosAplicados.fechaHasta ||
-            ingreso.fechaIngreso <=
-              filtrosAplicados.fechaHasta
-
-          return (
-            coincideBusqueda &&
-            coincideProveedor &&
-            coincideEstado &&
-            coincideDesde &&
-            coincideHasta
-          )
-        },
-      )
-    },
-    [
-      ingresosConDetalle,
-      filtrosAplicados,
-    ],
-  )
-
-  const totalItems =
-    ingresosFiltrados.length
-
-  const ingresosPaginados = useMemo(
-    () => {
-      const inicio =
-        (page - 1) * pageSize
-
-      return ingresosFiltrados.slice(
-        inicio,
-        inicio + pageSize,
-      )
-    },
-    [
-      ingresosFiltrados,
-      page,
-      pageSize,
-    ],
-  )
-
   useEffect(() => {
-    const totalPages = Math.max(
-      1,
-      Math.ceil(totalItems / pageSize),
-    )
+    let activo = true
+    setCargando(true)
 
-    if (page > totalPages) {
-      setPage(totalPages)
-    }
-  }, [page, pageSize, totalItems])
-
-  function confirmarAnulacion(): void {
-    if (!ingresoAAnular) {
-      return
-    }
-
-    try {
-      const ingresoAnulado =
-        anularIngresoAlmacen(
-          ingresoAAnular.id,
-        )
-
-      setIngresos(
-        obtenerIngresosAlmacen(),
-      )
-
-      setMensaje({
-        tipo: 'success',
-        texto:
-          `Ingreso ${ingresoAnulado.numeroIngreso} anulado correctamente.`,
+    listarIngresosAlmacen({
+      busqueda: filtrosAplicados.busqueda || undefined,
+      proveedorId: filtrosAplicados.proveedorId
+        ? Number(filtrosAplicados.proveedorId)
+        : undefined,
+      estado: filtrosAplicados.estado || undefined,
+      fechaDesde: filtrosAplicados.fechaDesde
+        ? new Date(`${filtrosAplicados.fechaDesde}T00:00:00Z`)
+        : undefined,
+      fechaHasta: filtrosAplicados.fechaHasta
+        ? new Date(`${filtrosAplicados.fechaHasta}T00:00:00Z`)
+        : undefined,
+      pagina: page,
+      tamPagina: pageSize,
+    })
+      .then((resultado) => {
+        if (!activo) return
+        setIngresos(resultado.datos)
+        setTotalItems(resultado.totalElementos)
       })
-    } catch (error) {
-      setMensaje({
-        tipo: 'danger',
-        texto: obtenerMensajeError(error),
+      .catch((error: unknown) => {
+        if (!activo) return
+        setIngresos([])
+        setTotalItems(0)
+        mostrarAlerta('error', obtenerMensajeError(error))
       })
-    } finally {
-      setIngresoAAnular(null)
+      .finally(() => {
+        if (activo) setCargando(false)
+      })
+
+    return () => {
+      activo = false
     }
-  }
+  }, [filtrosAplicados, page, pageSize, mostrarAlerta])
 
   function aplicarFiltros(): void {
     const errorRango = ValidadorRangoFechas.validar(
@@ -435,10 +220,7 @@ export function IngresosAlmacenPage() {
     )
 
     if (errorRango) {
-      setMensaje({
-        tipo: 'danger',
-        texto: errorRango,
-      })
+      mostrarAlerta('warning', errorRango)
       return
     }
 
@@ -460,24 +242,6 @@ export function IngresosAlmacenPage() {
               </p>
             </div>
           </section>
-
-          {mensaje && (
-            <div
-              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
-              role="alert"
-            >
-              {mensaje.texto}
-
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={() =>
-                  setMensaje(null)
-                }
-              />
-            </div>
-          )}
 
           <div className="maestro-panel">
             <section className="maestro-filter-card card border-0 shadow-sm">
@@ -705,7 +469,13 @@ export function IngresosAlmacenPage() {
                     </thead>
 
                     <tbody>
-                      {ingresosPaginados.length ===
+                      {cargando ? (
+                        <tr>
+                          <td colSpan={10} className="text-center py-4">
+                            Cargando ingresos...
+                          </td>
+                        </tr>
+                      ) : ingresos.length ===
                       0 ? (
                         <tr>
                           <td colSpan={10}>
@@ -713,7 +483,7 @@ export function IngresosAlmacenPage() {
                           </td>
                         </tr>
                       ) : (
-                        ingresosPaginados.map(
+                        ingresos.map(
                           (ingreso) => (
                             <tr key={ingreso.id}>
                               <td>
@@ -736,46 +506,39 @@ export function IngresosAlmacenPage() {
 
                               <td>
                                 {
-                                  ingreso.proveedorNombre
+                                  ingreso.proveedor
                                 }
                               </td>
 
                               <td>
                                 {
-                                  ingreso.contactoNombre
+                                  ingreso.contacto
                                 }
                               </td>
 
                               <td>
                                 <strong>
                                   {
-                                    ingreso.tipoDocumentoNombre
+                                    ingreso.documento
                                   }
                                 </strong>
                                 <div className="small text-secondary">
                                   {
-                                    ingreso.numeroDocumento
+                                    
                                   }
                                 </div>
                               </td>
 
                               <td
-                                title={
-                                  ingreso.productosResumen
-                                }
+                                title={`${ingreso.productos} producto(s)`}
                               >
-                                {
-                                  ingreso.detalles
-                                    .length
-                                }{' '}
+                                {ingreso.productos}{' '}
                                 producto(s)
                               </td>
                               <td
-                                title={
-                                  ingreso.cantidadesResumen
-                                }
+                                title={ingreso.cantidadIngresada}
                               >
-                                {ingreso.cantidadesResumen}
+                                {ingreso.cantidadIngresada}
                               </td>
 
                               <td>
@@ -825,24 +588,6 @@ export function IngresosAlmacenPage() {
                                     />
                                   </button>
 
-                                  <button
-                                    type="button"
-                                    className="btn table-action-btn table-action-btn--danger"
-                                    title="Anular"
-                                    disabled={
-                                      ingreso.estado ===
-                                      'ANULADO'
-                                    }
-                                    onClick={() =>
-                                      setIngresoAAnular(
-                                        ingreso,
-                                      )
-                                    }
-                                  >
-                                    <Trash2
-                                      size={16}
-                                    />
-                                  </button>
                                 </div>
                               </td>
                             </tr>
@@ -873,7 +618,14 @@ export function IngresosAlmacenPage() {
         </div>
       </main>
 
-      {ingresoAAnular && (
+      <SnackbarAlert
+        mensaje={mensaje}
+        abierta={abierta}
+        onClose={cerrarAlerta}
+        onExited={limpiarAlerta}
+      />
+
+      {false && (
         <div
           className="maestro-modal-backdrop"
           role="presentation"
@@ -896,31 +648,23 @@ export function IngresosAlmacenPage() {
             </p>
 
             <p className="maestro-delete-name">
-              {
-                ingresoAAnular.numeroIngreso
-              }
+              
             </p>
 
             <div className="maestro-modal-footer maestro-modal-footer--center">
               <button
                 type="button"
                 className="btn btn-maestro-danger"
-                onClick={() =>
-                  setIngresoAAnular(null)
-                }
+                onClick={() => undefined}
               >
-                <X size={18} />
                 Cancelar
               </button>
 
               <button
                 type="button"
                 className="btn btn-maestro-danger"
-                onClick={
-                  confirmarAnulacion
-                }
+                onClick={() => undefined}
               >
-                <Trash2 size={18} />
                 Anular ingreso
               </button>
             </div>

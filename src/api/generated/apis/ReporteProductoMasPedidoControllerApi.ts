@@ -13,6 +13,22 @@
  */
 
 import * as runtime from '../runtime';
+import {
+    type CustomPageReporteProductoMasPedidoResponse,
+    CustomPageReporteProductoMasPedidoResponseFromJSON,
+    CustomPageReporteProductoMasPedidoResponseToJSON,
+} from '../models/CustomPageReporteProductoMasPedidoResponse';
+
+export interface Listar2Request {
+    busqueda?: string;
+    tipoProductoId?: number;
+    categoriaId?: number;
+    destinoId?: number;
+    fechaDesde?: Date;
+    fechaHasta?: Date;
+    pagina?: number;
+    tamPagina?: number;
+}
 
 /**
  * 
@@ -20,10 +36,42 @@ import * as runtime from '../runtime';
 export class ReporteProductoMasPedidoControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for plantilla2 without sending the request
+     * Creates request options for listar2 without sending the request
      */
-    async plantilla2RequestOpts(): Promise<runtime.RequestOpts> {
+    async listar2RequestOpts(requestParameters: Listar2Request): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
+
+        if (requestParameters['busqueda'] != null) {
+            queryParameters['busqueda'] = requestParameters['busqueda'];
+        }
+
+        if (requestParameters['tipoProductoId'] != null) {
+            queryParameters['tipoProductoId'] = requestParameters['tipoProductoId'];
+        }
+
+        if (requestParameters['categoriaId'] != null) {
+            queryParameters['categoriaId'] = requestParameters['categoriaId'];
+        }
+
+        if (requestParameters['destinoId'] != null) {
+            queryParameters['destinoId'] = requestParameters['destinoId'];
+        }
+
+        if (requestParameters['fechaDesde'] != null) {
+            queryParameters['fechaDesde'] = (requestParameters['fechaDesde'] as any).toISOString().substring(0,10);
+        }
+
+        if (requestParameters['fechaHasta'] != null) {
+            queryParameters['fechaHasta'] = (requestParameters['fechaHasta'] as any).toISOString().substring(0,10);
+        }
+
+        if (requestParameters['pagina'] != null) {
+            queryParameters['pagina'] = requestParameters['pagina'];
+        }
+
+        if (requestParameters['tamPagina'] != null) {
+            queryParameters['tamPagina'] = requestParameters['tamPagina'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -36,7 +84,7 @@ export class ReporteProductoMasPedidoControllerApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/api/reportes/productos-mas-pedidos/_plantilla`;
+        let urlPath = `/api/reportes/productos-mas-pedidos`;
 
         return {
             path: urlPath,
@@ -48,17 +96,18 @@ export class ReporteProductoMasPedidoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async plantilla2Raw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const requestOptions = await this.plantilla2RequestOpts();
+    async listar2Raw(requestParameters: Listar2Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageReporteProductoMasPedidoResponse>> {
+        const requestOptions = await this.listar2RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageReporteProductoMasPedidoResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async plantilla2(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.plantilla2Raw(initOverrides);
+    async listar2(requestParameters: Listar2Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageReporteProductoMasPedidoResponse> {
+        const response = await this.listar2Raw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

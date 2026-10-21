@@ -18,6 +18,7 @@ import SpotlightCard from '../components/ui/SpotlightCard'
 import { useAuth } from '../hooks/useAuth'
 import '../styles/react-bits.css'
 import '../styles/DashboardPage.css'
+import { DASHBOARD_MOCK } from '../data/dashboardMock'
 
 const RESUMEN_VACIO: ResumenDashboard = {
   productosActivos: 0,
@@ -396,6 +397,7 @@ function DashboardPage() {
     useState<ResumenDashboard | null>(null)
   const [errorResumen, setErrorResumen] =
     useState<string | null>(null)
+  const [usarMock, setUsarMock] = useState(false)
 
   useEffect(() => {
     let activo = true
@@ -403,15 +405,26 @@ function DashboardPage() {
     obtenerResumenDashboard()
       .then((resumen) => {
         if (activo) {
+          const respuestaVacia =
+            resumen.productosActivos === 0 &&
+            resumen.ingresosDelMes === 0 &&
+            resumen.valesDelMes === 0 &&
+            resumen.movimientosHoy === 0 &&
+            resumen.movimientosRecientes.length === 0
+
+          setUsarMock(respuestaVacia)
           setResumenCargado(resumen)
         }
       })
       .catch((error: unknown) => {
         if (activo) {
+          setUsarMock(true)
           setErrorResumen(
-            error instanceof Error
-              ? error.message
-              : 'No se pudo cargar el resumen del panel.',
+            `No se pudo cargar el resumen real. ${
+              error instanceof Error
+                ? error.message
+                : 'Mostrando datos de demostración.'
+            }`,
           )
         }
       })
@@ -422,7 +435,9 @@ function DashboardPage() {
   }, [])
 
   const resumenDashboard =
-    resumenCargado ?? RESUMEN_VACIO
+    usarMock
+      ? DASHBOARD_MOCK
+      : resumenCargado ?? RESUMEN_VACIO
 
   const metrics: Metric[] = [
     {
@@ -570,6 +585,12 @@ const filteredModules =
       {errorResumen && (
         <div className="alert alert-danger" role="alert">
           {errorResumen}
+        </div>
+      )}
+
+      {usarMock && (
+        <div className="alert alert-info" role="status">
+          Mostrando datos de demostración en el panel principal.
         </div>
       )}
 

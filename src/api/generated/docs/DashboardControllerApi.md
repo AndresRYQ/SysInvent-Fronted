@@ -4,13 +4,13 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**plantilla7**](DashboardControllerApi.md#plantilla7) | **GET** /api/dashboard/_plantilla |  |
+| [**obtener3**](DashboardControllerApi.md#obtener3) | **GET** /api/dashboard |  |
 
 
 
-## plantilla7
+## obtener3
 
-> plantilla7()
+> DashboardResponse obtener3()
 
 
 
@@ -21,7 +21,7 @@ import {
   Configuration,
   DashboardControllerApi,
 } from '';
-import type { Plantilla7Request } from '';
+import type { Obtener3Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -32,7 +32,7 @@ async function example() {
   const api = new DashboardControllerApi(config);
 
   try {
-    const data = await api.plantilla7();
+    const data = await api.obtener3();
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -49,7 +49,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-`void` (Empty response body)
+[**DashboardResponse**](DashboardResponse.md)
 
 ### Authorization
 
@@ -58,7 +58,7 @@ This endpoint does not need any parameter.
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: Not defined
+- **Accept**: `*/*`
 
 
 ### HTTP response details

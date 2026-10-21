@@ -13,6 +13,35 @@
  */
 
 import * as runtime from '../runtime';
+import {
+    type BitacoraRequest,
+    BitacoraRequestFromJSON,
+    BitacoraRequestToJSON,
+} from '../models/BitacoraRequest';
+import {
+    type CustomPageBitacoraProjection,
+    CustomPageBitacoraProjectionFromJSON,
+    CustomPageBitacoraProjectionToJSON,
+} from '../models/CustomPageBitacoraProjection';
+import {
+    type MessageResponse,
+    MessageResponseFromJSON,
+    MessageResponseToJSON,
+} from '../models/MessageResponse';
+
+export interface Listar5Request {
+    busqueda?: string;
+    modulo?: string;
+    accion?: string;
+    fechaDesde?: Date;
+    fechaHasta?: Date;
+    pagina?: number;
+    tamPagina?: number;
+}
+
+export interface RegistrarRequest {
+    bitacoraRequest: BitacoraRequest;
+}
 
 /**
  * 
@@ -20,10 +49,38 @@ import * as runtime from '../runtime';
 export class BitacoraControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for plantilla8 without sending the request
+     * Creates request options for listar5 without sending the request
      */
-    async plantilla8RequestOpts(): Promise<runtime.RequestOpts> {
+    async listar5RequestOpts(requestParameters: Listar5Request): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
+
+        if (requestParameters['busqueda'] != null) {
+            queryParameters['busqueda'] = requestParameters['busqueda'];
+        }
+
+        if (requestParameters['modulo'] != null) {
+            queryParameters['modulo'] = requestParameters['modulo'];
+        }
+
+        if (requestParameters['accion'] != null) {
+            queryParameters['accion'] = requestParameters['accion'];
+        }
+
+        if (requestParameters['fechaDesde'] != null) {
+            queryParameters['fechaDesde'] = (requestParameters['fechaDesde'] as any).toISOString().substring(0,10);
+        }
+
+        if (requestParameters['fechaHasta'] != null) {
+            queryParameters['fechaHasta'] = (requestParameters['fechaHasta'] as any).toISOString().substring(0,10);
+        }
+
+        if (requestParameters['pagina'] != null) {
+            queryParameters['pagina'] = requestParameters['pagina'];
+        }
+
+        if (requestParameters['tamPagina'] != null) {
+            queryParameters['tamPagina'] = requestParameters['tamPagina'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -36,7 +93,7 @@ export class BitacoraControllerApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/api/bitacora/_plantilla`;
+        let urlPath = `/api/bitacora`;
 
         return {
             path: urlPath,
@@ -48,17 +105,71 @@ export class BitacoraControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async plantilla8Raw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const requestOptions = await this.plantilla8RequestOpts();
+    async listar5Raw(requestParameters: Listar5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageBitacoraProjection>> {
+        const requestOptions = await this.listar5RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageBitacoraProjectionFromJSON(jsonValue));
     }
 
     /**
      */
-    async plantilla8(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.plantilla8Raw(initOverrides);
+    async listar5(requestParameters: Listar5Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageBitacoraProjection> {
+        const response = await this.listar5Raw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for registrar without sending the request
+     */
+    async registrarRequestOpts(requestParameters: RegistrarRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['bitacoraRequest'] == null) {
+            throw new runtime.RequiredError(
+                'bitacoraRequest',
+                'Required parameter "bitacoraRequest" was null or undefined when calling registrar().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/bitacora`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: BitacoraRequestToJSON(requestParameters['bitacoraRequest']),
+        };
+    }
+
+    /**
+     */
+    async registrarRaw(requestParameters: RegistrarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageResponse>> {
+        const requestOptions = await this.registrarRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async registrar(requestParameters: RegistrarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageResponse> {
+        const response = await this.registrarRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

@@ -13,7 +13,6 @@ Name | Type
 `categoriaId` | number
 `unidadMedidaId` | number
 `proveedorId` | number
-`stockActual` | number
 `stockMinimo` | number
 `precioUnitario` | number
 
@@ -31,7 +30,6 @@ const example = {
   "categoriaId": null,
   "unidadMedidaId": null,
   "proveedorId": null,
-  "stockActual": null,
   "stockMinimo": null,
   "precioUnitario": null,
 } satisfies ProductoRequest

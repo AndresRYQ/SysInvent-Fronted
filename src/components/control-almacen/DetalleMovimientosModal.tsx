@@ -1,4 +1,9 @@
 import {
+  useEffect,
+  useState,
+} from 'react'
+
+import {
   ArrowDownToLine,
   ArrowUpFromLine,
   X,
@@ -8,8 +13,13 @@ import { obtenerCentrosCosto } from '../../services/centroCostoService'
 import { obtenerDestinos } from '../../services/destinoService'
 import { obtenerPartesEquipo } from '../../services/parteEquipoService'
 import { obtenerUnidadesMedida } from '../../services/unidadMedidaService'
+import { listarDetalleControlAlmacen } from '../../services/kardexService'
+import { TablePagination } from '../ui/TablePagination'
 
-import type { ControlAlmacenProducto } from '../../types/kardex'
+import type {
+  ControlAlmacenProducto,
+  MovimientoAlmacen,
+} from '../../types/kardex'
 
 interface DetalleMovimientosModalProps {
   abierto: boolean
@@ -45,6 +55,38 @@ export function DetalleMovimientosModal({
   producto,
   onClose,
 }: DetalleMovimientosModalProps) {
+  const [movimientos, setMovimientos] = useState<MovimientoAlmacen[]>([])
+  const [pagina, setPagina] = useState(1)
+  const [tamPagina, setTamPagina] = useState(10)
+  const [totalMovimientos, setTotalMovimientos] = useState(0)
+  const [cargando, setCargando] = useState(false)
+
+  useEffect(() => {
+    if (!abierto || !producto) return
+
+    let activo = true
+    setCargando(true)
+
+    listarDetalleControlAlmacen(producto.productoId, pagina, tamPagina)
+      .then((resultado) => {
+        if (!activo) return
+        setMovimientos(resultado.movimientos)
+        setTotalMovimientos(resultado.totalElementos)
+      })
+      .catch(() => {
+        if (!activo) return
+        setMovimientos([])
+        setTotalMovimientos(0)
+      })
+      .finally(() => {
+        if (activo) setCargando(false)
+      })
+
+    return () => {
+      activo = false
+    }
+  }, [abierto, producto?.productoId, pagina, tamPagina])
+
   if (!abierto || !producto) {
     return null
   }
@@ -60,7 +102,7 @@ export function DetalleMovimientosModal({
     obtenerUnidadesMedida()
 
   const unidad =
-    unidadesMedida.find(
+    producto.unidadMedidaNombre ?? unidadesMedida.find(
       (item) =>
         String(item.id) === String(
         producto.unidadMedidaId),
@@ -173,7 +215,13 @@ export function DetalleMovimientosModal({
               </thead>
 
               <tbody>
-                {producto.movimientos.length ===
+                {cargando ? (
+                  <tr>
+                    <td colSpan={9} className="text-center text-secondary py-4">
+                      Cargando movimientos...
+                    </td>
+                  </tr>
+                ) : movimientos.length ===
                 0 ? (
                   <tr>
                     <td
@@ -185,7 +233,7 @@ export function DetalleMovimientosModal({
                     </td>
                   </tr>
                 ) : (
-                  producto.movimientos.map(
+                  movimientos.map(
                     (movimiento) => {
                       const destino =
                         destinos.find(
@@ -266,16 +314,18 @@ export function DetalleMovimientosModal({
                           </td>
 
                           <td>
-                            {destino?.nombre ?? '-'}
+                            {destino?.nombre ?? movimiento.destinoId ?? '-'}
                           </td>
 
                           <td>
                             {parteEquipo?.nombre ??
+                              movimiento.parteEquipoId ??
                               'No aplica'}
                           </td>
 
                           <td>
                             {centroCosto?.nombre ??
+                              movimiento.centroCostoId ??
                               '-'}
                           </td>
 
@@ -306,6 +356,17 @@ export function DetalleMovimientosModal({
               </tbody>
             </table>
           </div>
+
+          <TablePagination
+            totalItems={totalMovimientos}
+            page={pagina}
+            pageSize={tamPagina}
+            onPageChange={setPagina}
+            onPageSizeChange={(size) => {
+              setTamPagina(size)
+              setPagina(1)
+            }}
+          />
         </div>
 
         <div className="maestro-modal-footer">

@@ -1,5 +1,6 @@
 import type { Producto, ProductoFormData } from '../types/producto'
 import {
+  CombosComunesApi,
   ProductosApi,
   type CustomPageProductoResponse,
   type MessageResponse,
@@ -9,12 +10,49 @@ import type { CatalogoPaginado } from './catalogoApi'
 
 let productosEnMemoria: Producto[] = []
 const productosApi = new ProductosApi(apiConfiguration)
+const combosComunesApi = new CombosComunesApi(apiConfiguration)
 const solicitudesEnCurso = new Map<string, Promise<CatalogoPaginado<Producto>>>()
 
 export interface ListarProductosParams {
   nombre?: string
   pagina?: number
   tamPagina?: number
+}
+
+export interface ListarProductosComboParams {
+  proveedorId: string | number
+  tipoProductoId: string | number
+}
+
+export interface ProductoCombo {
+  id: number
+  descripcion: string
+  unidadMedida: string
+}
+
+function convertirIdCombo(valor: string | number): number {
+  const id = Number(String(valor).replace(/^[A-Z]+-0*/i, ''))
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new Error('El identificador del producto no es válido.')
+  }
+  return id
+}
+
+export async function listarProductosCombo(
+  params: ListarProductosComboParams,
+): Promise<ProductoCombo[]> {
+  const respuesta = await combosComunesApi.productos({
+    proveedorId: convertirIdCombo(params.proveedorId),
+    tipoProductoId: convertirIdCombo(params.tipoProductoId),
+  })
+
+  return respuesta
+    .filter((producto) => producto.id != null)
+    .map((producto) => ({
+      id: producto.id as number,
+      descripcion: producto.descripcion ?? '',
+      unidadMedida: producto.value2 ?? '',
+    }))
 }
 
 export function obtenerProductos(): Producto[] {
@@ -106,7 +144,6 @@ function construirRequest(datos: ProductoFormData) {
     categoriaId: convertirId(datos.categoriaId),
     unidadMedidaId: convertirId(datos.unidadMedidaId),
     proveedorId: convertirId(datos.proveedorId),
-    stockActual: 0,
     stockMinimo: datos.stockMinimo,
     precioUnitario: datos.precioUnitario,
   }

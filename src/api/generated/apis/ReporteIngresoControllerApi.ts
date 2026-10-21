@@ -13,6 +13,23 @@
  */
 
 import * as runtime from '../runtime';
+import {
+    type CustomPageReporteIngresoListadoResponse,
+    CustomPageReporteIngresoListadoResponseFromJSON,
+    CustomPageReporteIngresoListadoResponseToJSON,
+} from '../models/CustomPageReporteIngresoListadoResponse';
+
+export interface Listar3Request {
+    busqueda?: string;
+    proveedorId?: number;
+    tipoProductoId?: number;
+    productoId?: number;
+    estado?: string;
+    fechaDesde?: Date;
+    fechaHasta?: Date;
+    pagina?: number;
+    tamPagina?: number;
+}
 
 /**
  * 
@@ -20,10 +37,46 @@ import * as runtime from '../runtime';
 export class ReporteIngresoControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for plantilla4 without sending the request
+     * Creates request options for listar3 without sending the request
      */
-    async plantilla4RequestOpts(): Promise<runtime.RequestOpts> {
+    async listar3RequestOpts(requestParameters: Listar3Request): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
+
+        if (requestParameters['busqueda'] != null) {
+            queryParameters['busqueda'] = requestParameters['busqueda'];
+        }
+
+        if (requestParameters['proveedorId'] != null) {
+            queryParameters['proveedorId'] = requestParameters['proveedorId'];
+        }
+
+        if (requestParameters['tipoProductoId'] != null) {
+            queryParameters['tipoProductoId'] = requestParameters['tipoProductoId'];
+        }
+
+        if (requestParameters['productoId'] != null) {
+            queryParameters['productoId'] = requestParameters['productoId'];
+        }
+
+        if (requestParameters['estado'] != null) {
+            queryParameters['estado'] = requestParameters['estado'];
+        }
+
+        if (requestParameters['fechaDesde'] != null) {
+            queryParameters['fechaDesde'] = (requestParameters['fechaDesde'] as any).toISOString().substring(0,10);
+        }
+
+        if (requestParameters['fechaHasta'] != null) {
+            queryParameters['fechaHasta'] = (requestParameters['fechaHasta'] as any).toISOString().substring(0,10);
+        }
+
+        if (requestParameters['pagina'] != null) {
+            queryParameters['pagina'] = requestParameters['pagina'];
+        }
+
+        if (requestParameters['tamPagina'] != null) {
+            queryParameters['tamPagina'] = requestParameters['tamPagina'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -36,7 +89,7 @@ export class ReporteIngresoControllerApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/api/reportes/ingresos/_plantilla`;
+        let urlPath = `/api/reportes/ingresos`;
 
         return {
             path: urlPath,
@@ -48,17 +101,18 @@ export class ReporteIngresoControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async plantilla4Raw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const requestOptions = await this.plantilla4RequestOpts();
+    async listar3Raw(requestParameters: Listar3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageReporteIngresoListadoResponse>> {
+        const requestOptions = await this.listar3RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageReporteIngresoListadoResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async plantilla4(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.plantilla4Raw(initOverrides);
+    async listar3(requestParameters: Listar3Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageReporteIngresoListadoResponse> {
+        const response = await this.listar3Raw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

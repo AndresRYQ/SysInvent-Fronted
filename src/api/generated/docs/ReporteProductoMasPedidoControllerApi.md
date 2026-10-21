@@ -4,13 +4,13 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**plantilla2**](ReporteProductoMasPedidoControllerApi.md#plantilla2) | **GET** /api/reportes/productos-mas-pedidos/_plantilla |  |
+| [**listar2**](ReporteProductoMasPedidoControllerApi.md#listar2) | **GET** /api/reportes/productos-mas-pedidos |  |
 
 
 
-## plantilla2
+## listar2
 
-> plantilla2()
+> CustomPageReporteProductoMasPedidoResponse listar2(busqueda, tipoProductoId, categoriaId, destinoId, fechaDesde, fechaHasta, pagina, tamPagina)
 
 
 
@@ -21,7 +21,7 @@ import {
   Configuration,
   ReporteProductoMasPedidoControllerApi,
 } from '';
-import type { Plantilla2Request } from '';
+import type { Listar2Request } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -31,8 +31,27 @@ async function example() {
   });
   const api = new ReporteProductoMasPedidoControllerApi(config);
 
+  const body = {
+    // string (optional)
+    busqueda: busqueda_example,
+    // number (optional)
+    tipoProductoId: 56,
+    // number (optional)
+    categoriaId: 56,
+    // number (optional)
+    destinoId: 56,
+    // Date (optional)
+    fechaDesde: 2013-10-20,
+    // Date (optional)
+    fechaHasta: 2013-10-20,
+    // number (optional)
+    pagina: 56,
+    // number (optional)
+    tamPagina: 56,
+  } satisfies Listar2Request;
+
   try {
-    const data = await api.plantilla2();
+    const data = await api.listar2(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -45,11 +64,21 @@ example().catch(console.error);
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **busqueda** | `string` |  | [Optional] [Defaults to `undefined`] |
+| **tipoProductoId** | `number` |  | [Optional] [Defaults to `undefined`] |
+| **categoriaId** | `number` |  | [Optional] [Defaults to `undefined`] |
+| **destinoId** | `number` |  | [Optional] [Defaults to `undefined`] |
+| **fechaDesde** | `Date` |  | [Optional] [Defaults to `undefined`] |
+| **fechaHasta** | `Date` |  | [Optional] [Defaults to `undefined`] |
+| **pagina** | `number` |  | [Optional] [Defaults to `1`] |
+| **tamPagina** | `number` |  | [Optional] [Defaults to `10`] |
 
 ### Return type
 
-`void` (Empty response body)
+[**CustomPageReporteProductoMasPedidoResponse**](CustomPageReporteProductoMasPedidoResponse.md)
 
 ### Authorization
 
@@ -58,7 +87,7 @@ This endpoint does not need any parameter.
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: Not defined
+- **Accept**: `*/*`
 
 
 ### HTTP response details
