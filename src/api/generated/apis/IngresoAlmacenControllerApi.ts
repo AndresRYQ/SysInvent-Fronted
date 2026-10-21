@@ -13,6 +13,34 @@
  */
 
 import * as runtime from '../runtime';
+import {
+    type CustomPageIngresoAlmacenListadoResponse,
+    CustomPageIngresoAlmacenListadoResponseFromJSON,
+    CustomPageIngresoAlmacenListadoResponseToJSON,
+} from '../models/CustomPageIngresoAlmacenListadoResponse';
+import {
+    type IngresoAlmacenRequest,
+    IngresoAlmacenRequestFromJSON,
+    IngresoAlmacenRequestToJSON,
+} from '../models/IngresoAlmacenRequest';
+
+export interface Crear1Request {
+    ingresoAlmacenRequest: IngresoAlmacenRequest;
+}
+
+export interface Listar4Request {
+    busqueda?: string;
+    proveedorId?: number;
+    estado?: string;
+    fechaDesde?: Date;
+    fechaHasta?: Date;
+    pagina?: number;
+    tamPagina?: number;
+}
+
+export interface Obtener2Request {
+    id: number;
+}
 
 /**
  * 
@@ -20,9 +48,140 @@ import * as runtime from '../runtime';
 export class IngresoAlmacenControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for plantilla6 without sending the request
+     * Creates request options for crear1 without sending the request
      */
-    async plantilla6RequestOpts(): Promise<runtime.RequestOpts> {
+    async crear1RequestOpts(requestParameters: Crear1Request): Promise<runtime.RequestOpts> {
+        if (requestParameters['ingresoAlmacenRequest'] == null) {
+            throw new runtime.RequiredError(
+                'ingresoAlmacenRequest',
+                'Required parameter "ingresoAlmacenRequest" was null or undefined when calling crear1().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/ingresos-almacen`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: IngresoAlmacenRequestToJSON(requestParameters['ingresoAlmacenRequest']),
+        };
+    }
+
+    /**
+     */
+    async crear1Raw(requestParameters: Crear1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        const requestOptions = await this.crear1RequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     */
+    async crear1(requestParameters: Crear1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.crear1Raw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for listar4 without sending the request
+     */
+    async listar4RequestOpts(requestParameters: Listar4Request): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        if (requestParameters['busqueda'] != null) {
+            queryParameters['busqueda'] = requestParameters['busqueda'];
+        }
+
+        if (requestParameters['proveedorId'] != null) {
+            queryParameters['proveedorId'] = requestParameters['proveedorId'];
+        }
+
+        if (requestParameters['estado'] != null) {
+            queryParameters['estado'] = requestParameters['estado'];
+        }
+
+        if (requestParameters['fechaDesde'] != null) {
+            queryParameters['fechaDesde'] = (requestParameters['fechaDesde'] as any).toISOString().substring(0,10);
+        }
+
+        if (requestParameters['fechaHasta'] != null) {
+            queryParameters['fechaHasta'] = (requestParameters['fechaHasta'] as any).toISOString().substring(0,10);
+        }
+
+        if (requestParameters['pagina'] != null) {
+            queryParameters['pagina'] = requestParameters['pagina'];
+        }
+
+        if (requestParameters['tamPagina'] != null) {
+            queryParameters['tamPagina'] = requestParameters['tamPagina'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/ingresos-almacen`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     */
+    async listar4Raw(requestParameters: Listar4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CustomPageIngresoAlmacenListadoResponse>> {
+        const requestOptions = await this.listar4RequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CustomPageIngresoAlmacenListadoResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async listar4(requestParameters: Listar4Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageIngresoAlmacenListadoResponse> {
+        const response = await this.listar4Raw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for obtener2 without sending the request
+     */
+    async obtener2RequestOpts(requestParameters: Obtener2Request): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling obtener2().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -36,7 +195,8 @@ export class IngresoAlmacenControllerApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/api/ingresos-almacen/_plantilla`;
+        let urlPath = `/api/ingresos-almacen/{id}`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -48,17 +208,18 @@ export class IngresoAlmacenControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async plantilla6Raw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const requestOptions = await this.plantilla6RequestOpts();
+    async obtener2Raw(requestParameters: Obtener2Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        const requestOptions = await this.obtener2RequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse<any>(response);
     }
 
     /**
      */
-    async plantilla6(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.plantilla6Raw(initOverrides);
+    async obtener2(requestParameters: Obtener2Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.obtener2Raw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

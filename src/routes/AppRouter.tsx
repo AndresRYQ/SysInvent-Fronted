@@ -38,6 +38,7 @@ import { NuevoIngresoPage } from '../pages/ingresos-almacen/NuevoIngresoPage'
 import { ReporteIngresosPage } from '../pages/reportes/ReporteIngresosPage'
 import { ReporteProductosMasPedidosPage } from '../pages/reportes/ReporteProductosMasPedidosPage'
 import { ReporteValesPage } from '../pages/reportes/ReporteValesPage'
+import { ReportesKardexPage } from '../pages/reportes/ReportesKardexPage'
 import { EditarValePage } from '../pages/vales-consumo/EditarValePage'
 import { NuevoValePage } from '../pages/vales-consumo/NuevoValePage'
 
@@ -198,6 +199,17 @@ export function AppRouter() {
                 <Route
                   path="/reportes/ingresos"
                   element={<ReporteIngresosPage />}
+                />
+              </Route>
+
+              <Route
+                element={
+                  <RoleRoute modulo="reporte-kardex" />
+                }
+              >
+                <Route
+                  path="/reportes/kardex"
+                  element={<ReportesKardexPage />}
                 />
               </Route>
 

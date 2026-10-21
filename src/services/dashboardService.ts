@@ -9,6 +9,7 @@ import {
   obtenerIngresosAlmacen,
 } from './ingresoAlmacenService'
 import { listarVales } from './valeConsumoService'
+import { obtenerDashboardApi } from './reportesApiService'
 
 export interface MovimientoRecienteDashboard {
   id: string
@@ -84,6 +85,10 @@ function formatearFecha(
 
 export async function obtenerResumenDashboard():
   Promise<ResumenDashboard> {
+  return obtenerDashboardApi()
+
+  /* Compatibilidad con el cálculo local anterior. */
+  /* istanbul ignore next */
   const vales = await listarVales()
   const fechaActual =
     obtenerFechaActual()
@@ -253,8 +258,8 @@ export async function obtenerResumenDashboard():
       titulo:
         'Último movimiento',
       detalle:
-        `${ultimoMovimiento.numeroDocumento} registrado el ${formatearFecha(
-          ultimoMovimiento.fecha,
+        `${ultimoMovimiento!.numeroDocumento} registrado el ${formatearFecha(
+          ultimoMovimiento!.fecha,
         )}.`,
       tono: 'info',
     })

@@ -19,6 +19,15 @@ import {
     ComunResponseToJSON,
 } from '../models/ComunResponse';
 
+export interface ContactosRequest {
+    proveedorId: number;
+}
+
+export interface ProductosRequest {
+    tipoProductoId: number;
+    proveedorId: number;
+}
+
 /**
  * 
  */
@@ -115,6 +124,62 @@ export class CombosComunesApi extends runtime.BaseAPI {
     }
 
     /**
+     * Creates request options for contactos without sending the request
+     */
+    async contactosRequestOpts(requestParameters: ContactosRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['proveedorId'] == null) {
+            throw new runtime.RequiredError(
+                'proveedorId',
+                'Required parameter "proveedorId" was null or undefined when calling contactos().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['proveedorId'] != null) {
+            queryParameters['proveedorId'] = requestParameters['proveedorId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/v1/comun/contactos`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Listar contactos activos por proveedor
+     */
+    async contactosRaw(requestParameters: ContactosRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComunResponse>>> {
+        const requestOptions = await this.contactosRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ComunResponseFromJSON));
+    }
+
+    /**
+     * Listar contactos activos por proveedor
+     */
+    async contactos(requestParameters: ContactosRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComunResponse>> {
+        const response = await this.contactosRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Creates request options for destinos without sending the request
      */
     async destinosRequestOpts(): Promise<runtime.RequestOpts> {
@@ -207,8 +272,30 @@ export class CombosComunesApi extends runtime.BaseAPI {
     /**
      * Creates request options for productos without sending the request
      */
-    async productosRequestOpts(): Promise<runtime.RequestOpts> {
+    async productosRequestOpts(requestParameters: ProductosRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['tipoProductoId'] == null) {
+            throw new runtime.RequiredError(
+                'tipoProductoId',
+                'Required parameter "tipoProductoId" was null or undefined when calling productos().'
+            );
+        }
+
+        if (requestParameters['proveedorId'] == null) {
+            throw new runtime.RequiredError(
+                'proveedorId',
+                'Required parameter "proveedorId" was null or undefined when calling productos().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['tipoProductoId'] != null) {
+            queryParameters['tipoProductoId'] = requestParameters['tipoProductoId'];
+        }
+
+        if (requestParameters['proveedorId'] != null) {
+            queryParameters['proveedorId'] = requestParameters['proveedorId'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -232,20 +319,20 @@ export class CombosComunesApi extends runtime.BaseAPI {
     }
 
     /**
-     * Listar productos activos
+     * Listar productos activos por tipo y proveedor
      */
-    async productosRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComunResponse>>> {
-        const requestOptions = await this.productosRequestOpts();
+    async productosRaw(requestParameters: ProductosRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComunResponse>>> {
+        const requestOptions = await this.productosRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ComunResponseFromJSON));
     }
 
     /**
-     * Listar productos activos
+     * Listar productos activos por tipo y proveedor
      */
-    async productos(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComunResponse>> {
-        const response = await this.productosRaw(initOverrides);
+    async productos(requestParameters: ProductosRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComunResponse>> {
+        const response = await this.productosRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

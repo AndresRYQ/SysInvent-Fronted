@@ -24,10 +24,8 @@ import { DatePickerInput } from '../../components/ui/DatePickerInput'
 import { obtenerCategorias } from '../../services/categoriaService'
 
 import {
-  obtenerControlAlmacen,
-  obtenerDiferenciasStock,
+  listarControlAlmacen,
 } from '../../services/kardexService'
-import { listarVales, obtenerMensajeErrorVale } from '../../services/valeConsumoService'
 
 import { obtenerProveedores } from '../../services/proveedorService'
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
@@ -57,53 +55,53 @@ export function ControlAlmacenPage() {
   const [control, setControl] = useState<
     ControlAlmacenProducto[]
   >([])
-  const [diferenciasStock, setDiferenciasStock] =
-    useState<Awaited<ReturnType<typeof obtenerDiferenciasStock>>>([])
+  const [diferenciasStock] = useState<unknown[]>([])
+  const [modoDemostracion] = useState(false)
   const [errorCarga, setErrorCarga] =
     useState<string | null>(null)
-
+  const [filtros, setFiltros] = useState<FiltrosControlAlmacen>(FILTROS_INICIALES)
+  const [filtrosAplicados, setFiltrosAplicados] = useState<FiltrosControlAlmacen>(FILTROS_INICIALES)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalItems, setTotalItems] = useState(0)
   useEffect(() => {
     let activo = true
 
-    listarVales()
-      .then((vales) =>
-        Promise.all([
-          obtenerControlAlmacen(vales),
-          obtenerDiferenciasStock(vales),
-        ] as const),
-      )
-      .then(([resultadoControl, resultadoDiferencias]) => {
-        if (activo) {
-          setControl(resultadoControl)
-          setDiferenciasStock(resultadoDiferencias)
-        }
+    setErrorCarga(null)
+    listarControlAlmacen({
+      busqueda: filtrosAplicados.busqueda || undefined,
+      tipoProductoId: filtrosAplicados.tipoProductoId
+        ? Number(filtrosAplicados.tipoProductoId)
+        : undefined,
+      categoriaId: filtrosAplicados.categoriaId
+        ? Number(filtrosAplicados.categoriaId)
+        : undefined,
+      estado: filtrosAplicados.estadoStock || undefined,
+      fechaDesde: filtrosAplicados.fechaDesde
+        ? new Date(`${filtrosAplicados.fechaDesde}T00:00:00Z`)
+        : undefined,
+      fechaHasta: filtrosAplicados.fechaHasta
+        ? new Date(`${filtrosAplicados.fechaHasta}T00:00:00Z`)
+        : undefined,
+      pagina: page,
+      tamPagina: pageSize,
+    })
+      .then((resultado) => {
+        if (!activo) return
+        setControl(resultado.datos)
+        setTotalItems(resultado.totalElementos)
       })
       .catch((error: unknown) => {
-        if (activo) {
-          setErrorCarga(obtenerMensajeErrorVale(error))
-        }
+        if (!activo) return
+        setControl([])
+        setTotalItems(0)
+        setErrorCarga(error instanceof Error ? error.message : 'No se pudo cargar el control de almacén.')
       })
 
     return () => {
       activo = false
     }
-  }, [])
-
-  const [filtros, setFiltros] =
-    useState<FiltrosControlAlmacen>(
-      FILTROS_INICIALES,
-    )
-
-  const [
-    filtrosAplicados,
-    setFiltrosAplicados,
-  ] = useState<FiltrosControlAlmacen>(
-    FILTROS_INICIALES,
-  )
-
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] =
-    useState(10)
+  }, [filtrosAplicados, page, pageSize])
 
   const [
     productoSeleccionado,
@@ -139,6 +137,7 @@ export function ControlAlmacenPage() {
         ...producto,
 
         tipoProductoNombre:
+          producto.tipoProductoNombre ??
           tiposProducto.find(
             (tipo) =>
               String(tipo.id) === String(
@@ -146,6 +145,7 @@ export function ControlAlmacenPage() {
           )?.nombre ?? 'Sin tipo',
 
         categoriaNombre:
+          producto.categoriaNombre ??
           categorias.find(
             (categoria) =>
               String(categoria.id) === String(
@@ -153,6 +153,7 @@ export function ControlAlmacenPage() {
           )?.nombre ?? 'Sin categoría',
 
         unidadNombre:
+          producto.unidadMedidaNombre ??
           unidadesMedida.find(
             (unidad) =>
               String(unidad.id) === String(
@@ -160,6 +161,7 @@ export function ControlAlmacenPage() {
           )?.nombre ?? 'Sin unidad',
 
         proveedorNombre:
+          producto.proveedorNombre ??
           proveedores.find(
             (proveedor) =>
               String(proveedor.id) === String(
@@ -176,116 +178,7 @@ export function ControlAlmacenPage() {
     ],
   )
 
-  const filasFiltradas = useMemo(
-    () => {
-      const busqueda =
-        filtrosAplicados.busqueda
-          .trim()
-          .toLowerCase()
-
-      return filas.filter((producto) => {
-        const coincideBusqueda =
-          !busqueda ||
-          producto.codigo
-            .toLowerCase()
-            .includes(busqueda) ||
-          producto.nombre
-            .toLowerCase()
-            .includes(busqueda) ||
-          producto.proveedorNombre
-            .toLowerCase()
-            .includes(busqueda)
-
-        const coincideTipo =
-          !filtrosAplicados.tipoProductoId ||
-          coincidenIds(
-            producto.tipoProductoId,
-            filtrosAplicados.tipoProductoId,
-            'TP-',
-          )
-
-        const coincideCategoria =
-          !filtrosAplicados.categoriaId ||
-          coincidenIds(
-            producto.categoriaId,
-            filtrosAplicados.categoriaId,
-            'CAT-',
-          )
-
-        const coincideEstado =
-          !filtrosAplicados.estadoStock ||
-          producto.estadoStock ===
-            filtrosAplicados.estadoStock
-
-        const requiereFiltroFecha =
-          Boolean(
-            filtrosAplicados.fechaDesde ||
-              filtrosAplicados.fechaHasta,
-          )
-
-        const coincideFecha =
-          !requiereFiltroFecha ||
-          producto.movimientos.some(
-            (movimiento) => {
-              const coincideDesde =
-                !filtrosAplicados.fechaDesde ||
-                movimiento.fecha >=
-                  filtrosAplicados.fechaDesde
-
-              const coincideHasta =
-                !filtrosAplicados.fechaHasta ||
-                movimiento.fecha <=
-                  filtrosAplicados.fechaHasta
-
-              return (
-                coincideDesde &&
-                coincideHasta
-              )
-            },
-          )
-
-        return (
-          coincideBusqueda &&
-          coincideTipo &&
-          coincideCategoria &&
-          coincideEstado &&
-          coincideFecha
-        )
-      })
-    },
-    [filas, filtrosAplicados],
-  )
-
-  const totalItems =
-    filasFiltradas.length
-
-  const filasPaginadas = useMemo(
-    () => {
-      const inicio =
-        (page - 1) * pageSize
-
-      return filasFiltradas.slice(
-        inicio,
-        inicio + pageSize,
-      )
-    },
-    [
-      filasFiltradas,
-      page,
-      pageSize,
-    ],
-  )
-
-  useEffect(() => {
-    const totalPages = Math.max(
-      1,
-      Math.ceil(totalItems / pageSize),
-    )
-
-    if (page > totalPages) {
-      setPage(totalPages)
-    }
-  }, [page, pageSize, totalItems])
+  const filasPaginadas = filas
 
   const productosConStock =
     control.filter(
@@ -314,6 +207,12 @@ export function ControlAlmacenPage() {
           {errorCarga && (
             <div className="alert alert-danger" role="alert">
               {errorCarga}
+            </div>
+          )}
+
+          {modoDemostracion && (
+            <div className="alert alert-info" role="status">
+              Mostrando datos de demostración para visualizar el kardex y el stock.
             </div>
           )}
 
@@ -693,11 +592,7 @@ export function ControlAlmacenPage() {
                                     type="button"
                                     className="btn table-action-btn"
                                     title="Ver movimientos"
-                                    onClick={() =>
-                                      setProductoSeleccionado(
-                                        producto,
-                                      )
-                                    }
+                                    onClick={() => setProductoSeleccionado(producto)}
                                   >
                                     <Eye size={16} />
                                   </button>

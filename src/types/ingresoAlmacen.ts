@@ -2,6 +2,19 @@ export type EstadoIngresoAlmacen =
   | 'REGISTRADO'
   | 'ANULADO'
 
+export interface IngresoAlmacenListado {
+  id: number
+  numeroIngreso: string
+  fechaIngreso: string
+  proveedor: string
+  contacto: string
+  documento: string
+  productos: number
+  cantidadIngresada: string
+  total: number
+  estado: EstadoIngresoAlmacen
+}
+
 /**
  * Producto incluido en un ingreso.
  *

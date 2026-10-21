@@ -6,9 +6,10 @@ All URIs are relative to *http://localhost:8080*
 |------------- | ------------- | -------------|
 | [**categorias**](CombosComunesApi.md#categorias) | **GET** /api/v1/comun/categorias | Listar categorías activas |
 | [**centrosCosto**](CombosComunesApi.md#centroscosto) | **GET** /api/v1/comun/centros-costo | Listar centros de costo activos |
+| [**contactos**](CombosComunesApi.md#contactos) | **GET** /api/v1/comun/contactos | Listar contactos activos por proveedor |
 | [**destinos**](CombosComunesApi.md#destinos) | **GET** /api/v1/comun/destinos | Listar destinos activos |
 | [**partesEquipo**](CombosComunesApi.md#partesequipo) | **GET** /api/v1/comun/partes-equipo | Listar partes de equipo activas |
-| [**productos**](CombosComunesApi.md#productos) | **GET** /api/v1/comun/productos | Listar productos activos |
+| [**productos**](CombosComunesApi.md#productos) | **GET** /api/v1/comun/productos | Listar productos activos por tipo y proveedor |
 | [**proveedores**](CombosComunesApi.md#proveedores) | **GET** /api/v1/comun/proveedores | Listar proveedores activos |
 | [**roles**](CombosComunesApi.md#roles) | **GET** /api/v1/comun/roles | Listar roles activos |
 | [**tiposDocumento**](CombosComunesApi.md#tiposdocumento) | **GET** /api/v1/comun/tipos-documento | Listar tipos de documento activos |
@@ -116,6 +117,75 @@ example().catch(console.error);
 ### Parameters
 
 This endpoint does not need any parameter.
+
+### Return type
+
+[**Array&lt;ComunResponse&gt;**](ComunResponse.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `*/*`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## contactos
+
+> Array&lt;ComunResponse&gt; contactos(proveedorId)
+
+Listar contactos activos por proveedor
+
+### Example
+
+```ts
+import {
+  Configuration,
+  CombosComunesApi,
+} from '';
+import type { ContactosRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new CombosComunesApi(config);
+
+  const body = {
+    // number
+    proveedorId: 56,
+  } satisfies ContactosRequest;
+
+  try {
+    const data = await api.contactos(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **proveedorId** | `number` |  | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -263,9 +333,9 @@ This endpoint does not need any parameter.
 
 ## productos
 
-> Array&lt;ComunResponse&gt; productos()
+> Array&lt;ComunResponse&gt; productos(tipoProductoId, proveedorId)
 
-Listar productos activos
+Listar productos activos por tipo y proveedor
 
 ### Example
 
@@ -284,8 +354,15 @@ async function example() {
   });
   const api = new CombosComunesApi(config);
 
+  const body = {
+    // number
+    tipoProductoId: 56,
+    // number
+    proveedorId: 56,
+  } satisfies ProductosRequest;
+
   try {
-    const data = await api.productos();
+    const data = await api.productos(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -298,7 +375,11 @@ example().catch(console.error);
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **tipoProductoId** | `number` |  | [Defaults to `undefined`] |
+| **proveedorId** | `number` |  | [Defaults to `undefined`] |
 
 ### Return type
 

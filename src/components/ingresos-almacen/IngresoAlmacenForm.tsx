@@ -14,26 +14,36 @@ import {
   X,
 } from 'lucide-react'
 import DatePicker from 'react-datepicker'
+import Select from 'react-select'
 
-import { obtenerContactos } from '../../services/contactoService'
-import { obtenerProductos } from '../../services/productoService'
-import { obtenerProveedores } from '../../services/proveedorService'
-import { obtenerTiposDocumento } from '../../services/tipoDocumentoService'
-import { obtenerTiposProducto } from '../../services/tipoProductoService'
-import { obtenerUnidadesMedida } from '../../services/unidadMedidaService'
-import { coincidenIds } from '../../utils/identificadores'
+import {
+  listarProductosCombo,
+  obtenerProductos,
+  type ProductoCombo,
+} from '../../services/productoService'
+import {
+  listarContactosCombo,
+  listarProveedoresCombo,
+  listarTiposDocumentoCombo,
+  listarTiposProductoCombo,
+} from '../../services/comboService'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
 import type {
   DetalleIngresoAlmacenFormData,
   IngresoAlmacenFormData,
   IngresoAlmacenRegistro,
 } from '../../types/ingresoAlmacen'
+import type { Contacto } from '../../types/contacto'
+import type { Proveedor } from '../../types/proveedor'
+import type { TipoDocumento } from '../../types/tipoDocumento'
+import type { TipoProducto } from '../../types/tipoProducto'
 
 interface IngresoAlmacenFormProps {
   ingreso?: IngresoAlmacenRegistro | null
   onSubmit: (
     datos: IngresoAlmacenFormData,
-  ) => void
+  ) => void | Promise<void>
   onCancelar: () => void
 }
 
@@ -99,35 +109,31 @@ export function IngresoAlmacenForm({
   onSubmit,
   onCancelar,
 }: IngresoAlmacenFormProps) {
-  const proveedores = useMemo(
-    () => obtenerProveedores(),
-    [],
-  )
+  const [proveedores, setProveedores] =
+    useState<Proveedor[]>([])
 
-  const contactos = useMemo(
-    () => obtenerContactos(),
-    [],
-  )
+  const [cargandoProveedores, setCargandoProveedores] =
+    useState(false)
 
-  const tiposDocumento = useMemo(
-    () => obtenerTiposDocumento(),
-    [],
-  )
+  const [tiposDocumento, setTiposDocumento] =
+    useState<TipoDocumento[]>([])
 
-  const tiposProducto = useMemo(
-    () => obtenerTiposProducto(),
-    [],
-  )
+  const [cargandoTiposDocumento, setCargandoTiposDocumento] =
+    useState(false)
 
-  const productos = useMemo(
-    () => obtenerProductos(),
-    [],
-  )
+  const [tiposProducto, setTiposProducto] =
+    useState<TipoProducto[]>([])
 
-  const unidadesMedida = useMemo(
-    () => obtenerUnidadesMedida(),
-    [],
-  )
+  const [cargandoTiposProducto, setCargandoTiposProducto] =
+    useState(false)
+
+  const productos = useMemo(() => obtenerProductos(), [])
+
+  const [productosFiltrados, setProductosFiltrados] =
+    useState<ProductoCombo[]>([])
+
+  const [cargandoProductos, setCargandoProductos] =
+    useState(false)
 
   const [fechaIngreso, setFechaIngreso] =
     useState(obtenerFechaActual())
@@ -137,6 +143,12 @@ export function IngresoAlmacenForm({
 
   const [contactoId, setContactoId] =
     useState('')
+
+  const [contactosFiltrados, setContactosFiltrados] =
+    useState<Contacto[]>([])
+
+  const [cargandoContactos, setCargandoContactos] =
+    useState(false)
 
   const [
     tipoDocumentoId,
@@ -156,6 +168,9 @@ export function IngresoAlmacenForm({
       DetalleIngresoAlmacenFormData[]
     >([])
 
+  const [productosComboSeleccionados, setProductosComboSeleccionados] =
+    useState<Record<number, ProductoCombo & { tipoProductoId: string }>>({})
+
   const [detalle, setDetalle] =
     useState<DetalleTemporal>(
       DETALLE_INICIAL,
@@ -163,6 +178,117 @@ export function IngresoAlmacenForm({
 
   const [error, setError] =
     useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelado = false
+    setCargandoProveedores(true)
+
+    listarProveedoresCombo()
+      .then((respuesta) => {
+        if (!cancelado) {
+          setProveedores(respuesta
+            .filter((proveedor) => proveedor.id != null)
+            .map((proveedor) => ({
+              id: proveedor.id as number,
+              ruc: '',
+              razonSocial: proveedor.descripcion ?? '',
+              correo: '',
+              telefono: '',
+              direccion: '',
+              activo: 1,
+              fechaRegistro: '',
+            })))
+        }
+      })
+      .catch((errorProveedor: unknown) => {
+        if (cancelado) return
+        setProveedores([])
+        setError(
+          errorProveedor instanceof Error
+            ? errorProveedor.message
+            : 'No se pudieron cargar los proveedores.',
+        )
+      })
+      .finally(() => {
+        if (!cancelado) setCargandoProveedores(false)
+      })
+
+    return () => {
+      cancelado = true
+    }
+  }, [])
+
+  useEffect(() => {
+    let cancelado = false
+    setCargandoTiposProducto(true)
+
+    listarTiposProductoCombo()
+      .then((respuesta) => {
+        if (!cancelado) {
+          setTiposProducto(respuesta
+            .filter((tipo) => tipo.id != null)
+            .map((tipo) => ({
+              id: tipo.id as number,
+              nombre: tipo.descripcion ?? '',
+              descripcion: '',
+              activo: 1,
+              fechaRegistro: '',
+            })))
+        }
+      })
+      .catch((errorTipoProducto: unknown) => {
+        if (cancelado) return
+        setTiposProducto([])
+        setError(
+          errorTipoProducto instanceof Error
+            ? errorTipoProducto.message
+            : 'No se pudieron cargar los tipos de producto.',
+        )
+      })
+      .finally(() => {
+        if (!cancelado) setCargandoTiposProducto(false)
+      })
+
+    return () => {
+      cancelado = true
+    }
+  }, [])
+
+  useEffect(() => {
+    let cancelado = false
+    setCargandoTiposDocumento(true)
+
+    listarTiposDocumentoCombo()
+      .then((respuesta) => {
+        if (!cancelado) {
+          setTiposDocumento(respuesta
+            .filter((tipo) => tipo.id != null)
+            .map((tipo) => ({
+              id: tipo.id as number,
+              nombre: tipo.descripcion ?? '',
+              descripcion: '',
+              activo: 1,
+              fechaRegistro: '',
+            })))
+        }
+      })
+      .catch((errorTipoDocumento: unknown) => {
+        if (cancelado) return
+        setTiposDocumento([])
+        setError(
+          errorTipoDocumento instanceof Error
+            ? errorTipoDocumento.message
+            : 'No se pudieron cargar los tipos de documento.',
+        )
+      })
+      .finally(() => {
+        if (!cancelado) setCargandoTiposDocumento(false)
+      })
+
+    return () => {
+      cancelado = true
+    }
+  }, [])
 
   useEffect(() => {
     if (!ingreso) {
@@ -173,6 +299,7 @@ export function IngresoAlmacenForm({
       setNumeroDocumento('')
       setObservacion('')
       setDetalles([])
+      setProductosComboSeleccionados({})
       setDetalle(DETALLE_INICIAL)
       setError(null)
       return
@@ -207,70 +334,117 @@ export function IngresoAlmacenForm({
     setError(null)
   }, [ingreso])
 
-  const contactosFiltrados =
-    useMemo(
-      () =>
-        contactos.filter(
-          (contacto) =>
-            contacto.activo === 1 &&
-            coincidenIds(
-              contacto.proveedorId,
-              proveedorId,
-              'PROV-',
-            ),
-        ),
-      [contactos, proveedorId],
-    )
+  useEffect(() => {
+    if (!proveedorId) {
+      setContactosFiltrados([])
+      setCargandoContactos(false)
+      return
+    }
 
-  const productosFiltrados =
-    useMemo(
-      () =>
-        productos.filter(
-          (producto) =>
-            producto.activo &&
-            coincidenIds(
-              producto.proveedorId,
-              proveedorId,
-              'PROV-',
-            ) &&
-            coincidenIds(
-              producto.tipoProductoId,
-              detalle.tipoProductoId,
-              'TP-',
-            ),
-        ),
-      [
-        productos,
-        proveedorId,
-        detalle.tipoProductoId,
-      ],
-    )
+    let cancelado = false
+    setCargandoContactos(true)
 
-  const productoSeleccionado =
-    useMemo(
-      () =>
-        productos.find(
-          (producto) =>
-            String(producto.productoId) ===
-            detalle.productoId,
-        ) ?? null,
-      [productos, detalle.productoId],
-    )
+    listarContactosCombo(Number(String(proveedorId).replace(/^PROV-0*/i, '')))
+      .then((respuesta) => {
+        if (cancelado) return
+
+        const contactosActivos = respuesta
+          .filter((contacto) => contacto.id != null)
+          .map((contacto) => ({
+            id: contacto.id as number,
+            proveedorId: Number(String(proveedorId).replace(/^PROV-0*/i, '')),
+            nombreCompleto: contacto.descripcion ?? '',
+            cargo: '',
+            telefono: '',
+            correo: '',
+            activo: 1 as const,
+            fechaRegistro: '',
+          }))
+        setContactosFiltrados(contactosActivos)
+
+        if (
+          contactoId &&
+          !contactosActivos.some(
+            (contacto) => String(contacto.id) === String(contactoId),
+          )
+        ) {
+          setContactoId('')
+        }
+      })
+      .catch(() => {
+        if (!cancelado) {
+          setContactosFiltrados([])
+          setContactoId('')
+        }
+      })
+      .finally(() => {
+        if (!cancelado) setCargandoContactos(false)
+      })
+
+    return () => {
+      cancelado = true
+    }
+  }, [proveedorId])
+
+  useEffect(() => {
+    if (!proveedorId || !detalle.tipoProductoId) {
+      setProductosFiltrados([])
+      setCargandoProductos(false)
+      return
+    }
+
+    let cancelado = false
+    setCargandoProductos(true)
+
+    listarProductosCombo({
+      proveedorId,
+      tipoProductoId: detalle.tipoProductoId,
+    })
+      .then((respuesta) => {
+        if (cancelado) return
+        setProductosFiltrados(respuesta)
+
+        if (
+          detalle.productoId &&
+          !respuesta.some(
+            (producto) => String(producto.id) === String(detalle.productoId),
+          )
+        ) {
+          setDetalle((actual) => ({
+            ...actual,
+            productoId: '',
+            precioUnitario: '',
+          }))
+        }
+      })
+      .catch(() => {
+        if (!cancelado) {
+          setProductosFiltrados([])
+          setDetalle((actual) => ({
+            ...actual,
+            productoId: '',
+            precioUnitario: '',
+          }))
+        }
+      })
+      .finally(() => {
+        if (!cancelado) setCargandoProductos(false)
+      })
+
+    return () => {
+      cancelado = true
+    }
+  }, [proveedorId, detalle.tipoProductoId])
 
   const unidadSeleccionada =
     useMemo(
       () =>
-        unidadesMedida.find(
-          (unidad) =>
-            coincidenIds(
-              unidad.id,
-              productoSeleccionado?.unidadMedidaId,
-              'UM-',
-            ),
-        ) ?? null,
+        productosFiltrados.find(
+          (producto) => String(producto.id) === String(detalle.productoId),
+        )?.unidadMedida ?? '',
       [
-        unidadesMedida,
-        productoSeleccionado,
+        productosFiltrados,
+        detalle.productoId,
       ],
     )
 
@@ -292,6 +466,7 @@ export function IngresoAlmacenForm({
     setProveedorId(nuevoProveedorId)
     setContactoId('')
     setDetalles([])
+    setProductosComboSeleccionados({})
     setDetalle(DETALLE_INICIAL)
     setError(null)
   }
@@ -390,6 +565,20 @@ export function IngresoAlmacenForm({
       return
     }
 
+    const productoCombo = productosFiltrados.find(
+      (producto) => String(producto.id) === detalle.productoId,
+    )
+
+    if (productoCombo) {
+      setProductosComboSeleccionados((actuales) => ({
+        ...actuales,
+        [productoCombo.id]: {
+          ...productoCombo,
+          tipoProductoId: detalle.tipoProductoId,
+        },
+      }))
+    }
+
     setDetalles((actuales) => [
       ...actuales,
       {
@@ -423,9 +612,9 @@ export function IngresoAlmacenForm({
     )
   }
 
-  function guardar(
+  async function guardar(
     event: FormEvent<HTMLFormElement>,
-  ): void {
+  ): Promise<void> {
     event.preventDefault()
     setError(null)
 
@@ -468,7 +657,7 @@ export function IngresoAlmacenForm({
     }
 
     try {
-      onSubmit({
+      await onSubmit({
         fechaIngreso,
         proveedorId,
         contactoId,
@@ -556,36 +745,32 @@ export function IngresoAlmacenForm({
             Proveedor *
           </label>
 
-          <select
-            id="ingresoProveedor"
-            className="form-select maestro-control"
-            value={proveedorId}
-            onChange={(event) =>
-              cambiarProveedor(
-                event.target.value,
-              )
-            }
-          >
-            <option value="">
-              Seleccione
-            </option>
-
-            {proveedores
+          <Select
+            inputId="ingresoProveedor"
+            classNamePrefix="maestro-select"
+            styles={crearEstilosSelect()}
+            placeholder={cargandoProveedores ? 'Cargando proveedores...' : 'Seleccione'}
+            isLoading={cargandoProveedores}
+            isClearable
+            isDisabled={cargandoProveedores}
+            options={proveedores
               .filter(
                 (proveedor) =>
                   proveedor.activo === 1 ||
-                  String(proveedor.id) ===
-                    String(proveedorId),
+                  String(proveedor.id) === String(proveedorId),
               )
-              .map((proveedor) => (
-                <option
-                  key={proveedor.id}
-                  value={proveedor.id}
-                >
-                  {proveedor.razonSocial}
-                </option>
-              ))}
-          </select>
+              .map((proveedor) => ({
+                value: String(proveedor.id),
+                label: proveedor.razonSocial,
+              }))}
+            value={proveedores
+              .filter((proveedor) => String(proveedor.id) === String(proveedorId))
+              .map((proveedor) => ({
+                value: String(proveedor.id),
+                label: proveedor.razonSocial,
+              }))[0] ?? null}
+            onChange={(option) => cambiarProveedor(option?.value ?? '')}
+          />
         </div>
 
         <div className="col-12 col-md-4">
@@ -596,32 +781,26 @@ export function IngresoAlmacenForm({
             Contacto *
           </label>
 
-          <select
-            id="ingresoContacto"
-            className="form-select maestro-control"
-            value={contactoId}
-            disabled={!proveedorId}
-            onChange={(event) =>
-              setContactoId(
-                event.target.value,
-              )
-            }
-          >
-            <option value="">
-              Seleccione
-            </option>
-
-            {contactosFiltrados.map(
-              (contacto) => (
-                <option
-                  key={contacto.id}
-                  value={contacto.id}
-                >
-                  {contacto.nombreCompleto}
-                </option>
-              ),
-            )}
-          </select>
+          <Select
+            inputId="ingresoContacto"
+            classNamePrefix="maestro-select"
+            styles={crearEstilosSelect()}
+            placeholder={cargandoContactos ? 'Cargando contactos...' : 'Seleccione'}
+            isClearable
+            isLoading={cargandoContactos}
+            isDisabled={!proveedorId || cargandoContactos}
+            options={contactosFiltrados.map((contacto) => ({
+              value: String(contacto.id),
+              label: contacto.nombreCompleto,
+            }))}
+            value={contactosFiltrados
+              .filter((contacto) => String(contacto.id) === String(contactoId))
+              .map((contacto) => ({
+                value: String(contacto.id),
+                label: contacto.nombreCompleto,
+              }))[0] ?? null}
+            onChange={(option) => setContactoId(option?.value ?? '')}
+          />
         </div>
 
         <div className="col-12 col-md-4">
@@ -632,36 +811,32 @@ export function IngresoAlmacenForm({
             Tipo de documento *
           </label>
 
-          <select
-            id="ingresoTipoDocumento"
-            className="form-select maestro-control"
-            value={tipoDocumentoId}
-            onChange={(event) =>
-              setTipoComprobanteId(
-                event.target.value,
-              )
-            }
-          >
-            <option value="">
-              Seleccione
-            </option>
-
-            {tiposDocumento
+          <Select
+            inputId="ingresoTipoDocumento"
+            classNamePrefix="maestro-select"
+            styles={crearEstilosSelect()}
+            placeholder={cargandoTiposDocumento ? 'Cargando tipos de documento...' : 'Seleccione'}
+            isLoading={cargandoTiposDocumento}
+            isClearable
+            isDisabled={cargandoTiposDocumento}
+            options={tiposDocumento
               .filter(
                 (tipo) =>
                   tipo.activo === 1 ||
-                  String(tipo.id) ===
-                    String(tipoDocumentoId),
+                  String(tipo.id) === String(tipoDocumentoId),
               )
-              .map((tipo) => (
-                <option
-                  key={tipo.id}
-                  value={tipo.id}
-                >
-                  {tipo.nombre}
-                </option>
-              ))}
-          </select>
+              .map((tipo) => ({
+                value: String(tipo.id),
+                label: tipo.nombre,
+              }))}
+            value={tiposDocumento
+              .filter((tipo) => String(tipo.id) === String(tipoDocumentoId))
+              .map((tipo) => ({
+                value: String(tipo.id),
+                label: tipo.nombre,
+              }))[0] ?? null}
+            onChange={(option) => setTipoComprobanteId(option?.value ?? '')}
+          />
         </div>
 
         <div className="col-12 col-md-4">
@@ -728,32 +903,28 @@ export function IngresoAlmacenForm({
             Tipo de producto *
           </label>
 
-          <select
-            id="detalleTipoProducto"
-            className="form-select maestro-control"
-            value={detalle.tipoProductoId}
-            disabled={!proveedorId}
-            onChange={(event) =>
-              cambiarTipoProducto(
-                event.target.value,
-              )
-            }
-          >
-            <option value="">
-              Seleccione
-            </option>
-
-            {tiposProducto
+          <Select
+            inputId="detalleTipoProducto"
+            classNamePrefix="maestro-select"
+            styles={crearEstilosSelect()}
+            placeholder="Seleccione"
+            isClearable
+            isLoading={cargandoTiposProducto}
+            isDisabled={!proveedorId || cargandoTiposProducto}
+            options={tiposProducto
               .filter((tipo) => tipo.activo === 1)
-              .map((tipo) => (
-                <option
-                  key={tipo.id}
-                  value={tipo.id}
-                >
-                  {tipo.nombre}
-                </option>
-              ))}
-          </select>
+              .map((tipo) => ({
+                value: String(tipo.id),
+                label: tipo.nombre,
+              }))}
+            value={tiposProducto
+              .filter((tipo) => String(tipo.id) === String(detalle.tipoProductoId))
+              .map((tipo) => ({
+                value: String(tipo.id),
+                label: tipo.nombre,
+              }))[0] ?? null}
+            onChange={(option) => cambiarTipoProducto(option?.value ?? '')}
+          />
         </div>
 
         <div className="col-12 col-md-4">
@@ -764,36 +935,26 @@ export function IngresoAlmacenForm({
             Producto *
           </label>
 
-          <select
-            id="detalleProducto"
-            className="form-select maestro-control"
-            value={detalle.productoId}
-            disabled={
-              !proveedorId ||
-              !detalle.tipoProductoId
-            }
-            onChange={(event) =>
-              cambiarProducto(
-                event.target.value,
-              )
-            }
-          >
-            <option value="">
-              Seleccione
-            </option>
-
-            {productosFiltrados.map(
-              (producto) => (
-                <option
-                  key={producto.productoId}
-                  value={producto.productoId}
-                >
-                  {producto.codigo} -{' '}
-                  {producto.nombre}
-                </option>
-              ),
-            )}
-          </select>
+          <Select
+            inputId="detalleProducto"
+            classNamePrefix="maestro-select"
+            styles={crearEstilosSelect()}
+            placeholder="Seleccione"
+            isClearable
+            isLoading={cargandoProductos}
+            isDisabled={!proveedorId || !detalle.tipoProductoId || cargandoProductos}
+            options={productosFiltrados.map((producto) => ({
+              value: String(producto.id),
+              label: producto.descripcion,
+            }))}
+            value={productosFiltrados
+              .filter((producto) => String(producto.id) === String(detalle.productoId))
+              .map((producto) => ({
+                value: String(producto.id),
+                label: producto.descripcion,
+              }))[0] ?? null}
+            onChange={(option) => cambiarProducto(option?.value ?? '')}
+          />
         </div>
 
         <div className="col-12 col-md-3">
@@ -807,9 +968,7 @@ export function IngresoAlmacenForm({
           <input
             id="detalleUnidad"
             className="form-control maestro-control"
-            value={
-              unidadSeleccionada?.nombre ?? ''
-            }
+            value={unidadSeleccionada}
             placeholder="Automático"
             readOnly
           />
@@ -909,6 +1068,9 @@ export function IngresoAlmacenForm({
             )}
 
             {detalles.map((item) => {
+              const productoCombo =
+                productosComboSeleccionados[item.productoId]
+
               const producto =
                 productos.find(
                   (productoActual) =>
@@ -920,19 +1082,23 @@ export function IngresoAlmacenForm({
                 tiposProducto.find(
                   (tipo) =>
                     String(tipo.id) ===
-                    String(producto?.tipoProductoId),
+                    String(
+                      producto?.tipoProductoId ??
+                        productoCombo?.tipoProductoId,
+                    ),
                 )
 
               return (
                 <tr key={item.productoId}>
                   <td>
                     <strong>
-                      {producto?.nombre ??
+                      {productoCombo?.descripcion ??
+                        producto?.nombre ??
                         'Producto no disponible'}
                     </strong>
 
                     <div className="small text-secondary">
-                      {producto?.codigo}
+                      {producto?.codigo ?? ''}
                     </div>
                   </td>
 

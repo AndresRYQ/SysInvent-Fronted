@@ -44,6 +44,10 @@ export const MODULOS_SISTEMA = [
     nombre: 'Reporte de vales',
   },
   {
+    id: 'reporte-kardex',
+    nombre: 'Reporte de Kardex',
+  },
+  {
     id: 'reporte-productos',
     nombre: 'Productos más pedidos',
   },
@@ -110,6 +114,7 @@ const ROLES_INICIALES: Rol[] = [
       'control-almacen',
       'reporte-ingresos',
       'reporte-vales',
+      'reporte-kardex',
       'reporte-productos',
       'perfil-usuario',
     ],
@@ -132,7 +137,30 @@ export function obtenerRoles(): Rol[] {
   )
 
   if (guardados.length > 0) {
-    return copiarRoles(guardados)
+    const rolesActualizados = guardados.map((rol) => {
+      const nombre = rol.nombre.trim().toLowerCase()
+      const debeTenerKardex =
+        nombre === 'administrador' ||
+        nombre === 'supervisor'
+      const modulos = Array.isArray(rol.modulos)
+        ? rol.modulos
+        : []
+
+      if (!debeTenerKardex || modulos.includes('reporte-kardex')) {
+        return rol
+      }
+
+      return {
+        ...rol,
+        modulos: [...modulos, 'reporte-kardex'],
+      }
+    })
+
+    if (rolesActualizados.some((rol, index) => rol !== guardados[index])) {
+      guardarStorage(STORAGE_KEY, rolesActualizados)
+    }
+
+    return copiarRoles(rolesActualizados)
   }
 
   guardarStorage(

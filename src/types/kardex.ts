@@ -59,6 +59,10 @@ export interface ControlAlmacenProducto {
   stockDisponible: number
   estadoStock: EstadoStockProducto
   movimientos: MovimientoAlmacen[]
+  tipoProductoNombre?: string
+  categoriaNombre?: string
+  unidadMedidaNombre?: string
+  proveedorNombre?: string
 }
 
 /**

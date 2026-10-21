@@ -13,6 +13,7 @@ const solicitudesEnCurso = new Map<string, Promise<CatalogoPaginado<Contacto>>>(
 
 export interface ListarContactosParams {
   nombre?: string
+  proveedorId?: string | number
   pagina?: number
   tamPagina?: number
 }
@@ -51,8 +52,13 @@ function mapearRespuesta(response: CustomPageContactoResponse): CatalogoPaginado
 export async function listarContactos(
   params: ListarContactosParams = {},
 ): Promise<CatalogoPaginado<Contacto>> {
+  const proveedorId = params.proveedorId === undefined || params.proveedorId === ''
+    ? undefined
+    : Number(String(params.proveedorId).replace(/^PROV-0*/i, ''))
+
   const parametros = {
     nombre: params.nombre?.trim() || undefined,
+    proveedorId: Number.isFinite(proveedorId) ? proveedorId : undefined,
     pagina: params.pagina,
     tamPagina: params.tamPagina,
   }

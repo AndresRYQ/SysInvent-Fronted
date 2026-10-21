@@ -31,6 +31,12 @@ export interface ComunResponse {
      * @memberof ComunResponse
      */
     descripcion?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ComunResponse
+     */
+    value2?: string;
 }
 
 /**
@@ -52,6 +58,7 @@ export function ComunResponseFromJSONTyped(json: any, ignoreDiscriminator: boole
         
         'id': json['id'] == null ? undefined : json['id'],
         'descripcion': json['descripcion'] == null ? undefined : json['descripcion'],
+        'value2': json['value2'] == null ? undefined : json['value2'],
     };
 }
 
@@ -68,6 +75,7 @@ export function ComunResponseToJSONTyped(value?: ComunResponse | null, ignoreDis
         
         'id': value['id'],
         'descripcion': value['descripcion'],
+        'value2': value['value2'],
     };
 }
 

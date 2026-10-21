@@ -8,6 +8,7 @@ Name | Type
 ------------ | -------------
 `id` | number
 `descripcion` | string
+`value2` | string
 
 ## Example
 
@@ -18,6 +19,7 @@ import type { ComunResponse } from ''
 const example = {
   "id": null,
   "descripcion": null,
+  "value2": null,
 } satisfies ComunResponse
 
 console.log(example)
