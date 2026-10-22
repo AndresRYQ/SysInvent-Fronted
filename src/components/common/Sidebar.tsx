@@ -19,7 +19,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 
 import {
-  tienePermisoModulo,
+  tienePermisoSesion,
 } from '../../services/rolService'
 
 type SidebarItem = {
@@ -192,10 +192,15 @@ const SECCIONES: SidebarSection[] = [
 
 type SidebarProps = {
   abierto: boolean
+  onNavigate?: () => void
   onToggle: () => void
 }
 
-export function Sidebar({ abierto, onToggle }: SidebarProps) {
+export function Sidebar({
+  abierto,
+  onNavigate,
+  onToggle,
+}: SidebarProps) {
   const { pathname } = useLocation()
   const { sesion } = useAuth()
 
@@ -205,8 +210,8 @@ const seccionesPermitidas =
     items: seccion.items.filter(
       (item) =>
         !item.moduleId ||
-        tienePermisoModulo(
-          sesion?.rol,
+        tienePermisoSesion(
+          sesion,
           item.moduleId,
         ),
     ),
@@ -265,6 +270,7 @@ const seccionesPermitidas =
                     to={enlace.to}
                     className={className}
                     title={!abierto ? enlace.label : undefined}
+                    onClick={onNavigate}
                   >
                     <Icon size={18} />
                     {abierto && <span>{enlace.label}</span>}
@@ -288,3 +294,4 @@ const seccionesPermitidas =
     </aside>
   )
 }
+

@@ -1,14 +1,16 @@
 import {
   useMemo,
   useState,
+  useEffect,
   type ReactNode,
 } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  tienePermisoModulo,
+  tienePermisoSesion,
 } from '../services/rolService'
 import {
   obtenerResumenDashboard,
+  type ResumenDashboard,
 } from '../services/dashboardService'
 import AnimatedContent from '../components/ui/AnimatedContent'
 import CountUp from '../components/ui/CountUp'
@@ -16,6 +18,18 @@ import SpotlightCard from '../components/ui/SpotlightCard'
 import { useAuth } from '../hooks/useAuth'
 import '../styles/react-bits.css'
 import '../styles/DashboardPage.css'
+import { DASHBOARD_MOCK } from '../data/dashboardMock'
+
+const RESUMEN_VACIO: ResumenDashboard = {
+  productosActivos: 0,
+  productosStockBajo: 0,
+  productosSinStock: 0,
+  ingresosDelMes: 0,
+  valesDelMes: 0,
+  movimientosHoy: 0,
+  alertas: [],
+  movimientosRecientes: [],
+}
 
 type IconName =
   | 'leaf'
@@ -379,10 +393,51 @@ function DashboardPage() {
     setSelectedCategory,
   ] = useState('Todos')
 
-  const resumenDashboard = useMemo(
-    () => obtenerResumenDashboard(),
-    [],
-  )
+  const [resumenCargado, setResumenCargado] =
+    useState<ResumenDashboard | null>(null)
+  const [errorResumen, setErrorResumen] =
+    useState<string | null>(null)
+  const [usarMock, setUsarMock] = useState(false)
+
+  useEffect(() => {
+    let activo = true
+
+    obtenerResumenDashboard()
+      .then((resumen) => {
+        if (activo) {
+          const respuestaVacia =
+            resumen.productosActivos === 0 &&
+            resumen.ingresosDelMes === 0 &&
+            resumen.valesDelMes === 0 &&
+            resumen.movimientosHoy === 0 &&
+            resumen.movimientosRecientes.length === 0
+
+          setUsarMock(respuestaVacia)
+          setResumenCargado(resumen)
+        }
+      })
+      .catch((error: unknown) => {
+        if (activo) {
+          setUsarMock(true)
+          setErrorResumen(
+            `No se pudo cargar el resumen real. ${
+              error instanceof Error
+                ? error.message
+                : 'Mostrando datos de demostración.'
+            }`,
+          )
+        }
+      })
+
+    return () => {
+      activo = false
+    }
+  }, [])
+
+  const resumenDashboard =
+    usarMock
+      ? DASHBOARD_MOCK
+      : resumenCargado ?? RESUMEN_VACIO
 
   const metrics: Metric[] = [
     {
@@ -489,12 +544,12 @@ function DashboardPage() {
  const modulosPermitidos = useMemo(
   () =>
     modules.filter((module) =>
-      tienePermisoModulo(
-        sesion?.rol,
+      tienePermisoSesion(
+        sesion,
         module.id,
       ),
     ),
-  [sesion?.rol],
+  [sesion],
 )
 
 const categoriasPermitidas = useMemo(
@@ -527,6 +582,17 @@ const filteredModules =
 
   return (
     <main className="dashboard-shell">
+      {errorResumen && (
+        <div className="alert alert-danger" role="alert">
+          {errorResumen}
+        </div>
+      )}
+
+      {usarMock && (
+        <div className="alert alert-info" role="status">
+          Mostrando datos de demostración en el panel principal.
+        </div>
+      )}
 
       <section className="hero-panel">
         <div className="hero-copy">
@@ -775,3 +841,4 @@ const filteredModules =
 }
 
 export default DashboardPage
+

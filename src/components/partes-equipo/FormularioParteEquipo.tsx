@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import {
   useEffect,
   useState,
@@ -16,6 +17,7 @@ import type {
 interface FormularioParteEquipoProps {
   abierto: boolean
   parteEquipo: ParteEquipo | null
+  soloLectura?: boolean
   error: string
   onClose: () => void
   onSubmit: (
@@ -47,6 +49,7 @@ const ERRORES_INICIALES:
 export function FormularioParteEquipo({
   abierto,
   parteEquipo,
+  soloLectura = false,
   error,
   onClose,
   onSubmit,
@@ -150,7 +153,6 @@ export function FormularioParteEquipo({
     <div
       className="maestro-modal-backdrop"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="maestro-modal-card"
@@ -167,16 +169,11 @@ export function FormularioParteEquipo({
               id="parte-equipo-form-title"
               className="maestro-modal-title"
             >
-              {parteEquipo
+              {soloLectura ? 'Visualizar parte de equipo' : parteEquipo
                 ? 'Editar parte de equipo'
                 : 'Registrar parte de equipo'}
             </h3>
 
-            <p className="maestro-modal-copy mb-0">
-              Completa la información de la
-              parte que será utilizada en
-              los movimientos del almacén.
-            </p>
           </div>
 
           <button
@@ -207,11 +204,11 @@ export function FormularioParteEquipo({
                 form.nombre.trim(),
               descripcion:
                 form.descripcion.trim(),
-              estado: form.estado,
             })
           }}
         >
-          <div className="maestro-modal-body">
+          <div className={`maestro-modal-body${soloLectura ? ' modo-visualizacion' : ''}`}>
+            <fieldset disabled={soloLectura}>
             {error && (
               <div
                 className="alert alert-danger py-2"
@@ -224,18 +221,16 @@ export function FormularioParteEquipo({
             <div className="row g-3">
               <div className="col-12 col-md-5">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label required"
                   htmlFor="parteEquipoCodigo"
                 >
                   Código
-                  <span className="maestro-required">
-                    *
-                  </span>
+
                 </label>
 
                 <input
                   id="parteEquipoCodigo"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.codigo
                       ? ' maestro-control--error'
                       : ''
@@ -243,7 +238,7 @@ export function FormularioParteEquipo({
                   type="text"
                   maxLength={30}
                   value={form.codigo}
-                  placeholder="Ej. MOT-001"
+                  placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
                     setForm((actual) => ({
                       ...actual,
@@ -270,18 +265,16 @@ export function FormularioParteEquipo({
 
               <div className="col-12 col-md-7">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label required"
                   htmlFor="parteEquipoNombre"
                 >
                   Nombre
-                  <span className="maestro-required">
-                    *
-                  </span>
+
                 </label>
 
                 <input
                   id="parteEquipoNombre"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.nombre
                       ? ' maestro-control--error'
                       : ''
@@ -289,7 +282,7 @@ export function FormularioParteEquipo({
                   type="text"
                   maxLength={120}
                   value={form.nombre}
-                  placeholder="Ej. Motor principal"
+                  placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
                     setForm((actual) => ({
                       ...actual,
@@ -315,18 +308,16 @@ export function FormularioParteEquipo({
 
               <div className="col-12">
                 <label
-                  className="form-label maestro-label"
+                  className="form-label required"
                   htmlFor="parteEquipoDescripcion"
                 >
                   Descripción
-                  <span className="maestro-required">
-                    *
-                  </span>
+
                 </label>
 
                 <textarea
                   id="parteEquipoDescripcion"
-                  className={`form-control maestro-control maestro-control--textarea${
+                  className={`form-control${
                     errores.descripcion
                       ? ' maestro-control--error'
                       : ''
@@ -373,47 +364,14 @@ export function FormularioParteEquipo({
                 </div>
               </div>
 
-              <div className="col-12">
-                <label
-                  className="form-label maestro-label"
-                  htmlFor="parteEquipoEstado"
-                >
-                  Estado
-                </label>
-
-                <select
-                  id="parteEquipoEstado"
-                  className="form-select maestro-control"
-                  value={
-                    form.estado
-                      ? 'activo'
-                      : 'inactivo'
-                  }
-                  onChange={(event) =>
-                    setForm((actual) => ({
-                      ...actual,
-                      estado:
-                        event.target.value ===
-                        'activo',
-                    }))
-                  }
-                >
-                  <option value="activo">
-                    Activo
-                  </option>
-
-                  <option value="inactivo">
-                    Inactivo
-                  </option>
-                </select>
-              </div>
             </div>
+            </fieldset>
           </div>
 
-          <div className="maestro-modal-footer">
+          {!soloLectura && <div className="maestro-modal-footer">
             <button
               type="button"
-              className="btn maestro-btn-secondary"
+              className="btn btn-maestro-danger"
               onClick={onClose}
             >
               <X size={18} />
@@ -422,7 +380,7 @@ export function FormularioParteEquipo({
 
             <button
               type="submit"
-              className="btn maestro-btn-primary"
+              className="btn btn-maestro-primary"
             >
               <Save size={18} />
 
@@ -430,7 +388,7 @@ export function FormularioParteEquipo({
                 ? 'Guardar cambios'
                 : 'Registrar'}
             </button>
-          </div>
+          </div>}
         </form>
       </div>
     </div>

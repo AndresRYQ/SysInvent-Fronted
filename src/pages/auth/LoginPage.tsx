@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import {  useEffect,  useState,  type FormEvent,} from 'react'
 import {  AlertCircle,  Eye,  EyeOff,  LoaderCircle,  LockKeyhole,  UserRound,} from 'lucide-react'
 import {  Navigate,  useLocation,  useNavigate,} from 'react-router-dom'
@@ -9,6 +10,11 @@ interface EstadoNavegacion {
   desde?: {
     pathname?: string
   }
+}
+
+interface ErroresCamposLogin {
+  usuario: boolean
+  contrasena: boolean
 }
 
 function calcularSegundosRestantes(
@@ -62,6 +68,12 @@ export function LoginPage() {
     setMensajeError,
   ] = useState('')
 
+  const [erroresCampos, setErroresCampos] =
+    useState<ErroresCamposLogin>({
+      usuario: false,
+      contrasena: false,
+    })
+
   const [enviando, setEnviando] =
     useState(false)
 
@@ -92,7 +104,7 @@ export function LoginPage() {
 
   if (motivoCierre === 'vencimiento') {
     setMensajeError(
-      'Tu sesión alcanzó el tiempo máximo de 5 minutos. Inicia sesión nuevamente.',
+      'Tu sesión alcanzó el tiempo máximo de 1 hora. Inicia sesión nuevamente.',
     )
   }
 
@@ -148,7 +160,7 @@ export function LoginPage() {
     )
   }
 
-  const manejarEnvio = (
+  const manejarEnvio = async (
     evento: FormEvent<HTMLFormElement>,
   ) => {
     evento.preventDefault()
@@ -159,10 +171,14 @@ export function LoginPage() {
 
     setMensajeError('')
 
-    if (
-      !usuario.trim() ||
-      !contrasena
-    ) {
+    const usuarioInvalido = !usuario.trim()
+    const contrasenaInvalida = !contrasena
+
+    if (usuarioInvalido || contrasenaInvalida) {
+      setErroresCampos({
+        usuario: usuarioInvalido,
+        contrasena: contrasenaInvalida,
+      })
       setMensajeError(
         'Ingresa tu usuario y contraseña.',
       )
@@ -171,8 +187,7 @@ export function LoginPage() {
 
     setEnviando(true)
 
-    window.setTimeout(() => {
-      const resultado = login({
+    const resultado = await login({
         usuario,
         contrasena,
       })
@@ -180,6 +195,10 @@ export function LoginPage() {
       setEnviando(false)
 
       if (!resultado.exitoso) {
+        setErroresCampos({
+          usuario: true,
+          contrasena: true,
+        })
         setMensajeError(
           resultado.mensaje,
         )
@@ -202,7 +221,6 @@ export function LoginPage() {
       navigate(rutaDestino, {
         replace: true,
       })
-    }, 350)
   }
 
   const formularioBloqueado =
@@ -234,7 +252,9 @@ export function LoginPage() {
           onSubmit={manejarEnvio}
           noValidate
         >
-          <label className="login-field">
+          <label
+            className={`login-field${erroresCampos.usuario ? ' login-field--error' : ''}`}
+          >
             <span className="sr-only">
               Usuario
             </span>
@@ -247,16 +267,17 @@ export function LoginPage() {
             />
 
             <input
+              className="login-field__input"
               type="text"
               name="usuario"
-              placeholder="Usuario"
+              placeholder={Placeholder.Ingresar}
               value={usuario}
               maxLength={50}
               autoComplete="username"
               autoFocus
               disabled={segundosBloqueo > 0}
               aria-invalid={
-                Boolean(mensajeError)
+                erroresCampos.usuario
               }
               onChange={(evento) => {
                 setUsuario(
@@ -266,11 +287,18 @@ export function LoginPage() {
                 if (!bloqueadoHasta) {
                   setMensajeError('')
                 }
+
+                setErroresCampos((erroresActuales) => ({
+                  ...erroresActuales,
+                  usuario: false,
+                }))
               }}
             />
           </label>
 
-          <label className="login-field">
+          <label
+            className={`login-field${erroresCampos.contrasena ? ' login-field--error' : ''}`}
+          >
             <span className="sr-only">
               Contraseña
             </span>
@@ -283,19 +311,20 @@ export function LoginPage() {
             />
 
             <input
+              className="login-field__input"
               type={
                 mostrarContrasena
                   ? 'text'
                   : 'password'
               }
               name="contrasena"
-              placeholder="Contraseña"
+              placeholder={Placeholder.Ingresar}
               value={contrasena}
               maxLength={80}
               autoComplete="current-password"
               disabled={segundosBloqueo > 0}
               aria-invalid={
-                Boolean(mensajeError)
+                erroresCampos.contrasena
               }
               onChange={(evento) => {
                 setContrasena(
@@ -305,6 +334,11 @@ export function LoginPage() {
                 if (!bloqueadoHasta) {
                   setMensajeError('')
                 }
+
+                setErroresCampos((erroresActuales) => ({
+                  ...erroresActuales,
+                  contrasena: false,
+                }))
               }}
             />
 

@@ -1,356 +1,154 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
-
-import {
-  FiltrosUnidadesMedida,
-  type FiltrosUnidadesMedidaValores,
-} from '../../components/unidades-medida/FiltrosUnidadesMedida'
-
+import { useEffect, useMemo, useState } from 'react'
+import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
+import { FiltrosUnidadesMedida, type FiltrosUnidadesMedidaValores } from '../../components/unidades-medida/FiltrosUnidadesMedida'
 import { TablaUnidadesMedida } from '../../components/unidades-medida/TablaUnidadesMedida'
 import { UnidadMedidaDeleteModal } from '../../components/unidades-medida/UnidadMedidaDeleteModal'
 import { UnidadMedidaFormModal } from '../../components/unidades-medida/UnidadMedidaFormModal'
-
-import {
-  actualizarUnidadMedida,
-  crearUnidadMedida,
-  eliminarUnidadMedida,
-  obtenerUnidadesMedida,
-} from '../../services/unidadMedidaService'
-
-import type {
-  UnidadMedida,
-  UnidadMedidaFormData,
-} from '../../types/unidadMedida'
-
+import { actualizarUnidadMedida, crearUnidadMedida, eliminarUnidadMedida, listarUnidadesMedida, reactivarUnidadMedida } from '../../services/unidadMedidaService'
+import type { UnidadMedida, UnidadMedidaFormData } from '../../types/unidadMedida'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
-const FILTROS_INICIALES: FiltrosUnidadesMedidaValores = {
-  nombre: '',
-  estado: '',
-}
+const INICIALES: FiltrosUnidadesMedidaValores = { nombre: '', estado: '' }
 
-interface MensajePagina {
-  tipo: 'success' | 'danger'
-  texto: string
-}
-
-function filtrarUnidades(
-  unidades: UnidadMedida[],
-  filtros: FiltrosUnidadesMedidaValores,
-): UnidadMedida[] {
-  const nombre = filtros.nombre
-    .trim()
-    .toLowerCase()
-
-  return unidades.filter((unidad) => {
-    const coincideNombre =
-      !nombre ||
-      unidad.nombre
-        .toLowerCase()
-        .includes(nombre)
-
-    const coincideEstado =
-      !filtros.estado ||
-      (filtros.estado === 'activo' &&
-        unidad.estado) ||
-      (filtros.estado === 'inactivo' &&
-        !unidad.estado)
-
-    return coincideNombre && coincideEstado
-  })
-}
-
-function obtenerMensajeError(error: unknown): string {
-  return error instanceof Error
-    ? error.message
-    : 'Ocurrió un error inesperado.'
+function filtrar(lista: UnidadMedida[], filtros: FiltrosUnidadesMedidaValores) {
+  return lista.filter((unidad) => (
+    !filtros.estado || (filtros.estado === 'activo' ? unidad.activo === 1 : unidad.activo === 0)
+  ))
 }
 
 export function UnidadesMedidaPage() {
-  const [unidades, setUnidades] =
-    useState<UnidadMedida[]>(() =>
-      obtenerUnidadesMedida(),
-    )
-
-  const [filtros, setFiltros] =
-    useState<FiltrosUnidadesMedidaValores>(
-      FILTROS_INICIALES,
-    )
-
-  const [
-    filtrosAplicados,
-    setFiltrosAplicados,
-  ] = useState<FiltrosUnidadesMedidaValores>(
-    FILTROS_INICIALES,
-  )
-
+  const [lista, setLista] = useState<UnidadMedida[]>([])
+  const [totalItems, setTotalItems] = useState(-1)
+  const [recarga, setRecarga] = useState(0)
+  const [filtros, setFiltros] = useState(INICIALES)
+  const [aplicados, setAplicados] = useState(INICIALES)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
+  const [formOpen, setFormOpen] = useState(false)
+  const [soloLectura, setSoloLectura] = useState(false)
+  const [seleccionada, setSeleccionada] = useState<UnidadMedida | null>(null)
+  const [error, setError] = useState('')
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [reactivarOpen, setReactivarOpen] = useState(false)
+  const [objetivo, setObjetivo] = useState<UnidadMedida | null>(null)
+  const { mensaje, abierta, mostrarAlerta, cerrarAlerta, limpiarAlerta } = useSnackbar()
 
-  const [modalFormOpen, setModalFormOpen] =
-    useState(false)
-
-  const [
-    unidadEnEdicion,
-    setUnidadEnEdicion,
-  ] = useState<UnidadMedida | null>(null)
-
-  const [errorFormulario, setErrorFormulario] =
-    useState('')
-
-  const [
-    modalDeleteOpen,
-    setModalDeleteOpen,
-  ] = useState(false)
-
-  const [
-    unidadAEliminar,
-    setUnidadAEliminar,
-  ] = useState<UnidadMedida | null>(null)
-
-  const [mensaje, setMensaje] =
-    useState<MensajePagina | null>(null)
-
-  const unidadesFiltradas = useMemo(
-    () =>
-      filtrarUnidades(
-        unidades,
-        filtrosAplicados,
-      ),
-    [unidades, filtrosAplicados],
-  )
-
-  const totalItems = unidadesFiltradas.length
-
-  const unidadesPaginadas = useMemo(() => {
-    const startIndex = (page - 1) * pageSize
-
-    return unidadesFiltradas.slice(
-      startIndex,
-      startIndex + pageSize,
-    )
-  }, [
-    unidadesFiltradas,
-    page,
-    pageSize,
-  ])
+  const filtrados = useMemo(() => filtrar(lista, aplicados), [lista, aplicados])
 
   useEffect(() => {
-    const totalPages = Math.max(
-      1,
-      Math.ceil(totalItems / pageSize),
-    )
-
-    if (page > totalPages) {
-      setPage(totalPages)
-    }
-  }, [page, pageSize, totalItems])
-
-  function recargarUnidades(): void {
-    setUnidades(obtenerUnidadesMedida())
-  }
-
-  function abrirFormularioNuevo(): void {
-    setMensaje(null)
-    setErrorFormulario('')
-    setUnidadEnEdicion(null)
-    setModalFormOpen(true)
-  }
-
-  function abrirFormularioEdicion(
-    unidad: UnidadMedida,
-  ): void {
-    setMensaje(null)
-    setErrorFormulario('')
-    setUnidadEnEdicion(unidad)
-    setModalFormOpen(true)
-  }
-
-  function cerrarFormulario(): void {
-    setModalFormOpen(false)
-    setUnidadEnEdicion(null)
-    setErrorFormulario('')
-  }
-
-  function guardarUnidad(
-    datos: UnidadMedidaFormData,
-  ): void {
-    try {
-      if (unidadEnEdicion) {
-        actualizarUnidadMedida(
-          unidadEnEdicion.id,
-          datos,
-        )
-
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Unidad de medida actualizada correctamente.',
-        })
-      } else {
-        crearUnidadMedida(datos)
-
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Unidad de medida registrada correctamente.',
-        })
-      }
-
-      recargarUnidades()
-      cerrarFormulario()
-      setPage(1)
-    } catch (error) {
-      setErrorFormulario(
-        obtenerMensajeError(error),
-      )
-    }
-  }
-
-  function abrirConfirmacionEliminar(
-    unidad: UnidadMedida,
-  ): void {
-    setMensaje(null)
-    setUnidadAEliminar(unidad)
-    setModalDeleteOpen(true)
-  }
-
-  function cerrarConfirmacionEliminar(): void {
-    setModalDeleteOpen(false)
-    setUnidadAEliminar(null)
-  }
-
-  function confirmarEliminacion(): void {
-    if (!unidadAEliminar) {
-      return
-    }
-
-    try {
-      eliminarUnidadMedida(
-        unidadAEliminar.id,
-      )
-
-      recargarUnidades()
-      cerrarConfirmacionEliminar()
-
-      setMensaje({
-        tipo: 'success',
-        texto:
-          'Unidad de medida eliminada correctamente.',
+    let activo = true
+    setTotalItems(-1)
+    listarUnidadesMedida({
+      nombre: aplicados.nombre,
+      pagina: page,
+      tamPagina: pageSize,
+    })
+      .then((resultado) => {
+        if (!activo) return
+        setLista(resultado.datos)
+        setTotalItems(resultado.paginacion.totalElementos ?? resultado.datos.length)
       })
-    } catch (error) {
-      cerrarConfirmacionEliminar()
-
-      setMensaje({
-        tipo: 'danger',
-        texto: obtenerMensajeError(error),
+      .catch((e) => {
+        if (!activo) return
+        mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar las unidades de medida.')
       })
+    return () => { activo = false }
+  }, [aplicados.nombre, page, pageSize, recarga])
+
+  const recargar = () => {
+    setPage(1)
+    setRecarga((actual) => actual + 1)
+  }
+
+  const cerrarForm = () => {
+    setFormOpen(false)
+    setSeleccionada(null)
+    setSoloLectura(false)
+    setError('')
+  }
+
+  const guardar = async (datos: UnidadMedidaFormData) => {
+    try {
+      const editando = Boolean(seleccionada)
+      const respuesta = editando
+        ? await actualizarUnidadMedida(seleccionada!.id, datos)
+        : await crearUnidadMedida(datos)
+      recargar()
+      cerrarForm()
+      mostrarAlerta('success', respuesta.message ?? (editando
+        ? 'Unidad de medida actualizada correctamente.'
+        : 'Unidad de medida registrada correctamente.'))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Ocurrió un error inesperado.')
+    }
+  }
+
+  const cerrarConfirmacion = () => {
+    setConfirmOpen(false)
+    setReactivarOpen(false)
+    setObjetivo(null)
+  }
+
+  const confirmar = async () => {
+    if (!objetivo) return
+    const reactivando = reactivarOpen
+    try {
+      const respuesta = reactivando
+        ? await reactivarUnidadMedida(objetivo.id)
+        : await eliminarUnidadMedida(objetivo.id)
+      recargar()
+      mostrarAlerta('success', respuesta.message ?? (reactivando
+        ? 'Unidad de medida reactivada correctamente.'
+        : 'Unidad de medida desactivada correctamente.'))
+    } catch (e) {
+      mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudo actualizar la unidad de medida.')
+    } finally {
+      cerrarConfirmacion()
     }
   }
 
   return (
-    <>
+    <div className="unidades-medida-page">
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
               <h1>Unidades de medida</h1>
-
-              <p>
-                Administración de unidades utilizadas
-                para controlar las existencias.
-              </p>
+              <p>Administración de unidades utilizadas para controlar las existencias.</p>
             </div>
           </section>
-
-          {mensaje && (
-            <div
-              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
-              role="alert"
-            >
-              {mensaje.texto}
-
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={() => setMensaje(null)}
-              />
-            </div>
-          )}
 
           <div className="maestro-panel">
             <FiltrosUnidadesMedida
               valores={filtros}
-              onChange={(campo, valor) =>
-                setFiltros((actual) => ({
-                  ...actual,
-                  [campo]: valor,
-                }))
-              }
-              onBuscar={() => {
-                setFiltrosAplicados({
-                  ...filtros,
-                })
-                setPage(1)
-              }}
-              onLimpiar={() => {
-                setFiltros(FILTROS_INICIALES)
-                setFiltrosAplicados(
-                  FILTROS_INICIALES,
-                )
-                setPage(1)
-              }}
+              onChange={(campo, valor) => setFiltros((actual) => ({ ...actual, [campo]: valor }))}
+              onBuscar={() => { setAplicados({ ...filtros }); setPage(1) }}
+              onLimpiar={() => { setFiltros(INICIALES); setAplicados(INICIALES); setPage(1) }}
             />
           </div>
 
           <div className="maestro-panel">
             <TablaUnidadesMedida
-              unidades={unidadesPaginadas}
-              totalItems={totalItems}
+              unidades={filtrados}
+              totalItems={aplicados.estado ? filtrados.length : totalItems}
               page={page}
               pageSize={pageSize}
-              onAgregar={
-                abrirFormularioNuevo
-              }
-              onEditar={
-                abrirFormularioEdicion
-              }
-              onEliminar={
-                abrirConfirmacionEliminar
-              }
+              onAgregar={() => { setSeleccionada(null); setSoloLectura(false); setError(''); setFormOpen(true) }}
+              onEditar={(item) => { setSeleccionada(item); setSoloLectura(false); setError(''); setFormOpen(true) }}
+              onVisualizar={(item) => { setSeleccionada(item); setSoloLectura(true); setError(''); setFormOpen(true) }}
+              onEliminar={(item) => { setObjetivo(item); setConfirmOpen(true) }}
+              onReactivar={(item) => { setObjetivo(item); setReactivarOpen(true) }}
               onPageChange={setPage}
-              onPageSizeChange={(
-                nextPageSize,
-              ) => {
-                setPageSize(nextPageSize)
-                setPage(1)
-              }}
+              onPageSizeChange={(size) => { setPageSize(size); setPage(1) }}
             />
           </div>
         </div>
       </main>
 
-      <UnidadMedidaFormModal
-        abierto={modalFormOpen}
-        unidadMedida={unidadEnEdicion}
-        error={errorFormulario}
-        onClose={cerrarFormulario}
-        onSubmit={guardarUnidad}
-      />
-
-      <UnidadMedidaDeleteModal
-        abierto={modalDeleteOpen}
-        unidadMedida={unidadAEliminar}
-        onClose={
-          cerrarConfirmacionEliminar
-        }
-        onConfirm={confirmarEliminacion}
-      />
-    </>
+      <SnackbarAlert mensaje={mensaje} abierta={abierta} onClose={cerrarAlerta} onExited={limpiarAlerta} />
+      <UnidadMedidaFormModal abierto={formOpen} unidadMedida={seleccionada} error={error} soloLectura={soloLectura} onClose={cerrarForm} onSubmit={guardar} />
+      <UnidadMedidaDeleteModal abierto={confirmOpen || reactivarOpen} unidadMedida={objetivo} modo={reactivarOpen ? 'reactivar' : 'desactivar'} onClose={cerrarConfirmacion} onConfirm={confirmar} />
+    </div>
   )
 }

@@ -1,152 +1,50 @@
-import {
-  FolderKanban,
-  MapPin,
-  Pencil,
-  Plus,
-  ShieldCheck,
-  Trash2,
-} from 'lucide-react'
-
+import { Eye, FolderKanban, MapPin, Pencil, Plus, RotateCcw, Trash2 } from 'lucide-react'
+import { EmptyState } from '../common/EmptyState'
 import type { Destino } from '../../types/destino'
 import { TablePagination } from '../ui/TablePagination'
+import { TableLoadingState } from '../ui/TableLoadingState'
 
-interface TablaDestinosProps {
+interface Props {
   destinos: Destino[]
   totalItems: number
   page: number
   pageSize: number
   onAgregar: () => void
-  onEditar: (destino: Destino) => void
-  onEliminar: (destino: Destino) => void
+  onEditar: (item: Destino) => void
+  onVisualizar: (item: Destino) => void
+  onEliminar: (item: Destino) => void
+  onReactivar: (item: Destino) => void
   onPageChange: (page: number) => void
-  onPageSizeChange: (pageSize: number) => void
+  onPageSizeChange: (size: number) => void
+  loading?: boolean
 }
 
-export function TablaDestinos({
-  destinos,
-  totalItems,
-  page,
-  pageSize,
-  onAgregar,
-  onEditar,
-  onEliminar,
-  onPageChange,
-  onPageSizeChange,
-}: TablaDestinosProps) {
+export function TablaDestinos({ destinos, totalItems, page, pageSize, onAgregar, onEditar, onVisualizar, onEliminar, onReactivar, onPageChange, onPageSizeChange, loading = totalItems < 0 }: Props) {
   return (
-    <section className="maestro-table-card card border-0 shadow-sm">
+    <section className="table-card card border-0 shadow-sm">
       <div className="card-body p-0">
-        <div className="maestro-table-header">
-          <div>
-            <span className="maestro-kicker">
-              <FolderKanban size={16} />
-              Listado de destinos
-            </span>
-          </div>
-
-          <button
-            type="button"
-            className="btn maestro-toolbar-btn"
-            onClick={onAgregar}
-          >
-            <Plus size={18} />
-            Agregar destino
-          </button>
+        <div className="table-header">
+          <span className="maestro-kicker"><FolderKanban size={16} />Listado de destinos</span>
+          <button type="button" className="btn table-toolbar-btn" onClick={onAgregar}><Plus size={18} />Agregar destino</button>
         </div>
-
-        <div className="table-responsive">
-          <table className="table maestro-table align-middle mb-0">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre de destino</th>
-                <th>Descripción</th>
-                <th>Fecha de registro</th>
-                <th>Estado</th>
-                <th className="text-center">Acciones</th>
-              </tr>
-            </thead>
-
+        <div className="table-responsive"><TableLoadingState visible={loading} />
+          <table className="table standard-table align-middle mb-0">
+            <thead><tr><th>N°</th><th>Nombre de destino</th><th>Descripción</th><th>Fecha registro</th><th>Estado</th><th className="text-center">Acciones</th></tr></thead>
             <tbody>
-              {destinos.length > 0 ? (
-                destinos.map((destino) => (
-                  <tr key={destino.id}>
-                    <td>
-                      <span className="maestro-id-chip">{destino.id}</span>
-                    </td>
-
-                    <td>
-                      <div className="maestro-cell-main">
-                        <span className="maestro-cell-icon">
-                          <MapPin size={16} />
-                        </span>
-                        {destino.nombre}
-                      </div>
-                    </td>
-
-                    <td>{destino.descripcion}</td>
-                    <td>{destino.fechaRegistro}</td>
-
-                    <td>
-                      <span
-                        className={
-                          destino.estado
-                            ? 'maestro-status maestro-status--active'
-                            : 'maestro-status maestro-status--inactive'
-                        }
-                      >
-                        <ShieldCheck size={14} />
-                        {destino.estado ? 'Activo' : 'Inactivo'}
-                      </span>
-                    </td>
-
-                    <td>
-                      <div className="maestro-actions">
-                        <button
-                          type="button"
-                          className="btn maestro-action-btn"
-                          onClick={() => onEditar(destino)}
-                          title="Editar"
-                          aria-label={`Editar ${destino.nombre}`}
-                        >
-                          <Pencil size={16} />
-                        </button>
-
-                        <button
-                          type="button"
-                          className="btn maestro-action-btn maestro-action-btn--danger"
-                          onClick={() => onEliminar(destino)}
-                          title="Eliminar"
-                          aria-label={`Eliminar ${destino.nombre}`}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6}>
-                    <div className="maestro-empty-state">
-                      <FolderKanban size={28} />
-                      <p className="mb-1">No se encontraron destinos</p>
-                      <span>Ajusta los filtros o limpia la búsqueda.</span>
-                    </div>
-                  </td>
+              {destinos.length ? destinos.map((item, index) => (
+                <tr key={item.id}>
+                  <td><span className="table-id-chip">{((page - 1) * pageSize) + index + 1}</span></td>
+                  <td><div className="table-cell-main"><span className="table-cell-icon"><MapPin size={16} /></span>{item.nombre}</div></td>
+                  <td>{item.descripcion}</td>
+                  <td>{item.fechaRegistro ?? '—'}</td>
+                  <td><span className={item.activo === 1 ? 'status-label status-label--active' : 'status-label status-label--inactive'}><span className="status-label__dot" aria-hidden="true" />{item.activo === 1 ? 'Activo' : 'Inactivo'}</span></td>
+                  <td><div className="table-actions">{item.activo === 1 ? <><button type="button" className="btn table-action-btn" onClick={() => onVisualizar(item)} title="Visualizar"><Eye size={16} /></button><button type="button" className="btn table-action-btn" onClick={() => onEditar(item)} title="Editar"><Pencil size={16} /></button><button type="button" className="btn table-action-btn table-action-btn--danger" onClick={() => onEliminar(item)} title="Desactivar"><Trash2 size={16} /></button></> : <><button type="button" className="btn table-action-btn" onClick={() => onVisualizar(item)} title="Visualizar"><Eye size={16} /></button><button type="button" className="btn table-action-btn" onClick={() => onReactivar(item)} title="Reactivar"><RotateCcw size={16} /></button></>}</div></td>
                 </tr>
-              )}
+              )) : <tr><td colSpan={6}><EmptyState icon={FolderKanban} iconSize={28} title="No se encontraron destinos" description="Ajusta los filtros o limpia la búsqueda." /></td></tr>}
             </tbody>
           </table>
         </div>
-
-        <TablePagination
-          totalItems={totalItems}
-          page={page}
-          pageSize={pageSize}
-          onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
-        />
+        <TablePagination totalItems={totalItems} page={page} pageSize={pageSize} onPageChange={onPageChange} onPageSizeChange={onPageSizeChange} />
       </div>
     </section>
   )

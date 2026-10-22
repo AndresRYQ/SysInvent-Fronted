@@ -9,7 +9,7 @@ export interface FiltrosProductosMasPedidos {
 
 export interface FilaProductoMasPedido {
   posicion: number
-  productoId: string
+  productoId: number
   codigoProducto: string
   producto: string
   tipoProductoId: string
@@ -34,3 +34,4 @@ export interface ResumenProductosMasPedidos {
   cantidadProductoMasPedido: number
   unidadProductoMasPedido: string
 }
+

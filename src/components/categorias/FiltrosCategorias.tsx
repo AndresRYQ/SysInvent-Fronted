@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import { Filter, RotateCcw, Search } from 'lucide-react'
 import { MaestroEstadoSelect } from '../common/MaestroEstadoSelect'
 
@@ -29,23 +30,23 @@ export function FiltrosCategorias({
           <div>
             <span className="maestro-kicker">
               <Filter size={16} />
-              Filtros
+              Filtros de búsqueda
             </span>
           </div>
         </div>
 
         <div className="row g-3">
           <div className="col-12 col-lg-8">
-            <label className="form-label maestro-label" htmlFor="nombreCategoria">
+            <label className="form-label" htmlFor="nombreCategoria">
               Nombre de categoría
             </label>
 
             <input
               id="nombreCategoria"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.nombre}
-              placeholder="Ej. Herramientas, Seguridad, Repuestos"
+              placeholder={Placeholder.Buscar}
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }
@@ -53,7 +54,7 @@ export function FiltrosCategorias({
           </div>
 
           <div className="col-12 col-md-6 col-lg-4">
-            <label className="form-label maestro-label" htmlFor="estadoCategoria">
+            <label className="form-label" htmlFor="estadoCategoria">
               Estado
             </label>
 
@@ -71,16 +72,16 @@ export function FiltrosCategorias({
             <div className="maestro-filter-actions">
               <button
                 type="button"
-                className="btn maestro-btn-secondary maestro-filter-btn"
+                className="btn btn-maestro-secondary"
                 onClick={onLimpiar}
               >
                 <RotateCcw size={18} />
                 Limpiar
               </button>
-              
+
               <button
                 type="button"
-                className="btn maestro-btn-primary maestro-filter-btn"
+                className="btn btn-maestro-primary"
                 onClick={onBuscar}
               >
                 <Search size={18} />
@@ -93,4 +94,5 @@ export function FiltrosCategorias({
     </section>
   )
 }
+
 

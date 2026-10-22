@@ -24,11 +24,11 @@ export function NuevoProductoPage() {
       'Nuevo producto | AGRIHUSAC'
   }, [])
 
-  function guardarProducto(
+  async function guardarProducto(
     datos: ProductoFormData,
-  ): void {
+  ): Promise<void> {
     try {
-      crearProducto(datos)
+      await crearProducto(datos)
 
       navigate('/productos', {
         replace: true,
@@ -59,7 +59,7 @@ export function NuevoProductoPage() {
 
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn btn-maestro-info"
             onClick={() =>
               navigate('/productos')
             }

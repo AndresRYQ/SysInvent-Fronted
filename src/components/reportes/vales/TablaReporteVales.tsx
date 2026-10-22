@@ -1,5 +1,7 @@
 import { PackageSearch } from 'lucide-react'
 
+import { EmptyState } from '../../common/EmptyState'
+
 import type {
   FilaReporteVale,
 } from '../../../types/reporteVale'
@@ -55,7 +57,7 @@ export function TablaReporteVales({
 }: TablaReporteValesProps) {
   return (
     <div className="table-responsive">
-      <table className="table maestro-table align-middle mb-0">
+      <table className="table standard-table align-middle mb-0">
         <thead>
           <tr>
             <th>Nro. vale</th>
@@ -84,18 +86,7 @@ export function TablaReporteVales({
           {filas.length === 0 ? (
             <tr>
               <td colSpan={11}>
-                <div className="maestro-empty-state">
-                  <PackageSearch size={38} />
-
-                  <strong>
-                    No se encontraron vales
-                  </strong>
-
-                  <span>
-                    Cambia los filtros o registra
-                    un vale de consumo.
-                  </span>
-                </div>
+                <EmptyState icon={PackageSearch} title="No se encontraron vales" description="Cambia los filtros o registra un vale de consumo." />
               </td>
             </tr>
           ) : (
@@ -106,7 +97,7 @@ export function TablaReporteVales({
                 }
               >
                 <td>
-                  <span className="maestro-id-chip">
+                  <span className="table-id-chip">
                     {fila.numeroVale}
                   </span>
                 </td>
@@ -184,8 +175,8 @@ export function TablaReporteVales({
                     className={
                       fila.estado ===
                       'REGISTRADO'
-                        ? 'maestro-status maestro-status--active'
-                        : 'maestro-status maestro-status--inactive'
+                        ? 'status-label status-label--active'
+                        : 'status-label status-label--inactive'
                     }
                   >
                     {fila.estado ===
@@ -202,3 +193,4 @@ export function TablaReporteVales({
     </div>
   )
 }
+

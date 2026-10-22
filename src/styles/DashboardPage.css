@@ -85,12 +85,31 @@
   box-shadow: 0 20px 45px rgba(9, 18, 32, 0.24);
 }
 
+.mobile-menu-button {
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+}
+
 .brand {
   display: flex;
   align-items: center;
   gap: 10px;
   min-width: max-content;
+  color: #f8fafc;
   font-weight: 800;
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.brand:hover {
+  color: #ffffff;
 }
 
 .brand-mark {
@@ -111,12 +130,14 @@
 }
 
 .brand-name {
+  color: #ffffff;
   font-size: 20px;
   letter-spacing: 0;
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.18);
 }
 
 .brand-system {
-  color: #2ac06d;
+  color: #66e39a;
   font-size: 15px;
   font-weight: 800;
 }
@@ -1007,9 +1028,64 @@
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 1024px) {
+  .topbar {
+    grid-template-columns: auto 1fr auto;
+    min-height: 60px;
+    padding: 10px 14px;
+    gap: 12px;
+  }
+
+  .mobile-menu-button {
+    display: inline-flex;
+  }
+
+  .brand {
+    gap: 7px;
+  }
+
+  .brand-mark {
+    width: 24px;
+    height: 24px;
+  }
+
+  .brand-name {
+    font-size: 16px;
+  }
+
+  .brand-system {
+    font-size: 12px;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .topbar-actions {
+    gap: 8px;
+  }
+
+  .user-menu {
+    min-width: auto;
+    padding: 5px;
+  }
+
+  .user-menu > span:last-child {
+    display: none;
+  }
+
+  .notification-button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .logout-button {
+    width: 34px;
+    height: 34px;
+  }
+
   .dashboard-shell {
-    padding: 12px;
+    padding: 0 12px 12px;
   }
 
   .categories-bar {
@@ -1059,20 +1135,38 @@
 }
 
 @media (max-width: 560px) {
-  .brand {
-    flex-wrap: wrap;
+  .topbar {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    padding: 9px 10px;
+    gap: 8px;
   }
 
-  .nav-link {
-    padding: 0 11px;
+  .brand {
+    gap: 5px;
+  }
+
+  .brand-mark {
+    display: none;
+  }
+
+  .brand-name {
+    font-size: 13px;
+  }
+
+  .brand-system {
+    font-size: 10px;
+  }
+
+  .notification-button {
+    display: none;
   }
 
   .topbar-actions {
-    align-items: stretch;
+    gap: 5px;
   }
 
   .user-menu {
-    flex: 1;
+    background: transparent;
   }
 
   .hero-copy h1 {

@@ -1,6 +1,7 @@
 import type {
   DetalleIngresoAlmacen,
   IngresoAlmacenFormData,
+  IngresoAlmacenListado,
   IngresoAlmacenRegistro,
 } from '../types/ingresoAlmacen'
 
@@ -10,11 +11,99 @@ import {
   obtenerProductos,
 } from './productoService'
 import { obtenerProveedores } from './proveedorService'
-import { obtenerTiposDocumento } from './tipoComprobanteService'
+import { obtenerTiposDocumento } from './tipoDocumentoService'
 import { registrarEventoBitacora } from './bitacoraService'
+import { coincidenIds } from '../utils/identificadores'
+import {
+  IngresoAlmacenControllerApi,
+  type Listar4Request,
+  type IngresoAlmacenRequest,
+  type MessageResponse,
+} from '../api/generated'
+import { apiConfiguration } from '../api/client'
 
 const STORAGE_KEY =
   'agrihusac_ingresos_almacen'
+
+const ingresoAlmacenApi =
+  new IngresoAlmacenControllerApi(apiConfiguration)
+
+function convertirIdIngreso(valor: string | number): number {
+  const id = Number(String(valor).replace(/^[A-Z]+-0*/i, ''))
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new Error('El identificador del ingreso no es válido.')
+  }
+  return id
+}
+
+function construirRequestIngreso(
+  datos: IngresoAlmacenFormData,
+): IngresoAlmacenRequest {
+  return {
+    proveedorId: convertirIdIngreso(datos.proveedorId),
+    contactoId: convertirIdIngreso(datos.contactoId),
+    tipoDocumentoId: convertirIdIngreso(datos.tipoDocumentoId),
+    numeroDocumento: datos.numeroDocumento.trim().toUpperCase(),
+    fechaIngreso: datos.fechaIngreso
+      ? new Date(`${datos.fechaIngreso}T00:00:00Z`)
+      : undefined,
+    observacion: datos.observacion.trim() || undefined,
+    detalles: datos.detalles.map((detalle) => ({
+      productoId: convertirIdIngreso(detalle.productoId),
+      cantidad: Number(detalle.cantidad),
+      precioUnitario: Number(detalle.precioUnitario),
+    })),
+  }
+}
+
+export async function registrarIngresoAlmacen(
+  datos: IngresoAlmacenFormData,
+): Promise<MessageResponse> {
+  const response = await ingresoAlmacenApi.crear1({
+    ingresoAlmacenRequest: construirRequestIngreso(datos),
+  }) as MessageResponse
+
+  if (response.success === false) {
+    throw new Error(response.message ?? 'No se pudo registrar el ingreso.')
+  }
+
+  return response
+}
+
+export async function listarIngresosAlmacen(
+  parametros: Listar4Request = {},
+): Promise<{
+  datos: IngresoAlmacenListado[]
+  totalElementos: number
+}> {
+  const response = await ingresoAlmacenApi.listar4(parametros)
+
+  return {
+    datos: (response.datos ?? []).map((ingreso) => ({
+      id: ingreso.ingresoAlmacenId ?? 0,
+      numeroIngreso: ingreso.numeroIngreso ?? '',
+      fechaIngreso: ingreso.fechaIngreso ?? '',
+      proveedor: ingreso.proveedor ?? '',
+      contacto: ingreso.contacto ?? '',
+      documento: ingreso.documento ?? '',
+      productos: ingreso.productos ?? 0,
+      cantidadIngresada: ingreso.cantidadIngresada ?? '0',
+      total: Number(ingreso.total ?? 0),
+      estado: ingreso.estado === 'ANULADO'
+        ? 'ANULADO'
+        : 'REGISTRADO',
+    })),
+    totalElementos: Number(response.paginacion?.totalElementos ?? 0),
+  }
+}
+
+function normalizarProductoId(
+  id: unknown,
+): number {
+  return Number(
+    String(id ?? '').replace(/^PROD-0*/i, ''),
+  )
+}
 
 function copiarIngreso(
   ingreso: IngresoAlmacenRegistro,
@@ -24,6 +113,9 @@ function copiarIngreso(
     detalles: ingreso.detalles.map(
       (detalle) => ({
         ...detalle,
+        productoId: normalizarProductoId(
+          detalle.productoId,
+        ),
       }),
     ),
   }
@@ -58,7 +150,7 @@ function esIngresoValido(
   )
 }
 
-export function obtenerIngresosAlmacen():
+function obtenerIngresosReales():
   IngresoAlmacenRegistro[] {
   const datosGuardados =
     localStorage.getItem(STORAGE_KEY)
@@ -80,6 +172,11 @@ export function obtenerIngresosAlmacen():
   } catch {
     return []
   }
+}
+
+export function obtenerIngresosAlmacen():
+  IngresoAlmacenRegistro[] {
+  return obtenerIngresosReales()
 }
 
 export function obtenerIngresoAlmacenPorId(
@@ -122,7 +219,7 @@ export function obtenerSiguienteNumeroIngreso():
   const prefijo = `ING-${anio}-`
 
   const numeroMayor =
-    obtenerIngresosAlmacen().reduce(
+    obtenerIngresosReales().reduce(
       (mayor, ingreso) => {
         if (
           !ingreso.numeroIngreso.startsWith(
@@ -176,7 +273,7 @@ function validarDatosIngreso(
   const proveedor =
     obtenerProveedores().find(
       (item) =>
-        item.id === datos.proveedorId,
+        coincidenIds(item.id, datos.proveedorId, 'PROV-'),
     )
 
   if (!proveedor) {
@@ -185,7 +282,7 @@ function validarDatosIngreso(
     )
   }
 
-  if (!proveedor.estado) {
+  if (proveedor.activo !== 1) {
     throw new Error(
       'El proveedor seleccionado está inactivo.',
     )
@@ -194,7 +291,7 @@ function validarDatosIngreso(
   const contacto =
     obtenerContactos().find(
       (item) =>
-        item.id === datos.contactoId,
+        coincidenIds(item.id, datos.contactoId, 'CONT-'),
     )
 
   if (!contacto) {
@@ -203,15 +300,18 @@ function validarDatosIngreso(
     )
   }
 
-  if (!contacto.estado) {
+  if (contacto.activo !== 1) {
     throw new Error(
       'El contacto seleccionado está inactivo.',
     )
   }
 
   if (
-    contacto.proveedorId !==
-    datos.proveedorId
+    !coincidenIds(
+      contacto.proveedorId,
+      datos.proveedorId,
+      'PROV-',
+    )
   ) {
     throw new Error(
       'El contacto no pertenece al proveedor seleccionado.',
@@ -221,8 +321,7 @@ function validarDatosIngreso(
   const tipoDocumento =
     obtenerTiposDocumento().find(
       (item) =>
-        item.id ===
-        datos.tipoComprobanteId,
+        coincidenIds(item.id, datos.tipoDocumentoId, 'TD-'),
     )
 
   if (!tipoDocumento) {
@@ -231,7 +330,7 @@ function validarDatosIngreso(
     )
   }
 
-  if (!tipoDocumento.estado) {
+  if (tipoDocumento.activo !== 1) {
     throw new Error(
       'El tipo de documento seleccionado está inactivo.',
     )
@@ -240,15 +339,9 @@ function validarDatosIngreso(
   const numeroDocumento =
     datos.numeroDocumento.trim()
 
-  if (numeroDocumento.length < 3) {
+  if (!/^\d{7}$/.test(numeroDocumento)) {
     throw new Error(
-      'El número de documento debe tener al menos 3 caracteres.',
-    )
-  }
-
-  if (numeroDocumento.length > 50) {
-    throw new Error(
-      'El número de documento no puede superar los 50 caracteres.',
+      'El número de documento debe tener exactamente 7 dígitos.',
     )
   }
 
@@ -258,8 +351,8 @@ function validarDatosIngreso(
         ingreso.id !== ingresoIdExcluir &&
         ingreso.proveedorId ===
           datos.proveedorId &&
-        ingreso.tipoComprobanteId ===
-          datos.tipoComprobanteId &&
+        ingreso.tipoDocumentoId ===
+          datos.tipoDocumentoId &&
         normalizarTexto(
           ingreso.numeroDocumento,
         ) ===
@@ -286,7 +379,7 @@ function validarDatosIngreso(
   const productos = obtenerProductos()
 
   const productosSeleccionados =
-    new Set<string>()
+    new Set<number>()
 
   datos.detalles.forEach(
     (detalle, indice) => {
@@ -308,7 +401,7 @@ function validarDatosIngreso(
 
       const producto = productos.find(
         (item) =>
-          item.id === detalle.productoId,
+          coincidenIds(item.productoId, detalle.productoId, 'PROD-'),
       )
 
       if (!producto) {
@@ -317,15 +410,18 @@ function validarDatosIngreso(
         )
       }
 
-      if (!producto.estado) {
+      if (!producto.activo) {
         throw new Error(
           `El producto "${producto.nombre}" está inactivo.`,
         )
       }
 
       if (
-        producto.proveedorId !==
-        datos.proveedorId
+        !coincidenIds(
+          producto.proveedorId,
+          datos.proveedorId,
+          'PROV-',
+        )
       ) {
         throw new Error(
           `El producto "${producto.nombre}" no pertenece al proveedor seleccionado.`,
@@ -387,9 +483,9 @@ function crearDetalles(
 
 function obtenerCantidadesPorProducto(
   detalles: DetalleIngresoAlmacen[],
-): Map<string, number> {
+): Map<number, number> {
   const cantidades =
-    new Map<string, number>()
+    new Map<number, number>()
 
   detalles.forEach((detalle) => {
     const cantidadActual =
@@ -410,7 +506,7 @@ function calcularAjustesStock(
     DetalleIngresoAlmacen[],
   detallesNuevos:
     DetalleIngresoAlmacen[],
-): Map<string, number> {
+): Map<number, number> {
   const anteriores =
     obtenerCantidadesPorProducto(
       detallesAnteriores,
@@ -427,7 +523,7 @@ function calcularAjustesStock(
   ])
 
   const ajustes = new Map<
-    string,
+    number,
     number
   >()
 
@@ -453,7 +549,7 @@ function calcularAjustesStock(
 }
 
 function validarAjustesStock(
-  ajustes: Map<string, number>,
+  ajustes: Map<number, number>,
 ): void {
   const productos = obtenerProductos()
 
@@ -465,7 +561,7 @@ function validarAjustesStock(
 
       const producto = productos.find(
         (item) =>
-          item.id === productoId,
+          item.productoId === productoId,
       )
 
       if (!producto) {
@@ -487,10 +583,10 @@ function validarAjustesStock(
 }
 
 function aplicarAjustesStock(
-  ajustes: Map<string, number>,
+  ajustes: Map<number, number>,
 ): void {
   const ajustesAplicados: Array<{
-    productoId: string
+    productoId: number
     cantidad: number
   }> = []
 
@@ -528,7 +624,7 @@ function aplicarAjustesStock(
 }
 
 function revertirAjustesStock(
-  ajustes: Map<string, number>,
+  ajustes: Map<number, number>,
 ): void {
   Array.from(ajustes.entries())
     .reverse()
@@ -546,7 +642,7 @@ export function crearIngresoAlmacen(
   datos: IngresoAlmacenFormData,
 ): IngresoAlmacenRegistro {
   const ingresos =
-    obtenerIngresosAlmacen()
+    obtenerIngresosReales()
 
   validarDatosIngreso(datos, ingresos)
 
@@ -561,8 +657,8 @@ export function crearIngresoAlmacen(
       fechaIngreso: datos.fechaIngreso,
       proveedorId: datos.proveedorId,
       contactoId: datos.contactoId,
-      tipoComprobanteId:
-        datos.tipoComprobanteId,
+      tipoDocumentoId:
+        datos.tipoDocumentoId,
       numeroDocumento:
         datos.numeroDocumento
           .trim()
@@ -612,7 +708,7 @@ export function actualizarIngresoAlmacen(
   datos: IngresoAlmacenFormData,
 ): IngresoAlmacenRegistro {
   const ingresos =
-    obtenerIngresosAlmacen()
+    obtenerIngresosReales()
 
   const ingresoActual =
     ingresos.find(
@@ -645,8 +741,8 @@ export function actualizarIngresoAlmacen(
       fechaIngreso: datos.fechaIngreso,
       proveedorId: datos.proveedorId,
       contactoId: datos.contactoId,
-      tipoComprobanteId:
-        datos.tipoComprobanteId,
+      tipoDocumentoId:
+        datos.tipoDocumentoId,
       numeroDocumento:
         datos.numeroDocumento
           .trim()
@@ -698,7 +794,7 @@ export function anularIngresoAlmacen(
   id: string,
 ): IngresoAlmacenRegistro {
   const ingresos =
-    obtenerIngresosAlmacen()
+    obtenerIngresosReales()
 
   const ingresoActual =
     ingresos.find(
@@ -770,3 +866,4 @@ export function calcularTotalIngreso(
 
   return Number(total.toFixed(2))
 }
+

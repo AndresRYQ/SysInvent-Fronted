@@ -1,13 +1,14 @@
 export interface TipoProducto {
-  id: string
+  id: number
   nombre: string
   descripcion: string
-  estado: boolean
-  fechaRegistro: string
+  activo: 0 | 1
+  /** Compatibilidad con consumidores antiguos. */
+  estado?: boolean
+  fechaRegistro?: string
 }
 
 export interface TipoProductoFormData {
   nombre: string
   descripcion: string
-  estado: boolean
 }

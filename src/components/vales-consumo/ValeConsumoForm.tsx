@@ -13,13 +13,23 @@ import {
   X,
 } from 'lucide-react'
 
-import { obtenerCentrosCosto } from '../../services/centroCostoService'
-import { obtenerDestinos } from '../../services/destinoService'
-import { obtenerPartesEquipo } from '../../services/parteEquipoService'
-import { obtenerProductos } from '../../services/productoService'
-import { obtenerTiposProducto } from '../../services/tipoProductoService'
-import { obtenerUnidadesMedida } from '../../services/unidadMedidaService'
+import { listarCentrosCostoApi } from '../../services/centroCostoService'
+import { listarDestinosApi } from '../../services/destinoService'
+import { listarPartesEquipoApi } from '../../services/parteEquipoService'
+import { listarProductosApi } from '../../services/productoService'
+import { listarTiposProductoApi } from '../../services/tipoProductoService'
+import { listarUnidadesMedidaApi } from '../../services/unidadMedidaService'
+import { coincidenIds } from '../../utils/identificadores'
+import { obtenerMensajeErrorVale } from '../../services/valeConsumoService'
+import { DatePickerInput } from '../ui/DatePickerInput'
 
+import type { CentroCosto } from '../../types/centroCosto'
+import type { Destino } from '../../types/destino'
+import type { ParteEquipo } from '../../types/parteEquipo'
+import type { Producto } from '../../types/producto'
+import type { TipoProducto } from '../../types/tipoProducto'
+import type { UnidadMedida } from '../../types/unidadMedida'
+import type { CatalogoPaginado } from '../../services/catalogoApi'
 import type {
   DetalleValeConsumoFormData,
   DistribucionValeConsumoFormData,
@@ -31,7 +41,7 @@ interface ValeConsumoFormProps {
   vale?: ValeConsumo | null
   onSubmit: (
     datos: ValeConsumoFormData,
-  ) => void
+  ) => void | Promise<void>
   onCancelar: () => void
 }
 
@@ -64,14 +74,6 @@ function obtenerFechaActual(): string {
     .slice(0, 10)
 }
 
-function obtenerMensajeError(
-  error: unknown,
-): string {
-  return error instanceof Error
-    ? error.message
-    : 'Ocurrió un error inesperado.'
-}
-
 function calcularCantidadDistribuida(
   distribuciones:
     DistribucionValeConsumoFormData[],
@@ -87,40 +89,52 @@ function calcularCantidadDistribuida(
   )
 }
 
+function aplicarResultadoCatalogo<T>(
+  resultado: PromiseSettledResult<CatalogoPaginado<T>>,
+  etiqueta: string,
+  endpoint: string,
+  guardar: (datos: T[]) => void,
+): string | null {
+  if (resultado.status === 'fulfilled') {
+    guardar(resultado.value.datos)
+    if (import.meta.env.DEV) {
+      console.info(`${etiqueta}: ${resultado.value.datos.length}`)
+    }
+    return null
+  }
+
+  console.error(`[Catálogo ${endpoint}] error de carga`, resultado.reason)
+  if (import.meta.env.DEV) {
+    console.info(`${etiqueta}: 0`)
+  }
+  return `${endpoint}: ${
+    resultado.reason instanceof Error
+      ? resultado.reason.message
+      : 'Error desconocido'
+  }`
+}
+
 export function ValeConsumoForm({
   vale = null,
   onSubmit,
   onCancelar,
 }: ValeConsumoFormProps) {
-  const centrosCosto = useMemo(
-    () => obtenerCentrosCosto(),
-    [],
-  )
-
-  const destinos = useMemo(
-    () => obtenerDestinos(),
-    [],
-  )
-
-  const partesEquipo = useMemo(
-    () => obtenerPartesEquipo(),
-    [],
-  )
-
-  const tiposProducto = useMemo(
-    () => obtenerTiposProducto(),
-    [],
-  )
-
-  const productos = useMemo(
-    () => obtenerProductos(),
-    [],
-  )
-
-  const unidadesMedida = useMemo(
-    () => obtenerUnidadesMedida(),
-    [],
-  )
+  const [centrosCosto, setCentrosCosto] =
+    useState<CentroCosto[]>([])
+  const [destinos, setDestinos] =
+    useState<Destino[]>([])
+  const [partesEquipo, setPartesEquipo] =
+    useState<ParteEquipo[]>([])
+  const [tiposProducto, setTiposProducto] =
+    useState<TipoProducto[]>([])
+  const [productos, setProductos] =
+    useState<Producto[]>([])
+  const [unidadesMedida, setUnidadesMedida] =
+    useState<UnidadMedida[]>([])
+  const [catalogosCargando, setCatalogosCargando] =
+    useState(true)
+  const [errorCatalogos, setErrorCatalogos] =
+    useState<string | null>(null)
 
   const [fechaVale, setFechaVale] =
     useState(obtenerFechaActual())
@@ -155,6 +169,77 @@ export function ValeConsumoForm({
 
   const [error, setError] =
     useState<string | null>(null)
+  const [guardando, setGuardando] =
+    useState(false)
+
+  useEffect(() => {
+    let cancelado = false
+
+    async function cargarCatalogos(): Promise<void> {
+      const resultados = await Promise.allSettled([
+        listarCentrosCostoApi(),
+        listarDestinosApi(),
+        listarPartesEquipoApi(),
+        listarTiposProductoApi(),
+        listarProductosApi(),
+        listarUnidadesMedidaApi(),
+      ])
+
+      if (cancelado) return
+
+      const errores = [
+        aplicarResultadoCatalogo(
+          resultados[0],
+          'Centros cargados',
+          '/api/v1/catalogos/centros-costo',
+          setCentrosCosto,
+        ),
+        aplicarResultadoCatalogo(
+          resultados[1],
+          'Destinos cargados',
+          '/api/v1/catalogos/destinos',
+          setDestinos,
+        ),
+        aplicarResultadoCatalogo(
+          resultados[2],
+          'Partes cargadas',
+          '/api/v1/catalogos/partes-equipo',
+          setPartesEquipo,
+        ),
+        aplicarResultadoCatalogo(
+          resultados[3],
+          'Tipos cargados',
+          '/api/v1/catalogos/tipos-producto',
+          setTiposProducto,
+        ),
+        aplicarResultadoCatalogo(
+          resultados[4],
+          'Productos cargados',
+          '/api/v1/productos',
+          setProductos,
+        ),
+        aplicarResultadoCatalogo(
+          resultados[5],
+          'Unidades cargadas',
+          '/api/v1/catalogos/unidades-medida',
+          setUnidadesMedida,
+        ),
+      ].filter((mensaje): mensaje is string => mensaje !== null)
+
+      setErrorCatalogos(
+        errores.length > 0
+          ? errores.join(' ')
+          : null,
+      )
+      setCatalogosCargando(false)
+    }
+
+    void cargarCatalogos()
+
+    return () => {
+      cancelado = true
+    }
+  }, [])
 
   useEffect(() => {
     if (!vale) {
@@ -206,46 +291,62 @@ export function ValeConsumoForm({
       () =>
         productos.filter((producto) => {
           if (
-            !producto.estado ||
-            producto.tipoProductoId !==
-              borrador.tipoProductoId
+            !producto.activo ||
+            !coincidenIds(
+              producto.tipoProductoId,
+              borrador.tipoProductoId,
+              'TP-',
+            )
           ) {
             return false
           }
-
-          const cantidadOriginal =
-            vale?.detalles
-              .find(
-                (detalle) =>
-                  detalle.productoId ===
-                  producto.id,
-              )
-              ?.distribuciones.reduce(
-                (total, distribucion) =>
-                  total +
-                  distribucion.cantidad,
-                0,
-              ) ?? 0
-
-          return (
-            producto.stockActual +
-              cantidadOriginal >
-            0
-          )
+          return true
         }),
       [
         productos,
         borrador.tipoProductoId,
-        vale,
       ],
     )
+
+  useEffect(() => {
+    if (!import.meta.env.DEV || catalogosCargando) return
+
+    console.debug('[ValeConsumoForm] opciones después de filtros', {
+      centrosCosto: centrosCosto.filter(
+        (centro) =>
+          centro.activo === 1 ||
+          String(centro.id) === String(centroCostoId),
+      ).length,
+      tiposProducto: tiposProducto.filter(
+        (tipo) => tipo.activo === 1,
+      ).length,
+      productos: productosFiltrados.length,
+      destinos: destinos.filter(
+        (destino) => destino.activo === 1,
+      ).length,
+      partesEquipo: partesEquipo.filter(
+        (parte) => parte.estado,
+      ).length,
+    })
+  }, [
+    catalogosCargando,
+    centroCostoId,
+    centrosCosto,
+    destinos,
+    partesEquipo,
+    productosFiltrados,
+    tiposProducto,
+  ])
+
+  const catalogosNoDisponibles =
+    catalogosCargando
 
   const productoSeleccionado =
     useMemo(
       () =>
         productos.find(
           (producto) =>
-            producto.id ===
+            String(producto.productoId) ===
             borrador.productoId,
         ) ?? null,
       [productos, borrador.productoId],
@@ -256,43 +357,17 @@ export function ValeConsumoForm({
       () =>
         unidadesMedida.find(
           (unidad) =>
-            unidad.id ===
-            productoSeleccionado
-              ?.unidadMedidaId,
+            coincidenIds(
+              unidad.id,
+              productoSeleccionado?.unidadMedidaId,
+              'UM-',
+            ),
         ) ?? null,
       [
         unidadesMedida,
         productoSeleccionado,
       ],
     )
-
-  const cantidadOriginal =
-    useMemo(
-      () =>
-        vale?.detalles
-          .find(
-            (detalle) =>
-              detalle.productoId ===
-              borrador.productoId,
-          )
-          ?.distribuciones.reduce(
-            (total, distribucion) =>
-              total +
-              distribucion.cantidad,
-            0,
-          ) ?? 0,
-      [vale, borrador.productoId],
-    )
-
-  const stockDisponible =
-    productoSeleccionado
-      ? Number(
-          (
-            productoSeleccionado.stockActual +
-            cantidadOriginal
-          ).toFixed(3),
-        )
-      : 0
 
   const totalVale = useMemo(
     () =>
@@ -379,21 +454,6 @@ export function ValeConsumoForm({
       return
     }
 
-    const cantidadAcumulada =
-      calcularCantidadDistribuida(
-        distribucionesBorrador,
-      ) + cantidad
-
-    if (
-      cantidadAcumulada >
-      stockDisponible
-    ) {
-      setError(
-        `Stock insuficiente. Disponible: ${stockDisponible} ${unidadSeleccionada?.nombre ?? ''}.`,
-      )
-      return
-    }
-
     setDistribucionesBorrador(
       (actuales) => [
         ...actuales,
@@ -451,7 +511,7 @@ export function ValeConsumoForm({
       detalles.some(
         (detalle) =>
           detalle.productoId ===
-          productoSeleccionado.id,
+          productoSeleccionado.productoId,
       )
 
     if (productoRepetido) {
@@ -465,7 +525,7 @@ export function ValeConsumoForm({
       ...actuales,
       {
         productoId:
-          productoSeleccionado.id,
+          productoSeleccionado.productoId,
         precioUnitario:
           productoSeleccionado
             .precioUnitario,
@@ -489,7 +549,7 @@ export function ValeConsumoForm({
   ): void {
     const producto = productos.find(
       (item) =>
-        item.id === detalle.productoId,
+        item.productoId === detalle.productoId,
     )
 
     if (!producto) {
@@ -509,8 +569,8 @@ export function ValeConsumoForm({
 
     setBorrador({
       tipoProductoId:
-        producto.tipoProductoId,
-      productoId: producto.id,
+        String(producto.tipoProductoId),
+      productoId: String(producto.productoId),
       destinoId: '',
       parteEquipoId: '',
       cantidad: '',
@@ -527,14 +587,20 @@ export function ValeConsumoForm({
     setError(null)
   }
 
-  function guardar(
+  async function guardar(
     event: FormEvent<HTMLFormElement>,
-  ): void {
+  ): Promise<void> {
     event.preventDefault()
+    if (guardando) {
+      return
+    }
     setError(null)
 
-    if (!fechaVale) {
-      setError('Selecciona la fecha.')
+    if (
+      !fechaVale ||
+      Number.isNaN(Date.parse(fechaVale))
+    ) {
+      setError('Selecciona una fecha válida.')
       return
     }
 
@@ -552,9 +618,23 @@ export function ValeConsumoForm({
       return
     }
 
+    if (solicitante.trim().length > 120) {
+      setError(
+        'El solicitante no puede superar los 120 caracteres.',
+      )
+      return
+    }
+
     if (motivo.trim().length < 5) {
       setError(
         'Describe el motivo de la salida.',
+      )
+      return
+    }
+
+    if (motivo.trim().length > 500) {
+      setError(
+        'El motivo no puede superar los 500 caracteres.',
       )
       return
     }
@@ -566,8 +646,9 @@ export function ValeConsumoForm({
       return
     }
 
+    setGuardando(true)
     try {
-      onSubmit({
+      await onSubmit({
         fechaVale,
         centroCostoId,
         solicitante:
@@ -577,10 +658,10 @@ export function ValeConsumoForm({
       })
     } catch (errorGuardado) {
       setError(
-        obtenerMensajeError(
-          errorGuardado,
-        ),
+        obtenerMensajeErrorVale(errorGuardado),
       )
+    } finally {
+      setGuardando(false)
     }
   }
 
@@ -620,31 +701,37 @@ export function ValeConsumoForm({
         </div>
       )}
 
+      {catalogosCargando && (
+        <div className="alert alert-info" role="status">
+          Cargando catálogos…
+        </div>
+      )}
+
+      {errorCatalogos && (
+        <div className="alert alert-danger" role="alert">
+          No se pudieron cargar los catálogos: {errorCatalogos}
+        </div>
+      )}
+
       <div className="row g-3">
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="valeFecha"
           >
             Fecha *
           </label>
 
-          <input
+          <DatePickerInput
             id="valeFecha"
-            className="form-control maestro-control"
-            type="date"
             value={fechaVale}
-            onChange={(event) =>
-              setFechaVale(
-                event.target.value,
-              )
-            }
+            onChange={setFechaVale}
           />
         </div>
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="valeCentroCosto"
           >
             Centro de costo *
@@ -654,6 +741,7 @@ export function ValeConsumoForm({
             id="valeCentroCosto"
             className="form-select maestro-control"
             value={centroCostoId}
+            disabled={catalogosNoDisponibles}
             onChange={(event) =>
               setCentroCostoId(
                 event.target.value,
@@ -667,9 +755,9 @@ export function ValeConsumoForm({
             {centrosCosto
               .filter(
                 (centro) =>
-                  centro.estado ||
-                  centro.id ===
-                    centroCostoId,
+                  centro.activo === 1 ||
+                  String(centro.id) ===
+                    String(centroCostoId),
               )
               .map((centro) => (
                 <option
@@ -684,7 +772,7 @@ export function ValeConsumoForm({
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="valeSolicitante"
           >
             Solicitante *
@@ -705,7 +793,7 @@ export function ValeConsumoForm({
 
         <div className="col-12">
           <label
-            className="form-label maestro-label"
+            className="form-label"
             htmlFor="valeMotivo"
           >
             Motivo de la salida *
@@ -734,13 +822,14 @@ export function ValeConsumoForm({
 
       <div className="row g-3">
         <div className="col-12 col-md-4">
-          <label className="form-label maestro-label">
+          <label className="form-label">
             Tipo de producto *
           </label>
 
           <select
             className="form-select maestro-control"
             value={borrador.tipoProductoId}
+            disabled={catalogosNoDisponibles}
             onChange={(event) =>
               cambiarTipoProducto(
                 event.target.value,
@@ -752,7 +841,7 @@ export function ValeConsumoForm({
             </option>
 
             {tiposProducto
-              .filter((tipo) => tipo.estado)
+              .filter((tipo) => tipo.activo === 1)
               .map((tipo) => (
                 <option
                   key={tipo.id}
@@ -765,7 +854,7 @@ export function ValeConsumoForm({
         </div>
 
         <div className="col-12 col-md-5">
-          <label className="form-label maestro-label">
+          <label className="form-label">
             Producto *
           </label>
 
@@ -773,6 +862,7 @@ export function ValeConsumoForm({
             className="form-select maestro-control"
             value={borrador.productoId}
             disabled={
+              catalogosNoDisponibles ||
               !borrador.tipoProductoId
             }
             onChange={(event) =>
@@ -788,8 +878,8 @@ export function ValeConsumoForm({
             {productosFiltrados.map(
               (producto) => (
                 <option
-                  key={producto.id}
-                  value={producto.id}
+                  key={producto.productoId}
+                  value={producto.productoId}
                 >
                   {producto.codigo} -{' '}
                   {producto.nombre}
@@ -800,7 +890,7 @@ export function ValeConsumoForm({
         </div>
 
         <div className="col-12 col-md-3">
-          <label className="form-label maestro-label">
+          <label className="form-label">
             Stock disponible
           </label>
 
@@ -808,25 +898,26 @@ export function ValeConsumoForm({
             className="form-control maestro-control"
             readOnly
             value={
-              productoSeleccionado
-                ? `${stockDisponible} ${unidadSeleccionada?.nombre ?? ''}`
-                : ''
+              ''
             }
-            placeholder="Automático"
+            placeholder="Se valida al guardar."
           />
         </div>
       </div>
 
       <div className="row g-3 align-items-end mt-1">
         <div className="col-12 col-md-4">
-          <label className="form-label maestro-label">
+          <label className="form-label">
             Destino *
           </label>
 
           <select
             className="form-select maestro-control"
             value={borrador.destinoId}
-            disabled={!borrador.productoId}
+            disabled={
+              catalogosNoDisponibles ||
+              !borrador.productoId
+            }
             onChange={(event) =>
               setBorrador((actual) => ({
                 ...actual,
@@ -842,7 +933,7 @@ export function ValeConsumoForm({
             {destinos
               .filter(
                 (destino) =>
-                  destino.estado,
+                  destino.activo === 1,
               )
               .map((destino) => (
                 <option
@@ -856,14 +947,17 @@ export function ValeConsumoForm({
         </div>
 
         <div className="col-12 col-md-4">
-          <label className="form-label maestro-label">
+          <label className="form-label">
             Parte de equipo
           </label>
 
           <select
             className="form-select maestro-control"
             value={borrador.parteEquipoId}
-            disabled={!borrador.productoId}
+            disabled={
+              catalogosNoDisponibles ||
+              !borrador.productoId
+            }
             onChange={(event) =>
               setBorrador((actual) => ({
                 ...actual,
@@ -891,7 +985,7 @@ export function ValeConsumoForm({
         </div>
 
         <div className="col-12 col-md-2">
-          <label className="form-label maestro-label">
+          <label className="form-label">
             Cantidad *
           </label>
 
@@ -915,8 +1009,9 @@ export function ValeConsumoForm({
         <div className="col-12 col-md-2">
           <button
             type="button"
-            className="btn maestro-btn-primary w-100"
+            className="btn btn-maestro-primary w-100"
             onClick={agregarDistribucion}
+            disabled={catalogosNoDisponibles}
           >
             <Plus size={18} />
             Distribuir
@@ -945,15 +1040,15 @@ export function ValeConsumoForm({
                   const destino =
                     destinos.find(
                       (item) =>
-                        item.id ===
-                        distribucion.destinoId,
+                        String(item.id) ===
+                        String(distribucion.destinoId),
                     )
 
                   const parte =
                     partesEquipo.find(
                       (item) =>
-                        item.id ===
-                        distribucion.parteEquipoId,
+                        String(item.id) ===
+                        String(distribucion.parteEquipoId),
                     )
 
                   return (
@@ -981,7 +1076,7 @@ export function ValeConsumoForm({
                       <td className="text-end">
                         <button
                           type="button"
-                          className="btn btn-sm btn-outline-danger"
+                          className="btn btn-maestro-danger"
                           onClick={() =>
                             quitarDistribucion(
                               indice,
@@ -1005,8 +1100,9 @@ export function ValeConsumoForm({
       <div className="d-flex justify-content-end mt-3">
         <button
           type="button"
-          className="btn maestro-btn-primary"
+          className="btn btn-maestro-primary"
           onClick={agregarProducto}
+          disabled={catalogosNoDisponibles}
         >
           <Plus size={18} />
           Agregar producto al vale
@@ -1047,7 +1143,7 @@ export function ValeConsumoForm({
               const producto =
                 productos.find(
                   (item) =>
-                    item.id ===
+                    item.productoId ===
                     detalle.productoId,
                 )
 
@@ -1104,7 +1200,7 @@ export function ValeConsumoForm({
 
                       <button
                         type="button"
-                        className="btn btn-sm btn-outline-danger"
+                        className="btn btn-maestro-danger"
                         onClick={() =>
                           setDetalles(
                             (actuales) =>
@@ -1147,7 +1243,7 @@ export function ValeConsumoForm({
       <div className="d-flex justify-content-end gap-2 mt-4">
         <button
           type="button"
-          className="btn maestro-btn-danger"
+          className="btn btn-maestro-danger"
           onClick={onCancelar}
         >
           <X size={18} />
@@ -1156,10 +1252,11 @@ export function ValeConsumoForm({
 
         <button
           type="submit"
-          className="btn maestro-btn-primary"
+          className="btn btn-maestro-primary"
+          disabled={guardando || catalogosNoDisponibles}
         >
           <Save size={18} />
-          Guardar vale
+          {guardando ? 'Guardando…' : 'Guardar vale'}
         </button>
       </div>
     </form>

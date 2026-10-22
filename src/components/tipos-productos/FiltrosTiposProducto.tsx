@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import { Filter, RotateCcw, Search } from 'lucide-react'
 import { MaestroEstadoSelect } from '../common/MaestroEstadoSelect'
 
@@ -29,23 +30,23 @@ export function FiltrosTiposProducto({
           <div>
             <span className="maestro-kicker">
               <Filter size={16} />
-              Filtros
+              Filtros de búsqueda
             </span>
           </div>
         </div>
 
         <div className="row g-3">
           <div className="col-12 col-lg-8">
-            <label className="form-label maestro-label" htmlFor="nombreTipoProducto">
+            <label className="form-label" htmlFor="nombreTipoProducto">
               Nombre de tipo de producto
             </label>
 
             <input
               id="nombreTipoProducto"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.nombre}
-              placeholder="Ej. Insumo, Producto terminado, Material"
+              placeholder={Placeholder.Buscar}
               onChange={(event) =>
                 onChange('nombre', event.target.value)
               }
@@ -53,7 +54,7 @@ export function FiltrosTiposProducto({
           </div>
 
           <div className="col-12 col-md-6 col-lg-4">
-            <label className="form-label maestro-label" htmlFor="estadoTipoProducto">
+            <label className="form-label" htmlFor="estadoTipoProducto">
               Estado
             </label>
 
@@ -62,26 +63,6 @@ export function FiltrosTiposProducto({
               value={valores.estado}
               onChange={(value) => onChange('estado', value)}
             />
-            {/*
-              <select
-                id="estadoTipoProducto"
-                className="form-select maestro-control maestro-select-control"
-                value={valores.estado}
-                onMouseDown={() => setEstadoAbierto(true)}
-                onKeyDown={() => setEstadoAbierto(true)}
-                onFocus={() => setEstadoAbierto(true)}
-                onBlur={() => setEstadoAbierto(false)}
-                onChange={(event) => {
-                  onChange('estado', event.target.value)
-                  setEstadoAbierto(false)
-                }}
-              >
-                <option value="">Todos</option>
-                <option value="activo">Activo</option>
-                <option value="inactivo">Inactivo</option>
-              </select>
-              <ChevronDown size={16} />
-            </div> */}
           </div>
 
         </div>
@@ -91,16 +72,16 @@ export function FiltrosTiposProducto({
             <div className="maestro-filter-actions">
               <button
                 type="button"
-                className="btn maestro-btn-secondary maestro-filter-btn"
+                className="btn btn-maestro-secondary"
                 onClick={onLimpiar}
               >
                 <RotateCcw size={18} />
                 Limpiar
               </button>
-              
+
               <button
                 type="button"
-                className="btn maestro-btn-primary maestro-filter-btn"
+                className="btn btn-maestro-primary"
                 onClick={onBuscar}
               >
                 <Search size={18} />

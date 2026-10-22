@@ -1,469 +1,136 @@
-import type {
-  Contacto,
-  ContactoFormData,
-} from '../types/contacto'
+import type { Contacto, ContactoFormData } from '../types/contacto'
+import {
+  ContactosApi,
+  type CustomPageContactoResponse,
+  type MessageResponse,
+} from '../api/generated'
+import { apiConfiguration } from '../api/client'
+import type { CatalogoPaginado } from './catalogoApi'
 
-import { registrarEventoBitacora } from './bitacoraService'
-import { obtenerProveedores } from './proveedorService'
+let contactosEnMemoria: Contacto[] = []
+const contactosApi = new ContactosApi(apiConfiguration)
+const solicitudesEnCurso = new Map<string, Promise<CatalogoPaginado<Contacto>>>()
 
-const STORAGE_KEY =
-  'agrihusac_contactos'
-
-const INGRESOS_STORAGE_KEY =
-  'agrihusac_ingresos_almacen'
-
-const CONTACTOS_INICIALES:
-  Contacto[] = [
-    {
-      id: 'CONT-001',
-      proveedorId: 'PROV-001',
-      nombreCompleto:
-        'Carlos Mendoza',
-      cargo:
-        'Ejecutivo de ventas',
-      telefono: '987654321',
-      correo:
-        'carlos.mendoza@ferreteriaindustrial.pe',
-      estado: true,
-      fechaRegistro: '10/08/2026',
-    },
-    {
-      id: 'CONT-002',
-      proveedorId: 'PROV-002',
-      nombreCompleto:
-        'María Salazar',
-      cargo:
-        'Representante comercial',
-      telefono: '945678210',
-      correo:
-        'maria.salazar@suministrosnorte.pe',
-      estado: true,
-      fechaRegistro: '11/08/2026',
-    },
-    {
-      id: 'CONT-003',
-      proveedorId: 'PROV-003',
-      nombreCompleto:
-        'José Ramírez',
-      cargo:
-        'Coordinador de pedidos',
-      telefono: '912345678',
-      correo:
-        'jose.ramirez@equiposrepuestos.pe',
-      estado: true,
-      fechaRegistro: '12/08/2026',
-    },
-    {
-      id: 'CONT-004',
-      proveedorId: 'PROV-004',
-      nombreCompleto:
-        'Ana Torres',
-      cargo:
-        'Asesora comercial',
-      telefono: '901234567',
-      correo:
-        'ana.torres@dahuaral.pe',
-      estado: false,
-      fechaRegistro: '13/08/2026',
-    },
-  ]
-
-function copiarContactos(
-  contactos: Contacto[],
-): Contacto[] {
-  return contactos.map(
-    (contacto) => ({
-      ...contacto,
-    }),
-  )
+export interface ListarContactosParams {
+  nombre?: string
+  proveedorId?: string | number
+  pagina?: number
+  tamPagina?: number
 }
 
-function guardarContactos(
-  contactos: Contacto[],
-): void {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(contactos),
-  )
+export function obtenerContactos(): Contacto[] {
+  return contactosEnMemoria.map((contacto) => ({ ...contacto }))
 }
 
-function normalizarTexto(
-  valor: string | null | undefined,
-): string {
-  return (valor ?? '')
-    .trim()
-    .toLowerCase()
+export function obtenerContactoPorId(id: number): Contacto | null {
+  const contacto = contactosEnMemoria.find((item) => item.id === id)
+  return contacto ? { ...contacto } : null
 }
 
-function crearFechaActual(): string {
-  return new Intl.DateTimeFormat(
-    'es-PE',
-  ).format(new Date())
-}
-
-function crearSiguienteId(
-  contactos: Contacto[],
-): string {
-  const numeroMayor =
-    contactos.reduce(
-      (mayor, contacto) => {
-        const numero = Number(
-          contacto.id.replace(
-            'CONT-',
-            '',
-          ),
-        )
-
-        return Number.isNaN(numero)
-          ? mayor
-          : Math.max(mayor, numero)
-      },
-      0,
-    )
-
-  return `CONT-${String(
-    numeroMayor + 1,
-  ).padStart(3, '0')}`
-}
-
-function validarDatos(
-  datos: ContactoFormData,
-): void {
-  const nombreCompleto =
-    datos.nombreCompleto.trim()
-  const cargo = datos.cargo.trim()
-  const telefono =
-    datos.telefono.trim()
-  const correo =
-    datos.correo.trim()
-
-  if (!datos.proveedorId) {
-    throw new Error(
-      'Selecciona un proveedor.',
-    )
-  }
-
-  const proveedorExiste =
-    obtenerProveedores().some(
-      (proveedor) =>
-        proveedor.id ===
-        datos.proveedorId,
-    )
-
-  if (!proveedorExiste) {
-    throw new Error(
-      'El proveedor seleccionado no existe.',
-    )
-  }
-
-  if (nombreCompleto.length < 3) {
-    throw new Error(
-      'El nombre completo debe tener al menos 3 caracteres.',
-    )
-  }
-
-  if (nombreCompleto.length > 120) {
-    throw new Error(
-      'El nombre completo no puede superar los 120 caracteres.',
-    )
-  }
-
-  if (cargo.length < 2) {
-    throw new Error(
-      'El cargo debe tener al menos 2 caracteres.',
-    )
-  }
-
-  if (cargo.length > 80) {
-    throw new Error(
-      'El cargo no puede superar los 80 caracteres.',
-    )
-  }
-
-  const numerosTelefono =
-    telefono.replace(/\D/g, '')
-
-  if (
-    numerosTelefono.length < 7 ||
-    numerosTelefono.length > 15
-  ) {
-    throw new Error(
-      'Ingresa un teléfono válido.',
-    )
-  }
-
-  if (
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-      correo,
-    )
-  ) {
-    throw new Error(
-      'Ingresa un correo válido.',
-    )
-  }
-}
-
-function contactoEstaEnUso(
-  contactoId: string,
-): boolean {
-  try {
-    const datosGuardados =
-      localStorage.getItem(
-        INGRESOS_STORAGE_KEY,
-      )
-
-    if (!datosGuardados) {
-      return false
-    }
-
-    const ingresos = JSON.parse(
-      datosGuardados,
-    )
-
-    if (!Array.isArray(ingresos)) {
-      return false
-    }
-
-    return ingresos.some(
-      (ingreso) =>
-        typeof ingreso === 'object' &&
-        ingreso !== null &&
-        ingreso.contactoId ===
-          contactoId,
-    )
-  } catch {
-    return false
-  }
-}
-
-export function obtenerContactos():
-  Contacto[] {
-  const datosGuardados =
-    localStorage.getItem(STORAGE_KEY)
-
-  if (!datosGuardados) {
-    guardarContactos(
-      CONTACTOS_INICIALES,
-    )
-
-    return copiarContactos(
-      CONTACTOS_INICIALES,
-    )
-  }
-
-  try {
-    const datos = JSON.parse(
-      datosGuardados,
-    )
-
-    if (!Array.isArray(datos)) {
-      throw new Error(
-        'Formato inválido',
-      )
-    }
-
-    return copiarContactos(
-      datos as Contacto[],
-    )
-  } catch {
-    guardarContactos(
-      CONTACTOS_INICIALES,
-    )
-
-    return copiarContactos(
-      CONTACTOS_INICIALES,
-    )
-  }
-}
-
-export function obtenerContactoPorId(
-  id: string,
-): Contacto | null {
-  const contacto =
-    obtenerContactos().find(
-      (item) => item.id === id,
-    )
-
-  return contacto
-    ? { ...contacto }
-    : null
-}
-
-export function crearContacto(
-  datos: ContactoFormData,
-): Contacto {
-  validarDatos(datos)
-
-  const contactos =
-    obtenerContactos()
-
-  const correoDuplicado =
-    contactos.some(
-      (contacto) =>
-        contacto.proveedorId ===
-          datos.proveedorId &&
-        normalizarTexto(
-          contacto.correo,
-        ) ===
-          normalizarTexto(
-            datos.correo,
-          ),
-    )
-
-  if (correoDuplicado) {
-    throw new Error(
-      'Este correo ya está registrado para el proveedor seleccionado.',
-    )
-  }
-
-  const nuevoContacto: Contacto = {
-    id: crearSiguienteId(contactos),
-    proveedorId:
-      datos.proveedorId,
-    nombreCompleto:
-      datos.nombreCompleto.trim(),
-    cargo: datos.cargo.trim(),
-    telefono:
-      datos.telefono.trim(),
-    correo:
-      datos.correo
-        .trim()
-        .toLowerCase(),
-    estado: datos.estado,
-    fechaRegistro:
-      crearFechaActual(),
-  }
-
-  guardarContactos([
-    nuevoContacto,
-    ...contactos,
-  ])
-
-  registrarEventoBitacora({
-    modulo: 'Contactos',
-    accion: 'CREAR',
-    detalle:
-      `Se creó el contacto "${nuevoContacto.nombreCompleto}".`,
-    registroId:
-      nuevoContacto.id,
-  })
-
-  return { ...nuevoContacto }
-}
-
-export function actualizarContacto(
-  id: string,
-  datos: ContactoFormData,
-): Contacto {
-  validarDatos(datos)
-
-  const contactos =
-    obtenerContactos()
-
-  const contactoActual =
-    contactos.find(
-      (contacto) =>
-        contacto.id === id,
-    )
-
-  if (!contactoActual) {
-    throw new Error(
-      'El contacto no existe.',
-    )
-  }
-
-  const correoDuplicado =
-    contactos.some(
-      (contacto) =>
-        contacto.id !== id &&
-        contacto.proveedorId ===
-          datos.proveedorId &&
-        normalizarTexto(
-          contacto.correo,
-        ) ===
-          normalizarTexto(
-            datos.correo,
-          ),
-    )
-
-  if (correoDuplicado) {
-    throw new Error(
-      'Este correo ya está registrado para el proveedor seleccionado.',
-    )
-  }
-
-  const contactoActualizado:
-    Contacto = {
-      ...contactoActual,
-      proveedorId:
-        datos.proveedorId,
-      nombreCompleto:
-        datos.nombreCompleto.trim(),
-      cargo: datos.cargo.trim(),
-      telefono:
-        datos.telefono.trim(),
-      correo:
-        datos.correo
-          .trim()
-          .toLowerCase(),
-      estado: datos.estado,
-    }
-
-  guardarContactos(
-    contactos.map((contacto) =>
-      contacto.id === id
-        ? contactoActualizado
-        : contacto,
-    ),
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Contactos',
-    accion: 'EDITAR',
-    detalle:
-      `Se actualizó el contacto "${contactoActualizado.nombreCompleto}".`,
-    registroId:
-      contactoActualizado.id,
-  })
-
+function mapearContacto(contacto: NonNullable<CustomPageContactoResponse['datos']>[number]): Contacto {
   return {
-    ...contactoActualizado,
+    id: contacto.contactoId ?? 0,
+    proveedorId: contacto.proveedorId ?? 0,
+    nombreCompleto: contacto.nombreCompleto ?? '',
+    cargo: contacto.cargo ?? '',
+    telefono: contacto.telefono ?? '',
+    correo: contacto.correo ?? '',
+    activo: contacto.activo ? 1 : 0,
+    fechaRegistro: contacto.fechaRegistro ?? '',
   }
 }
 
-export function eliminarContacto(
-  id: string,
-): void {
-  const contactos =
-    obtenerContactos()
-
-  const contacto = contactos.find(
-    (item) => item.id === id,
-  )
-
-  if (!contacto) {
-    throw new Error(
-      'El contacto no existe.',
-    )
+function mapearRespuesta(response: CustomPageContactoResponse): CatalogoPaginado<Contacto> {
+  const resultado: CatalogoPaginado<Contacto> = {
+    datos: (response.datos ?? []).map(mapearContacto),
+    paginacion: response.paginacion ?? {},
   }
+  contactosEnMemoria = resultado.datos
+  return resultado
+}
 
-  if (contactoEstaEnUso(id)) {
-    throw new Error(
-      'No puedes eliminar este contacto porque está asignado a uno o más ingresos de almacén. Puedes desactivarlo.',
-    )
+export async function listarContactos(
+  params: ListarContactosParams = {},
+): Promise<CatalogoPaginado<Contacto>> {
+  const proveedorId = params.proveedorId === undefined || params.proveedorId === ''
+    ? undefined
+    : Number(String(params.proveedorId).replace(/^PROV-0*/i, ''))
+
+  const parametros = {
+    nombre: params.nombre?.trim() || undefined,
+    proveedorId: Number.isFinite(proveedorId) ? proveedorId : undefined,
+    pagina: params.pagina,
+    tamPagina: params.tamPagina,
   }
+  const clave = JSON.stringify(parametros)
+  const solicitudExistente = solicitudesEnCurso.get(clave)
+  if (solicitudExistente) return solicitudExistente
 
-  guardarContactos(
-    contactos.filter(
-      (item) => item.id !== id,
-    ),
-  )
+  const solicitud = contactosApi
+    .listarContactos(parametros)
+    .then(mapearRespuesta)
+    .finally(() => solicitudesEnCurso.delete(clave))
+  solicitudesEnCurso.set(clave, solicitud)
+  return solicitud
+}
 
-  registrarEventoBitacora({
-    modulo: 'Contactos',
-    accion: 'ELIMINAR',
-    detalle:
-      `Se eliminó el contacto "${contacto.nombreCompleto}".`,
-    registroId: contacto.id,
-  })
+export const listarContactosApi = listarContactos
+
+function validar(datos: ContactoFormData): void {
+  if (!datos.proveedorId) throw new Error('Selecciona un proveedor.')
+  const nombre = datos.nombreCompleto.trim()
+  const cargo = datos.cargo.trim()
+  const telefono = datos.telefono.trim()
+  const correo = datos.correo.trim()
+
+  if (nombre.length < 3) throw new Error('El nombre completo debe tener al menos 3 caracteres.')
+  if (nombre.length > 120) throw new Error('El nombre completo no puede superar los 120 caracteres.')
+  if (cargo.length > 80) throw new Error('El cargo no puede superar los 80 caracteres.')
+  const digitosTelefono = telefono.replace(/\D/g, '')
+  if (telefono && (digitosTelefono.length < 7 || digitosTelefono.length > 15)) {
+    throw new Error('Ingresa un teléfono válido.')
+  }
+  if (correo && !/^\S+@\S+\.\S+$/.test(correo)) throw new Error('Ingresa un correo válido.')
+}
+
+function validarRespuesta(response: MessageResponse): MessageResponse {
+  if (response.success === false) {
+    throw new Error(response.message ?? 'La operación de contactos no fue completada.')
+  }
+  return response
+}
+
+function construirRequest(datos: ContactoFormData) {
+  return {
+    proveedorId: Number(datos.proveedorId.replace(/^PROV-0*/i, '')),
+    nombreCompleto: datos.nombreCompleto.trim(),
+    cargo: datos.cargo.trim() || undefined,
+    telefono: datos.telefono.trim() || undefined,
+    correo: datos.correo.trim().toLowerCase() || undefined,
+  }
+}
+
+export async function crearContacto(datos: ContactoFormData): Promise<MessageResponse> {
+  validar(datos)
+  return validarRespuesta(await contactosApi.registrarContacto({ contactoRequest: construirRequest(datos) }))
+}
+
+export async function actualizarContacto(id: number, datos: ContactoFormData): Promise<MessageResponse> {
+  validar(datos)
+  return validarRespuesta(await contactosApi.actualizarContacto({ id, contactoRequest: construirRequest(datos) }))
+}
+
+export async function cambiarEstadoContacto(id: number, activo: boolean): Promise<MessageResponse> {
+  return validarRespuesta(await contactosApi.cambiarEstadoContacto({
+    id,
+    estadoCatalogoRequest: { activo },
+  }))
+}
+
+export function desactivarContacto(id: number): Promise<MessageResponse> {
+  return cambiarEstadoContacto(id, false)
+}
+
+export function reactivarContacto(id: number): Promise<MessageResponse> {
+  return cambiarEstadoContacto(id, true)
 }

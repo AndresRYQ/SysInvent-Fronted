@@ -9,9 +9,10 @@ import { obtenerContactos } from './contactoService'
 import { obtenerIngresosAlmacen } from './ingresoAlmacenService'
 import { obtenerProductos } from './productoService'
 import { obtenerProveedores } from './proveedorService'
-import { obtenerTiposDocumento } from './tipoComprobanteService'
+import { obtenerTiposDocumento } from './tipoDocumentoService'
 import { obtenerTiposProducto } from './tipoProductoService'
 import { obtenerUnidadesMedida } from './unidadMedidaService'
+import { coincidenIds } from '../utils/identificadores'
 
 function normalizarTexto(
   valor: string,
@@ -54,21 +55,18 @@ export function obtenerFilasReporteIngresos():
       const proveedor =
         proveedores.find(
           (item) =>
-            item.id ===
-            ingreso.proveedorId,
+            coincidenIds(item.id, ingreso.proveedorId, 'PROV-'),
         )
 
       const contacto = contactos.find(
         (item) =>
-          item.id ===
-          ingreso.contactoId,
+            coincidenIds(item.id, ingreso.contactoId, 'CONT-'),
       )
 
       const tipoDocumento =
         tiposDocumento.find(
           (item) =>
-            item.id ===
-            ingreso.tipoComprobanteId,
+            coincidenIds(item.id, ingreso.tipoDocumentoId, 'TD-'),
         )
 
       return ingreso.detalles.map(
@@ -76,29 +74,25 @@ export function obtenerFilasReporteIngresos():
           const producto =
             productos.find(
               (item) =>
-                item.id ===
-                detalle.productoId,
+                coincidenIds(item.productoId, detalle.productoId, 'PROD-'),
             )
 
           const tipoProducto =
             tiposProducto.find(
               (item) =>
-                item.id ===
-                producto?.tipoProductoId,
+                coincidenIds(item.id, producto?.tipoProductoId, 'TP-'),
             )
 
           const categoria =
             categorias.find(
               (item) =>
-                item.id ===
-                producto?.categoriaId,
+                coincidenIds(item.id, producto?.categoriaId, 'CAT-'),
             )
 
           const unidad =
             unidadesMedida.find(
               (item) =>
-                item.id ===
-                producto?.unidadMedidaId,
+                coincidenIds(item.id, producto?.unidadMedidaId, 'UM-'),
             )
 
           const subtotal =
@@ -127,9 +121,9 @@ export function obtenerFilasReporteIngresos():
             contacto:
               contacto?.nombreCompleto ??
               'No disponible',
-            tipoProductoId:
-              producto?.tipoProductoId ??
-              '',
+            tipoProductoId: String(
+              producto?.tipoProductoId ?? '',
+            ),
             tipoProducto:
               tipoProducto?.nombre ??
               'No disponible',
@@ -212,18 +206,27 @@ export function filtrarReporteIngresos(
 
     const coincideProveedor =
       !filtros.proveedorId ||
-      fila.proveedorId ===
-        filtros.proveedorId
+      coincidenIds(
+        fila.proveedorId,
+        filtros.proveedorId,
+        'PROV-',
+      )
 
     const coincideTipo =
       !filtros.tipoProductoId ||
-      fila.tipoProductoId ===
-        filtros.tipoProductoId
+      coincidenIds(
+        fila.tipoProductoId,
+        filtros.tipoProductoId,
+        'TP-',
+      )
 
     const coincideProducto =
       !filtros.productoId ||
-      fila.productoId ===
-        filtros.productoId
+      coincidenIds(
+        fila.productoId,
+        filtros.productoId,
+        'PROD-',
+      )
 
     const coincideEstado =
       !filtros.estado ||

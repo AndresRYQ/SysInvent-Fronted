@@ -1,10 +1,7 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { useEffect, useState } from 'react'
 
 import { ContactoDeleteModal } from '../../components/contactos/ContactoDeleteModal'
+import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
 import {
   FiltrosContactos,
   type FiltrosContactosValores,
@@ -15,11 +12,13 @@ import { TablaContactos } from '../../components/contactos/TablaContactos'
 import {
   actualizarContacto,
   crearContacto,
-  eliminarContacto,
-  obtenerContactos,
+  desactivarContacto,
+  listarContactos,
+  reactivarContacto,
 } from '../../services/contactoService'
 
-import { obtenerProveedores } from '../../services/proveedorService'
+import { listarProveedores } from '../../services/proveedorService'
+import { coincidenIds } from '../../utils/identificadores'
 
 import type {
   Contacto,
@@ -38,11 +37,6 @@ const FILTROS_INICIALES:
     estado: '',
   }
 
-interface MensajePagina {
-  tipo: 'success' | 'danger'
-  texto: string
-}
-
 function filtrarContactos(
   contactos: Contacto[],
   proveedores: Proveedor[],
@@ -57,8 +51,11 @@ function filtrarContactos(
       const nombreProveedor =
         proveedores.find(
           (proveedor) =>
-            proveedor.id ===
+          coincidenIds(
+            proveedor.id,
             contacto.proveedorId,
+            'PROV-',
+          ),
         )?.razonSocial ?? ''
 
       const coincideBusqueda =
@@ -81,17 +78,20 @@ function filtrarContactos(
 
       const coincideProveedor =
         !filtros.proveedorId ||
-        contacto.proveedorId ===
-          filtros.proveedorId
+        coincidenIds(
+          contacto.proveedorId,
+          filtros.proveedorId,
+          'PROV-',
+        )
 
       const coincideEstado =
         !filtros.estado ||
         (filtros.estado ===
           'activo' &&
-          contacto.estado) ||
+          contacto.activo === 1) ||
         (filtros.estado ===
           'inactivo' &&
-          !contacto.estado)
+          contacto.activo === 0)
 
       return (
         coincideBusqueda &&
@@ -111,14 +111,10 @@ function obtenerMensajeError(
 }
 
 export function ContactosPage() {
-  const [contactos, setContactos] =
-    useState<Contacto[]>(() =>
-      obtenerContactos(),
-    )
+  const [contactos, setContactos] = useState<Contacto[]>([])
+  const [totalItems, setTotalItems] = useState(-1)
 
-  const [proveedores] = useState<
-    Proveedor[]
-  >(() => obtenerProveedores())
+  const [proveedores, setProveedores] = useState<Proveedor[]>([])
 
   const [filtros, setFiltros] =
     useState<FiltrosContactosValores>({
@@ -143,6 +139,9 @@ export function ContactosPage() {
     setModalFormularioAbierto,
   ] = useState(false)
 
+  const [modoConfirmacion, setModoConfirmacion] =
+    useState<'desactivar' | 'reactivar'>('desactivar')
+
   const [
     contactoEnEdicion,
     setContactoEnEdicion,
@@ -150,10 +149,29 @@ export function ContactosPage() {
     null,
   )
 
+  const [soloLectura, setSoloLectura] = useState(false)
+
   const [
     errorFormulario,
     setErrorFormulario,
   ] = useState('')
+  const { mensaje, abierta, mostrarAlerta, cerrarAlerta, limpiarAlerta } = useSnackbar()
+
+  useEffect(() => {
+    let cancelado = false
+
+    listarProveedores({ pagina: 1, tamPagina: 100 })
+      .then((respuesta) => {
+        if (!cancelado) setProveedores(respuesta.datos)
+      })
+      .catch((error) => {
+        if (!cancelado) mostrarAlerta('error', obtenerMensajeError(error))
+      })
+
+    return () => {
+      cancelado = true
+    }
+  }, [mostrarAlerta])
 
   const [
     modalEliminarAbierto,
@@ -167,112 +185,77 @@ export function ContactosPage() {
     null,
   )
 
-  const [mensaje, setMensaje] =
-    useState<MensajePagina | null>(
-      null,
-    )
-
-  const contactosFiltrados =
-    useMemo(
-      () =>
-        filtrarContactos(
-          contactos,
-          proveedores,
-          filtrosAplicados,
-        ),
-      [
-        contactos,
-        proveedores,
-        filtrosAplicados,
-      ],
-    )
-
-  const totalItems =
-    contactosFiltrados.length
-
-  const contactosPaginados =
-    useMemo(() => {
-      const indiceInicial =
-        (page - 1) * pageSize
-
-      return contactosFiltrados.slice(
-        indiceInicial,
-        indiceInicial + pageSize,
-      )
-    }, [
-      contactosFiltrados,
-      page,
-      pageSize,
-    ])
-
   useEffect(() => {
-    const totalPaginas = Math.max(
-      1,
-      Math.ceil(
-        totalItems / pageSize,
-      ),
-    )
-
-    if (page > totalPaginas) {
-      setPage(totalPaginas)
-    }
-  }, [
-    page,
-    pageSize,
-    totalItems,
-  ])
+    let cancelado = false
+    listarContactos({ nombre: filtrosAplicados.busqueda, pagina: page, tamPagina: pageSize })
+      .then((respuesta) => {
+        if (cancelado) return
+        const datos = filtrarContactos(respuesta.datos, proveedores, { ...filtrosAplicados, busqueda: '' })
+        setContactos(datos)
+        setTotalItems(respuesta.paginacion.totalElementos ?? datos.length)
+      })
+      .catch((error) => {
+        if (!cancelado) mostrarAlerta('error', obtenerMensajeError(error))
+      })
+    return () => { cancelado = true }
+  }, [page, pageSize, filtrosAplicados, proveedores])
 
   function recargarContactos(): void {
-    setContactos(
-      obtenerContactos(),
-    )
+    void listarContactos({ nombre: filtrosAplicados.busqueda, pagina: page, tamPagina: pageSize })
+      .then((respuesta) => {
+        const datos = filtrarContactos(respuesta.datos, proveedores, { ...filtrosAplicados, busqueda: '' })
+        setContactos(datos)
+        setTotalItems(respuesta.paginacion.totalElementos ?? datos.length)
+      })
   }
 
   function abrirFormularioNuevo(): void {
-    setMensaje(null)
     setErrorFormulario('')
     setContactoEnEdicion(null)
+    setSoloLectura(false)
     setModalFormularioAbierto(true)
   }
 
   function abrirFormularioEdicion(
     contacto: Contacto,
   ): void {
-    setMensaje(null)
     setErrorFormulario('')
     setContactoEnEdicion(contacto)
+    setSoloLectura(false)
+    setModalFormularioAbierto(true)
+  }
+
+  function abrirVisualizacion(contacto: Contacto): void {
+    setErrorFormulario('')
+    setContactoEnEdicion(contacto)
+    setSoloLectura(true)
     setModalFormularioAbierto(true)
   }
 
   function cerrarFormulario(): void {
     setModalFormularioAbierto(false)
     setContactoEnEdicion(null)
+    setSoloLectura(false)
     setErrorFormulario('')
   }
 
-  function guardarContacto(
+  async function guardarContacto(
     datos: ContactoFormData,
-  ): void {
+  ): Promise<void> {
     try {
+      const mensajePorDefecto = contactoEnEdicion
+        ? 'Contacto actualizado correctamente.'
+        : 'Contacto registrado correctamente.'
+
       if (contactoEnEdicion) {
-        actualizarContacto(
+        const respuesta = await actualizarContacto(
           contactoEnEdicion.id,
           datos,
         )
-
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Contacto actualizado correctamente.',
-        })
+        mostrarAlerta('success', respuesta.message ?? mensajePorDefecto)
       } else {
-        crearContacto(datos)
-
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Contacto registrado correctamente.',
-        })
+        const respuesta = await crearContacto(datos)
+        mostrarAlerta('success', respuesta.message ?? mensajePorDefecto)
       }
 
       recargarContactos()
@@ -288,7 +271,15 @@ export function ContactosPage() {
   function abrirConfirmacionEliminar(
     contacto: Contacto,
   ): void {
-    setMensaje(null)
+    setModoConfirmacion('desactivar')
+    setContactoAEliminar(contacto)
+    setModalEliminarAbierto(true)
+  }
+
+  function abrirConfirmacionReactivar(
+    contacto: Contacto,
+  ): void {
+    setModoConfirmacion('reactivar')
     setContactoAEliminar(contacto)
     setModalEliminarAbierto(true)
   }
@@ -299,37 +290,31 @@ export function ContactosPage() {
     setContactoAEliminar(null)
   }
 
-  function confirmarEliminacion(): void {
+  async function confirmarEliminacion(): Promise<void> {
     if (!contactoAEliminar) {
       return
     }
 
     try {
-      eliminarContacto(
-        contactoAEliminar.id,
-      )
+      if (modoConfirmacion === 'reactivar') {
+        await reactivarContacto(contactoAEliminar.id)
+      } else {
+        await desactivarContacto(contactoAEliminar.id)
+      }
 
       recargarContactos()
       cerrarConfirmacionEliminar()
+      mostrarAlerta('success', modoConfirmacion === 'reactivar' ? 'Contacto reactivado correctamente.' : 'Contacto eliminado correctamente.')
 
-      setMensaje({
-        tipo: 'success',
-        texto:
-          'Contacto eliminado correctamente.',
-      })
     } catch (error) {
       cerrarConfirmacionEliminar()
-
-      setMensaje({
-        tipo: 'danger',
-        texto:
-          obtenerMensajeError(error),
-      })
+      mostrarAlerta('error', obtenerMensajeError(error))
     }
   }
 
   return (
     <>
+      <div className="contactos-page">
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
@@ -343,24 +328,6 @@ export function ContactosPage() {
               </p>
             </div>
           </section>
-
-          {mensaje && (
-            <div
-              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
-              role="alert"
-            >
-              {mensaje.texto}
-
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={() =>
-                  setMensaje(null)
-                }
-              />
-            </div>
-          )}
 
           <div className="maestro-panel">
             <FiltrosContactos
@@ -399,9 +366,7 @@ export function ContactosPage() {
 
           <div className="maestro-panel">
             <TablaContactos
-              contactos={
-                contactosPaginados
-              }
+              contactos={contactos}
               proveedores={proveedores}
               totalItems={totalItems}
               page={page}
@@ -412,8 +377,14 @@ export function ContactosPage() {
               onEditar={
                 abrirFormularioEdicion
               }
+              onVisualizar={
+                abrirVisualizacion
+              }
               onEliminar={
                 abrirConfirmacionEliminar
+              }
+              onReactivar={
+                abrirConfirmacionReactivar
               }
               onPageChange={setPage}
               onPageSizeChange={(
@@ -426,6 +397,7 @@ export function ContactosPage() {
           </div>
         </div>
       </main>
+      </div>
 
       <FormularioContacto
         abierto={
@@ -436,8 +408,16 @@ export function ContactosPage() {
         }
         proveedores={proveedores}
         error={errorFormulario}
+        soloLectura={soloLectura}
         onClose={cerrarFormulario}
         onSubmit={guardarContacto}
+      />
+
+      <SnackbarAlert
+        mensaje={mensaje}
+        abierta={abierta}
+        onClose={cerrarAlerta}
+        onExited={limpiarAlerta}
       />
 
       <ContactoDeleteModal
@@ -453,6 +433,7 @@ export function ContactosPage() {
         onConfirm={
           confirmarEliminacion
         }
+        modo={modoConfirmacion}
       />
     </>
   )

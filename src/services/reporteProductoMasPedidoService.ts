@@ -9,13 +9,10 @@ import type {
 } from '../types/reporteVale'
 
 import { obtenerProductos } from './productoService'
-
-import {
-  obtenerFilasReporteVales,
-} from './reporteValeService'
+import { coincidenIds } from '../utils/identificadores'
 
 interface ProductoAcumulado {
-  productoId: string
+  productoId: number
   codigoProducto: string
   producto: string
   tipoProductoId: string
@@ -52,13 +49,14 @@ function redondearImporte(
 
 function filtrarDistribuciones(
   filtros: FiltrosProductosMasPedidos,
+  filasReporte: FilaReporteVale[],
 ): FilaReporteVale[] {
   const busqueda =
     normalizarTexto(filtros.busqueda)
 
   const productos = obtenerProductos()
 
-  return obtenerFilasReporteVales()
+  return filasReporte
     .filter(
       (fila) =>
         fila.estado === 'REGISTRADO',
@@ -67,8 +65,7 @@ function filtrarDistribuciones(
       const producto =
         productos.find(
           (item) =>
-            item.id ===
-            fila.productoId,
+            coincidenIds(item.productoId, fila.productoId, 'PROD-'),
         )
 
       const coincideBusqueda =
@@ -98,18 +95,15 @@ function filtrarDistribuciones(
 
       const coincideTipo =
         !filtros.tipoProductoId ||
-        fila.tipoProductoId ===
-          filtros.tipoProductoId
+        coincidenIds(fila.tipoProductoId, filtros.tipoProductoId, 'TP-')
 
       const coincideCategoria =
         !filtros.categoriaId ||
-        producto?.categoriaId ===
-          filtros.categoriaId
+        coincidenIds(producto?.categoriaId, filtros.categoriaId, 'CAT-')
 
       const coincideDestino =
         !filtros.destinoId ||
-        fila.destinoId ===
-          filtros.destinoId
+        coincidenIds(fila.destinoId, filtros.destinoId, 'DES-')
 
       return (
         coincideBusqueda &&
@@ -124,14 +118,15 @@ function filtrarDistribuciones(
 
 export function obtenerProductosMasPedidos(
   filtros: FiltrosProductosMasPedidos,
+  filasReporte: FilaReporteVale[],
 ): FilaProductoMasPedido[] {
   const distribuciones =
-    filtrarDistribuciones(filtros)
+    filtrarDistribuciones(filtros, filasReporte)
 
   const productos = obtenerProductos()
 
   const acumulados = new Map<
-    string,
+    number,
     ProductoAcumulado
   >()
 
@@ -139,8 +134,7 @@ export function obtenerProductosMasPedidos(
     const producto =
       productos.find(
         (item) =>
-          item.id ===
-          fila.productoId,
+          coincidenIds(item.productoId, fila.productoId, 'PROD-'),
       )
 
     const existente =
@@ -180,9 +174,9 @@ export function obtenerProductosMasPedidos(
           fila.tipoProductoId,
         tipoProducto:
           fila.tipoProducto,
-        categoriaId:
-          producto?.categoriaId ??
-          '',
+        categoriaId: String(
+          producto?.categoriaId ?? '',
+        ),
         categoria:
           fila.categoria,
         unidadMedida:
@@ -286,9 +280,10 @@ export function obtenerProductosMasPedidos(
 export function obtenerResumenProductosMasPedidos(
   filas: FilaProductoMasPedido[],
   filtros: FiltrosProductosMasPedidos,
+  filasReporte: FilaReporteVale[],
 ): ResumenProductosMasPedidos {
   const distribuciones =
-    filtrarDistribuciones(filtros)
+    filtrarDistribuciones(filtros, filasReporte)
 
   const valesIds = new Set(
     distribuciones.map(

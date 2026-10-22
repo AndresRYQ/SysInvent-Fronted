@@ -9,6 +9,7 @@ import type {
   RegistroBitacora,
 } from '../../types/bitacora'
 
+import { EmptyState } from '../common/EmptyState'
 import { TablePagination } from '../ui/TablePagination'
 
 interface TablaBitacoraProps {
@@ -94,9 +95,9 @@ export function TablaBitacora({
   onPageSizeChange,
 }: TablaBitacoraProps) {
   return (
-    <section className="maestro-table-card card border-0 shadow-sm">
+    <section className="table-card card border-0 shadow-sm">
       <div className="card-body p-0">
-        <div className="maestro-table-header">
+        <div className="table-header">
           <span className="maestro-kicker">
             <History size={16} />
             Registros de auditoría
@@ -104,7 +105,7 @@ export function TablaBitacora({
         </div>
 
         <div className="table-responsive">
-          <table className="table maestro-table align-middle mb-0">
+          <table className="table standard-table align-middle mb-0">
             <thead>
               <tr>
                 <th>Fecha y hora</th>
@@ -130,8 +131,8 @@ export function TablaBitacora({
                     </td>
 
                     <td>
-                      <div className="maestro-cell-main">
-                        <span className="maestro-cell-icon">
+                      <div className="table-cell-main">
+                        <span className="table-cell-icon">
                           <UserRound size={16} />
                         </span>
 
@@ -174,10 +175,10 @@ export function TablaBitacora({
                     </td>
 
                     <td>
-                      <div className="maestro-actions">
+                      <div className="table-actions">
                         <button
                           type="button"
-                          className="btn maestro-action-btn"
+                          className="btn table-action-btn"
                           title="Ver detalle"
                           aria-label="Ver detalle del registro"
                           onClick={() =>
@@ -195,17 +196,7 @@ export function TablaBitacora({
               ) : (
                 <tr>
                   <td colSpan={7}>
-                    <div className="maestro-empty-state">
-                      <History size={28} />
-
-                      <p className="mb-1">
-                        No hay registros de bitácora
-                      </p>
-
-                      <span>
-                        Las acciones del sistema aparecerán aquí.
-                      </span>
-                    </div>
+                    <EmptyState icon={History} iconSize={28} title="No hay registros de bitácora" description="Las acciones del sistema aparecerán aquí." />
                   </td>
                 </tr>
               )}

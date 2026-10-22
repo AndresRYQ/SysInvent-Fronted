@@ -1,825 +1,138 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-  type FormEvent,
-} from 'react'
-
-import {
-  Package,
-  Save,
-  X,
-} from 'lucide-react'
-
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import Select from 'react-select'
 import { obtenerProveedores } from '../../services/proveedorService'
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
+import { listarUnidadesMedida } from '../../services/unidadMedidaService'
+import { listarCategorias } from '../../services/categoriaService'
+import type { Producto, ProductoFormData } from '../../types/producto'
+import type { Categoria } from '../../types/categoria'
+import type { Proveedor } from '../../types/proveedor'
+import type { TipoProducto } from '../../types/tipoProducto'
+import type { UnidadMedida } from '../../types/unidadMedida'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
-import type {
-  Producto,
-  ProductoFormData,
-} from '../../types/producto'
-
-interface FormularioProductoProps {
+interface Props {
   producto?: Producto | null
+  soloLectura?: boolean
   error: string
-  onSubmit: (
-    datos: ProductoFormData,
-  ) => void
+  catalogos?: {
+    categorias: Categoria[]
+    tiposProducto: TipoProducto[]
+    unidadesMedida: UnidadMedida[]
+    proveedores: Proveedor[]
+  }
+  onSubmit: (datos: ProductoFormData) => void
   onCancelar: () => void
 }
 
-interface OpcionMaestro {
-  id: string
-  nombre: string
-  estado: boolean
-}
+interface Opcion { id: string | number; nombre: string; estado?: boolean; activo?: 0 | 1 }
+interface Errores { codigo: string; nombre: string; descripcion: string; tipoProductoId: string; categoriaId: string; unidadMedidaId: string; proveedorId: string; precioUnitario: string }
 
-interface ErroresFormulario {
-  codigo: string
-  nombre: string
-  descripcion: string
-  tipoProductoId: string
-  categoriaId: string
-  unidadMedidaId: string
-  proveedorId: string
-  stockMinimo: string
-  precioUnitario: string
-}
-
-const CATEGORIAS_INICIALES: OpcionMaestro[] = [
-  {
-    id: 'CAT-001',
-    nombre: 'Herramientas',
-    estado: true,
-  },
-  {
-    id: 'CAT-002',
-    nombre: 'Seguridad Industrial',
-    estado: true,
-  },
-  {
-    id: 'CAT-003',
-    nombre: 'Ferretería',
-    estado: true,
-  },
-  {
-    id: 'CAT-004',
-    nombre: 'Repuestos',
-    estado: true,
-  },
-  {
-    id: 'CAT-005',
-    nombre: 'Limpieza',
-    estado: false,
-  },
+const CATEGORIAS: Opcion[] = [
+  { id: 'CAT-001', nombre: 'Herramientas' },
+  { id: 'CAT-002', nombre: 'Seguridad Industrial' },
+  { id: 'CAT-003', nombre: 'Ferretería' },
+  { id: 'CAT-004', nombre: 'Repuestos' },
+  { id: 'CAT-005', nombre: 'Limpieza' },
 ]
+const INICIAL: ProductoFormData = { codigo: '', nombre: '', descripcion: '', tipoProductoId: '', categoriaId: '', unidadMedidaId: '', proveedorId: '', stockMinimo: 0, precioUnitario: 0, estado: true }
+const SIN_ERRORES: Errores = { codigo: '', nombre: '', descripcion: '', tipoProductoId: '', categoriaId: '', unidadMedidaId: '', proveedorId: '', precioUnitario: '' }
 
-const UNIDADES_INICIALES: OpcionMaestro[] = [
-  {
-    id: 'UM-001',
-    nombre: 'Unidad',
-    estado: true,
-  },
-  {
-    id: 'UM-002',
-    nombre: 'Kilogramo',
-    estado: true,
-  },
-  {
-    id: 'UM-003',
-    nombre: 'Litro',
-    estado: true,
-  },
-  {
-    id: 'UM-004',
-    nombre: 'Metro',
-    estado: true,
-  },
-  {
-    id: 'UM-005',
-    nombre: 'Caja',
-    estado: true,
-  },
-]
-
-const FORM_INICIAL: ProductoFormData = {
-  codigo: '',
-  nombre: '',
-  descripcion: '',
-  tipoProductoId: '',
-  categoriaId: '',
-  unidadMedidaId: '',
-  proveedorId: '',
-  stockMinimo: 0,
-  precioUnitario: 0,
-  estado: true,
-}
-
-const ERRORES_INICIALES: ErroresFormulario = {
-  codigo: '',
-  nombre: '',
-  descripcion: '',
-  tipoProductoId: '',
-  categoriaId: '',
-  unidadMedidaId: '',
-  proveedorId: '',
-  stockMinimo: '',
-  precioUnitario: '',
-}
-
-function obtenerOpcionesLocales(
-  storageKey: string,
-  valoresIniciales: OpcionMaestro[],
-): OpcionMaestro[] {
+function opcionesLocales(clave: string, iniciales: Opcion[]): Opcion[] {
   try {
-    const datosGuardados =
-      localStorage.getItem(storageKey)
-
-    if (!datosGuardados) {
-      return valoresIniciales
-    }
-
-    const datos = JSON.parse(datosGuardados)
-
-    return Array.isArray(datos)
-      ? (datos as OpcionMaestro[])
-      : valoresIniciales
-  } catch {
-    return valoresIniciales
-  }
+    const valor = ''
+    if (!valor) return iniciales
+    const datos = JSON.parse(valor)
+    return Array.isArray(datos) ? datos : iniciales
+  } catch { return iniciales }
 }
 
-export function FormularioProducto({
-  producto,
-  error,
-  onSubmit,
-  onCancelar,
-}: FormularioProductoProps) {
-  const [form, setForm] =
-    useState<ProductoFormData>(
-      FORM_INICIAL,
-    )
+function idCompatible(valor: string, id: string | number, prefijo: string): boolean {
+  const texto = String(id)
+  return valor === texto || valor === `${prefijo}${texto.padStart(3, '0')}`
+}
 
-  const [errores, setErrores] =
-    useState<ErroresFormulario>(
-      ERRORES_INICIALES,
-    )
+function opcionesSelect(items: Opcion[]) {
+  return items.map((item) => ({ value: String(item.id), label: item.nombre }))
+}
 
-  const tiposProducto = useMemo(
-    () =>
-      obtenerTiposProducto().filter(
-        (tipo) =>
-          tipo.estado ||
-          tipo.id ===
-            producto?.tipoProductoId,
-      ),
-    [producto],
-  )
-
-  const proveedores = useMemo(
-    () =>
-      obtenerProveedores().filter(
-        (proveedor) =>
-          proveedor.estado ||
-          proveedor.id ===
-            producto?.proveedorId,
-      ),
-    [producto],
-  )
-
-  const categorias = useMemo(
-    () =>
-      obtenerOpcionesLocales(
-        'agrihusac_categorias',
-        CATEGORIAS_INICIALES,
-      ).filter(
-        (categoria) =>
-          categoria.estado ||
-          categoria.id ===
-            producto?.categoriaId,
-      ),
-    [producto],
-  )
-
-  const unidadesMedida = useMemo(
-    () =>
-      obtenerOpcionesLocales(
-        'agrihusac_unidades_medida',
-        UNIDADES_INICIALES,
-      ).filter(
-        (unidad) =>
-          unidad.estado ||
-          unidad.id ===
-            producto?.unidadMedidaId,
-      ),
-    [producto],
-  )
+export function FormularioProducto({ producto, soloLectura = false, error, catalogos, onSubmit, onCancelar }: Props) {
+  const [form, setForm] = useState<ProductoFormData>(INICIAL)
+  const [errores, setErrores] = useState<Errores>(SIN_ERRORES)
+  const [unidadesMedida, setUnidadesMedida] = useState<Opcion[]>([])
+  const [categoriasDisponibles, setCategoriasDisponibles] = useState<Opcion[]>([])
+  const tiposDisponibles = catalogos?.tiposProducto ?? obtenerTiposProducto()
+  const proveedoresDisponibles = catalogos?.proveedores ?? obtenerProveedores()
+  const categoriasBase = catalogos?.categorias ?? categoriasDisponibles
+  const unidadesBase = catalogos?.unidadesMedida ?? unidadesMedida
+  const tipos = useMemo(() => tiposDisponibles.filter((item) => item.activo === 1 || idCompatible(String(producto?.tipoProductoId ?? ''), item.id, 'TP-')), [producto, tiposDisponibles])
+  const proveedores = useMemo(() => proveedoresDisponibles.filter((item) => item.activo === 1 || idCompatible(String(producto?.proveedorId ?? ''), item.id, 'PROV-')), [producto, proveedoresDisponibles])
+  const categorias = useMemo(() => categoriasBase.filter((item) => item.estado !== false && item.activo !== 0 || String(item.id) === String(producto?.categoriaId)), [producto, categoriasBase])
+  const unidades = useMemo(() => unidadesBase.filter((item) => item.estado !== false && item.activo !== 0 || String(item.id) === String(producto?.unidadMedidaId)), [producto, unidadesBase])
 
   useEffect(() => {
-    if (producto) {
-      setForm({
-        codigo: producto.codigo,
-        nombre: producto.nombre,
-        descripcion: producto.descripcion,
-        tipoProductoId:
-          producto.tipoProductoId,
-        categoriaId:
-          producto.categoriaId,
-        unidadMedidaId:
-          producto.unidadMedidaId,
-        proveedorId:
-          producto.proveedorId,
-        stockMinimo:
-          producto.stockMinimo,
-        precioUnitario:
-          producto.precioUnitario,
-        estado: producto.estado,
-      })
-    } else {
-      setForm(FORM_INICIAL)
-    }
+    if (catalogos) return
+    listarCategorias({ pagina: 1, tamPagina: 100 })
+      .then((resultado) => setCategoriasDisponibles(resultado.datos))
+      .catch(() => setCategoriasDisponibles([]))
+  }, [catalogos])
 
-    setErrores(ERRORES_INICIALES)
+  useEffect(() => {
+    if (catalogos) return
+    listarUnidadesMedida({ pagina: 1, tamPagina: 100 })
+      .then((resultado) => setUnidadesMedida(resultado.datos))
+      .catch(() => setUnidadesMedida([]))
+  }, [catalogos])
+
+  useEffect(() => {
+    setForm(producto ? { codigo: producto.codigo, nombre: producto.nombre, descripcion: producto.descripcion, tipoProductoId: String(producto.tipoProductoId), categoriaId: String(producto.categoriaId), unidadMedidaId: String(producto.unidadMedidaId), proveedorId: String(producto.proveedorId), stockMinimo: producto.stockMinimo, precioUnitario: producto.precioUnitario, estado: producto.activo } : INICIAL)
+    setErrores(SIN_ERRORES)
   }, [producto])
 
-  function limpiarError(
-    campo: keyof ErroresFormulario,
-  ): void {
-    setErrores((actual) => ({
-      ...actual,
-      [campo]: '',
-    }))
+  function cambiar(campo: keyof ProductoFormData, valor: string | number | boolean): void {
+    setForm((actual) => ({ ...actual, [campo]: valor }))
+    if (campo in errores) setErrores((actual) => ({ ...actual, [campo]: '' }))
   }
 
-  function validarFormulario(): boolean {
-    const nuevosErrores: ErroresFormulario = {
-      ...ERRORES_INICIALES,
-    }
-
-    const codigo = form.codigo
-      .trim()
-      .toUpperCase()
-
-    const nombre = form.nombre.trim()
-    const descripcion =
-      form.descripcion.trim()
-
-    if (
-      !/^[A-Z0-9-]{3,30}$/.test(codigo)
-    ) {
-      nuevosErrores.codigo =
-        'Utiliza entre 3 y 30 letras, números o guiones'
-    }
-
-    if (nombre.length < 2) {
-      nuevosErrores.nombre =
-        'Debe tener al menos 2 caracteres'
-    } else if (nombre.length > 120) {
-      nuevosErrores.nombre =
-        'No puede superar los 120 caracteres'
-    }
-
-    if (descripcion.length < 5) {
-      nuevosErrores.descripcion =
-        'Debe tener al menos 5 caracteres'
-    } else if (descripcion.length > 250) {
-      nuevosErrores.descripcion =
-        'No puede superar los 250 caracteres'
-    }
-
-    if (!form.tipoProductoId) {
-      nuevosErrores.tipoProductoId =
-        'Selecciona un tipo de producto'
-    }
-
-    if (!form.categoriaId) {
-      nuevosErrores.categoriaId =
-        'Selecciona una categoría'
-    }
-
-    if (!form.unidadMedidaId) {
-      nuevosErrores.unidadMedidaId =
-        'Selecciona una unidad de medida'
-    }
-
-    if (!form.proveedorId) {
-      nuevosErrores.proveedorId =
-        'Selecciona un proveedor'
-    }
-
-    if (
-      !Number.isFinite(form.stockMinimo) ||
-      form.stockMinimo < 0
-    ) {
-      nuevosErrores.stockMinimo =
-        'Ingresa un stock mínimo válido'
-    }
-
-    if (
-      !Number.isFinite(
-        form.precioUnitario,
-      ) ||
-      form.precioUnitario < 0
-    ) {
-      nuevosErrores.precioUnitario =
-        'Ingresa un precio válido'
-    }
-
-    setErrores(nuevosErrores)
-
-    return Object.values(
-      nuevosErrores,
-    ).every((mensaje) => !mensaje)
+  function validar(): boolean {
+    const siguiente: Errores = { ...SIN_ERRORES }
+    const codigo = form.codigo.trim().toUpperCase()
+    if (!/^[A-Z0-9-]{3,30}$/.test(codigo)) siguiente.codigo = 'Utiliza entre 3 y 30 letras, números o guiones'
+    if (form.nombre.trim().length < 2 || form.nombre.trim().length > 120) siguiente.nombre = 'El nombre debe tener entre 2 y 120 caracteres'
+    if (form.descripcion.trim().length < 5 || form.descripcion.trim().length > 250) siguiente.descripcion = 'La descripción debe tener entre 5 y 250 caracteres'
+    if (!form.tipoProductoId) siguiente.tipoProductoId = 'Selecciona un tipo de producto'
+    if (!form.categoriaId) siguiente.categoriaId = 'Selecciona una categoría'
+    if (!form.unidadMedidaId) siguiente.unidadMedidaId = 'Selecciona una unidad de medida'
+    if (!form.proveedorId) siguiente.proveedorId = 'Selecciona un proveedor'
+    if (!Number.isFinite(form.precioUnitario) || form.precioUnitario < 0) siguiente.precioUnitario = 'Ingresa un precio válido'
+    setErrores(siguiente)
+    return Object.values(siguiente).every((valor) => !valor)
   }
 
-  function manejarEnvio(
-    event: FormEvent<HTMLFormElement>,
-  ): void {
+  function enviar(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault()
-
-    if (!validarFormulario()) {
-      return
-    }
-
-    onSubmit({
-      ...form,
-      codigo: form.codigo
-        .trim()
-        .toUpperCase(),
-      nombre: form.nombre.trim(),
-      descripcion:
-        form.descripcion.trim(),
-    })
+    if (!validar()) return
+    onSubmit({ ...form, codigo: form.codigo.trim().toUpperCase(), nombre: form.nombre.trim(), descripcion: form.descripcion.trim() })
   }
 
   return (
-    <form
-      className="card border-0 shadow-sm"
-      noValidate
-      onSubmit={manejarEnvio}
-    >
-      <div className="card-header bg-white border-bottom p-4">
-        <div className="d-flex align-items-center gap-3">
-          <span className="maestro-cell-icon">
-            <Package size={20} />
-          </span>
-
-          <div>
-            <h2 className="h5 mb-1">
-              Información del producto
-            </h2>
-
-            <p className="text-muted mb-0">
-              Registra la información general y
-              configuración de inventario.
-            </p>
+    <form className="card border-0 shadow-sm" noValidate onSubmit={enviar}>
+      <div className="maestro-modal-body">
+        {error && <div className="alert alert-danger" role="alert">{error}</div>}
+        <fieldset disabled={soloLectura} className={soloLectura ? 'modo-visualizacion' : undefined}>
+          <div className="row g-4">
+            <div className="col-12 col-lg-4"><label className="form-label maestro-label required" htmlFor="productoCodigo">Código</label><input id="productoCodigo" className={`form-control maestro-control${errores.codigo ? ' maestro-control--error' : ''}`} maxLength={30} placeholder="Ej. HER-001" value={form.codigo} onChange={(e) => cambiar('codigo', e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, ''))} />{errores.codigo && <div className="maestro-field-error">{errores.codigo}</div>}</div>
+            <div className="col-12 col-lg-8"><label className="form-label maestro-label required" htmlFor="productoNombre">Nombre</label><input id="productoNombre" className={`form-control maestro-control${errores.nombre ? ' maestro-control--error' : ''}`} maxLength={120} placeholder="Nombre del producto" value={form.nombre} onChange={(e) => cambiar('nombre', e.target.value)} />{errores.nombre && <div className="maestro-field-error">{errores.nombre}</div>}</div>
+            <div className="col-12 col-md-4"><label className="form-label maestro-label required" htmlFor="productoTipo">Tipo de producto</label><Select inputId="productoTipo" classNamePrefix="maestro-select" options={opcionesSelect(tipos)} value={opcionesSelect(tipos).find((item) => item.value === String(form.tipoProductoId)) ?? null} onChange={(item) => cambiar('tipoProductoId', item?.value ?? '')} placeholder="Seleccionar" isDisabled={soloLectura} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ tieneError: Boolean(errores.tipoProductoId), zIndex: 1300 })} />{errores.tipoProductoId && <div className="maestro-field-error">{errores.tipoProductoId}</div>}</div>
+            <div className="col-12 col-md-4"><label className="form-label maestro-label required" htmlFor="productoCategoria">Categoría</label><Select inputId="productoCategoria" classNamePrefix="maestro-select" options={opcionesSelect(categorias)} value={opcionesSelect(categorias).find((item) => item.value === String(form.categoriaId)) ?? null} onChange={(item) => cambiar('categoriaId', item?.value ?? '')} placeholder="Seleccionar" isDisabled={soloLectura} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ tieneError: Boolean(errores.categoriaId), zIndex: 1300 })} />{errores.categoriaId && <div className="maestro-field-error">{errores.categoriaId}</div>}</div>
+            <div className="col-12 col-md-4"><label className="form-label maestro-label required" htmlFor="productoUnidad">Unidad de medida</label><Select inputId="productoUnidad" classNamePrefix="maestro-select" options={opcionesSelect(unidades)} value={opcionesSelect(unidades).find((item) => item.value === String(form.unidadMedidaId)) ?? null} onChange={(item) => cambiar('unidadMedidaId', item?.value ?? '')} placeholder="Seleccionar" isDisabled={soloLectura} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ tieneError: Boolean(errores.unidadMedidaId), zIndex: 1300 })} />{errores.unidadMedidaId && <div className="maestro-field-error">{errores.unidadMedidaId}</div>}</div>
+            <div className="col-12 col-md-4"><label className="form-label maestro-label required" htmlFor="productoProveedor">Proveedor</label><Select inputId="productoProveedor" classNamePrefix="maestro-select" options={proveedores.map((item) => ({ value: String(item.id), label: item.razonSocial }))} value={proveedores.map((item) => ({ value: String(item.id), label: item.razonSocial })).find((item) => item.value === String(form.proveedorId) || idCompatible(String(form.proveedorId), item.value, 'PROV-')) ?? null} onChange={(item) => cambiar('proveedorId', item?.value ?? '')} placeholder="Seleccionar" isDisabled={soloLectura} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ tieneError: Boolean(errores.proveedorId), zIndex: 1300 })} />{errores.proveedorId && <div className="maestro-field-error">{errores.proveedorId}</div>}</div>
+            <div className="col-12 col-lg-4"><label className="form-label maestro-label required" htmlFor="productoPrecio">Precio unitario</label><div className="input-group"><span className="input-group-text">S/</span><input id="productoPrecio" className={`form-control maestro-control${errores.precioUnitario ? ' maestro-control--error' : ''}`} type="number" min="0" step="0.01" value={form.precioUnitario} onChange={(e) => cambiar('precioUnitario', e.target.value === '' ? 0 : Number(e.target.value))} /></div>{errores.precioUnitario && <div className="maestro-field-error">{errores.precioUnitario}</div>}</div>
+            <div className="col-12"><label className="form-label maestro-label required" htmlFor="productoDescripcion">Descripción</label><textarea id="productoDescripcion" className={`form-control maestro-control${errores.descripcion ? ' maestro-control--error' : ''}`} rows={4} maxLength={250} placeholder="Descripción del producto" value={form.descripcion} onChange={(e) => cambiar('descripcion', e.target.value)} />{errores.descripcion && <div className="maestro-field-error">{errores.descripcion}</div>}</div>
           </div>
-        </div>
+        </fieldset>
       </div>
-
-      <div className="card-body p-4">
-        {error && (
-          <div
-            className="alert alert-danger"
-            role="alert"
-          >
-            {error}
-          </div>
-        )}
-
-        <div className="row g-4">
-          <div className="col-12 col-lg-4">
-            <label
-              className="form-label maestro-label"
-              htmlFor="productoCodigo"
-            >
-              Código
-              <span className="maestro-required">*</span>
-            </label>
-
-            <input
-              id="productoCodigo"
-              className={`form-control maestro-control${
-                errores.codigo
-                  ? ' maestro-control--error'
-                  : ''
-              }`}
-              maxLength={30}
-              placeholder="Ej. HER-001"
-              value={form.codigo}
-              onChange={(event) => {
-                const value =
-                  event.target.value
-                    .toUpperCase()
-                    .replace(
-                      /[^A-Z0-9-]/g,
-                      '',
-                    )
-
-                setForm((actual) => ({
-                  ...actual,
-                  codigo: value,
-                }))
-
-                limpiarError('codigo')
-              }}
-            />
-
-            {errores.codigo && (
-              <div className="maestro-field-error">
-                {errores.codigo}
-              </div>
-            )}
-          </div>
-
-          <div className="col-12 col-lg-8">
-            <label
-              className="form-label maestro-label"
-              htmlFor="productoNombre"
-            >
-              Nombre
-              <span className="maestro-required">*</span>
-            </label>
-
-            <input
-              id="productoNombre"
-              className={`form-control maestro-control${
-                errores.nombre
-                  ? ' maestro-control--error'
-                  : ''
-              }`}
-              maxLength={120}
-              value={form.nombre}
-              onChange={(event) => {
-                setForm((actual) => ({
-                  ...actual,
-                  nombre: event.target.value,
-                }))
-
-                limpiarError('nombre')
-              }}
-            />
-
-            {errores.nombre && (
-              <div className="maestro-field-error">
-                {errores.nombre}
-              </div>
-            )}
-          </div>
-
-          <div className="col-12 col-lg-6">
-            <label
-              className="form-label maestro-label"
-              htmlFor="productoTipo"
-            >
-              Tipo de producto
-              <span className="maestro-required">*</span>
-            </label>
-
-            <select
-              id="productoTipo"
-              className={`form-select maestro-control${
-                errores.tipoProductoId
-                  ? ' maestro-control--error'
-                  : ''
-              }`}
-              value={form.tipoProductoId}
-              onChange={(event) => {
-                setForm((actual) => ({
-                  ...actual,
-                  tipoProductoId:
-                    event.target.value,
-                }))
-
-                limpiarError(
-                  'tipoProductoId',
-                )
-              }}
-            >
-              <option value="">
-                Seleccionar
-              </option>
-
-              {tiposProducto.map((tipo) => (
-                <option
-                  key={tipo.id}
-                  value={tipo.id}
-                >
-                  {tipo.nombre}
-                </option>
-              ))}
-            </select>
-
-            {errores.tipoProductoId && (
-              <div className="maestro-field-error">
-                {errores.tipoProductoId}
-              </div>
-            )}
-          </div>
-
-          <div className="col-12 col-lg-6">
-            <label
-              className="form-label maestro-label"
-              htmlFor="productoCategoria"
-            >
-              Categoría
-              <span className="maestro-required">*</span>
-            </label>
-
-            <select
-              id="productoCategoria"
-              className={`form-select maestro-control${
-                errores.categoriaId
-                  ? ' maestro-control--error'
-                  : ''
-              }`}
-              value={form.categoriaId}
-              onChange={(event) => {
-                setForm((actual) => ({
-                  ...actual,
-                  categoriaId:
-                    event.target.value,
-                }))
-
-                limpiarError('categoriaId')
-              }}
-            >
-              <option value="">
-                Seleccionar
-              </option>
-
-              {categorias.map((categoria) => (
-                <option
-                  key={categoria.id}
-                  value={categoria.id}
-                >
-                  {categoria.nombre}
-                </option>
-              ))}
-            </select>
-
-            {errores.categoriaId && (
-              <div className="maestro-field-error">
-                {errores.categoriaId}
-              </div>
-            )}
-          </div>
-
-          <div className="col-12 col-lg-6">
-            <label
-              className="form-label maestro-label"
-              htmlFor="productoUnidad"
-            >
-              Unidad de medida
-              <span className="maestro-required">*</span>
-            </label>
-
-            <select
-              id="productoUnidad"
-              className={`form-select maestro-control${
-                errores.unidadMedidaId
-                  ? ' maestro-control--error'
-                  : ''
-              }`}
-              value={form.unidadMedidaId}
-              onChange={(event) => {
-                setForm((actual) => ({
-                  ...actual,
-                  unidadMedidaId:
-                    event.target.value,
-                }))
-
-                limpiarError(
-                  'unidadMedidaId',
-                )
-              }}
-            >
-              <option value="">
-                Seleccionar
-              </option>
-
-              {unidadesMedida.map((unidad) => (
-                <option
-                  key={unidad.id}
-                  value={unidad.id}
-                >
-                  {unidad.nombre}
-                </option>
-              ))}
-            </select>
-
-            {errores.unidadMedidaId && (
-              <div className="maestro-field-error">
-                {errores.unidadMedidaId}
-              </div>
-            )}
-          </div>
-
-          <div className="col-12 col-lg-6">
-            <label
-              className="form-label maestro-label"
-              htmlFor="productoProveedor"
-            >
-              Proveedor
-              <span className="maestro-required">*</span>
-            </label>
-
-            <select
-              id="productoProveedor"
-              className={`form-select maestro-control${
-                errores.proveedorId
-                  ? ' maestro-control--error'
-                  : ''
-              }`}
-              value={form.proveedorId}
-              onChange={(event) => {
-                setForm((actual) => ({
-                  ...actual,
-                  proveedorId:
-                    event.target.value,
-                }))
-
-                limpiarError('proveedorId')
-              }}
-            >
-              <option value="">
-                Seleccionar
-              </option>
-
-              {proveedores.map(
-                (proveedor) => (
-                  <option
-                    key={proveedor.id}
-                    value={proveedor.id}
-                  >
-                    {proveedor.razonSocial}
-                  </option>
-                ),
-              )}
-            </select>
-
-            {errores.proveedorId && (
-              <div className="maestro-field-error">
-                {errores.proveedorId}
-              </div>
-            )}
-          </div>
-
-          <div className="col-12 col-lg-4">
-            <label
-              className="form-label maestro-label"
-              htmlFor="productoPrecio"
-            >
-              Precio unitario
-              <span className="maestro-required">*</span>
-            </label>
-
-            <div className="input-group">
-              <span className="input-group-text">
-                S/
-              </span>
-
-              <input
-                id="productoPrecio"
-                className={`form-control maestro-control${
-                  errores.precioUnitario
-                    ? ' maestro-control--error'
-                    : ''
-                }`}
-                type="number"
-                min="0"
-                step="0.01"
-                value={form.precioUnitario}
-                onChange={(event) => {
-                  setForm((actual) => ({
-                    ...actual,
-                    precioUnitario:
-                      event.target.value === ''
-                        ? 0
-                        : Number(
-                            event.target.value,
-                          ),
-                  }))
-
-                  limpiarError(
-                    'precioUnitario',
-                  )
-                }}
-              />
-            </div>
-
-            {errores.precioUnitario && (
-              <div className="maestro-field-error">
-                {errores.precioUnitario}
-              </div>
-            )}
-          </div>
-
-          <div className="col-12 col-lg-4">
-            <label
-              className="form-label maestro-label"
-              htmlFor="productoEstado"
-            >
-              Estado
-            </label>
-
-            <select
-              id="productoEstado"
-              className="form-select maestro-control"
-              value={
-                form.estado
-                  ? 'activo'
-                  : 'inactivo'
-              }
-              onChange={(event) =>
-                setForm((actual) => ({
-                  ...actual,
-                  estado:
-                    event.target.value ===
-                    'activo',
-                }))
-              }
-            >
-              <option value="activo">
-                Activo
-              </option>
-
-              <option value="inactivo">
-                Inactivo
-              </option>
-            </select>
-          </div>
-
-          <div className="col-12">
-            <label
-              className="form-label maestro-label"
-              htmlFor="productoDescripcion"
-            >
-              Descripción
-              <span className="maestro-required">*</span>
-            </label>
-
-            <textarea
-              id="productoDescripcion"
-              className={`form-control maestro-control maestro-control--textarea${
-                errores.descripcion
-                  ? ' maestro-control--error'
-                  : ''
-              }`}
-              rows={4}
-              maxLength={250}
-              value={form.descripcion}
-              onChange={(event) => {
-                setForm((actual) => ({
-                  ...actual,
-                  descripcion:
-                    event.target.value,
-                }))
-
-                limpiarError('descripcion')
-              }}
-            />
-
-            <div className="d-flex justify-content-between">
-              <div>
-                {errores.descripcion && (
-                  <span className="maestro-field-error">
-                    {errores.descripcion}
-                  </span>
-                )}
-              </div>
-
-              <small className="text-muted">
-                {form.descripcion.length}/250
-              </small>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="card-footer bg-white border-top p-4">
-        <div className="d-flex flex-wrap justify-content-end gap-2">
-          <button
-            type="button"
-            className="btn maestro-btn-secondary"
-            onClick={onCancelar}
-          >
-            <X size={18} />
-            Cancelar
-          </button>
-
-          <button
-            type="submit"
-            className="btn maestro-btn-primary"
-          >
-            <Save size={18} />
-
-            {producto
-              ? 'Guardar cambios'
-              : 'Registrar producto'}
-          </button>
-        </div>
-      </div>
+      {!soloLectura && <div className="maestro-modal-footer"><button type="button" className="btn btn-maestro-danger" onClick={onCancelar}>Cancelar</button><button type="submit" className="btn btn-maestro-primary">{producto ? 'Guardar cambios' : 'Registrar producto'}</button></div>}
     </form>
   )
 }

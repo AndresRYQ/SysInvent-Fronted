@@ -1,446 +1,127 @@
-import type {
-  Destino,
-  DestinoFormData,
-} from '../types/destino'
+import type { Destino, DestinoFormData } from '../types/destino'
+import {
+  DestinosApi,
+  type CustomPageDestinoResponse,
+  type MessageResponse,
+} from '../api/generated'
+import { apiConfiguration } from '../api/client'
+import type { CatalogoPaginado } from './catalogoApi'
 
-import { registrarEventoBitacora } from './bitacoraService'
+let destinosEnMemoria: Destino[] = []
+const destinoApi = new DestinosApi(apiConfiguration)
+const solicitudesEnCurso = new Map<string, Promise<CatalogoPaginado<Destino>>>()
 
-const STORAGE_KEY =
-  'agrihusac_destinos'
+export interface ListarDestinosParams {
+  nombre?: string
+  estado?: string
+  pagina?: number
+  tamPagina?: number
+}
 
-const VALES_STORAGE_KEY =
-  'agrihusac_vales_consumo'
+export function obtenerDestinos(): Destino[] {
+  return destinosEnMemoria.map((destino) => ({ ...destino }))
+}
 
-const DESTINOS_INICIALES: Destino[] = [
-  {
-    id: 'DES-001',
-    nombre: 'Almacén Central',
-    descripcion:
-      'Almacén principal de la empresa.',
-    estado: true,
-    fechaRegistro: '10/08/2026',
-  },
-  {
-    id: 'DES-002',
-    nombre:
-      'Planta de procesamiento',
-    descripcion:
-      'Área donde se procesa la mercadería.',
-    estado: true,
-    fechaRegistro: '11/08/2026',
-  },
-  {
-    id: 'DES-003',
-    nombre: 'Sucursal Norte',
-    descripcion:
-      'Sucursal ubicada en la zona norte.',
-    estado: true,
-    fechaRegistro: '12/08/2026',
-  },
-  {
-    id: 'DES-004',
-    nombre: 'Punto de venta Sur',
-    descripcion:
-      'Punto de venta ubicado en la zona sur.',
-    estado: true,
-    fechaRegistro: '13/08/2026',
-  },
-  {
-    id: 'DES-005',
-    nombre: 'Depósito temporal',
-    descripcion:
-      'Espacio temporal para almacenamiento.',
-    estado: false,
-    fechaRegistro: '14/08/2026',
-  },
-]
+function mapearRespuestaDestino(response: CustomPageDestinoResponse): CatalogoPaginado<Destino> {
+  const resultado: CatalogoPaginado<Destino> = {
+    datos: (response.datos ?? []).map((destino) => ({
+      id: destino.destinoId ?? 0,
+      nombre: destino.nombre ?? '',
+      descripcion: destino.descripcion ?? '',
+      activo: destino.activo ? 1 : 0,
+      fechaRegistro: destino.fechaRegistro,
+    })),
+    paginacion: response.paginacion ?? {},
+  }
 
-function copiarDestinos(
-  destinos: Destino[],
-): Destino[] {
-  return destinos.map((destino) => ({
-    ...destino,
+  destinosEnMemoria = resultado.datos
+  return resultado
+}
+
+export async function listarDestinos(
+  params: ListarDestinosParams = {},
+): Promise<CatalogoPaginado<Destino>> {
+  const parametros = {
+    nombre: params.nombre?.trim() || undefined,
+    estado: params.estado === 'activo'
+      ? true
+      : params.estado === 'inactivo'
+        ? false
+        : undefined,
+    pagina: params.pagina,
+    tamPagina: params.tamPagina,
+  }
+  const clave = JSON.stringify(parametros)
+  const solicitudExistente = solicitudesEnCurso.get(clave)
+
+  if (solicitudExistente) return solicitudExistente
+
+  const solicitud = destinoApi
+    .listarDestinos(parametros)
+    .then(mapearRespuestaDestino)
+    .finally(() => solicitudesEnCurso.delete(clave))
+
+  solicitudesEnCurso.set(clave, solicitud)
+  return solicitud
+}
+
+export const listarDestinosApi = listarDestinos
+
+function validar(datos: DestinoFormData): void {
+  const nombre = datos.nombre.trim()
+  const descripcion = datos.descripcion.trim()
+  if (!nombre) throw new Error('El nombre del destino es obligatorio.')
+  if (nombre.length < 2) throw new Error('El nombre debe tener al menos 2 caracteres.')
+  if (nombre.length > 100) throw new Error('El nombre no puede superar los 100 caracteres.')
+  if (!descripcion) throw new Error('La descripción es obligatoria.')
+  if (descripcion.length > 250) throw new Error('La descripción no puede superar los 250 caracteres.')
+}
+
+function validarRespuesta(response: MessageResponse): MessageResponse {
+  if (response.success === false) {
+    throw new Error(response.message ?? 'La operación de destinos no fue completada.')
+  }
+  return response
+}
+
+export async function crearDestino(datos: DestinoFormData): Promise<MessageResponse> {
+  validar(datos)
+  return validarRespuesta(await destinoApi.registrarDestino({
+    destinoRequest: {
+      nombre: datos.nombre.trim(),
+      descripcion: datos.descripcion.trim(),
+    },
   }))
 }
 
-function guardarDestinos(
-  destinos: Destino[],
-): void {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(destinos),
-  )
-}
-
-function normalizarTexto(
-  valor: string | null | undefined,
-): string {
-  return (valor ?? '')
-    .trim()
-    .toLowerCase()
-}
-
-function validarDatos(
+export async function actualizarDestino(
+  id: number,
   datos: DestinoFormData,
-): void {
-  const nombre = datos.nombre.trim()
-  const descripcion =
-    datos.descripcion.trim()
-
-  if (!nombre) {
-    throw new Error(
-      'El nombre del destino es obligatorio.',
-    )
-  }
-
-  if (nombre.length < 2) {
-    throw new Error(
-      'El nombre debe tener al menos 2 caracteres.',
-    )
-  }
-
-  if (nombre.length > 100) {
-    throw new Error(
-      'El nombre no puede superar los 100 caracteres.',
-    )
-  }
-
-  if (!descripcion) {
-    throw new Error(
-      'La descripción es obligatoria.',
-    )
-  }
-
-  if (descripcion.length > 250) {
-    throw new Error(
-      'La descripción no puede superar los 250 caracteres.',
-    )
-  }
-}
-
-function crearSiguienteId(
-  destinos: Destino[],
-): string {
-  const numeroMayor =
-    destinos.reduce(
-      (mayor, destino) => {
-        const numero = Number(
-          destino.id.replace(
-            'DES-',
-            '',
-          ),
-        )
-
-        return Number.isNaN(numero)
-          ? mayor
-          : Math.max(mayor, numero)
-      },
-      0,
-    )
-
-  return `DES-${String(
-    numeroMayor + 1,
-  ).padStart(3, '0')}`
-}
-
-function crearFechaActual(): string {
-  return new Intl.DateTimeFormat(
-    'es-PE',
-  ).format(new Date())
-}
-
-function destinoEstaEnUso(
-  destinoId: string,
-): boolean {
-  try {
-    const datosGuardados =
-      localStorage.getItem(
-        VALES_STORAGE_KEY,
-      )
-
-    if (!datosGuardados) {
-      return false
-    }
-
-    const datos: unknown =
-      JSON.parse(datosGuardados)
-
-    if (!Array.isArray(datos)) {
-      return false
-    }
-
-    return datos.some(
-      (valorVale: unknown) => {
-        if (
-          typeof valorVale !== 'object' ||
-          valorVale === null
-        ) {
-          return false
-        }
-
-        const vale = valorVale as {
-          detalles?: unknown
-        }
-
-        if (
-          !Array.isArray(vale.detalles)
-        ) {
-          return false
-        }
-
-        return vale.detalles.some(
-          (valorDetalle: unknown) => {
-            if (
-              typeof valorDetalle !==
-                'object' ||
-              valorDetalle === null
-            ) {
-              return false
-            }
-
-            const detalle =
-              valorDetalle as {
-                distribuciones?: unknown
-              }
-
-            if (
-              !Array.isArray(
-                detalle.distribuciones,
-              )
-            ) {
-              return false
-            }
-
-            return detalle.distribuciones.some(
-              (
-                valorDistribucion:
-                  unknown,
-              ) => {
-                if (
-                  typeof valorDistribucion !==
-                    'object' ||
-                  valorDistribucion ===
-                    null
-                ) {
-                  return false
-                }
-
-                const distribucion =
-                  valorDistribucion as {
-                    destinoId?: unknown
-                  }
-
-                return (
-                  distribucion.destinoId ===
-                  destinoId
-                )
-              },
-            )
-          },
-        )
-      },
-    )
-  } catch {
-    return false
-  }
-}
-
-export function obtenerDestinos():
-  Destino[] {
-  const datosGuardados =
-    localStorage.getItem(STORAGE_KEY)
-
-  if (!datosGuardados) {
-    guardarDestinos(
-      DESTINOS_INICIALES,
-    )
-
-    return copiarDestinos(
-      DESTINOS_INICIALES,
-    )
-  }
-
-  try {
-    const datos = JSON.parse(
-      datosGuardados,
-    )
-
-    if (!Array.isArray(datos)) {
-      throw new Error(
-        'Formato inválido',
-      )
-    }
-
-    return copiarDestinos(
-      datos as Destino[],
-    )
-  } catch {
-    guardarDestinos(
-      DESTINOS_INICIALES,
-    )
-
-    return copiarDestinos(
-      DESTINOS_INICIALES,
-    )
-  }
-}
-
-export function crearDestino(
-  datos: DestinoFormData,
-): Destino {
-  validarDatos(datos)
-
-  const destinos =
-    obtenerDestinos()
-
-  const nombreDuplicado =
-    destinos.some(
-      (destino) =>
-        normalizarTexto(
-          destino.nombre,
-        ) ===
-        normalizarTexto(
-          datos.nombre,
-        ),
-    )
-
-  if (nombreDuplicado) {
-    throw new Error(
-      'Ya existe un destino con ese nombre.',
-    )
-  }
-
-  const nuevoDestino: Destino = {
-    id: crearSiguienteId(destinos),
-    nombre: datos.nombre.trim(),
-    descripcion:
-      datos.descripcion.trim(),
-    estado: datos.estado,
-    fechaRegistro:
-      crearFechaActual(),
-  }
-
-  guardarDestinos([
-    nuevoDestino,
-    ...destinos,
-  ])
-
-  registrarEventoBitacora({
-    modulo: 'Destinos',
-    accion: 'CREAR',
-    detalle:
-      `Se creó el destino "${nuevoDestino.nombre}".`,
-    registroId: nuevoDestino.id,
-  })
-
-  return { ...nuevoDestino }
-}
-
-export function actualizarDestino(
-  id: string,
-  datos: DestinoFormData,
-): Destino {
-  validarDatos(datos)
-
-  const destinos =
-    obtenerDestinos()
-
-  const destinoActual =
-    destinos.find(
-      (destino) =>
-        destino.id === id,
-    )
-
-  if (!destinoActual) {
-    throw new Error(
-      'El destino no existe.',
-    )
-  }
-
-  const nombreDuplicado =
-    destinos.some(
-      (destino) =>
-        destino.id !== id &&
-        normalizarTexto(
-          destino.nombre,
-        ) ===
-          normalizarTexto(
-            datos.nombre,
-          ),
-    )
-
-  if (nombreDuplicado) {
-    throw new Error(
-      'Ya existe otro destino con ese nombre.',
-    )
-  }
-
-  const destinoActualizado:
-    Destino = {
-      ...destinoActual,
+): Promise<MessageResponse> {
+  validar(datos)
+  return validarRespuesta(await destinoApi.actualizarDestino({
+    id,
+    destinoRequest: {
       nombre: datos.nombre.trim(),
-      descripcion:
-        datos.descripcion.trim(),
-      estado: datos.estado,
-    }
-
-  guardarDestinos(
-    destinos.map((destino) =>
-      destino.id === id
-        ? destinoActualizado
-        : destino,
-    ),
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Destinos',
-    accion: 'EDITAR',
-    detalle:
-      `Se actualizó el destino "${destinoActualizado.nombre}".`,
-    registroId:
-      destinoActualizado.id,
-  })
-
-  return { ...destinoActualizado }
+      descripcion: datos.descripcion.trim(),
+    },
+  }))
 }
 
-export function eliminarDestino(
-  id: string,
-): void {
-  const destinos =
-    obtenerDestinos()
+export async function cambiarEstadoDestino(
+  id: number,
+  activo: boolean,
+): Promise<MessageResponse> {
+  return validarRespuesta(await destinoApi.cambiarEstadoDestino({
+    id,
+    estadoCatalogoRequest: { activo },
+  }))
+}
 
-  const destinoAEliminar =
-    destinos.find(
-      (destino) =>
-        destino.id === id,
-    )
-  
-  if (!destinoAEliminar) {
-    throw new Error(
-      'El destino no existe.',
-    )
-  }
+export function eliminarDestino(id: number): Promise<MessageResponse> {
+  return cambiarEstadoDestino(id, false)
+}
 
-   if (destinoEstaEnUso(id)) {
-      throw new Error(
-        'No puedes eliminar este destino porque está utilizado en uno o más vales de consumo. Puedes desactivarlo.',
-      )
-    }
-
-  guardarDestinos(
-    destinos.filter(
-      (destino) =>
-        destino.id !== id,
-    ),
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Destinos',
-    accion: 'ELIMINAR',
-    detalle:
-      `Se eliminó el destino "${destinoAEliminar.nombre}".`,
-    registroId:
-      destinoAEliminar.id,
-  })
+export function reactivarDestino(id: number): Promise<MessageResponse> {
+  return cambiarEstadoDestino(id, true)
 }

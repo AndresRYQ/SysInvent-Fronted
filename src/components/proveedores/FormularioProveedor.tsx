@@ -1,14 +1,12 @@
+import { Placeholder } from '../../constants/placeholders'
 import {
   useEffect,
   useState,
   type FormEvent,
+  type KeyboardEvent,
 } from 'react'
 
-import {
-  Building2,
-  Save,
-  X,
-} from 'lucide-react'
+import { Save, X } from 'lucide-react'
 
 import type {
   Proveedor,
@@ -17,6 +15,7 @@ import type {
 
 interface FormularioProveedorProps {
   proveedor?: Proveedor | null
+  soloLectura?: boolean
   error: string
   onSubmit: (
     datos: ProveedorFormData,
@@ -38,7 +37,6 @@ const FORM_INICIAL: ProveedorFormData = {
   correo: '',
   telefono: '',
   direccion: '',
-  estado: true,
 }
 
 const ERRORES_INICIALES: ErroresFormulario = {
@@ -51,6 +49,7 @@ const ERRORES_INICIALES: ErroresFormulario = {
 
 export function FormularioProveedor({
   proveedor,
+  soloLectura = false,
   error,
   onSubmit,
   onCancelar,
@@ -71,7 +70,6 @@ export function FormularioProveedor({
         correo: proveedor.correo,
         telefono: proveedor.telefono,
         direccion: proveedor.direccion,
-        estado: proveedor.estado,
       })
     } else {
       setForm(FORM_INICIAL)
@@ -122,8 +120,7 @@ export function FormularioProveedor({
       telefono.replace(/\D/g, '')
 
     if (
-      numerosTelefono.length < 7 ||
-      numerosTelefono.length > 15
+      numerosTelefono.length !== 9
     ) {
       nuevosErrores.telefono =
         'Ingresa un número de teléfono válido'
@@ -162,7 +159,6 @@ export function FormularioProveedor({
         .toLowerCase(),
       telefono: form.telefono.trim(),
       direccion: form.direccion.trim(),
-      estado: form.estado,
     })
   }
 
@@ -172,25 +168,7 @@ export function FormularioProveedor({
       noValidate
       onSubmit={manejarEnvio}
     >
-      <div className="card-header bg-white border-bottom p-4">
-        <div className="d-flex align-items-center gap-3">
-          <span className="maestro-cell-icon">
-            <Building2 size={20} />
-          </span>
-
-          <div>
-            <h2 className="h5 mb-1">
-              Información del proveedor
-            </h2>
-
-            <p className="text-muted mb-0">
-              Registra los datos fiscales y de contacto.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="card-body p-4">
+      <div className="maestro-modal-body">
         {error && (
           <div
             className="alert alert-danger"
@@ -200,21 +178,21 @@ export function FormularioProveedor({
           </div>
         )}
 
+        <fieldset disabled={soloLectura}>
         <div className="row g-4">
           <div className="col-12 col-lg-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="proveedorRuc"
             >
               RUC
-              <span className="maestro-required">
-                *
-              </span>
             </label>
 
             <input
               id="proveedorRuc"
-              className={`form-control maestro-control${
+              className={`form-control${
+                !soloLectura ? ' required' : ''
+              }${
                 errores.ruc
                   ? ' maestro-control--error'
                   : ''
@@ -222,11 +200,12 @@ export function FormularioProveedor({
               type="text"
               inputMode="numeric"
               maxLength={11}
-              placeholder="Ej. 20123456789"
+              placeholder={Placeholder.Ingresar}
               value={form.ruc}
               aria-invalid={Boolean(
                 errores.ruc,
               )}
+              onKeyDown={permitirSoloNumeros}
               onChange={(event) => {
                 const value =
                   event.target.value.replace(
@@ -255,25 +234,24 @@ export function FormularioProveedor({
 
           <div className="col-12 col-lg-8">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="proveedorRazonSocial"
             >
               Razón social
-              <span className="maestro-required">
-                *
-              </span>
             </label>
 
             <input
               id="proveedorRazonSocial"
-              className={`form-control maestro-control${
+              className={`form-control${
+                !soloLectura ? ' required' : ''
+              }${
                 errores.razonSocial
                   ? ' maestro-control--error'
                   : ''
               }`}
               type="text"
               maxLength={120}
-              placeholder="Nombre legal del proveedor"
+              placeholder={Placeholder.Ingresar}
               value={form.razonSocial}
               aria-invalid={Boolean(
                 errores.razonSocial,
@@ -301,25 +279,24 @@ export function FormularioProveedor({
 
           <div className="col-12 col-lg-6">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="proveedorCorreo"
             >
               Correo electrónico
-              <span className="maestro-required">
-                *
-              </span>
             </label>
 
             <input
               id="proveedorCorreo"
-              className={`form-control maestro-control${
+              className={`form-control${
+                !soloLectura ? ' required' : ''
+              }${
                 errores.correo
                   ? ' maestro-control--error'
                   : ''
               }`}
               type="email"
               maxLength={120}
-              placeholder="ventas@proveedor.com"
+              placeholder={Placeholder.Ingresar}
               value={form.correo}
               aria-invalid={Boolean(
                 errores.correo,
@@ -346,34 +323,36 @@ export function FormularioProveedor({
 
           <div className="col-12 col-lg-6">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="proveedorTelefono"
             >
               Teléfono
-              <span className="maestro-required">
-                *
-              </span>
             </label>
 
             <input
               id="proveedorTelefono"
-              className={`form-control maestro-control${
+              className={`form-control${
+                !soloLectura ? ' required' : ''
+              }${
                 errores.telefono
                   ? ' maestro-control--error'
                   : ''
               }`}
               type="tel"
-              maxLength={20}
-              placeholder="Ej. 987654321"
+              inputMode="numeric"
+              maxLength={9}
+              placeholder={Placeholder.Ingresar}
               value={form.telefono}
               aria-invalid={Boolean(
                 errores.telefono,
               )}
+              onKeyDown={permitirSoloNumeros}
               onChange={(event) => {
+                const value = event.target.value.replace(/\D/g, '')
+
                 setForm((actual) => ({
                   ...actual,
-                  telefono:
-                    event.target.value,
+                  telefono: value,
                 }))
 
                 setErrores((actual) => ({
@@ -392,25 +371,24 @@ export function FormularioProveedor({
 
           <div className="col-12">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="proveedorDireccion"
             >
               Dirección
-              <span className="maestro-required">
-                *
-              </span>
             </label>
 
             <textarea
               id="proveedorDireccion"
-              className={`form-control maestro-control maestro-control--textarea${
+              className={`form-control${
+                !soloLectura ? ' required' : ''
+              }${
                 errores.direccion
                   ? ' maestro-control--error'
                   : ''
               }`}
               rows={3}
               maxLength={200}
-              placeholder="Dirección fiscal del proveedor"
+              placeholder={Placeholder.Ingresar}
               value={form.direccion}
               aria-invalid={Boolean(
                 errores.direccion,
@@ -444,48 +422,14 @@ export function FormularioProveedor({
             </div>
           </div>
 
-          <div className="col-12 col-lg-4">
-            <label
-              className="form-label maestro-label"
-              htmlFor="proveedorEstado"
-            >
-              Estado
-            </label>
-
-            <select
-              id="proveedorEstado"
-              className="form-select maestro-control"
-              value={
-                form.estado
-                  ? 'activo'
-                  : 'inactivo'
-              }
-              onChange={(event) =>
-                setForm((actual) => ({
-                  ...actual,
-                  estado:
-                    event.target.value ===
-                    'activo',
-                }))
-              }
-            >
-              <option value="activo">
-                Activo
-              </option>
-
-              <option value="inactivo">
-                Inactivo
-              </option>
-            </select>
-          </div>
         </div>
+        </fieldset>
       </div>
 
-      <div className="card-footer bg-white border-top p-4">
-        <div className="d-flex flex-wrap justify-content-end gap-2">
+      {!soloLectura && <div className="maestro-modal-footer">
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn btn-maestro-danger"
             onClick={onCancelar}
           >
             <X size={18} />
@@ -494,15 +438,25 @@ export function FormularioProveedor({
 
           <button
             type="submit"
-            className="btn maestro-btn-primary"
+            className="btn btn-maestro-primary"
           >
             <Save size={18} />
             {proveedor
               ? 'Guardar cambios'
               : 'Registrar proveedor'}
           </button>
-        </div>
-      </div>
+      </div>}
     </form>
   )
+}
+
+const teclasEdicionNumerica = new Set([
+  'Backspace', 'Delete', 'Tab', 'ArrowLeft',
+  'ArrowRight', 'Home', 'End',
+])
+
+function permitirSoloNumeros(event: KeyboardEvent<HTMLInputElement>): void {
+  if (!/^\d$/.test(event.key) && !teclasEdicionNumerica.has(event.key) && !event.ctrlKey && !event.metaKey) {
+    event.preventDefault()
+  }
 }

@@ -1,9 +1,6 @@
-import {
-  ChevronDown,
-  Filter,
-  RotateCcw,
-  Search,
-} from 'lucide-react'
+import { Placeholder } from '../../constants/placeholders'
+import { Filter, RotateCcw, Search } from 'lucide-react'
+import { MaestroEstadoSelect } from '../common/MaestroEstadoSelect'
 
 export interface FiltrosPartesEquipoValores {
   busqueda: string
@@ -32,7 +29,7 @@ export function FiltrosPartesEquipo({
         <div className="mb-3">
           <span className="maestro-kicker">
             <Filter size={16} />
-            Filtros
+            Filtros de búsqueda
           </span>
         </div>
 
@@ -45,7 +42,7 @@ export function FiltrosPartesEquipo({
         >
           <div className="col-12 col-lg-8">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="buscarParteEquipo"
             >
               Código o nombre
@@ -53,10 +50,10 @@ export function FiltrosPartesEquipo({
 
             <input
               id="buscarParteEquipo"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.busqueda}
-              placeholder="Ej. MOT-001 o Motor principal"
+              placeholder={Placeholder.Buscar}
               onChange={(event) =>
                 onChange(
                   'busqueda',
@@ -68,46 +65,24 @@ export function FiltrosPartesEquipo({
 
           <div className="col-12 col-lg-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="estadoParteEquipo"
             >
               Estado
             </label>
 
-            <div className="maestro-select-wrap">
-              <select
-                id="estadoParteEquipo"
-                className="form-select maestro-control maestro-select-control"
-                value={valores.estado}
-                onChange={(event) =>
-                  onChange(
-                    'estado',
-                    event.target.value,
-                  )
-                }
-              >
-                <option value="">
-                  Todos
-                </option>
-
-                <option value="activo">
-                  Activo
-                </option>
-
-                <option value="inactivo">
-                  Inactivo
-                </option>
-              </select>
-
-              <ChevronDown size={16} />
-            </div>
+            <MaestroEstadoSelect
+              inputId="estadoParteEquipo"
+              value={valores.estado}
+              onChange={(value) => onChange('estado', value)}
+            />
           </div>
 
           <div className="col-12">
             <div className="maestro-filter-actions">
               <button
                 type="button"
-                className="btn maestro-btn-secondary maestro-filter-btn"
+                className="btn btn-maestro-secondary"
                 onClick={onLimpiar}
               >
                 <RotateCcw size={18} />
@@ -116,7 +91,7 @@ export function FiltrosPartesEquipo({
 
               <button
                 type="submit"
-                className="btn maestro-btn-primary maestro-filter-btn"
+                className="btn btn-maestro-primary"
               >
                 <Search size={18} />
                 Buscar

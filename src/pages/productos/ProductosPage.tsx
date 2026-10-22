@@ -1,6 +1,7 @@
 import {
   useEffect,
   useMemo,
+  useCallback,
   useState,
 } from 'react'
 
@@ -21,16 +22,28 @@ import {
 } from '../../components/productos/TablaProductos'
 
 import { ProductoDeleteModal } from '../../components/productos/ProductoDeleteModal'
+import { FormularioProducto } from '../../components/productos/FormularioProducto'
+import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
 
 import {
+  actualizarProducto,
+  crearProducto,
   eliminarProducto,
-  obtenerProductos,
+  listarProductosApi,
+  reactivarProducto,
 } from '../../services/productoService'
 
-import { obtenerProveedores } from '../../services/proveedorService'
-import { obtenerTiposProducto } from '../../services/tipoProductoService'
+import { listarProveedores } from '../../services/proveedorService'
+import { listarTiposProducto } from '../../services/tipoProductoService'
+import { listarUnidadesMedida } from '../../services/unidadMedidaService'
+import { listarCategorias } from '../../services/categoriaService'
 
 import type { Producto } from '../../types/producto'
+import type { Categoria } from '../../types/categoria'
+import type { Proveedor } from '../../types/proveedor'
+import type { TipoProducto } from '../../types/tipoProducto'
+import type { UnidadMedida } from '../../types/unidadMedida'
+import { coincidenIds } from '../../utils/identificadores'
 
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
@@ -38,7 +51,7 @@ import '../../styles/maestros.css'
 const FILTROS_INICIALES: FiltrosProductosValores = {
   busqueda: '',
   tipoProductoId: '',
-  categoriaId: '',  
+  categoriaId: '',
   estado: '',
 }
 
@@ -53,19 +66,6 @@ const CATEGORIAS_INICIALES: OpcionFiltroProducto[] = [
   { id: 'CAT-005', nombre: 'Limpieza' },
 ]
 
-const UNIDADES_INICIALES: OpcionFiltroProducto[] = [
-  { id: 'UM-001', nombre: 'Unidad' },
-  { id: 'UM-002', nombre: 'Kilogramo' },
-  { id: 'UM-003', nombre: 'Litro' },
-  { id: 'UM-004', nombre: 'Metro' },
-  { id: 'UM-005', nombre: 'Caja' },
-]
-
-interface MensajePagina {
-  tipo: 'success' | 'danger'
-  texto: string
-}
-
 interface EstadoNavegacion {
   mensaje?: string
 }
@@ -75,8 +75,7 @@ function obtenerOpcionesLocales(
   valoresIniciales: OpcionFiltroProducto[],
 ): OpcionFiltroProducto[] {
   try {
-    const datosGuardados =
-      localStorage.getItem(storageKey)
+    const datosGuardados = ''
 
     if (!datosGuardados) {
       return valoresIniciales
@@ -98,36 +97,69 @@ function obtenerMensajeError(error: unknown): string {
     : 'Ocurrió un error inesperado.'
 }
 
+function coincideIdMaestro(
+  valorProducto: string | number,
+  idMaestro: string | number,
+  prefijo: string,
+): boolean {
+  const valor = String(valorProducto)
+  const id = String(idMaestro)
+  return valor === id || valor === `${prefijo}${id.padStart(3, '0')}`
+}
+
 export function ProductosPage() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const [productos, setProductos] =
-    useState<Producto[]>(() =>
-      obtenerProductos(),
-    )
+  const [productos, setProductos] = useState<Producto[]>([])
+  const [cargandoProductos, setCargandoProductos] = useState(true)
 
-  const [tiposProducto] = useState(() =>
-    obtenerTiposProducto(),
-  )
+  const [tiposProducto, setTiposProducto] = useState<TipoProducto[]>([])
+  const [proveedores, setProveedores] = useState<Proveedor[]>([])
+  const [categorias, setCategorias] = useState<Categoria[]>([])
+  const [unidadesMedida, setUnidadesMedida] = useState<UnidadMedida[]>([])
+  const [catalogosModalCargados, setCatalogosModalCargados] = useState(false)
+  const [modalFormOpen, setModalFormOpen] = useState(false)
+  const [productoEnEdicion, setProductoEnEdicion] = useState<Producto | null>(null)
+  const [modoVisualizacion, setModoVisualizacion] = useState(false)
+  const [errorFormulario, setErrorFormulario] = useState('')
 
-  const [proveedores] = useState(() =>
-    obtenerProveedores(),
-  )
+  useEffect(() => {
+    listarCategorias({ pagina: 1, tamPagina: 100 })
+      .then((resultado) => setCategorias(resultado.datos))
+      .catch(() => setCategorias([]))
+  }, [])
 
-  const [categorias] = useState(() =>
-    obtenerOpcionesLocales(
-      'agrihusac_categorias',
-      CATEGORIAS_INICIALES,
-    ),
-  )
+  useEffect(() => {
+    listarTiposProducto({ pagina: 1, tamPagina: 100 })
+      .then((resultado) => setTiposProducto(resultado.datos))
+      .catch(() => setTiposProducto([]))
+  }, [])
 
-  const [unidadesMedida] = useState(() =>
-    obtenerOpcionesLocales(
-      'agrihusac_unidades_medida',
-      UNIDADES_INICIALES,
-    ),
-  )
+  useEffect(() => {
+    if (!modalFormOpen || catalogosModalCargados) return
+
+    let cancelado = false
+    setErrorFormulario('')
+
+    Promise.all([
+      listarUnidadesMedida({ pagina: 1, tamPagina: 100 }),
+      listarProveedores({ pagina: 1, tamPagina: 100 }),
+    ])
+      .then(([unidades, proveedoresResultado]) => {
+        if (cancelado) return
+        setUnidadesMedida(unidades.datos)
+        setProveedores(proveedoresResultado.datos)
+        setCatalogosModalCargados(true)
+      })
+      .catch(() => {
+        if (!cancelado) setErrorFormulario('No se pudieron cargar los catálogos del producto.')
+      })
+
+    return () => {
+      cancelado = true
+    }
+  }, [modalFormOpen, catalogosModalCargados])
 
   const [filtros, setFiltros] =
     useState<FiltrosProductosValores>(
@@ -151,9 +183,26 @@ export function ProductosPage() {
 
   const [modalDeleteOpen, setModalDeleteOpen] =
     useState(false)
+  const [modalReactivarOpen, setModalReactivarOpen] = useState(false)
+  const [productoAReactivar, setProductoAReactivar] = useState<Producto | null>(null)
 
-  const [mensaje, setMensaje] =
-    useState<MensajePagina | null>(null)
+  const { mensaje, abierta, mostrarAlerta, cerrarAlerta, limpiarAlerta } = useSnackbar()
+
+  const cargarProductos = useCallback(async (): Promise<void> => {
+    setCargandoProductos(true)
+    try {
+      const resultado = await listarProductosApi({ pagina: 1, tamPagina: 100 })
+      setProductos(resultado.datos)
+    } finally {
+      setCargandoProductos(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    void cargarProductos().catch((error) => {
+      mostrarAlerta('error', obtenerMensajeError(error))
+    })
+  }, [cargarProductos, mostrarAlerta])
 
   useEffect(() => {
     const estado =
@@ -163,10 +212,7 @@ export function ProductosPage() {
       return
     }
 
-    setMensaje({
-      tipo: 'success',
-      texto: estado.mensaje,
-    })
+    mostrarAlerta('success', estado.mensaje)
 
     navigate(location.pathname, {
       replace: true,
@@ -176,6 +222,7 @@ export function ProductosPage() {
     location.pathname,
     location.state,
     navigate,
+    mostrarAlerta,
   ])
 
   const productosConDetalle = useMemo<
@@ -184,32 +231,40 @@ export function ProductosPage() {
     return productos.map((producto) => ({
       ...producto,
 
-      tipoProductoNombre:
-        tiposProducto.find(
+        tipoProductoNombre: producto.tipoProductoNombre ?? tiposProducto.find(
           (tipo) =>
-            tipo.id ===
-            producto.tipoProductoId,
+            coincideIdMaestro(
+              producto.tipoProductoId,
+              tipo.id,
+              'TP-',
+            ),
         )?.nombre ?? 'Sin tipo',
 
-      categoriaNombre:
-        categorias.find(
+      categoriaNombre: producto.categoriaNombre ?? categorias.find(
           (categoria) =>
-            categoria.id ===
-            producto.categoriaId,
+            coincideIdMaestro(
+              producto.categoriaId,
+              categoria.id,
+              'CAT-',
+            ),
         )?.nombre ?? 'Sin categoría',
 
-      unidadMedidaNombre:
-        unidadesMedida.find(
+      unidadMedidaNombre: producto.unidadMedidaNombre ?? unidadesMedida.find(
           (unidad) =>
-            unidad.id ===
-            producto.unidadMedidaId,
+            coincideIdMaestro(
+              producto.unidadMedidaId,
+              unidad.id,
+              'UM-',
+            ),
         )?.nombre ?? 'Sin unidad',
 
-      proveedorNombre:
-        proveedores.find(
+        proveedorNombre: producto.proveedorRazonSocial ?? proveedores.find(
           (proveedor) =>
-            proveedor.id ===
-            producto.proveedorId,
+            coincideIdMaestro(
+              producto.proveedorId,
+              proveedor.id,
+              'PROV-',
+            ),
         )?.razonSocial ?? 'Sin proveedor',
     }))
   }, [
@@ -242,27 +297,33 @@ export function ProductosPage() {
 
         const coincideTipo =
           !filtrosAplicados.tipoProductoId ||
-          producto.tipoProductoId ===
-            filtrosAplicados.tipoProductoId
+          coincidenIds(
+            producto.tipoProductoId,
+            filtrosAplicados.tipoProductoId,
+            'TP-',
+          )
 
         const coincideCategoria =
           !filtrosAplicados.categoriaId ||
-          producto.categoriaId ===
-            filtrosAplicados.categoriaId
+          coincidenIds(
+            producto.categoriaId,
+            filtrosAplicados.categoriaId,
+            'CAT-',
+          )
 
         const coincideEstado =
           !filtrosAplicados.estado ||
           (filtrosAplicados.estado ===
             'activo' &&
-            producto.estado) ||
+            producto.activo) ||
           (filtrosAplicados.estado ===
             'inactivo' &&
-            !producto.estado)
+            !producto.activo)
 
         return (
           coincideBusqueda &&
           coincideTipo &&
-          coincideCategoria &&       
+          coincideCategoria &&
           coincideEstado
         )
       },
@@ -272,7 +333,7 @@ export function ProductosPage() {
     filtrosAplicados,
   ])
 
-  const totalItems = productosFiltrados.length
+  const totalItems = cargandoProductos ? -1 : productosFiltrados.length
 
   const productosPaginados = useMemo(() => {
     const startIndex = (page - 1) * pageSize
@@ -298,38 +359,67 @@ export function ProductosPage() {
     }
   }, [page, pageSize, totalItems])
 
-  function confirmarEliminacion(): void {
+  async function confirmarEliminacion(): Promise<void> {
     if (!productoAEliminar) {
       return
     }
 
     try {
-      eliminarProducto(
-        productoAEliminar.id,
-      )
-
-      setProductos(obtenerProductos())
+      await eliminarProducto(productoAEliminar.productoId)
+      await cargarProductos()
       setModalDeleteOpen(false)
       setProductoAEliminar(null)
 
-      setMensaje({
-        tipo: 'success',
-        texto:
-          'Producto eliminado correctamente.',
-      })
+      mostrarAlerta('success', 'Producto eliminado correctamente.')
     } catch (error) {
       setModalDeleteOpen(false)
       setProductoAEliminar(null)
 
-      setMensaje({
-        tipo: 'danger',
-        texto: obtenerMensajeError(error),
-      })
+      mostrarAlerta('error', obtenerMensajeError(error))
+    }
+  }
+
+  async function confirmarReactivacion(): Promise<void> {
+    if (!productoAReactivar) return
+
+    try {
+      const respuesta = await reactivarProducto(productoAReactivar.productoId)
+      await cargarProductos()
+      mostrarAlerta('success', respuesta.message ?? 'Producto reactivado correctamente.')
+    } catch (error) {
+      mostrarAlerta('error', obtenerMensajeError(error))
+    } finally {
+      setModalReactivarOpen(false)
+      setProductoAReactivar(null)
+    }
+  }
+
+  function cerrarFormulario(): void {
+    setModalFormOpen(false)
+    setProductoEnEdicion(null)
+    setModoVisualizacion(false)
+    setErrorFormulario('')
+  }
+
+  async function guardarProducto(datos: import('../../types/producto').ProductoFormData): Promise<void> {
+    try {
+      const editando = Boolean(productoEnEdicion)
+      if (editando) {
+        await actualizarProducto(productoEnEdicion!.productoId, datos)
+      } else {
+        await crearProducto(datos)
+      }
+      await cargarProductos()
+      cerrarFormulario()
+      mostrarAlerta('success', editando ? 'Producto actualizado correctamente.' : 'Producto registrado correctamente.')
+    } catch (error) {
+      setErrorFormulario(obtenerMensajeError(error))
     }
   }
 
   return (
     <>
+      <div className="productos-page">
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
@@ -343,26 +433,10 @@ export function ProductosPage() {
             </div>
           </section>
 
-          {mensaje && (
-            <div
-              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
-              role="alert"
-            >
-              {mensaje.texto}
-
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={() => setMensaje(null)}
-              />
-            </div>
-          )}
-
           <div className="maestro-panel">
             <FiltrosProductos
               valores={filtros}
-              tiposProducto={tiposProducto}
+              tiposProducto={tiposProducto.map(({ id, nombre }) => ({ id, nombre }))}
               categorias={categorias}
               onChange={(campo, valor) =>
                 setFiltros((actual) => ({
@@ -392,18 +466,16 @@ export function ProductosPage() {
               totalItems={totalItems}
               page={page}
               pageSize={pageSize}
-              onAgregar={() =>
-                navigate('/productos/nuevo')
-              }
-              onEditar={(producto) =>
-                navigate(
-                  `/productos/${producto.id}/editar`,
-                )
-              }
+              onAgregar={() => { setProductoEnEdicion(null); setModoVisualizacion(false); setErrorFormulario(''); setModalFormOpen(true) }}
+              onEditar={(producto) => { setProductoEnEdicion(producto); setModoVisualizacion(false); setErrorFormulario(''); setModalFormOpen(true) }}
+              onVisualizar={(producto) => { setProductoEnEdicion(producto); setModoVisualizacion(true); setErrorFormulario(''); setModalFormOpen(true) }}
               onEliminar={(producto) => {
-                setMensaje(null)
                 setProductoAEliminar(producto)
                 setModalDeleteOpen(true)
+              }}
+              onReactivar={(producto) => {
+                setProductoAReactivar(producto)
+                setModalReactivarOpen(true)
               }}
               onPageChange={setPage}
               onPageSizeChange={(
@@ -416,6 +488,7 @@ export function ProductosPage() {
           </div>
         </div>
       </main>
+      </div>
 
       <ProductoDeleteModal
         abierto={modalDeleteOpen}
@@ -426,6 +499,23 @@ export function ProductosPage() {
         }}
         onConfirm={confirmarEliminacion}
       />
+      <ProductoDeleteModal
+        abierto={modalReactivarOpen}
+        producto={productoAReactivar}
+        modo="reactivar"
+        onClose={() => {
+          setModalReactivarOpen(false)
+          setProductoAReactivar(null)
+        }}
+        onConfirm={confirmarReactivacion}
+      />
+      <SnackbarAlert
+        mensaje={mensaje}
+        abierta={abierta}
+        onClose={cerrarAlerta}
+        onExited={limpiarAlerta}
+      />
+      {modalFormOpen && <div className="maestro-modal-backdrop productos-page" role="presentation"><div className="maestro-modal-card maestro-modal-card--product" role="dialog" aria-modal="true"><div className="maestro-modal-header"><h3 className="maestro-modal-title">{modoVisualizacion ? 'Visualizar producto' : productoEnEdicion ? 'Editar producto' : 'Registrar producto'}</h3><button type="button" className="btn maestro-modal-close" onClick={cerrarFormulario} aria-label="Cerrar modal">×</button></div><FormularioProducto producto={productoEnEdicion} soloLectura={modoVisualizacion} error={errorFormulario} catalogos={{ categorias, tiposProducto, unidadesMedida, proveedores }} onSubmit={guardarProducto} onCancelar={cerrarFormulario} /></div></div>}
     </>
   )
 }

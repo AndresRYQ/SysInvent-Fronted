@@ -1,12 +1,16 @@
+import { Placeholder } from '../../../constants/placeholders'
 import {
   Filter,
   RotateCcw,
   Search,
 } from 'lucide-react'
+import Select from 'react-select'
 
 import type {
   FiltrosProductosMasPedidos as FiltrosValores,
 } from '../../../types/reporteProductoMasPedido'
+import { crearEstilosSelect } from '../../../styles/reactSelectStyles'
+import { DatePickerInput } from '../../ui/DatePickerInput'
 
 interface OpcionFiltro {
   id: string
@@ -41,7 +45,7 @@ export function FiltrosProductosMasPedidos({
         <div className="mb-3">
           <span className="maestro-kicker">
             <Filter size={16} />
-            Filtros del ranking
+            Filtros de búsqueda
           </span>
         </div>
 
@@ -54,7 +58,7 @@ export function FiltrosProductosMasPedidos({
         >
           <div className="col-12 col-xl-6">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="buscarProductoPedido"
             >
               Buscar producto
@@ -65,7 +69,7 @@ export function FiltrosProductosMasPedidos({
               type="search"
               className="form-control maestro-control"
               value={valores.busqueda}
-              placeholder="Código, producto, tipo o categoría"
+              placeholder={Placeholder.Buscar}
               onChange={(event) =>
                 onChange(
                   'busqueda',
@@ -77,167 +81,76 @@ export function FiltrosProductosMasPedidos({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPedidoDesde"
             >
               Fecha desde
             </label>
 
-            <input
+            <DatePickerInput
               id="productoPedidoDesde"
-              type="date"
-              className="form-control maestro-control"
               value={valores.fechaDesde}
-              max={
-                valores.fechaHasta ||
-                undefined
-              }
-              onChange={(event) =>
-                onChange(
-                  'fechaDesde',
-                  event.target.value,
-                )
-              }
+              maxValue={valores.fechaHasta}
+              rangoEstricto
+              onChange={(value) => onChange('fechaDesde', value)}
             />
           </div>
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPedidoHasta"
             >
               Fecha hasta
             </label>
 
-            <input
+            <DatePickerInput
               id="productoPedidoHasta"
-              type="date"
-              className="form-control maestro-control"
               value={valores.fechaHasta}
-              min={
-                valores.fechaDesde ||
-                undefined
-              }
-              onChange={(event) =>
-                onChange(
-                  'fechaHasta',
-                  event.target.value,
-                )
-              }
+              minValue={valores.fechaDesde}
+              rangoEstricto
+              onChange={(value) => onChange('fechaHasta', value)}
             />
           </div>
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPedidoTipo"
             >
               Tipo de producto
             </label>
 
-            <select
-              id="productoPedidoTipo"
-              className="form-select maestro-control"
-              value={
-                valores.tipoProductoId
-              }
-              onChange={(event) =>
-                onChange(
-                  'tipoProductoId',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todos los tipos
-              </option>
-
-              {tiposProducto.map((tipo) => (
-                <option
-                  key={tipo.id}
-                  value={tipo.id}
-                >
-                  {tipo.nombre}
-                </option>
-              ))}
-            </select>
+            <Select inputId="productoPedidoTipo" classNamePrefix="maestro-select" options={tiposProducto.map((item) => ({ value: item.id, label: item.nombre }))} value={tiposProducto.map((item) => ({ value: item.id, label: item.nombre })).find((item) => item.value === valores.tipoProductoId) ?? null} onChange={(opcion) => onChange('tipoProductoId', opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPedidoCategoria"
             >
               Categoría
             </label>
 
-            <select
-              id="productoPedidoCategoria"
-              className="form-select maestro-control"
-              value={valores.categoriaId}
-              onChange={(event) =>
-                onChange(
-                  'categoriaId',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todas las categorías
-              </option>
-
-              {categorias.map(
-                (categoria) => (
-                  <option
-                    key={categoria.id}
-                    value={categoria.id}
-                  >
-                    {categoria.nombre}
-                  </option>
-                ),
-              )}
-            </select>
+            <Select inputId="productoPedidoCategoria" classNamePrefix="maestro-select" options={categorias.map((item) => ({ value: item.id, label: item.nombre }))} value={categorias.map((item) => ({ value: item.id, label: item.nombre })).find((item) => item.value === valores.categoriaId) ?? null} onChange={(opcion) => onChange('categoriaId', opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12 col-md-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="productoPedidoDestino"
             >
               Destino
             </label>
 
-            <select
-              id="productoPedidoDestino"
-              className="form-select maestro-control"
-              value={valores.destinoId}
-              onChange={(event) =>
-                onChange(
-                  'destinoId',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todos los destinos
-              </option>
-
-              {destinos.map((destino) => (
-                <option
-                  key={destino.id}
-                  value={destino.id}
-                >
-                  {destino.nombre}
-                </option>
-              ))}
-            </select>
+            <Select inputId="productoPedidoDestino" classNamePrefix="maestro-select" options={destinos.map((item) => ({ value: item.id, label: item.nombre }))} value={destinos.map((item) => ({ value: item.id, label: item.nombre })).find((item) => item.value === valores.destinoId) ?? null} onChange={(opcion) => onChange('destinoId', opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12">
             <div className="maestro-filter-actions">
               <button
                 type="button"
-                className="btn maestro-btn-secondary maestro-filter-btn"
+                className="btn btn-maestro-secondary"
                 onClick={onLimpiar}
               >
                 <RotateCcw size={18} />
@@ -246,7 +159,7 @@ export function FiltrosProductosMasPedidos({
 
               <button
                 type="submit"
-                className="btn maestro-btn-primary maestro-filter-btn"
+                className="btn btn-maestro-primary"
               >
                 <Search size={18} />
                 Generar ranking

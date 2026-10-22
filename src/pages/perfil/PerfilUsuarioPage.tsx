@@ -297,8 +297,8 @@ export function PerfilUsuarioPage() {
                         <span
                           className={
                             perfil.estado
-                              ? 'maestro-status maestro-status--active mt-1'
-                              : 'maestro-status maestro-status--inactive mt-1'
+                              ? 'status-label status-label--active mt-1'
+                              : 'status-label status-label--inactive mt-1'
                           }
                         >
                           {perfil.estado
@@ -339,7 +339,7 @@ export function PerfilUsuarioPage() {
             </div>
 
             <div className="col-12 col-lg-8">
-              <section className="maestro-table-card card border-0 shadow-sm">
+              <section className="table-card card border-0 shadow-sm">
                 <div className="card-body p-4">
                   <div className="mb-4">
                     <span className="maestro-kicker">
@@ -375,7 +375,7 @@ export function PerfilUsuarioPage() {
                     <div className="row g-3">
                       <div className="col-12 col-md-6">
                         <label
-                          className="form-label maestro-label"
+                          className="form-label"
                           htmlFor="perfilUsuario"
                         >
                           Usuario
@@ -401,7 +401,7 @@ export function PerfilUsuarioPage() {
 
                       <div className="col-12 col-md-6">
                         <label
-                          className="form-label maestro-label"
+                          className="form-label"
                           htmlFor="perfilNombre"
                         >
                           Nombre completo
@@ -426,7 +426,7 @@ export function PerfilUsuarioPage() {
 
                       <div className="col-12">
                         <label
-                          className="form-label maestro-label"
+                          className="form-label"
                           htmlFor="perfilCorreo"
                         >
                           Correo electrónico
@@ -469,7 +469,7 @@ export function PerfilUsuarioPage() {
 
                       <button
                         type="button"
-                        className="btn maestro-btn-secondary"
+                        className="btn btn-maestro-info"
                         onClick={() =>
                           setMostrarContrasenas(
                             (actual) => !actual,
@@ -491,7 +491,7 @@ export function PerfilUsuarioPage() {
                     <div className="row g-3">
                       <div className="col-12">
                         <label
-                          className="form-label maestro-label"
+                          className="form-label"
                           htmlFor="perfilContrasenaActual"
                         >
                           Contraseña actual
@@ -522,7 +522,7 @@ export function PerfilUsuarioPage() {
 
                       <div className="col-12 col-md-6">
                         <label
-                          className="form-label maestro-label"
+                          className="form-label"
                           htmlFor="perfilNuevaContrasena"
                         >
                           Nueva contraseña
@@ -553,7 +553,7 @@ export function PerfilUsuarioPage() {
 
                       <div className="col-12 col-md-6">
                         <label
-                          className="form-label maestro-label"
+                          className="form-label"
                           htmlFor="perfilConfirmarContrasena"
                         >
                           Confirmar contraseña
@@ -586,7 +586,7 @@ export function PerfilUsuarioPage() {
                     <div className="d-flex justify-content-end mt-4">
                       <button
                         type="submit"
-                        className="btn maestro-btn-primary"
+                        className="btn btn-maestro-primary"
                         disabled={guardando}
                       >
                         <Save size={18} />
@@ -606,3 +606,4 @@ export function PerfilUsuarioPage() {
     </main>
   )
 }
+

@@ -1,3 +1,4 @@
+import { Placeholder } from '../../../constants/placeholders'
 import { useMemo } from 'react'
 
 import {
@@ -5,10 +6,14 @@ import {
   RotateCcw,
   Search,
 } from 'lucide-react'
+import Select from 'react-select'
 
 import type {
   FiltrosReporteVales as FiltrosValores,
 } from '../../../types/reporteVale'
+import { crearEstilosSelect } from '../../../styles/reactSelectStyles'
+import { coincidenIds } from '../../../utils/identificadores'
+import { DatePickerInput } from '../../ui/DatePickerInput'
 
 interface OpcionFiltro {
   id: string
@@ -57,8 +62,11 @@ export function FiltrosReporteVales({
       productos.filter(
         (producto) =>
           !valores.tipoProductoId ||
-          producto.tipoProductoId ===
+          coincidenIds(
+            producto.tipoProductoId,
             valores.tipoProductoId,
+            'TP-',
+          ),
       ),
     [
       productos,
@@ -83,8 +91,11 @@ export function FiltrosReporteVales({
 
     if (
       productoSeleccionado &&
-      productoSeleccionado.tipoProductoId !==
-        tipoProductoId
+      !coincidenIds(
+        productoSeleccionado.tipoProductoId,
+        tipoProductoId,
+        'TP-',
+      )
     ) {
       onChange('productoId', '')
     }
@@ -96,7 +107,7 @@ export function FiltrosReporteVales({
         <div className="mb-3">
           <span className="maestro-kicker">
             <Filter size={16} />
-            Filtros del reporte
+            Filtros de búsqueda
           </span>
         </div>
 
@@ -109,7 +120,7 @@ export function FiltrosReporteVales({
         >
           <div className="col-12 col-xl-6">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="buscarReporteVale"
             >
               Buscar
@@ -120,7 +131,7 @@ export function FiltrosReporteVales({
               type="search"
               className="form-control maestro-control"
               value={valores.busqueda}
-              placeholder="Vale, solicitante, producto, destino o equipo"
+              placeholder={Placeholder.Buscar}
               onChange={(event) =>
                 onChange(
                   'busqueda',
@@ -132,273 +143,109 @@ export function FiltrosReporteVales({
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeDesde"
             >
               Fecha desde
             </label>
 
-            <input
+            <DatePickerInput
               id="reporteValeDesde"
-              type="date"
-              className="form-control maestro-control"
               value={valores.fechaDesde}
-              max={
-                valores.fechaHasta ||
-                undefined
-              }
-              onChange={(event) =>
-                onChange(
-                  'fechaDesde',
-                  event.target.value,
-                )
-              }
+              maxValue={valores.fechaHasta}
+              rangoEstricto
+              onChange={(value) => onChange('fechaDesde', value)}
             />
           </div>
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeHasta"
             >
               Fecha hasta
             </label>
 
-            <input
+            <DatePickerInput
               id="reporteValeHasta"
-              type="date"
-              className="form-control maestro-control"
               value={valores.fechaHasta}
-              min={
-                valores.fechaDesde ||
-                undefined
-              }
-              onChange={(event) =>
-                onChange(
-                  'fechaHasta',
-                  event.target.value,
-                )
-              }
+              minValue={valores.fechaDesde}
+              rangoEstricto
+              onChange={(value) => onChange('fechaHasta', value)}
             />
           </div>
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeCentroCosto"
             >
               Centro de costo
             </label>
 
-            <select
-              id="reporteValeCentroCosto"
-              className="form-select maestro-control"
-              value={valores.centroCostoId}
-              onChange={(event) =>
-                onChange(
-                  'centroCostoId',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todos los centros
-              </option>
-
-              {centrosCosto.map(
-                (centro) => (
-                  <option
-                    key={centro.id}
-                    value={centro.id}
-                  >
-                    {centro.nombre}
-                  </option>
-                ),
-              )}
-            </select>
+            <Select inputId="reporteValeCentroCosto" classNamePrefix="maestro-select" options={centrosCosto.map((item) => ({ value: item.id, label: item.nombre }))} value={centrosCosto.map((item) => ({ value: item.id, label: item.nombre })).find((item) => item.value === valores.centroCostoId) ?? null} onChange={(opcion) => onChange('centroCostoId', opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeDestino"
             >
               Destino
             </label>
 
-            <select
-              id="reporteValeDestino"
-              className="form-select maestro-control"
-              value={valores.destinoId}
-              onChange={(event) =>
-                onChange(
-                  'destinoId',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todos los destinos
-              </option>
-
-              {destinos.map((destino) => (
-                <option
-                  key={destino.id}
-                  value={destino.id}
-                >
-                  {destino.nombre}
-                </option>
-              ))}
-            </select>
+            <Select inputId="reporteValeDestino" classNamePrefix="maestro-select" options={destinos.map((item) => ({ value: item.id, label: item.nombre }))} value={destinos.map((item) => ({ value: item.id, label: item.nombre })).find((item) => item.value === valores.destinoId) ?? null} onChange={(opcion) => onChange('destinoId', opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeParteEquipo"
             >
               Parte de equipo
             </label>
 
-            <select
-              id="reporteValeParteEquipo"
-              className="form-select maestro-control"
-              value={valores.parteEquipoId}
-              onChange={(event) =>
-                onChange(
-                  'parteEquipoId',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todas las partes
-              </option>
-
-              {partesEquipo.map(
-                (parte) => (
-                  <option
-                    key={parte.id}
-                    value={parte.id}
-                  >
-                    {parte.codigo} —{' '}
-                    {parte.nombre}
-                  </option>
-                ),
-              )}
-            </select>
+            <Select inputId="reporteValeParteEquipo" classNamePrefix="maestro-select" options={partesEquipo.map((item) => ({ value: item.id, label: item.codigo + ' — ' + item.nombre }))} value={partesEquipo.map((item) => ({ value: item.id, label: item.codigo + ' — ' + item.nombre })).find((item) => item.value === valores.parteEquipoId) ?? null} onChange={(opcion) => onChange('parteEquipoId', opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeEstado"
             >
               Estado
             </label>
 
-            <select
-              id="reporteValeEstado"
-              className="form-select maestro-control"
-              value={valores.estado}
-              onChange={(event) =>
-                onChange(
-                  'estado',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todos los estados
-              </option>
-
-              <option value="REGISTRADO">
-                Registrado
-              </option>
-
-              <option value="ANULADO">
-                Anulado
-              </option>
-            </select>
+            <Select inputId="reporteValeEstado" classNamePrefix="maestro-select" options={[{ value: 'REGISTRADO', label: 'Registrado' }, { value: 'ANULADO', label: 'Anulado' }]} value={[{ value: 'REGISTRADO', label: 'Registrado' }, { value: 'ANULADO', label: 'Anulado' }].find((item) => item.value === valores.estado) ?? null} onChange={(opcion) => onChange('estado', opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable={false} menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeTipoProducto"
             >
               Tipo de producto
             </label>
 
-            <select
-              id="reporteValeTipoProducto"
-              className="form-select maestro-control"
-              value={
-                valores.tipoProductoId
-              }
-              onChange={(event) =>
-                cambiarTipoProducto(
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todos los tipos
-              </option>
-
-              {tiposProducto.map((tipo) => (
-                <option
-                  key={tipo.id}
-                  value={tipo.id}
-                >
-                  {tipo.nombre}
-                </option>
-              ))}
-            </select>
+            <Select inputId="reporteValeTipoProducto" classNamePrefix="maestro-select" options={tiposProducto.map((item) => ({ value: item.id, label: item.nombre }))} value={tiposProducto.map((item) => ({ value: item.id, label: item.nombre })).find((item) => item.value === valores.tipoProductoId) ?? null} onChange={(opcion) => cambiarTipoProducto(opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12 col-md-6 col-xl-3">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="reporteValeProducto"
             >
               Producto
             </label>
 
-            <select
-              id="reporteValeProducto"
-              className="form-select maestro-control"
-              value={valores.productoId}
-              onChange={(event) =>
-                onChange(
-                  'productoId',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">
-                Todos los productos
-              </option>
-
-              {productosFiltrados.map(
-                (producto) => (
-                  <option
-                    key={producto.id}
-                    value={producto.id}
-                  >
-                    {producto.codigo} —{' '}
-                    {producto.nombre}
-                  </option>
-                ),
-              )}
-            </select>
+            <Select inputId="reporteValeProducto" classNamePrefix="maestro-select" options={productosFiltrados.map((item) => ({ value: item.id, label: item.codigo + ' — ' + item.nombre }))} value={productosFiltrados.map((item) => ({ value: item.id, label: item.codigo + ' — ' + item.nombre })).find((item) => item.value === valores.productoId) ?? null} onChange={(opcion) => onChange('productoId', opcion?.value ?? '')} placeholder={Placeholder.Seleccionar} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })} />
           </div>
 
           <div className="col-12">
             <div className="maestro-filter-actions">
               <button
                 type="button"
-                className="btn maestro-btn-secondary maestro-filter-btn"
+                className="btn btn-maestro-secondary"
                 onClick={onLimpiar}
               >
                 <RotateCcw size={18} />
@@ -407,7 +254,7 @@ export function FiltrosReporteVales({
 
               <button
                 type="submit"
-                className="btn maestro-btn-primary maestro-filter-btn"
+                className="btn btn-maestro-primary"
               >
                 <Search size={18} />
                 Buscar

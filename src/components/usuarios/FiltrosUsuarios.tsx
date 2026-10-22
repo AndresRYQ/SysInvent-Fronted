@@ -1,6 +1,8 @@
-import { useState } from 'react'
-import { ChevronDown, Filter, RotateCcw, Search } from 'lucide-react'
+import { Placeholder } from '../../constants/placeholders'
+import { Filter, RotateCcw, Search } from 'lucide-react'
+import Select from 'react-select'
 import type { Rol } from '../../types/rol'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
 export interface FiltrosUsuariosValores {
   busqueda: string
@@ -26,9 +28,6 @@ export function FiltrosUsuarios({
   onLimpiar,
   roles,
 }: FiltrosUsuariosProps) {
-  const [rolAbierto, setRolAbierto] = useState(false)
-  const [estadoAbierto, setEstadoAbierto] = useState(false)
-
   return (
     <section className="maestro-filter-card card border-0 shadow-sm">
       <div className="card-body p-3 p-lg-3">
@@ -36,23 +35,23 @@ export function FiltrosUsuarios({
           <div>
             <span className="maestro-kicker">
               <Filter size={16} />
-              Filtros
+              Filtros de búsqueda
             </span>
           </div>
         </div>
 
         <div className="row g-3">
           <div className="col-12 col-lg-6">
-            <label className="form-label maestro-label" htmlFor="busquedaUsuario">
+            <label className="form-label" htmlFor="busquedaUsuario">
               Buscar usuario
             </label>
 
             <input
               id="busquedaUsuario"
-              className="form-control maestro-control"
+              className="form-control"
               type="text"
               value={valores.busqueda}
-              placeholder="Ej. admin o Administrador del Sistema"
+              placeholder={Placeholder.Buscar}
               onChange={(event) =>
                 onChange('busqueda', event.target.value)
               }
@@ -60,67 +59,45 @@ export function FiltrosUsuarios({
           </div>
 
           <div className="col-12 col-md-6 col-lg-3">
-            <label className="form-label maestro-label" htmlFor="rolUsuario">
+            <label className="form-label" htmlFor="rolUsuario">
               Rol
             </label>
 
-            <div
-              className={`maestro-select-wrap${rolAbierto ? ' is-open' : ''}`}
-            >
-              <select
-                id="rolUsuario"
-                className="form-select maestro-control maestro-select-control"
-                value={valores.rol}
-                onMouseDown={() => setRolAbierto(true)}
-                onKeyDown={() => setRolAbierto(true)}
-                onFocus={() => setRolAbierto(true)}
-                onBlur={() => setRolAbierto(false)}
-                onChange={(event) => {
-                  onChange('rol', event.target.value)
-                  setRolAbierto(false)
-                }}
-              >
-                <option value="">Todos</option>
-                {roles.map((rol) => (
-                  <option
-                    value={rol.nombre}
-                    key={rol.id}
-                  >
-                    {rol.nombre}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown size={16} />
-            </div>
+            <Select
+              inputId="rolUsuario" classNamePrefix="maestro-select"
+              options={roles.map((rol) => ({ value: rol.nombre, label: rol.nombre }))}
+              value={roles.map((rol) => ({ value: rol.nombre, label: rol.nombre })).find((opcion) => opcion.value === valores.rol) ?? null}
+              onChange={(opcion) => onChange('rol', opcion?.value ?? '')}
+              placeholder={Placeholder.Seleccionar}
+              isClearable
+              isSearchable
+
+              menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })}
+            />
           </div>
 
           <div className="col-12 col-md-6 col-lg-3">
-            <label className="form-label maestro-label" htmlFor="estadoUsuario">
+            <label className="form-label" htmlFor="estadoUsuario">
               Estado
             </label>
 
-            <div
-              className={`maestro-select-wrap${estadoAbierto ? ' is-open' : ''}`}
-            >
-              <select
-                id="estadoUsuario"
-                className="form-select maestro-control maestro-select-control"
-                value={valores.estado}
-                onMouseDown={() => setEstadoAbierto(true)}
-                onKeyDown={() => setEstadoAbierto(true)}
-                onFocus={() => setEstadoAbierto(true)}
-                onBlur={() => setEstadoAbierto(false)}
-                onChange={(event) => {
-                  onChange('estado', event.target.value)
-                  setEstadoAbierto(false)
-                }}
-              >
-                <option value="">Todos</option>
-                <option value="activo">Activo</option>
-                <option value="inactivo">Inactivo</option>
-              </select>
-              <ChevronDown size={16} />
-            </div>
+            <Select
+              inputId="estadoUsuario" classNamePrefix="maestro-select"
+              options={[
+                { value: 'activo', label: 'Activo' },
+                { value: 'inactivo', label: 'Inactivo' },
+              ]}
+              value={[
+                { value: 'activo', label: 'Activo' },
+                { value: 'inactivo', label: 'Inactivo' },
+              ].find((opcion) => opcion.value === valores.estado) ?? null}
+              onChange={(opcion) => onChange('estado', opcion?.value ?? '')}
+              placeholder={Placeholder.Seleccionar}
+              isClearable
+              isSearchable={false}
+
+              menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })}
+            />
           </div>
         </div>
 
@@ -129,7 +106,7 @@ export function FiltrosUsuarios({
             <div className="maestro-filter-actions">
               <button
                 type="button"
-                className="btn maestro-btn-secondary maestro-filter-btn"
+                className="btn btn-maestro-secondary"
                 onClick={onLimpiar}
               >
                 <RotateCcw size={18} />
@@ -138,7 +115,7 @@ export function FiltrosUsuarios({
 
               <button
                 type="button"
-                className="btn maestro-btn-primary maestro-filter-btn"
+                className="btn btn-maestro-primary"
                 onClick={onBuscar}
               >
                 <Search size={18} />

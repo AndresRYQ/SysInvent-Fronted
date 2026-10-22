@@ -1,374 +1,114 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
-
+import { useEffect, useMemo, useState } from 'react'
 import { CentroCostoDeleteModal } from '../../components/centros-costo/CentroCostoDeleteModal'
 import { CentroCostoFormModal } from '../../components/centros-costo/CentroCostoFormModal'
-
-import {
-  FiltrosCentrosCosto,
-  type FiltrosCentrosCostoValores,
-} from '../../components/centros-costo/FiltrosCentrosCosto'
-
+import { FiltrosCentrosCosto, type FiltrosCentrosCostoValores } from '../../components/centros-costo/FiltrosCentrosCosto'
 import { TablaCentrosCosto } from '../../components/centros-costo/TablaCentrosCosto'
-
-import {
-  actualizarCentroCosto,
-  crearCentroCosto,
-  eliminarCentroCosto,
-  obtenerCentrosCosto,
-} from '../../services/centroCostoService'
-
-import type {
-  CentroCosto,
-  CentroCostoFormData,
-} from '../../types/centroCosto'
-
+import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
+import { actualizarCentroCosto, crearCentroCosto, eliminarCentroCosto, listarCentrosCosto, reactivarCentroCosto } from '../../services/centroCostoService'
+import type { CentroCosto, CentroCostoFormData } from '../../types/centroCosto'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
-const FILTROS_INICIALES: FiltrosCentrosCostoValores = {
-  nombre: '',
-  estado: '',
-}
+const FILTROS_INICIALES: FiltrosCentrosCostoValores = { nombre: '', estado: '' }
 
-interface MensajePagina {
-  tipo: 'success' | 'danger'
-  texto: string
-}
-
-function filtrarCentrosCosto(
-  centrosCosto: CentroCosto[],
-  filtros: FiltrosCentrosCostoValores,
-): CentroCosto[] {
-  const nombre = filtros.nombre
-    .trim()
-    .toLowerCase()
-
-  return centrosCosto.filter(
-    (centroCosto) => {
-      const coincideNombre =
-        !nombre ||
-        centroCosto.nombre
-          .toLowerCase()
-          .includes(nombre)
-
-      const coincideEstado =
-        !filtros.estado ||
-        (filtros.estado === 'activo' &&
-          centroCosto.estado) ||
-        (filtros.estado === 'inactivo' &&
-          !centroCosto.estado)
-
-      return coincideNombre && coincideEstado
-    },
-  )
-}
-
-function obtenerMensajeError(error: unknown): string {
-  return error instanceof Error
-    ? error.message
-    : 'Ocurrió un error inesperado.'
+function filtrarCentrosCosto(centros: CentroCosto[], filtros: FiltrosCentrosCostoValores) {
+  return centros.filter((centro) => (
+    !filtros.estado || (filtros.estado === 'activo' ? centro.activo === 1 : centro.activo === 0)
+  ))
 }
 
 export function CentrosCostoPage() {
-  const [
-    centrosCosto,
-    setCentrosCosto,
-  ] = useState<CentroCosto[]>(() =>
-    obtenerCentrosCosto(),
-  )
-
-  const [filtros, setFiltros] =
-    useState<FiltrosCentrosCostoValores>(
-      FILTROS_INICIALES,
-    )
-
-  const [
-    filtrosAplicados,
-    setFiltrosAplicados,
-  ] = useState<FiltrosCentrosCostoValores>(
-    FILTROS_INICIALES,
-  )
-
+  const [centros, setCentros] = useState<CentroCosto[]>([])
+  const [totalItems, setTotalItems] = useState(-1)
+  const [recarga, setRecarga] = useState(0)
+  const [filtros, setFiltros] = useState(FILTROS_INICIALES)
+  const [aplicados, setAplicados] = useState(FILTROS_INICIALES)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
+  const [formOpen, setFormOpen] = useState(false)
+  const [soloLectura, setSoloLectura] = useState(false)
+  const [seleccionado, setSeleccionado] = useState<CentroCosto | null>(null)
+  const [error, setError] = useState('')
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [reactivarOpen, setReactivarOpen] = useState(false)
+  const [objetivo, setObjetivo] = useState<CentroCosto | null>(null)
+  const { mensaje, abierta, mostrarAlerta, cerrarAlerta, limpiarAlerta } = useSnackbar()
 
-  const [modalFormOpen, setModalFormOpen] =
-    useState(false)
-
-  const [
-    centroCostoEnEdicion,
-    setCentroCostoEnEdicion,
-  ] = useState<CentroCosto | null>(null)
-
-  const [errorFormulario, setErrorFormulario] =
-    useState('')
-
-  const [
-    modalDeleteOpen,
-    setModalDeleteOpen,
-  ] = useState(false)
-
-  const [
-    centroCostoAEliminar,
-    setCentroCostoAEliminar,
-  ] = useState<CentroCosto | null>(null)
-
-  const [mensaje, setMensaje] =
-    useState<MensajePagina | null>(null)
-
-  const centrosCostoFiltrados = useMemo(
-    () =>
-      filtrarCentrosCosto(
-        centrosCosto,
-        filtrosAplicados,
-      ),
-    [centrosCosto, filtrosAplicados],
-  )
-
-  const totalItems =
-    centrosCostoFiltrados.length
-
-  const centrosCostoPaginados = useMemo(
-    () => {
-      const startIndex =
-        (page - 1) * pageSize
-
-      return centrosCostoFiltrados.slice(
-        startIndex,
-        startIndex + pageSize,
-      )
-    },
-    [
-      centrosCostoFiltrados,
-      page,
-      pageSize,
-    ],
-  )
+  const filtrados = useMemo(() => filtrarCentrosCosto(centros, aplicados), [centros, aplicados])
 
   useEffect(() => {
-    const totalPages = Math.max(
-      1,
-      Math.ceil(totalItems / pageSize),
-    )
+    let activo = true
+    listarCentrosCosto({ nombre: aplicados.nombre, pagina: page, tamPagina: pageSize })
+      .then((resultado) => {
+        if (!activo) return
+        setCentros(resultado.datos)
+        setTotalItems(resultado.paginacion.totalElementos ?? resultado.datos.length)
+      })
+      .catch((e) => {
+        if (!activo) return
+        mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar los centros de costo.')
+      })
+    return () => { activo = false }
+  }, [aplicados.nombre, page, pageSize, recarga])
 
-    if (page > totalPages) {
-      setPage(totalPages)
-    }
-  }, [page, pageSize, totalItems])
-
-  function recargarCentrosCosto(): void {
-    setCentrosCosto(
-      obtenerCentrosCosto(),
-    )
+  const recargar = () => {
+    setPage(1)
+    setRecarga((actual) => actual + 1)
   }
 
-  function abrirFormularioNuevo(): void {
-    setMensaje(null)
-    setErrorFormulario('')
-    setCentroCostoEnEdicion(null)
-    setModalFormOpen(true)
+  const cerrarFormulario = () => {
+    setFormOpen(false)
+    setSeleccionado(null)
+    setSoloLectura(false)
+    setError('')
   }
 
-  function abrirFormularioEdicion(
-    centroCosto: CentroCosto,
-  ): void {
-    setMensaje(null)
-    setErrorFormulario('')
-    setCentroCostoEnEdicion(centroCosto)
-    setModalFormOpen(true)
-  }
-
-  function cerrarFormulario(): void {
-    setModalFormOpen(false)
-    setCentroCostoEnEdicion(null)
-    setErrorFormulario('')
-  }
-
-  function guardarCentroCosto(
-    datos: CentroCostoFormData,
-  ): void {
+  const guardar = async (datos: CentroCostoFormData) => {
     try {
-      if (centroCostoEnEdicion) {
-        actualizarCentroCosto(
-          centroCostoEnEdicion.id,
-          datos,
-        )
-
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Centro de costo actualizado correctamente.',
-        })
-      } else {
-        crearCentroCosto(datos)
-
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Centro de costo registrado correctamente.',
-        })
-      }
-
-      recargarCentrosCosto()
+      const editando = Boolean(seleccionado)
+      const respuesta = editando
+        ? await actualizarCentroCosto(seleccionado!.id, datos)
+        : await crearCentroCosto(datos)
+      recargar()
       cerrarFormulario()
-      setPage(1)
-    } catch (error) {
-      setErrorFormulario(
-        obtenerMensajeError(error),
-      )
+      mostrarAlerta('success', respuesta.message ?? (editando ? 'Centro de costo actualizado correctamente.' : 'Centro de costo registrado correctamente.'))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Ocurrió un error inesperado.')
     }
   }
 
-  function abrirConfirmacionEliminar(
-    centroCosto: CentroCosto,
-  ): void {
-    setMensaje(null)
-    setCentroCostoAEliminar(centroCosto)
-    setModalDeleteOpen(true)
+  const cerrarConfirmacion = () => {
+    setDeleteOpen(false)
+    setReactivarOpen(false)
+    setObjetivo(null)
   }
 
-  function cerrarConfirmacionEliminar(): void {
-    setModalDeleteOpen(false)
-    setCentroCostoAEliminar(null)
-  }
-
-  function confirmarEliminacion(): void {
-    if (!centroCostoAEliminar) {
-      return
-    }
-
+  const confirmar = async () => {
+    if (!objetivo) return
+    const reactivando = reactivarOpen
     try {
-      eliminarCentroCosto(
-        centroCostoAEliminar.id,
-      )
-
-      recargarCentrosCosto()
-      cerrarConfirmacionEliminar()
-
-      setMensaje({
-        tipo: 'success',
-        texto:
-          'Centro de costo eliminado correctamente.',
-      })
-    } catch (error) {
-      cerrarConfirmacionEliminar()
-
-      setMensaje({
-        tipo: 'danger',
-        texto: obtenerMensajeError(error),
-      })
+      const respuesta = reactivando ? await reactivarCentroCosto(objetivo.id) : await eliminarCentroCosto(objetivo.id)
+      recargar()
+      mostrarAlerta('success', respuesta.message ?? (reactivando ? 'Centro de costo reactivado correctamente.' : 'Centro de costo desactivado correctamente.'))
+    } catch (e) {
+      mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudo actualizar el centro de costo.')
+    } finally {
+      cerrarConfirmacion()
     }
   }
 
   return (
-    <>
+    <div className="centro-costo-page">
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
-          <section className="maestro-topbar">
-            <div className="maestro-topbar__copy">
-              <h1>Centros de costo</h1>
-
-              <p>
-                Administración de áreas responsables
-                del consumo de materiales.
-              </p>
-            </div>
-          </section>
-
-          {mensaje && (
-            <div
-              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
-              role="alert"
-            >
-              {mensaje.texto}
-
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={() => setMensaje(null)}
-              />
-            </div>
-          )}
-
-          <div className="maestro-panel">
-            <FiltrosCentrosCosto
-              valores={filtros}
-              onChange={(campo, valor) =>
-                setFiltros((actual) => ({
-                  ...actual,
-                  [campo]: valor,
-                }))
-              }
-              onBuscar={() => {
-                setFiltrosAplicados({
-                  ...filtros,
-                })
-                setPage(1)
-              }}
-              onLimpiar={() => {
-                setFiltros(FILTROS_INICIALES)
-                setFiltrosAplicados(
-                  FILTROS_INICIALES,
-                )
-                setPage(1)
-              }}
-            />
-          </div>
-
-          <div className="maestro-panel">
-            <TablaCentrosCosto
-              centrosCosto={
-                centrosCostoPaginados
-              }
-              totalItems={totalItems}
-              page={page}
-              pageSize={pageSize}
-              onAgregar={
-                abrirFormularioNuevo
-              }
-              onEditar={
-                abrirFormularioEdicion
-              }
-              onEliminar={
-                abrirConfirmacionEliminar
-              }
-              onPageChange={setPage}
-              onPageSizeChange={(
-                nextPageSize,
-              ) => {
-                setPageSize(nextPageSize)
-                setPage(1)
-              }}
-            />
-          </div>
+          <section className="maestro-topbar"><div className="maestro-topbar__copy"><h1>Centros de costo</h1><p>Administración de áreas responsables del consumo de materiales.</p></div></section>
+          <div className="maestro-panel"><FiltrosCentrosCosto valores={filtros} onChange={(campo, valor) => setFiltros((actual) => ({ ...actual, [campo]: valor }))} onBuscar={() => { setAplicados({ ...filtros }); setPage(1) }} onLimpiar={() => { setFiltros(FILTROS_INICIALES); setAplicados(FILTROS_INICIALES); setPage(1) }} /></div>
+          <div className="maestro-panel"><TablaCentrosCosto centrosCosto={filtrados} totalItems={aplicados.estado ? filtrados.length : totalItems} page={page} pageSize={pageSize} onAgregar={() => { setSeleccionado(null); setSoloLectura(false); setError(''); setFormOpen(true) }} onEditar={(item) => { setSeleccionado(item); setSoloLectura(false); setError(''); setFormOpen(true) }} onVisualizar={(item) => { setSeleccionado(item); setSoloLectura(true); setError(''); setFormOpen(true) }} onEliminar={(item) => { setObjetivo(item); setDeleteOpen(true) }} onReactivar={(item) => { setObjetivo(item); setReactivarOpen(true) }} onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(1) }} /></div>
         </div>
       </main>
-
-      <CentroCostoFormModal
-        abierto={modalFormOpen}
-        centroCosto={
-          centroCostoEnEdicion
-        }
-        error={errorFormulario}
-        onClose={cerrarFormulario}
-        onSubmit={guardarCentroCosto}
-      />
-
-      <CentroCostoDeleteModal
-        abierto={modalDeleteOpen}
-        centroCosto={
-          centroCostoAEliminar
-        }
-        onClose={
-          cerrarConfirmacionEliminar
-        }
-        onConfirm={confirmarEliminacion}
-      />
-    </>
+      <SnackbarAlert mensaje={mensaje} abierta={abierta} onClose={cerrarAlerta} onExited={limpiarAlerta} />
+      <CentroCostoFormModal abierto={formOpen} centroCosto={seleccionado} error={error} soloLectura={soloLectura} onClose={cerrarFormulario} onSubmit={guardar} />
+      <CentroCostoDeleteModal abierto={deleteOpen || reactivarOpen} centroCosto={objetivo} modo={reactivarOpen ? 'reactivar' : 'eliminar'} onClose={cerrarConfirmacion} onConfirm={confirmar} />
+    </div>
   )
 }

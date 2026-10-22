@@ -7,13 +7,19 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "openapi:generate": "openapi-generator-cli generate -i openapi/api.json -g typescript-fetch -o src/api/generated --additional-properties=supportsES6=true,typescriptThreePlus=true"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^9.4.0",
     "bootstrap": "^5.3.8",
-    "exceljs": "^4.4.0",
+    "date-fns": "^4.4.0",
+    "exceljs": "^3.4.0",
     "lucide-react": "^1.33.0",
     "react": "^19.2.8",
+    "react-datepicker": "^9.1.0",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",
     "react-select": "^5.10.2"
@@ -23,6 +29,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",
+    "@openapitools/openapi-generator-cli": "2.33.0",
     "oxlint": "^1.75.0",
     "typescript": "~6.0.2",
     "vite": "^8.3.0"

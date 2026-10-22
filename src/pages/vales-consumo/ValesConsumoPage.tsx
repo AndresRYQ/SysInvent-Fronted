@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import {
   useEffect,
   useMemo,
@@ -7,11 +8,16 @@ import {
 import {
   CalendarDays,
   ClipboardList,
+  Filter,
   Pencil,
   Plus,
+  RotateCcw,
+  Search,
   ShieldCheck,
   Trash2,
+  X,
 } from 'lucide-react'
+import Select from 'react-select'
 
 import {
   useLocation,
@@ -19,16 +25,20 @@ import {
 } from 'react-router-dom'
 
 import { TablePagination } from '../../components/ui/TablePagination'
+import { DatePickerInput } from '../../components/ui/DatePickerInput'
+import { EmptyState } from '../../components/common/EmptyState'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
 import { obtenerCentrosCosto } from '../../services/centroCostoService'
 import { obtenerDestinos } from '../../services/destinoService'
 import { obtenerProductos } from '../../services/productoService'
 
 import {
-  anularValeConsumo,
+  anularVale,
   calcularCantidadDetalle,
   calcularTotalVale,
-  obtenerValesConsumo,
+  listarVales,
+  obtenerMensajeErrorVale,
 } from '../../services/valeConsumoService'
 
 import type { ValeConsumo } from '../../types/valeConsumo'
@@ -61,14 +71,6 @@ const FILTROS_INICIALES: FiltrosVales = {
   fechaHasta: '',
 }
 
-function obtenerMensajeError(
-  error: unknown,
-): string {
-  return error instanceof Error
-    ? error.message
-    : 'Ocurrió un error inesperado.'
-}
-
 function formatearFecha(
   fecha: string,
 ): string {
@@ -96,9 +98,9 @@ export function ValesConsumoPage() {
   const location = useLocation()
 
   const [vales, setVales] =
-    useState<ValeConsumo[]>(
-      () => obtenerValesConsumo(),
-    )
+    useState<ValeConsumo[]>([])
+  const [cargando, setCargando] =
+    useState(true)
 
   const [filtros, setFiltros] =
     useState<FiltrosVales>(
@@ -140,6 +142,34 @@ export function ValesConsumoPage() {
   )
 
   useEffect(() => {
+    let activo = true
+
+    listarVales()
+      .then((resultado) => {
+        if (activo) {
+          setVales(resultado)
+        }
+      })
+      .catch((error) => {
+        if (activo) {
+          setMensaje({
+            tipo: 'danger',
+            texto: obtenerMensajeErrorVale(error),
+          })
+        }
+      })
+      .finally(() => {
+        if (activo) {
+          setCargando(false)
+        }
+      })
+
+    return () => {
+      activo = false
+    }
+  }, [])
+
+  useEffect(() => {
     const estado =
       location.state as EstadoNavegacion | null
 
@@ -168,8 +198,8 @@ export function ValesConsumoPage() {
         const centroCosto =
           centrosCosto.find(
             (item) =>
-              item.id ===
-              vale.centroCostoId,
+              String(item.id) ===
+              String(vale.centroCostoId),
           )
 
         const nombresProductos =
@@ -177,7 +207,7 @@ export function ValesConsumoPage() {
             (detalle) =>
               productos.find(
                 (producto) =>
-                  producto.id ===
+                  producto.productoId ===
                   detalle.productoId,
               )?.nombre ??
               'Producto no disponible',
@@ -198,8 +228,8 @@ export function ValesConsumoPage() {
             (destinoId) =>
               destinos.find(
                 (destino) =>
-                  destino.id ===
-                  destinoId,
+                  String(destino.id) ===
+                  String(destinoId),
               )?.nombre ??
               'Destino no disponible',
           )
@@ -217,6 +247,7 @@ export function ValesConsumoPage() {
         return {
           ...vale,
           centroCostoNombre:
+            vale.centroCosto ??
             centroCosto?.nombre ??
             'Centro no disponible',
           productosResumen:
@@ -330,18 +361,18 @@ export function ValesConsumoPage() {
     }
   }, [page, pageSize, totalItems])
 
-  function confirmarAnulacion(): void {
+  async function confirmarAnulacion(): Promise<void> {
     if (!valeAAnular) {
       return
     }
 
     try {
-      const valeAnulado =
-        anularValeConsumo(
-          valeAAnular.id,
-        )
-
-      setVales(obtenerValesConsumo())
+      const valeAnulado = await anularVale(valeAAnular.id)
+      setVales((actuales) =>
+        actuales.map((vale) =>
+          vale.id === valeAnulado.id ? valeAnulado : vale,
+        ),
+      )
 
       setMensaje({
         tipo: 'success',
@@ -351,7 +382,7 @@ export function ValesConsumoPage() {
     } catch (error) {
       setMensaje({
         tipo: 'danger',
-        texto: obtenerMensajeError(error),
+        texto: obtenerMensajeErrorVale(error),
       })
     } finally {
       setValeAAnular(null)
@@ -392,12 +423,21 @@ export function ValesConsumoPage() {
           )}
 
           <div className="maestro-panel">
-            <section className="card border-0 shadow-sm">
-              <div className="card-body p-3">
+            <section className="maestro-filter-card card border-0 shadow-sm">
+              <div className="card-body p-3 p-lg-3">
+                <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2">
+                  <div>
+                    <span className="maestro-kicker">
+                      <Filter size={16} />
+                      Filtros de búsqueda
+                    </span>
+                  </div>
+                </div>
+
                 <div className="row g-3">
                   <div className="col-12 col-lg-4">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeBusqueda"
                     >
                       Buscar
@@ -406,7 +446,7 @@ export function ValesConsumoPage() {
                     <input
                       id="valeBusqueda"
                       className="form-control maestro-control"
-                      placeholder="Vale, solicitante, producto o destino"
+                      placeholder={Placeholder.Buscar}
                       value={filtros.busqueda}
                       onChange={(event) =>
                         setFiltros(
@@ -423,138 +463,87 @@ export function ValesConsumoPage() {
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeCentroFiltro"
                     >
                       Centro de costo
                     </label>
 
-                    <select
-                      id="valeCentroFiltro"
-                      className="form-select maestro-control"
-                      value={
-                        filtros.centroCostoId
-                      }
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            centroCostoId:
-                              event.target
-                                .value,
-                          }),
-                        )
-                      }
-                    >
-                      <option value="">
-                        Todos
-                      </option>
-
-                      {centrosCosto.map(
-                        (centro) => (
-                          <option
-                            key={centro.id}
-                            value={centro.id}
-                          >
-                            {centro.nombre}
-                          </option>
-                        ),
-                      )}
-                    </select>
+                    <Select
+                      inputId="valeCentroFiltro"
+                      classNamePrefix="maestro-select"
+                      options={centrosCosto.map((centro) => ({ value: String(centro.id), label: centro.nombre }))}
+                      value={centrosCosto.map((centro) => ({ value: String(centro.id), label: centro.nombre })).find((option) => option.value === filtros.centroCostoId) ?? null}
+                      onChange={(option) => setFiltros((actual) => ({ ...actual, centroCostoId: option?.value ?? '' }))}
+                      placeholder={Placeholder.Seleccionar}
+                      isClearable
+                      isSearchable={false}
+                      menuPortalTarget={document.body}
+                      styles={crearEstilosSelect({ zIndex: 20 })}
+                    />
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
+                      className="form-label"
                       htmlFor="valeEstadoFiltro"
                     >
                       Estado
                     </label>
 
-                    <select
-                      id="valeEstadoFiltro"
-                      className="form-select maestro-control"
-                      value={filtros.estado}
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            estado:
-                              event.target
-                                .value,
-                          }),
-                        )
-                      }
-                    >
-                      <option value="">
-                        Todos
-                      </option>
-                      <option value="REGISTRADO">
-                        Registrado
-                      </option>
-                      <option value="ANULADO">
-                        Anulado
-                      </option>
-                    </select>
-                  </div>
-
-                  <div className="col-12 col-md-6 col-lg-2">
-                    <label
-                      className="form-label maestro-label"
-                      htmlFor="valeDesde"
-                    >
-                      Desde
-                    </label>
-
-                    <input
-                      id="valeDesde"
-                      className="form-control maestro-control"
-                      type="date"
-                      value={filtros.fechaDesde}
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            fechaDesde:
-                              event.target
-                                .value,
-                          }),
-                        )
-                      }
+                    <Select
+                      inputId="valeEstadoFiltro"
+                      classNamePrefix="maestro-select"
+                      options={[{ value: 'REGISTRADO', label: 'Registrado' }, { value: 'ANULADO', label: 'Anulado' }]}
+                      value={[{ value: 'REGISTRADO', label: 'Registrado' }, { value: 'ANULADO', label: 'Anulado' }].find((option) => option.value === filtros.estado) ?? null}
+                      onChange={(option) => setFiltros((actual) => ({ ...actual, estado: option?.value ?? '' }))}
+                      placeholder={Placeholder.Seleccionar}
+                      isClearable
+                      isSearchable={false}
+                      menuPortalTarget={document.body}
+                      styles={crearEstilosSelect({ zIndex: 20 })}
                     />
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-2">
                     <label
-                      className="form-label maestro-label"
-                      htmlFor="valeHasta"
+                      className="form-label"
+                      htmlFor="valeDesde"
                     >
-                      Hasta
+                      Fecha desde
                     </label>
 
-                    <input
+                    <DatePickerInput
+                      id="valeDesde"
+                      value={filtros.fechaDesde}
+                      maxValue={filtros.fechaHasta}
+                      rangoEstricto
+                      onChange={(value) => setFiltros((actual) => ({ ...actual, fechaDesde: value }))}
+                    />
+                  </div>
+
+                  <div className="col-12 col-md-6 col-lg-2">
+                    <label
+                      className="form-label"
+                      htmlFor="valeHasta"
+                    >
+                      Fecha hasta
+                    </label>
+
+                    <DatePickerInput
                       id="valeHasta"
-                      className="form-control maestro-control"
-                      type="date"
                       value={filtros.fechaHasta}
-                      onChange={(event) =>
-                        setFiltros(
-                          (actual) => ({
-                            ...actual,
-                            fechaHasta:
-                              event.target
-                                .value,
-                          }),
-                        )
-                      }
+                      minValue={filtros.fechaDesde}
+                      rangoEstricto
+                      onChange={(value) => setFiltros((actual) => ({ ...actual, fechaHasta: value }))}
                     />
                   </div>
                 </div>
 
-                <div className="d-flex justify-content-end gap-2 mt-3">
+                <div className="maestro-filter-actions mt-3">
                   <button
                     type="button"
-                    className="btn maestro-btn-secondary"
+                    className="btn btn-maestro-secondary"
                     onClick={() => {
                       setFiltros(
                         FILTROS_INICIALES,
@@ -565,12 +554,13 @@ export function ValesConsumoPage() {
                       setPage(1)
                     }}
                   >
+                    <RotateCcw size={18} />
                     Limpiar
                   </button>
 
                   <button
                     type="button"
-                    className="btn maestro-btn-primary"
+                    className="btn btn-maestro-primary"
                     onClick={() => {
                       setFiltrosAplicados({
                         ...filtros,
@@ -578,6 +568,7 @@ export function ValesConsumoPage() {
                       setPage(1)
                     }}
                   >
+                    <Search size={18} />
                     Buscar
                   </button>
                 </div>
@@ -586,9 +577,9 @@ export function ValesConsumoPage() {
           </div>
 
           <div className="maestro-panel">
-            <section className="maestro-table-card card border-0 shadow-sm">
+            <section className="table-card card border-0 shadow-sm">
               <div className="card-body p-0">
-                <div className="maestro-table-header">
+                <div className="table-header">
                   <span className="maestro-kicker">
                     <ClipboardList size={16} />
                     Listado de vales
@@ -596,7 +587,7 @@ export function ValesConsumoPage() {
 
                   <button
                     type="button"
-                    className="btn maestro-toolbar-btn"
+                    className="btn btn-maestro-primary"
                     onClick={() =>
                       navigate(
                         '/vales-consumo/nuevo',
@@ -609,7 +600,7 @@ export function ValesConsumoPage() {
                 </div>
 
                 <div className="table-responsive">
-                  <table className="table maestro-table align-middle mb-0">
+                  <table className="table standard-table align-middle mb-0">
                     <thead>
                       <tr>
                         <th>Número</th>
@@ -628,25 +619,17 @@ export function ValesConsumoPage() {
                     </thead>
 
                     <tbody>
-                      {valesPaginados.length ===
+                      {cargando ? (
+                        <tr>
+                          <td colSpan={10} className="text-center py-4">
+                            Cargando vales…
+                          </td>
+                        </tr>
+                      ) : valesPaginados.length ===
                       0 ? (
                         <tr>
                           <td colSpan={10}>
-                            <div className="maestro-empty-state">
-                              <ClipboardList
-                                size={28}
-                              />
-
-                              <p className="mb-1">
-                                No se encontraron
-                                vales
-                              </p>
-
-                              <span>
-                                Registra el primer
-                                vale de consumo.
-                              </span>
-                            </div>
+                            <EmptyState icon={ClipboardList} iconSize={28} title="No se encontraron vales" description="Registra el primer vale de consumo." />
                           </td>
                         </tr>
                       ) : (
@@ -654,7 +637,7 @@ export function ValesConsumoPage() {
                           (vale) => (
                             <tr key={vale.id}>
                               <td>
-                                <span className="maestro-id-chip">
+                                <span className="table-id-chip">
                                   {
                                     vale.numeroVale
                                   }
@@ -723,8 +706,8 @@ export function ValesConsumoPage() {
                                   className={
                                     vale.estado ===
                                     'REGISTRADO'
-                                      ? 'maestro-status maestro-status--active'
-                                      : 'maestro-status maestro-status--inactive'
+                                      ? 'status-label status-label--active'
+                                      : 'status-label status-label--inactive'
                                   }
                                 >
                                   <ShieldCheck
@@ -739,10 +722,10 @@ export function ValesConsumoPage() {
                               </td>
 
                               <td>
-                                <div className="maestro-actions">
+                                <div className="table-actions">
                                   <button
                                     type="button"
-                                    className="btn maestro-action-btn"
+                                    className="btn table-action-btn"
                                     title="Editar"
                                     disabled={
                                       vale.estado ===
@@ -761,7 +744,7 @@ export function ValesConsumoPage() {
 
                                   <button
                                     type="button"
-                                    className="btn maestro-action-btn maestro-action-btn--danger"
+                                    className="btn table-action-btn table-action-btn--danger"
                                     title="Anular"
                                     disabled={
                                       vale.estado ===
@@ -811,9 +794,6 @@ export function ValesConsumoPage() {
         <div
           className="maestro-modal-backdrop"
           role="presentation"
-          onClick={() =>
-            setValeAAnular(null)
-          }
         >
           <div
             className="maestro-modal-card maestro-modal-card--sm"
@@ -839,17 +819,18 @@ export function ValesConsumoPage() {
             <div className="maestro-modal-footer maestro-modal-footer--center">
               <button
                 type="button"
-                className="btn maestro-btn-secondary"
+                className="btn btn-maestro-info"
                 onClick={() =>
                   setValeAAnular(null)
                 }
               >
+                <X size={18} />
                 Cancelar
               </button>
 
               <button
                 type="button"
-                className="btn maestro-btn-danger"
+                className="btn btn-maestro-danger"
                 onClick={
                   confirmarAnulacion
                 }

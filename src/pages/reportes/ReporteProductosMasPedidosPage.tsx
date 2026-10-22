@@ -20,10 +20,12 @@ import { obtenerDestinos } from '../../services/destinoService'
 
 import {
   obtenerProductosMasPedidos,
-  obtenerResumenProductosMasPedidos,
 } from '../../services/reporteProductoMasPedidoService'
+import { listarReporteProductosApi } from '../../services/reportesApiService'
 
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
+import { REPORTE_VALES_MOCK } from '../../data/reporteValesMock'
+import type { FilaProductoMasPedido } from '../../types/reporteProductoMasPedido'
 
 import type {
   FiltrosProductosMasPedidos as Filtros,
@@ -42,6 +44,11 @@ const FILTROS_INICIALES: Filtros = {
 }
 
 export function ReporteProductosMasPedidosPage() {
+  const [filasApi, setFilasApi] = useState<FilaProductoMasPedido[]>([])
+  const [totalApi, setTotalApi] = useState(0)
+  const [usarMock, setUsarMock] = useState(false)
+  const [errorCarga, setErrorCarga] = useState<string | null>(null)
+
   const [filtros, setFiltros] =
     useState<Filtros>({
       ...FILTROS_INICIALES,
@@ -59,11 +66,37 @@ export function ReporteProductosMasPedidosPage() {
   const [pageSize, setPageSize] =
     useState(10)
 
+  useEffect(() => {
+    let activo = true
+
+    listarReporteProductosApi({
+      ...filtrosAplicados,
+      pagina: page,
+      tamPagina: pageSize,
+    })
+      .then((resultado) => {
+        if (!activo) return
+        const filtrosVacios = Object.values(filtrosAplicados).every((valor) => !valor)
+        setUsarMock(filtrosVacios && resultado.datos.length === 0 && page === 1)
+        setFilasApi(resultado.datos)
+        setTotalApi(resultado.totalElementos)
+        setErrorCarga(null)
+      })
+      .catch((error: unknown) => {
+        if (!activo) return
+        const filtrosVacios = Object.values(filtrosAplicados).every((valor) => !valor)
+        setUsarMock(filtrosVacios && page === 1)
+        setErrorCarga(error instanceof Error ? error.message : 'No se pudo cargar el reporte de productos.')
+      })
+
+    return () => { activo = false }
+  }, [filtrosAplicados, page, pageSize])
+
   const tiposProducto = useMemo(
     () =>
       obtenerTiposProducto()
         .map((tipo) => ({
-          id: tipo.id,
+          id: String(tipo.id),
           nombre: tipo.nombre,
         }))
         .sort((primero, segundo) =>
@@ -79,7 +112,7 @@ export function ReporteProductosMasPedidosPage() {
     () =>
       obtenerCategorias()
         .map((categoria) => ({
-          id: categoria.id,
+          id: String(categoria.id),
           nombre: categoria.nombre,
         }))
         .sort((primero, segundo) =>
@@ -95,7 +128,7 @@ export function ReporteProductosMasPedidosPage() {
     () =>
       obtenerDestinos()
         .map((destino) => ({
-          id: destino.id,
+          id: String(destino.id),
           nombre: destino.nombre,
         }))
         .sort((primero, segundo) =>
@@ -107,42 +140,37 @@ export function ReporteProductosMasPedidosPage() {
     [],
   )
 
-  const filas = useMemo(
-    () =>
-      obtenerProductosMasPedidos(
-        filtrosAplicados,
-      ),
-    [filtrosAplicados],
+  const filasMock = useMemo(
+    () => obtenerProductosMasPedidos(FILTROS_INICIALES, REPORTE_VALES_MOCK),
+    [],
   )
 
-  const resumen = useMemo(
-    () =>
-      obtenerResumenProductosMasPedidos(
-        filas,
-        filtrosAplicados,
-      ),
-    [
-      filas,
-      filtrosAplicados,
-    ],
-  )
+  const filas = usarMock ? filasMock : filasApi
 
-  const totalItems = filas.length
+  const resumen = useMemo(() => ({
+    totalProductos: usarMock ? filas.length : totalApi,
+    totalVales: filas.reduce((total, fila) => total + fila.numeroVales, 0),
+    totalDistribuciones: filas.reduce((total, fila) => total + fila.numeroDistribuciones, 0),
+    totalValorizado: filas.reduce((total, fila) => total + fila.totalValorizado, 0),
+    productoMasPedido: filas[0]?.producto ?? 'Sin registros',
+    cantidadProductoMasPedido: filas[0]?.cantidadSolicitada ?? 0,
+    unidadProductoMasPedido: filas[0]?.unidadMedida ?? '',
+  }), [filas, totalApi, usarMock])
+
+  const totalItems = usarMock ? filas.length : totalApi
 
   const filasPaginadas = useMemo(
     () => {
       const inicio =
         (page - 1) * pageSize
 
-      return filas.slice(
-        inicio,
-        inicio + pageSize,
-      )
+      return usarMock ? filas.slice(inicio, inicio + pageSize) : filas
     },
     [
       filas,
       page,
       pageSize,
+      usarMock,
     ],
   )
 
@@ -217,6 +245,24 @@ export function ReporteProductosMasPedidosPage() {
           </div>
         </section>
 
+        {errorCarga && (
+          <div className="alert alert-danger" role="alert">
+            {errorCarga}
+          </div>
+        )}
+
+        {usarMock && (
+          <div className="alert alert-info" role="status">
+            Mostrando datos de demostración para validar el ranking de productos.
+          </div>
+        )}
+
+        {usarMock && (
+          <div className="alert alert-info" role="status">
+            Mostrando datos de demostración para validar el ranking de productos.
+          </div>
+        )}
+
         <div className="maestro-panel">
           <ResumenProductosMasPedidos
             resumen={resumen}
@@ -242,9 +288,9 @@ export function ReporteProductosMasPedidosPage() {
         </div>
 
         <div className="maestro-panel">
-          <section className="maestro-table-card card border-0 shadow-sm">
+          <section className="table-card card border-0 shadow-sm">
             <div className="card-body p-0">
-              <div className="maestro-table-header">
+              <div className="table-header">
                 <div>
                   <span className="maestro-kicker">
                     <BarChart3 size={16} />

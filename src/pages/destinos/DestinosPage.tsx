@@ -1,356 +1,185 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import Alert from '@mui/material/Alert'
+import Snackbar from '@mui/material/Snackbar'
+import { CheckCircle2, XCircle } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 
-import {
-  FiltrosDestinos,
-  type FiltrosDestinosValores,
-} from '../../components/destinos/FiltrosDestinos'
-
-import { TablaDestinos } from '../../components/destinos/TablaDestinos'
 import { DestinoDeleteModal } from '../../components/destinos/DestinoDeleteModal'
 import { DestinoFormModal } from '../../components/destinos/DestinoFormModal'
-
-import {
-  actualizarDestino,
-  crearDestino,
-  eliminarDestino,
-  obtenerDestinos,
-} from '../../services/destinoService'
-
-import type {
-  Destino,
-  DestinoFormData,
-} from '../../types/destino'
-
+import { FiltrosDestinos, type FiltrosDestinosValores } from '../../components/destinos/FiltrosDestinos'
+import { TablaDestinos } from '../../components/destinos/TablaDestinos'
+import { actualizarDestino, crearDestino, eliminarDestino, listarDestinos, reactivarDestino } from '../../services/destinoService'
+import type { Destino, DestinoFormData } from '../../types/destino'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
-const FILTROS_INICIALES: FiltrosDestinosValores = {
-  nombre: '',
-  estado: '',
-}
+const INICIALES: FiltrosDestinosValores = { nombre: '', estado: '' }
 
-interface MensajePagina {
-  tipo: 'success' | 'danger'
-  texto: string
-}
-
-function filtrarDestinos(
-  destinos: Destino[],
-  filtros: FiltrosDestinosValores,
-): Destino[] {
-  const nombre = filtros.nombre
-    .trim()
-    .toLowerCase()
-
-  return destinos.filter((destino) => {
-    const coincideNombre =
-      !nombre ||
-      destino.nombre
-        .toLowerCase()
-        .includes(nombre)
-
-    const coincideEstado =
-      !filtros.estado ||
-      (filtros.estado === 'activo' &&
-        destino.estado) ||
-      (filtros.estado === 'inactivo' &&
-        !destino.estado)
-
-    return coincideNombre && coincideEstado
-  })
-}
-
-function obtenerMensajeError(error: unknown): string {
-  return error instanceof Error
-    ? error.message
-    : 'Ocurrió un error inesperado.'
+function filtrar(lista: Destino[], filtros: FiltrosDestinosValores) {
+  const nombre = filtros.nombre.trim().toLowerCase()
+  return lista.filter((item) => (
+    (!nombre || item.nombre.toLowerCase().includes(nombre)) &&
+    (!filtros.estado || (filtros.estado === 'activo' ? item.activo === 1 : item.activo === 0))
+  ))
 }
 
 export function DestinosPage() {
-  const [destinos, setDestinos] =
-    useState<Destino[]>(() =>
-      obtenerDestinos(),
-    )
-
-  const [filtros, setFiltros] =
-    useState<FiltrosDestinosValores>(
-      FILTROS_INICIALES,
-    )
-
-  const [
-    filtrosAplicados,
-    setFiltrosAplicados,
-  ] = useState<FiltrosDestinosValores>(
-    FILTROS_INICIALES,
-  )
-
+  const [lista, setLista] = useState<Destino[]>([])
+  const [totalItems, setTotalItems] = useState(-1)
+  const [recarga, setRecarga] = useState(0)
+  const [filtros, setFiltros] = useState(INICIALES)
+  const [aplicados, setAplicados] = useState(INICIALES)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
+  const [formOpen, setFormOpen] = useState(false)
+  const [soloLectura, setSoloLectura] = useState(false)
+  const [seleccionado, setSeleccionado] = useState<Destino | null>(null)
+  const [error, setError] = useState('')
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [reactivarOpen, setReactivarOpen] = useState(false)
+  const [objetivo, setObjetivo] = useState<Destino | null>(null)
+  const [mensaje, setMensaje] = useState<{ tipo: 'success' | 'error'; texto: string } | null>(null)
+  const [alertaAbierta, setAlertaAbierta] = useState(false)
 
-  const [modalFormOpen, setModalFormOpen] =
-    useState(false)
-
-  const [
-    destinoEnEdicion,
-    setDestinoEnEdicion,
-  ] = useState<Destino | null>(null)
-
-  const [errorFormulario, setErrorFormulario] =
-    useState('')
-
-  const [
-    modalDeleteOpen,
-    setModalDeleteOpen,
-  ] = useState(false)
-
-  const [
-    destinoAEliminar,
-    setDestinoAEliminar,
-  ] = useState<Destino | null>(null)
-
-  const [mensaje, setMensaje] =
-    useState<MensajePagina | null>(null)
-
-  const destinosFiltrados = useMemo(
-    () =>
-      filtrarDestinos(
-        destinos,
-        filtrosAplicados,
-      ),
-    [destinos, filtrosAplicados],
-  )
-
-  const totalItems = destinosFiltrados.length
-
-  const destinosPaginados = useMemo(() => {
-    const startIndex = (page - 1) * pageSize
-
-    return destinosFiltrados.slice(
-      startIndex,
-      startIndex + pageSize,
-    )
-  }, [
-    destinosFiltrados,
-    page,
-    pageSize,
-  ])
+  const filtrados = useMemo(() => filtrar(lista, aplicados), [lista, aplicados])
 
   useEffect(() => {
-    const totalPages = Math.max(
-      1,
-      Math.ceil(totalItems / pageSize),
-    )
+    let activo = true
+    listarDestinos({
+      nombre: aplicados.nombre,
+      estado: aplicados.estado,
+      pagina: page,
+      tamPagina: pageSize,
+    })
+      .then((resultado) => {
+        if (!activo) return
+        setLista(resultado.datos)
+        setTotalItems(resultado.paginacion.totalElementos ?? resultado.datos.length)
+      })
+      .catch((e) => {
+        if (!activo) return
+        mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar los destinos.')
+      })
+    return () => { activo = false }
+  }, [aplicados.nombre, aplicados.estado, page, pageSize, recarga])
 
-    if (page > totalPages) {
-      setPage(totalPages)
-    }
-  }, [page, pageSize, totalItems])
-
-  function recargarDestinos(): void {
-    setDestinos(obtenerDestinos())
+  const mostrarAlerta = (tipo: 'success' | 'error', texto: string) => {
+    setMensaje({ tipo, texto })
+    setAlertaAbierta(true)
   }
 
-  function abrirFormularioNuevo(): void {
-    setMensaje(null)
-    setErrorFormulario('')
-    setDestinoEnEdicion(null)
-    setModalFormOpen(true)
+  const recargar = () => {
+    setPage(1)
+    setRecarga((actual) => actual + 1)
+  }
+  const cerrarForm = () => {
+    setFormOpen(false)
+    setSeleccionado(null)
+    setSoloLectura(false)
+    setError('')
   }
 
-  function abrirFormularioEdicion(
-    destino: Destino,
-  ): void {
-    setMensaje(null)
-    setErrorFormulario('')
-    setDestinoEnEdicion(destino)
-    setModalFormOpen(true)
-  }
-
-  function cerrarFormulario(): void {
-    setModalFormOpen(false)
-    setDestinoEnEdicion(null)
-    setErrorFormulario('')
-  }
-
-  function guardarDestino(
-    datos: DestinoFormData,
-  ): void {
+  const guardar = async (datos: DestinoFormData) => {
     try {
-      if (destinoEnEdicion) {
-        actualizarDestino(
-          destinoEnEdicion.id,
-          datos,
-        )
-
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Destino actualizado correctamente.',
-        })
-      } else {
-        crearDestino(datos)
-
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Destino registrado correctamente.',
-        })
-      }
-
-      recargarDestinos()
-      cerrarFormulario()
+      const editando = Boolean(seleccionado)
+      const respuesta = editando
+        ? await actualizarDestino(seleccionado!.id, datos)
+        : await crearDestino(datos)
+      recargar()
+      cerrarForm()
       setPage(1)
-    } catch (error) {
-      setErrorFormulario(
-        obtenerMensajeError(error),
+      mostrarAlerta(
+        'success',
+        respuesta.message ?? (editando ? 'Destino actualizado correctamente.' : 'Destino registrado correctamente.'),
       )
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Ocurrió un error inesperado.')
     }
   }
 
-  function abrirConfirmacionEliminar(
-    destino: Destino,
-  ): void {
-    setMensaje(null)
-    setDestinoAEliminar(destino)
-    setModalDeleteOpen(true)
+  const cerrarConfirmacion = () => {
+    setConfirmOpen(false)
+    setReactivarOpen(false)
+    setObjetivo(null)
   }
 
-  function cerrarConfirmacionEliminar(): void {
-    setModalDeleteOpen(false)
-    setDestinoAEliminar(null)
-  }
-
-  function confirmarEliminacion(): void {
-    if (!destinoAEliminar) {
-      return
-    }
-
+  const confirmar = async () => {
+    if (!objetivo) return
+    const reactivando = reactivarOpen
     try {
-      eliminarDestino(
-        destinoAEliminar.id,
+      const respuesta = reactivando
+        ? await reactivarDestino(objetivo.id)
+        : await eliminarDestino(objetivo.id)
+      recargar()
+      setPage(1)
+      mostrarAlerta(
+        'success',
+        respuesta.message ?? (reactivando ? 'Destino reactivado correctamente.' : 'Destino eliminado correctamente.'),
       )
-
-      recargarDestinos()
-      cerrarConfirmacionEliminar()
-
-      setMensaje({
-        tipo: 'success',
-        texto:
-          'Destino eliminado correctamente.',
-      })
-    } catch (error) {
-      cerrarConfirmacionEliminar()
-
-      setMensaje({
-        tipo: 'danger',
-        texto: obtenerMensajeError(error),
-      })
+    } catch (e) {
+      mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudo actualizar el destino.')
+    } finally {
+      cerrarConfirmacion()
     }
   }
 
   return (
-    <>
+    <div className="destinos-page">
       <main className="dashboard-shell maestro-page-shell">
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
               <h1>Destinos</h1>
-
-              <p>
-                Administración de los destinos
-                utilizados en las operaciones del almacén.
-              </p>
+              <p>Administración de los destinos utilizados en las operaciones del almacén.</p>
             </div>
           </section>
-
-          {mensaje && (
-            <div
-              className={`alert alert-${mensaje.tipo} alert-dismissible fade show`}
-              role="alert"
-            >
-              {mensaje.texto}
-
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={() => setMensaje(null)}
-              />
-            </div>
-          )}
 
           <div className="maestro-panel">
             <FiltrosDestinos
               valores={filtros}
-              onChange={(campo, valor) =>
-                setFiltros((actual) => ({
-                  ...actual,
-                  [campo]: valor,
-                }))
-              }
-              onBuscar={() => {
-                setFiltrosAplicados({
-                  ...filtros,
-                })
-                setPage(1)
-              }}
-              onLimpiar={() => {
-                setFiltros(FILTROS_INICIALES)
-                setFiltrosAplicados(
-                  FILTROS_INICIALES,
-                )
-                setPage(1)
-              }}
+              onChange={(campo, valor) => setFiltros((actual) => ({ ...actual, [campo]: valor }))}
+              onBuscar={() => { setAplicados({ ...filtros }); setPage(1) }}
+              onLimpiar={() => { setFiltros(INICIALES); setAplicados(INICIALES); setPage(1) }}
             />
           </div>
 
           <div className="maestro-panel">
             <TablaDestinos
-              destinos={destinosPaginados}
-              totalItems={totalItems}
+              destinos={filtrados}
+              totalItems={aplicados.estado ? filtrados.length : totalItems}
               page={page}
               pageSize={pageSize}
-              onAgregar={
-                abrirFormularioNuevo
-              }
-              onEditar={
-                abrirFormularioEdicion
-              }
-              onEliminar={
-                abrirConfirmacionEliminar
-              }
+              onAgregar={() => { setSeleccionado(null); setSoloLectura(false); setError(''); setFormOpen(true) }}
+              onEditar={(item) => { setSeleccionado(item); setSoloLectura(false); setError(''); setFormOpen(true) }}
+              onVisualizar={(item) => { setSeleccionado(item); setSoloLectura(true); setError(''); setFormOpen(true) }}
+              onEliminar={(item) => { setObjetivo(item); setConfirmOpen(true) }}
+              onReactivar={(item) => { setObjetivo(item); setReactivarOpen(true) }}
               onPageChange={setPage}
-              onPageSizeChange={(
-                nextPageSize,
-              ) => {
-                setPageSize(nextPageSize)
-                setPage(1)
-              }}
+              onPageSizeChange={(size) => { setPageSize(size); setPage(1) }}
             />
           </div>
         </div>
       </main>
 
-      <DestinoFormModal
-        abierto={modalFormOpen}
-        destino={destinoEnEdicion}
-        error={errorFormulario}
-        onClose={cerrarFormulario}
-        onSubmit={guardarDestino}
-      />
+      <Snackbar
+        open={alertaAbierta && Boolean(mensaje)}
+        autoHideDuration={3000}
+        onClose={() => setAlertaAbierta(false)}
+        slotProps={{ transition: { onExited: () => setMensaje(null) } }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          severity={mensaje?.tipo ?? 'success'}
+          icon={mensaje?.tipo === 'success' ? <CheckCircle2 fontSize="inherit" /> : <XCircle fontSize="inherit" />}
+          onClose={() => setAlertaAbierta(false)}
+          variant="filled"
+          sx={{ width: '100%', minWidth: 320, boxShadow: 4 }}
+        >
+          {mensaje?.texto}
+        </Alert>
+      </Snackbar>
 
-      <DestinoDeleteModal
-        abierto={modalDeleteOpen}
-        destino={destinoAEliminar}
-        onClose={
-          cerrarConfirmacionEliminar
-        }
-        onConfirm={confirmarEliminacion}
-      />
-    </>
+      <DestinoFormModal abierto={formOpen} destino={seleccionado} error={error} soloLectura={soloLectura} onClose={cerrarForm} onSubmit={guardar} />
+      <DestinoDeleteModal abierto={confirmOpen || reactivarOpen} destino={objetivo} modo={reactivarOpen ? 'reactivar' : 'desactivar'} onClose={cerrarConfirmacion} onConfirm={confirmar} />
+    </div>
   )
 }

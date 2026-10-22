@@ -8,9 +8,8 @@ import {
 import {
   obtenerIngresosAlmacen,
 } from './ingresoAlmacenService'
-import {
-  obtenerValesConsumo,
-} from './valeConsumoService'
+import { listarVales } from './valeConsumoService'
+import { obtenerDashboardApi } from './reportesApiService'
 
 export interface MovimientoRecienteDashboard {
   id: string
@@ -84,8 +83,13 @@ function formatearFecha(
   ).format(fechaLocal)
 }
 
-export function obtenerResumenDashboard():
-  ResumenDashboard {
+export async function obtenerResumenDashboard():
+  Promise<ResumenDashboard> {
+  return obtenerDashboardApi()
+
+  /* Compatibilidad con el cálculo local anterior. */
+  /* istanbul ignore next */
+  const vales = await listarVales()
   const fechaActual =
     obtenerFechaActual()
 
@@ -98,19 +102,19 @@ export function obtenerResumenDashboard():
   const productosActivos =
     productos.filter(
       (producto) =>
-        producto.estado,
+        producto.activo,
     )
 
   const productosActivosIds =
     new Set(
       productosActivos.map(
         (producto) =>
-          producto.id,
+          producto.productoId,
       ),
     )
 
   const controlAlmacen =
-    obtenerControlAlmacen().filter(
+    (await obtenerControlAlmacen(vales)).filter(
       (control) =>
         productosActivosIds.has(
           control.productoId,
@@ -129,7 +133,7 @@ export function obtenerResumenDashboard():
         const producto =
           productos.find(
             (item) =>
-              item.id ===
+              item.productoId ===
               control.productoId,
           )
 
@@ -156,7 +160,7 @@ export function obtenerResumenDashboard():
     ).length
 
   const valesDelMes =
-    obtenerValesConsumo().filter(
+    vales.filter(
       (vale) =>
         vale.estado ===
           'REGISTRADO' &&
@@ -166,7 +170,7 @@ export function obtenerResumenDashboard():
     ).length
 
   const movimientos =
-    obtenerMovimientosAlmacen()
+    await obtenerMovimientosAlmacen(vales)
 
   const movimientosHoy =
     movimientos.filter(
@@ -187,7 +191,7 @@ export function obtenerResumenDashboard():
         const producto =
           productos.find(
             (item) =>
-              item.id ===
+              item.productoId ===
               movimiento.productoId,
           )
 
@@ -254,8 +258,8 @@ export function obtenerResumenDashboard():
       titulo:
         'Último movimiento',
       detalle:
-        `${ultimoMovimiento.numeroDocumento} registrado el ${formatearFecha(
-          ultimoMovimiento.fecha,
+        `${ultimoMovimiento!.numeroDocumento} registrado el ${formatearFecha(
+          ultimoMovimiento!.fecha,
         )}.`,
       tono: 'info',
     })

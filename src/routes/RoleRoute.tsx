@@ -11,9 +11,8 @@ import {
 import { useAuth } from '../hooks/useAuth'
 import { registrarEventoBitacora } from '../services/bitacoraService'
 import {
-  tienePermisoModulo,
+  tienePermisoSesion,
 } from '../services/rolService'
-
 interface RoleRouteProps {
   modulo: string
 }
@@ -27,12 +26,11 @@ export function RoleRoute({
   const ultimoAccesoRegistrado =
     useRef('')
 
-  const autorizado = sesion
-    ? tienePermisoModulo(
-        sesion.rol,
-        modulo,
-      )
-    : false
+  const autorizado =
+    tienePermisoSesion(
+      sesion,
+      modulo,
+    )
 
   useEffect(() => {
     if (!sesion || autorizado) {

@@ -770,7 +770,7 @@ export function ExportarProductosMasPedidosButton({
     <div>
       <button
         type="button"
-        className="btn maestro-toolbar-btn"
+        className="btn table-toolbar-btn"
         disabled={
           exportando ||
           filas.length === 0
@@ -796,3 +796,4 @@ export function ExportarProductosMasPedidosButton({
     </div>
   )
 }
+

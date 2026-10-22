@@ -1,7 +1,8 @@
 import {
   Pencil,
   Plus,
-  ShieldCheck,
+  RotateCcw,
+  Eye,
   Trash2,
   UserRound,
   Users,
@@ -10,7 +11,10 @@ import {
 import type { Contacto } from '../../types/contacto'
 import type { Proveedor } from '../../types/proveedor'
 
+import { EmptyState } from '../common/EmptyState'
 import { TablePagination } from '../ui/TablePagination'
+import { TableLoadingState } from '../ui/TableLoadingState'
+import { coincidenIds } from '../../utils/identificadores'
 
 interface TablaContactosProps {
   contactos: Contacto[]
@@ -22,7 +26,13 @@ interface TablaContactosProps {
   onEditar: (
     contacto: Contacto,
   ) => void
+  onVisualizar: (
+    contacto: Contacto,
+  ) => void
   onEliminar: (
+    contacto: Contacto,
+  ) => void
+  onReactivar: (
     contacto: Contacto,
   ) => void
   onPageChange: (
@@ -31,6 +41,7 @@ interface TablaContactosProps {
   onPageSizeChange: (
     pageSize: number,
   ) => void
+  loading?: boolean
 }
 
 export function TablaContactos({
@@ -41,26 +52,29 @@ export function TablaContactos({
   pageSize,
   onAgregar,
   onEditar,
+  onVisualizar,
   onEliminar,
+  onReactivar,
   onPageChange,
   onPageSizeChange,
+  loading = totalItems < 0,
 }: TablaContactosProps) {
   function obtenerProveedor(
-    proveedorId: string,
+    proveedorId: number,
   ): string {
     return (
       proveedores.find(
         (proveedor) =>
-          proveedor.id === proveedorId,
+          coincidenIds(proveedor.id, proveedorId, 'PROV-'),
       )?.razonSocial ??
       'Proveedor no disponible'
     )
   }
 
   return (
-    <section className="maestro-table-card card border-0 shadow-sm">
+    <section className="table-card card border-0 shadow-sm">
       <div className="card-body p-0">
-        <div className="maestro-table-header">
+        <div className="table-header">
           <span className="maestro-kicker">
             <Users size={16} />
             Listado de contactos
@@ -68,7 +82,7 @@ export function TablaContactos({
 
           <button
             type="button"
-            className="btn maestro-toolbar-btn"
+            className="btn table-toolbar-btn"
             onClick={onAgregar}
           >
             <Plus size={18} />
@@ -76,11 +90,11 @@ export function TablaContactos({
           </button>
         </div>
 
-        <div className="table-responsive">
-          <table className="table maestro-table align-middle mb-0">
+        <div className="table-responsive"><TableLoadingState visible={loading} />
+          <table className="table standard-table align-middle mb-0">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>N°</th>
                 <th>Contacto</th>
                 <th>Proveedor</th>
                 <th>Cargo</th>
@@ -98,14 +112,14 @@ export function TablaContactos({
                   (contacto) => (
                     <tr key={contacto.id}>
                       <td>
-                        <span className="maestro-id-chip">
+                        <span className="table-id-chip">
                           {contacto.id}
                         </span>
                       </td>
 
                       <td>
-                        <div className="maestro-cell-main">
-                          <span className="maestro-cell-icon">
+                        <div className="table-cell-main">
+                          <span className="table-cell-icon">
                             <UserRound
                               size={16}
                             />
@@ -142,54 +156,30 @@ export function TablaContactos({
                       <td>
                         <span
                           className={
-                            contacto.estado
-                              ? 'maestro-status maestro-status--active'
-                              : 'maestro-status maestro-status--inactive'
+                            contacto.activo === 1
+                              ? 'status-label status-label--active'
+                              : 'status-label status-label--inactive'
                           }
                         >
-                          <ShieldCheck
-                            size={14}
+                          <span
+                            className="status-label__dot"
+                            aria-hidden="true"
                           />
 
-                          {contacto.estado
-                            ? 'Activo'
-                            : 'Inactivo'}
+                          {contacto.activo === 1 ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
 
                       <td>
-                        <div className="maestro-actions">
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn"
-                            title="Editar"
-                            aria-label={`Editar ${contacto.nombreCompleto}`}
-                            onClick={() =>
-                              onEditar(
-                                contacto,
-                              )
-                            }
-                          >
-                            <Pencil
-                              size={16}
-                            />
-                          </button>
-
-                          <button
-                            type="button"
-                            className="btn maestro-action-btn maestro-action-btn--danger"
-                            title="Eliminar"
-                            aria-label={`Eliminar ${contacto.nombreCompleto}`}
-                            onClick={() =>
-                              onEliminar(
-                                contacto,
-                              )
-                            }
-                          >
-                            <Trash2
-                              size={16}
-                            />
-                          </button>
+                        <div className="table-actions">
+                          {contacto.activo === 1 ? <>
+                            <button type="button" className="btn table-action-btn" title="Visualizar" aria-label={`Visualizar ${contacto.nombreCompleto}`} onClick={() => onVisualizar(contacto)}><Eye size={16} /></button>
+                            <button type="button" className="btn table-action-btn" title="Editar" aria-label={`Editar ${contacto.nombreCompleto}`} onClick={() => onEditar(contacto)}><Pencil size={16} /></button>
+                            <button type="button" className="btn table-action-btn table-action-btn--danger" title="Desactivar" aria-label={`Desactivar ${contacto.nombreCompleto}`} onClick={() => onEliminar(contacto)}><Trash2 size={16} /></button>
+                          </> : <>
+                            <button type="button" className="btn table-action-btn" title="Visualizar" aria-label={`Visualizar ${contacto.nombreCompleto}`} onClick={() => onVisualizar(contacto)}><Eye size={16} /></button>
+                            <button type="button" className="btn table-action-btn" title="Reactivar" aria-label={`Reactivar ${contacto.nombreCompleto}`} onClick={() => onReactivar(contacto)}><RotateCcw size={16} /></button>
+                          </>}
                         </div>
                       </td>
                     </tr>
@@ -198,19 +188,7 @@ export function TablaContactos({
               ) : (
                 <tr>
                   <td colSpan={7}>
-                    <div className="maestro-empty-state">
-                      <Users size={28} />
-
-                      <p className="mb-1">
-                        No se encontraron
-                        contactos
-                      </p>
-
-                      <span>
-                        Ajusta los filtros o
-                        limpia la búsqueda.
-                      </span>
-                    </div>
+                    <EmptyState icon={Users} iconSize={28} title="No se encontraron contactos" description="Ajusta los filtros o limpia la búsqueda." />
                   </td>
                 </tr>
               )}

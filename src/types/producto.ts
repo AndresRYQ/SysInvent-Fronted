@@ -1,17 +1,21 @@
 export interface Producto {
-  id: string
+  productoId: number
   codigo: string
   nombre: string
   descripcion: string
-  tipoProductoId: string
-  categoriaId: string
-  unidadMedidaId: string
-  proveedorId: string
+  tipoProductoId: number
+  categoriaId: number
+  unidadMedidaId: number
+  proveedorId: number
   stockActual: number
   stockMinimo: number
   precioUnitario: number
-  estado: boolean
+  activo: boolean
   fechaRegistro: string
+  tipoProductoNombre?: string
+  categoriaNombre?: string
+  unidadMedidaNombre?: string
+  proveedorRazonSocial?: string
 }
 
 export interface ProductoFormData {

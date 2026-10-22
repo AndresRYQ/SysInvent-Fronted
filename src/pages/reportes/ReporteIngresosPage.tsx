@@ -18,10 +18,10 @@ import { obtenerProductos } from '../../services/productoService'
 import { obtenerProveedores } from '../../services/proveedorService'
 
 import {
-  filtrarReporteIngresos,
   obtenerFilasReporteIngresos,
   obtenerResumenReporteIngresos,
 } from '../../services/reporteIngresoService'
+import { listarReporteIngresosApi } from '../../services/reportesApiService'
 
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
 
@@ -43,9 +43,9 @@ const FILTROS_INICIALES: Filtros = {
 }
 
 export function ReporteIngresosPage() {
-  const [filas] = useState(
-    () => obtenerFilasReporteIngresos(),
-  )
+  const [filas, setFilas] = useState<ReturnType<typeof obtenerFilasReporteIngresos>>([])
+  const [totalApi, setTotalApi] = useState(0)
+  const [errorCarga, setErrorCarga] = useState<string | null>(null)
 
   const [filtros, setFiltros] =
     useState<Filtros>({
@@ -64,11 +64,35 @@ export function ReporteIngresosPage() {
   const [pageSize, setPageSize] =
     useState(10)
 
+  useEffect(() => {
+    let activo = true
+
+    listarReporteIngresosApi({
+      ...filtrosAplicados,
+      pagina: page,
+      tamPagina: pageSize,
+    })
+      .then((resultado) => {
+        if (!activo) return
+        setFilas(resultado.datos)
+        setTotalApi(resultado.totalElementos)
+        setErrorCarga(null)
+      })
+      .catch((error: unknown) => {
+        if (!activo) return
+        setErrorCarga(error instanceof Error ? error.message : 'No se pudo cargar el reporte de ingresos.')
+        setFilas([])
+        setTotalApi(0)
+      })
+
+    return () => { activo = false }
+  }, [filtrosAplicados, page, pageSize])
+
   const proveedores = useMemo(
     () =>
       obtenerProveedores()
         .map((proveedor) => ({
-          id: proveedor.id,
+          id: String(proveedor.id),
           nombre:
             proveedor.razonSocial,
         }))
@@ -85,7 +109,7 @@ export function ReporteIngresosPage() {
     () =>
       obtenerTiposProducto()
         .map((tipo) => ({
-          id: tipo.id,
+          id: String(tipo.id),
           nombre: tipo.nombre,
         }))
         .sort((primero, segundo) =>
@@ -101,11 +125,12 @@ export function ReporteIngresosPage() {
     () =>
       obtenerProductos()
         .map((producto) => ({
-          id: producto.id,
+          id: String(producto.productoId),
           codigo: producto.codigo,
           nombre: producto.nombre,
-          tipoProductoId:
+          tipoProductoId: String(
             producto.tipoProductoId,
+          ).replace(/^TP-0*/, ''),
         }))
         .sort((primero, segundo) =>
           primero.nombre.localeCompare(
@@ -116,14 +141,7 @@ export function ReporteIngresosPage() {
     [],
   )
 
-  const filasFiltradas = useMemo(
-    () =>
-      filtrarReporteIngresos(
-        filas,
-        filtrosAplicados,
-      ),
-    [filas, filtrosAplicados],
-  )
+  const filasFiltradas = filas
 
   const resumen = useMemo(
     () =>
@@ -133,23 +151,14 @@ export function ReporteIngresosPage() {
     [filasFiltradas],
   )
 
-  const totalItems =
-    filasFiltradas.length
+  const totalItems = totalApi
 
   const filasPaginadas = useMemo(
     () => {
-      const inicio =
-        (page - 1) * pageSize
-
-      return filasFiltradas.slice(
-        inicio,
-        inicio + pageSize,
-      )
+      return filasFiltradas
     },
     [
       filasFiltradas,
-      page,
-      pageSize,
     ],
   )
 
@@ -222,6 +231,12 @@ export function ReporteIngresosPage() {
           </div>
         </section>
 
+        {errorCarga && (
+          <div className="alert alert-danger" role="alert">
+            {errorCarga}
+          </div>
+        )}
+
         <div className="maestro-panel">
           <ResumenReporteIngresos
             resumen={resumen}
@@ -241,9 +256,9 @@ export function ReporteIngresosPage() {
         </div>
 
         <div className="maestro-panel">
-          <section className="maestro-table-card card border-0 shadow-sm">
+          <section className="table-card card border-0 shadow-sm">
             <div className="card-body p-0">
-              <div className="maestro-table-header">
+              <div className="table-header">
                 <div>
                   <span className="maestro-kicker">
                     <FileSpreadsheet

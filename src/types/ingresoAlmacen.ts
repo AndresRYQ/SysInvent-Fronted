@@ -2,6 +2,19 @@ export type EstadoIngresoAlmacen =
   | 'REGISTRADO'
   | 'ANULADO'
 
+export interface IngresoAlmacenListado {
+  id: number
+  numeroIngreso: string
+  fechaIngreso: string
+  proveedor: string
+  contacto: string
+  documento: string
+  productos: number
+  cantidadIngresada: string
+  total: number
+  estado: EstadoIngresoAlmacen
+}
+
 /**
  * Producto incluido en un ingreso.
  *
@@ -10,7 +23,7 @@ export type EstadoIngresoAlmacen =
  */
 export interface DetalleIngresoAlmacen {
   id: string
-  productoId: string
+  productoId: number
   cantidad: number
   precioUnitario: number
 }
@@ -34,7 +47,7 @@ export interface IngresoAlmacenRegistro {
   fechaIngreso: string
   proveedorId: string
   contactoId: string
-  tipoComprobanteId: string
+  tipoDocumentoId: string
   numeroDocumento: string
   observacion: string
   estado: EstadoIngresoAlmacen
@@ -49,8 +62,9 @@ export interface IngresoAlmacenFormData {
   fechaIngreso: string
   proveedorId: string
   contactoId: string
-  tipoComprobanteId: string
+  tipoDocumentoId: string
   numeroDocumento: string
   observacion: string
   detalles: DetalleIngresoAlmacenFormData[]
 }
+

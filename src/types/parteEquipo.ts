@@ -1,5 +1,5 @@
 export interface ParteEquipo {
-  id: string
+  id: number
   codigo: string
   nombre: string
   descripcion: string
@@ -11,5 +11,5 @@ export interface ParteEquipoFormData {
   codigo: string
   nombre: string
   descripcion: string
-  estado: boolean
+  estado?: boolean
 }

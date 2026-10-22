@@ -1,3 +1,4 @@
+import { Placeholder } from '../../constants/placeholders'
 import {
   useEffect,
   useState,
@@ -7,6 +8,8 @@ import {
   Save,
   X,
 } from 'lucide-react'
+import Select from 'react-select'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 
 import type {
   Contacto,
@@ -14,10 +17,12 @@ import type {
 } from '../../types/contacto'
 
 import type { Proveedor } from '../../types/proveedor'
+import { coincidenIds } from '../../utils/identificadores'
 
 interface FormularioContactoProps {
   abierto: boolean
   contacto: Contacto | null
+  soloLectura?: boolean
   proveedores: Proveedor[]
   error: string
   onClose: () => void
@@ -40,7 +45,6 @@ const FORM_INICIAL: ContactoFormData = {
   cargo: '',
   telefono: '',
   correo: '',
-  estado: true,
 }
 
 const ERRORES_INICIALES:
@@ -52,9 +56,16 @@ const ERRORES_INICIALES:
     correo: '',
   }
 
+const estilosSelect = (tieneError: boolean) =>
+  crearEstilosSelect({
+    tieneError,
+    zIndex: 1300,
+  })
+
 export function FormularioContacto({
   abierto,
   contacto,
+  soloLectura = false,
   proveedores,
   error,
   onClose,
@@ -78,13 +89,12 @@ export function FormularioContacto({
     if (contacto) {
       setForm({
         proveedorId:
-          contacto.proveedorId,
+          String(contacto.proveedorId),
         nombreCompleto:
           contacto.nombreCompleto,
         cargo: contacto.cargo,
         telefono: contacto.telefono,
         correo: contacto.correo,
-        estado: contacto.estado,
       })
     } else {
       setForm(FORM_INICIAL)
@@ -177,9 +187,8 @@ export function FormularioContacto({
 
   return (
     <div
-      className="maestro-modal-backdrop"
+      className="maestro-modal-backdrop contactos-page"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="maestro-modal-card"
@@ -196,15 +205,11 @@ export function FormularioContacto({
               id="contacto-form-title"
               className="maestro-modal-title"
             >
-              {contacto
+              {soloLectura ? 'Visualizar contacto' : contacto
                 ? 'Editar contacto'
                 : 'Registrar contacto'}
             </h3>
 
-            <p className="maestro-modal-copy mb-0">
-              Registra el contacto comercial
-              asociado a un proveedor.
-            </p>
           </div>
 
           <button
@@ -238,11 +243,11 @@ export function FormularioContacto({
                 form.correo
                   .trim()
                   .toLowerCase(),
-              estado: form.estado,
             })
           }}
         >
-          <div className="maestro-modal-body">
+          <div className={`maestro-modal-body${soloLectura ? ' modo-visualizacion' : ''}`}>
+            <fieldset disabled={soloLectura}>
             {error && (
               <div
                 className="alert alert-danger py-2"
@@ -254,51 +259,45 @@ export function FormularioContacto({
 
             <div className="mb-3">
               <label
-                className="form-label maestro-label"
+                className={`form-label${soloLectura ? '' : ' required'}`}
                 htmlFor="contactoProveedor"
               >
                 Proveedor
-                <span className="maestro-required">
-                  *
-                </span>
+
               </label>
 
-              <select
-                id="contactoProveedor"
-                className={`form-select maestro-control${
-                  errores.proveedorId
-                    ? ' maestro-control--error'
-                    : ''
-                }`}
-                value={form.proveedorId}
-                onChange={(event) => {
+              <Select
+                inputId="contactoProveedor"
+                classNamePrefix="maestro-select"
+                options={proveedores.map((proveedor) => ({
+                  value: String(proveedor.id),
+                  label: proveedor.razonSocial,
+                }))}
+                value={proveedores
+                  .map((proveedor) => ({
+                    value: String(proveedor.id),
+                    label: proveedor.razonSocial,
+                  }))
+                  .find((opcion) => coincidenIds(opcion.value, form.proveedorId, 'PROV-')) ?? null}
+                onChange={(opcion) => {
                   setForm((actual) => ({
                     ...actual,
                     proveedorId:
-                      event.target.value,
+                      opcion?.value ?? '',
                   }))
 
-                  setErrores((actual) => ({
-                    ...actual,
-                    proveedorId: '',
-                  }))
+                setErrores((actual) => ({
+                  ...actual,
+                  proveedorId: '',
+                }))
                 }}
-              >
-                <option value="">
-                  Selecciona un proveedor
-                </option>
-
-                {proveedores.map(
-                  (proveedor) => (
-                    <option
-                      key={proveedor.id}
-                      value={proveedor.id}
-                    >
-                      {proveedor.razonSocial}
-                    </option>
-                  ),
-                )}
-              </select>
+                placeholder={Placeholder.Seleccionar}
+                isDisabled={soloLectura}
+                isClearable
+                isSearchable
+                menuPortalTarget={document.body}
+                styles={estilosSelect(Boolean(errores.proveedorId))}
+              />
 
               {errores.proveedorId && (
                 <div className="maestro-field-error">
@@ -310,18 +309,16 @@ export function FormularioContacto({
             <div className="row g-3">
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className={`form-label${soloLectura ? '' : ' required'}`}
                   htmlFor="contactoNombre"
                 >
                   Nombre completo
-                  <span className="maestro-required">
-                    *
-                  </span>
+
                 </label>
 
                 <input
                   id="contactoNombre"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.nombreCompleto
                       ? ' maestro-control--error'
                       : ''
@@ -331,7 +328,7 @@ export function FormularioContacto({
                   value={
                     form.nombreCompleto
                   }
-                  placeholder="Ej. Carlos Mendoza"
+                  placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
                     setForm((actual) => ({
                       ...actual,
@@ -359,18 +356,16 @@ export function FormularioContacto({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className={`form-label${soloLectura ? '' : ' required'}`}
                   htmlFor="contactoCargo"
                 >
                   Cargo
-                  <span className="maestro-required">
-                    *
-                  </span>
+
                 </label>
 
                 <input
                   id="contactoCargo"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.cargo
                       ? ' maestro-control--error'
                       : ''
@@ -378,7 +373,7 @@ export function FormularioContacto({
                   type="text"
                   maxLength={80}
                   value={form.cargo}
-                  placeholder="Ej. Ejecutivo de ventas"
+                  placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
                     setForm((actual) => ({
                       ...actual,
@@ -404,18 +399,16 @@ export function FormularioContacto({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className={`form-label${soloLectura ? '' : ' required'}`}
                   htmlFor="contactoTelefono"
                 >
                   Teléfono
-                  <span className="maestro-required">
-                    *
-                  </span>
+
                 </label>
 
                 <input
                   id="contactoTelefono"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.telefono
                       ? ' maestro-control--error'
                       : ''
@@ -423,7 +416,7 @@ export function FormularioContacto({
                   type="tel"
                   maxLength={20}
                   value={form.telefono}
-                  placeholder="Ej. 987654321"
+                  placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
                     setForm((actual) => ({
                       ...actual,
@@ -449,18 +442,16 @@ export function FormularioContacto({
 
               <div className="col-12 col-md-6">
                 <label
-                  className="form-label maestro-label"
+                  className={`form-label${soloLectura ? '' : ' required'}`}
                   htmlFor="contactoCorreo"
                 >
                   Correo
-                  <span className="maestro-required">
-                    *
-                  </span>
+
                 </label>
 
                 <input
                   id="contactoCorreo"
-                  className={`form-control maestro-control${
+                  className={`form-control${
                     errores.correo
                       ? ' maestro-control--error'
                       : ''
@@ -468,7 +459,7 @@ export function FormularioContacto({
                   type="email"
                   maxLength={120}
                   value={form.correo}
-                  placeholder="contacto@empresa.com"
+                  placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
                     setForm((actual) => ({
                       ...actual,
@@ -492,47 +483,14 @@ export function FormularioContacto({
                 )}
               </div>
 
-              <div className="col-12">
-                <label
-                  className="form-label maestro-label"
-                  htmlFor="contactoEstado"
-                >
-                  Estado
-                </label>
-
-                <select
-                  id="contactoEstado"
-                  className="form-select maestro-control"
-                  value={
-                    form.estado
-                      ? 'activo'
-                      : 'inactivo'
-                  }
-                  onChange={(event) =>
-                    setForm((actual) => ({
-                      ...actual,
-                      estado:
-                        event.target.value ===
-                        'activo',
-                    }))
-                  }
-                >
-                  <option value="activo">
-                    Activo
-                  </option>
-
-                  <option value="inactivo">
-                    Inactivo
-                  </option>
-                </select>
-              </div>
             </div>
+            </fieldset>
           </div>
 
-          <div className="maestro-modal-footer">
+          {!soloLectura && <div className="maestro-modal-footer">
             <button
               type="button"
-              className="btn maestro-btn-secondary"
+              className="btn btn-maestro-danger"
               onClick={onClose}
             >
               <X size={18} />
@@ -541,7 +499,7 @@ export function FormularioContacto({
 
             <button
               type="submit"
-              className="btn maestro-btn-primary"
+              className="btn btn-maestro-primary"
             >
               <Save size={18} />
 
@@ -549,7 +507,7 @@ export function FormularioContacto({
                 ? 'Guardar cambios'
                 : 'Registrar'}
             </button>
-          </div>
+          </div>}
         </form>
       </div>
     </div>

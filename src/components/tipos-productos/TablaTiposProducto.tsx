@@ -1,14 +1,8 @@
-import {
-  FolderKanban,
-  Pencil,
-  Plus,
-  ShieldCheck,
-  Tags,
-  Trash2,
-} from 'lucide-react'
-
+import { Eye, FolderKanban, Pencil, Plus, RotateCcw, Tags, Trash2 } from 'lucide-react'
+import { EmptyState } from '../common/EmptyState'
 import type { TipoProducto } from '../../types/tipoProducto'
 import { TablePagination } from '../ui/TablePagination'
+import { TableLoadingState } from '../ui/TableLoadingState'
 
 interface TablaTiposProductoProps {
   tiposProducto: TipoProducto[]
@@ -17,142 +11,37 @@ interface TablaTiposProductoProps {
   pageSize: number
   onAgregar: () => void
   onEditar: (tipoProducto: TipoProducto) => void
+  onVisualizar: (tipoProducto: TipoProducto) => void
   onEliminar: (tipoProducto: TipoProducto) => void
+  onReactivar: (tipoProducto: TipoProducto) => void
+  loading?: boolean
   onPageChange: (page: number) => void
   onPageSizeChange: (pageSize: number) => void
 }
 
-export function TablaTiposProducto({
-  tiposProducto,
-  totalItems,
-  page,
-  pageSize,
-  onAgregar,
-  onEditar,
-  onEliminar,
-  onPageChange,
-  onPageSizeChange,
-}: TablaTiposProductoProps) {
+export function TablaTiposProducto({ tiposProducto, totalItems, page, pageSize, onAgregar, onEditar, onVisualizar, onEliminar, onReactivar, onPageChange, onPageSizeChange, loading = totalItems < 0 }: TablaTiposProductoProps) {
   return (
-    <section className="maestro-table-card card border-0 shadow-sm">
+    <section className="table-card card border-0 shadow-sm">
       <div className="card-body p-0">
-        <div className="maestro-table-header">
-          <div>
-            <span className="maestro-kicker">
-              <FolderKanban size={16} />
-              Listado de tipos de producto
-            </span>
-          </div>
-
-          <button
-            type="button"
-            className="btn maestro-toolbar-btn"
-            onClick={onAgregar}
-          >
-            <Plus size={18} />
-            Agregar tipo de producto
-          </button>
-        </div>
-
-        <div className="table-responsive">
-          <table className="table maestro-table align-middle mb-0">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre de tipo de producto</th>
-                <th>Descripción</th>
-                <th>Fecha de registro</th>
-                <th>Estado</th>
-                <th className="text-center">Acciones</th>
-              </tr>
-            </thead>
-
+        <div className="table-header"><span className="maestro-kicker"><FolderKanban size={16} />Listado de tipos de producto</span><button type="button" className="btn table-toolbar-btn" onClick={onAgregar}><Plus size={18} />Agregar tipo de producto</button></div>
+        <div className="table-responsive"><TableLoadingState visible={loading} />
+          <table className="table standard-table align-middle mb-0">
+            <thead><tr><th>N°</th><th>Nombre de tipo de producto</th><th>Descripción</th><th>Fecha registro</th><th>Estado</th><th className="text-center">Acciones</th></tr></thead>
             <tbody>
-              {tiposProducto.length > 0 ? (
-                tiposProducto.map((tipoProducto) => (
-                  <tr key={tipoProducto.id}>
-                    <td>
-                      <span className="maestro-id-chip">
-                        {tipoProducto.id}
-                      </span>
-                    </td>
-
-                    <td>
-                      <div className="maestro-cell-main">
-                        <span className="maestro-cell-icon">
-                          <Tags size={16} />
-                        </span>
-                        {tipoProducto.nombre}
-                      </div>
-                    </td>
-
-                    <td>{tipoProducto.descripcion}</td>
-                    <td>{tipoProducto.fechaRegistro}</td>
-
-                    <td>
-                      <span
-                        className={
-                          tipoProducto.estado
-                            ? 'maestro-status maestro-status--active'
-                            : 'maestro-status maestro-status--inactive'
-                        }
-                      >
-                        <ShieldCheck size={14} />
-                        {tipoProducto.estado ? 'Activo' : 'Inactivo'}
-                      </span>
-                    </td>
-
-                    <td>
-                      <div className="maestro-actions">
-                        <button
-                          type="button"
-                          className="btn maestro-action-btn"
-                          onClick={() => onEditar(tipoProducto)}
-                          title="Editar"
-                          aria-label={`Editar ${tipoProducto.nombre}`}
-                        >
-                          <Pencil size={16} />
-                        </button>
-
-                        <button
-                          type="button"
-                          className="btn maestro-action-btn maestro-action-btn--danger"
-                          onClick={() => onEliminar(tipoProducto)}
-                          title="Eliminar"
-                          aria-label={`Eliminar ${tipoProducto.nombre}`}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6}>
-                    <div className="maestro-empty-state">
-                      <FolderKanban size={28} />
-                      <p className="mb-1">
-                        No se encontraron tipos de producto
-                      </p>
-                      <span>
-                        Ajusta los filtros o limpia la búsqueda.
-                      </span>
-                    </div>
-                  </td>
+              {tiposProducto.length ? tiposProducto.map((tipoProducto, index) => (
+                <tr key={tipoProducto.id}>
+                  <td><span className="table-id-chip">{((page - 1) * pageSize) + index + 1}</span></td>
+                  <td><div className="table-cell-main"><span className="table-cell-icon"><Tags size={16} /></span>{tipoProducto.nombre}</div></td>
+                  <td>{tipoProducto.descripcion}</td>
+                  <td>{tipoProducto.fechaRegistro ?? '—'}</td>
+                  <td><span className={tipoProducto.activo === 1 ? 'status-label status-label--active' : 'status-label status-label--inactive'}><span className="status-label__dot" aria-hidden="true" />{tipoProducto.activo === 1 ? 'Activo' : 'Inactivo'}</span></td>
+                  <td><div className="table-actions">{tipoProducto.activo === 1 ? <><button type="button" className="btn table-action-btn" onClick={() => onVisualizar(tipoProducto)} title="Visualizar" aria-label={`Visualizar ${tipoProducto.nombre}`}><Eye size={16} /></button><button type="button" className="btn table-action-btn" onClick={() => onEditar(tipoProducto)} title="Editar" aria-label={`Editar ${tipoProducto.nombre}`}><Pencil size={16} /></button><button type="button" className="btn table-action-btn table-action-btn--danger" onClick={() => onEliminar(tipoProducto)} title="Desactivar" aria-label={`Desactivar ${tipoProducto.nombre}`}><Trash2 size={16} /></button></> : <><button type="button" className="btn table-action-btn" onClick={() => onVisualizar(tipoProducto)} title="Visualizar" aria-label={`Visualizar ${tipoProducto.nombre}`}><Eye size={16} /></button><button type="button" className="btn table-action-btn" onClick={() => onReactivar(tipoProducto)} title="Reactivar" aria-label={`Reactivar ${tipoProducto.nombre}`}><RotateCcw size={16} /></button></>}</div></td>
                 </tr>
-              )}
+              )) : <tr><td colSpan={6}><EmptyState icon={FolderKanban} iconSize={28} title="No se encontraron tipos de producto" description="Ajusta los filtros o limpia la búsqueda." /></td></tr>}
             </tbody>
           </table>
         </div>
-
-        <TablePagination
-          totalItems={totalItems}
-          page={page}
-          pageSize={pageSize}
-          onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
-        />
+        <TablePagination totalItems={totalItems} page={page} pageSize={pageSize} onPageChange={onPageChange} onPageSizeChange={onPageSizeChange} />
       </div>
     </section>
   )

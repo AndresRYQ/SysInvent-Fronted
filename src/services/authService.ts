@@ -1,409 +1,306 @@
-import { USUARIOS_INICIALES } from '../data/usuarios'
-import { registrarEventoBitacora } from './bitacoraService'
+import { toApiError } from './api'
+import {
+  LoginApi,
+  type LoginRequest,
+  type LoginResponse,
+} from '../api/generated'
+import { apiConfiguration } from '../api/client'
 
 import type {
   CredencialesLogin,
-  EstadoIntentosLogin,
   ResultadoLogin,
   SesionUsuario,
   UsuarioLogin,
 } from '../types/auth'
 
-import {
-  eliminarStorage,
-  guardarStorage,
-  obtenerStorage,
-  STORAGE_KEYS,
-} from './storageService'
+export const AUTH_TOKEN_KEY = 'sysinvent_token'
 
-const DURACION_SESION_MINUTOS = 5
-const MAXIMO_INTENTOS = 3
-const DURACION_BLOQUEO_MINUTOS = 5
+interface JwtModulo {
+  moduloId?: number
+  nombre?: string
+  ruta?: string
+}
 
-function inicializarUsuarios(): UsuarioLogin[] {
-  const usuariosGuardados =
-    obtenerStorage<UsuarioLogin[]>(
-      STORAGE_KEYS.usuarios,
-      [],
-    )
+interface JwtRol {
+  rolId?: number
+  nombre?: string
+  modulos?: JwtModulo[]
+}
 
-  if (usuariosGuardados.length > 0) {
-    return usuariosGuardados
+interface JwtPayload {
+  sub?: string
+  usuarioId?: number
+  usuario?: string
+  username?: string
+  nombreCompleto?: string
+  nombre?: string
+  email?: string
+  rolId?: number
+  rol?: string
+  role?: string
+  roles?: JwtRol[]
+  modulos?: JwtModulo[]
+  exp?: number
+  iat?: number
+}
+
+const loginApi = new LoginApi(apiConfiguration)
+
+async function requestLogin(
+  usuario: string,
+  contrasena: string,
+): Promise<LoginResponse> {
+  const request: LoginRequest = { usuario, contrasena }
+  return await loginApi.login({ loginRequest: request })
+}
+
+function decodeBase64Url(value: string): string {
+  const base64 = value.replace(/-/g, '+').replace(/_/g, '/')
+  const padded = base64.padEnd(
+    base64.length + ((4 - (base64.length % 4)) % 4),
+    '=',
+  )
+
+  return decodeURIComponent(
+    atob(padded)
+      .split('')
+      .map((character) =>
+        `%${character.charCodeAt(0).toString(16).padStart(2, '0')}`,
+      )
+      .join(''),
+  )
+}
+
+function obtenerPayloadJwt(token: string): JwtPayload | null {
+  const [, payload] = token.split('.')
+
+  if (!payload) {
+    return null
   }
 
-  guardarStorage(
-    STORAGE_KEYS.usuarios,
-    USUARIOS_INICIALES,
-  )
-
-  return USUARIOS_INICIALES
+  try {
+    return JSON.parse(decodeBase64Url(payload)) as JwtPayload
+  } catch {
+    return null
+  }
 }
 
-function generarTokenSeguro(): string {
-  const bytes = new Uint8Array(32)
+function convertirRutaAModuloId(
+  ruta?: string,
+): string | null {
+  if (!ruta) {
+    return null
+  }
 
-  crypto.getRandomValues(bytes)
+  const rutaNormalizada =
+    ruta.trim().replace(/\/+$/, '')
 
-  const textoBinario = Array.from(
-    bytes,
-    (byte) => String.fromCharCode(byte),
-  ).join('')
-
-  return btoa(textoBinario)
-    .replaceAll('+', '-')
-    .replaceAll('/', '_')
-    .replaceAll('=', '')
-}
-
-function calcularFechaExpiracion(): string {
-  const fechaExpiracion = new Date()
-
-  fechaExpiracion.setMinutes(
-    fechaExpiracion.getMinutes() +
-      DURACION_SESION_MINUTOS,
-  )
-
-  return fechaExpiracion.toISOString()
-}
-
-function normalizarUsuario(
-  usuario: string,
-): string {
-  return usuario.trim().toLowerCase()
-}
-
-function obtenerEstadosIntentos():
-  EstadoIntentosLogin[] {
-  return obtenerStorage<EstadoIntentosLogin[]>(
-    STORAGE_KEYS.intentosLogin,
-    [],
-  )
-}
-
-function obtenerEstadoIntentos(
-  usuario: string,
-): EstadoIntentosLogin {
-  const usuarioNormalizado =
-    normalizarUsuario(usuario)
-
-  const estado = obtenerEstadosIntentos().find(
-    (registro) =>
-      registro.usuario === usuarioNormalizado,
-  )
-
-  return (
-    estado ?? {
-      usuario: usuarioNormalizado,
-      intentosFallidos: 0,
-      bloqueadoHasta: null,
+  const equivalencias:
+    Record<string, string> = {
+      '/roles': 'roles',
+      '/usuarios': 'usuarios',
+      '/tipos-producto': 'tipos-producto',
+      '/proveedores': 'proveedores',
+      '/tipos-documento': 'tipos-documento',
+      '/destinos': 'destinos',
+      '/productos': 'productos',
+      '/unidades-medida': 'unidades-medida',
+      '/categorias': 'categorias',
+      '/centros-costos': 'centros-costo',
+      '/bitacora': 'bitacora',
+      '/reportes/ingresos':
+        'reporte-ingresos',
+      '/reportes/vales': 'reporte-vales',
+      '/reportes/productos-mas-pedidos':
+        'reporte-productos',
+      '/contactos': 'contactos',
+      '/partes-equipo': 'partes-equipo',
+      '/control-almacen':
+        'control-almacen',
+      '/vales-consumo': 'vales-consumo',
+      '/ingresos-almacen':
+        'ingresos-almacen',
+      '/perfil': 'perfil-usuario',
     }
-  )
+
+  return equivalencias[rutaNormalizada] ?? null
 }
 
-function guardarEstadoIntentos(
-  estado: EstadoIntentosLogin,
-): void {
-  const otrosEstados =
-    obtenerEstadosIntentos().filter(
-      (registro) =>
-        registro.usuario !== estado.usuario,
-    )
+function crearSesionDesdeToken(
+  token: string,
+): SesionUsuario {
+  const payload = obtenerPayloadJwt(token)
 
-  const debeGuardar =
-    estado.intentosFallidos > 0 ||
-    Boolean(estado.bloqueadoHasta)
+  const usuario =
+    payload?.usuario ??
+    payload?.username ??
+    payload?.sub ??
+    'usuario'
 
-  guardarStorage(
-    STORAGE_KEYS.intentosLogin,
-    debeGuardar
-      ? [...otrosEstados, estado]
-      : otrosEstados,
+  const rolPrincipal =
+    payload?.roles?.[0]
+
+  const rol =
+    rolPrincipal?.nombre ??
+    payload?.rol ??
+    payload?.role ??
+    'Sin rol'
+
+  const rolId =
+    rolPrincipal?.rolId ??
+    payload?.rolId ??
+    null
+
+  const modulosToken =
+    payload?.modulos?.length
+      ? payload.modulos
+      : rolPrincipal?.modulos ?? []
+
+  const modulos = Array.from(
+    new Set(
+      modulosToken
+        .map((modulo) =>
+          convertirRutaAModuloId(
+            modulo.ruta,
+          ),
+        )
+        .filter(
+          (moduloId):
+            moduloId is string =>
+              Boolean(moduloId),
+        ),
+    ),
   )
+
+  const nombreCompleto =
+    payload?.nombreCompleto ??
+    payload?.nombre ??
+    usuario
+
+  const fechaInicio = payload?.iat
+    ? new Date(
+        payload.iat * 1000,
+      ).toISOString()
+    : new Date().toISOString()
+
+  const fechaExpiracion = payload?.exp
+    ? new Date(
+        payload.exp * 1000,
+      ).toISOString()
+    : new Date(
+        Date.now() + 5 * 60 * 1000,
+      ).toISOString()
+
+  return {
+    id: String(
+      payload?.usuarioId ?? usuario,
+    ),
+    usuario,
+    nombreCompleto,
+    email: payload?.email ?? '',
+    rolId,
+    rol,
+    modulos,
+    token,
+    fechaInicio,
+    fechaExpiracion,
+  }
 }
 
-function limpiarIntentos(
+export async function login(
   usuario: string,
-): void {
-  guardarEstadoIntentos({
-    usuario: normalizarUsuario(usuario),
-    intentosFallidos: 0,
-    bloqueadoHasta: null,
-  })
-}
+  contrasena: string,
+): Promise<ResultadoLogin> {
+  try {
+    const response = await requestLogin(usuario, contrasena)
 
-function calcularBloqueo(): string {
-  const fechaBloqueo = new Date()
-
-  fechaBloqueo.setMinutes(
-    fechaBloqueo.getMinutes() +
-      DURACION_BLOQUEO_MINUTOS,
-  )
-
-  return fechaBloqueo.toISOString()
-}
-
-function obtenerMinutosRestantes(
-  bloqueadoHasta: string,
-): number {
-  const diferencia =
-    Date.parse(bloqueadoHasta) - Date.now()
-
-  return Math.max(
-    1,
-    Math.ceil(diferencia / 60_000),
-  )
-}
-
-export function iniciarSesion(
-  credenciales: CredencialesLogin,
-): ResultadoLogin {
-  const usuarioNormalizado =
-    normalizarUsuario(credenciales.usuario)
-
-  const estadoIntentos =
-    obtenerEstadoIntentos(usuarioNormalizado)
-
-  if (estadoIntentos.bloqueadoHasta) {
-    const fechaBloqueo = Date.parse(
-      estadoIntentos.bloqueadoHasta,
-    )
-
-    const bloqueoVigente =
-      !Number.isNaN(fechaBloqueo) &&
-      Date.now() < fechaBloqueo
-
-    if (bloqueoVigente) {
-      const minutos = obtenerMinutosRestantes(
-        estadoIntentos.bloqueadoHasta,
-      )
+    if (response.success === true && typeof response.data === 'string') {
+      localStorage.setItem(AUTH_TOKEN_KEY, response.data)
 
       return {
-        exitoso: false,
-        sesion: null,
-        mensaje:
-          `Acceso bloqueado. Intenta nuevamente en ${minutos} minuto(s).`,
-        bloqueadoHasta:
-          estadoIntentos.bloqueadoHasta,
+        exitoso: true,
+        sesion: crearSesionDesdeToken(response.data),
+        mensaje: response.message || 'Inicio de sesion correcto',
+        bloqueadoHasta: null,
       }
     }
 
-    limpiarIntentos(usuarioNormalizado)
-  }
-
-  const usuarios = inicializarUsuarios()
-
-  const usuarioRegistrado = usuarios.find(
-    (usuario) =>
-      usuario.usuario.toLowerCase() ===
-      usuarioNormalizado,
-  )
-
-  const usuarioEncontrado = usuarios.find(
-    (usuario) =>
-      usuario.usuario.toLowerCase() ===
-        usuarioNormalizado &&
-      usuario.contrasena ===
-        credenciales.contrasena &&
-      usuario.estado,
-  )
-
-  if (!usuarioEncontrado) {
-    const estadoActual =
-      obtenerEstadoIntentos(
-        usuarioNormalizado,
-      )
-
-    const nuevosIntentos =
-      estadoActual.intentosFallidos + 1
-
-    if (nuevosIntentos >= MAXIMO_INTENTOS) {
-      const bloqueadoHasta =
-        calcularBloqueo()
-
-      guardarEstadoIntentos({
-        usuario: usuarioNormalizado,
-        intentosFallidos: nuevosIntentos,
-        bloqueadoHasta,
-      })
-
-      registrarEventoBitacora({
-        modulo: 'Inicio de sesión',
-        accion: 'BLOQUEO_LOGIN',
-        detalle:
-          'Usuario bloqueado durante 5 minutos después de 3 intentos fallidos.',
-        registroId:
-          usuarioRegistrado?.id ?? null,
-        usuario:
-          usuarioNormalizado || 'sin-usuario',
-        nombreCompleto:
-          usuarioRegistrado?.nombreCompleto ??
-          'Usuario no identificado',
-        rol:
-          usuarioRegistrado?.rol ??
-          'No identificado',
-      })
-
-      return {
-        exitoso: false,
-        sesion: null,
-        mensaje:
-          'Demasiados intentos incorrectos. Acceso bloqueado durante 5 minutos.',
-        bloqueadoHasta,
-      }
-    }
-
-    guardarEstadoIntentos({
-      usuario: usuarioNormalizado,
-      intentosFallidos: nuevosIntentos,
+    return {
+      exitoso: false,
+      sesion: null,
+      mensaje: response.message || 'Usuario o contraseña incorrectos',
       bloqueadoHasta: null,
-    })
-
-    const intentosRestantes =
-      MAXIMO_INTENTOS - nuevosIntentos
+    }
+  } catch (error) {
+    const apiError = toApiError(error)
 
     return {
       exitoso: false,
       sesion: null,
       mensaje:
-        `Usuario o contraseña incorrectos. Te quedan ${intentosRestantes} intento(s).`,
+        apiError.status === 401
+          ? 'Usuario o contraseña incorrectos'
+          : 'No se pudo conectar con el servidor',
       bloqueadoHasta: null,
     }
   }
-
-  limpiarIntentos(usuarioNormalizado)
-
-  const sesion: SesionUsuario = {
-    id: usuarioEncontrado.id,
-    usuario: usuarioEncontrado.usuario,
-    nombreCompleto:
-      usuarioEncontrado.nombreCompleto,
-    rol: usuarioEncontrado.rol,
-    token: generarTokenSeguro(),
-    fechaInicio: new Date().toISOString(),
-    fechaExpiracion:
-      calcularFechaExpiracion(),
-  }
-
-  guardarStorage(
-    STORAGE_KEYS.sesion,
-    sesion,
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Inicio de sesión',
-    accion: 'INICIO_SESION',
-    detalle:
-      'El usuario inició sesión correctamente.',
-    registroId: sesion.id,
-  })
-
-  return {
-    exitoso: true,
-    sesion,
-    mensaje: 'Inicio de sesión correcto.',
-    bloqueadoHasta: null,
-  }
 }
 
-export function obtenerSesion():
-  SesionUsuario | null {
-  const sesion =
-    obtenerStorage<SesionUsuario | null>(
-      STORAGE_KEYS.sesion,
-      null,
-    )
-
-  if (!sesion) {
-    return null
-  }
-
-  if (
-    !sesion.token ||
-    !sesion.fechaInicio ||
-    !sesion.fechaExpiracion
-  ) {
-    cerrarSesion()
-    return null
-  }
-
-  const fechaExpiracion = Date.parse(
-    sesion.fechaExpiracion,
-  )
-
-  const fechaInvalida =
-    Number.isNaN(fechaExpiracion)
-
-  const sesionVencida =
-    Date.now() >= fechaExpiracion
-
-  if (fechaInvalida || sesionVencida) {
-    cerrarSesion(
-      'La sesión se cerró al alcanzar el tiempo máximo de 5 minutos.',
-    )
-    return null
-  }
-
-  return sesion
+export function logout(): void {
+  localStorage.removeItem(AUTH_TOKEN_KEY)
 }
 
-export function cerrarSesion(
-  detalle =
-    'El usuario cerró la sesión manualmente.',
-): void {
-  const sesionActual =
-    obtenerStorage<SesionUsuario | null>(
-      STORAGE_KEYS.sesion,
-      null,
-    )
+export function getToken(): string | null {
+  return localStorage.getItem(AUTH_TOKEN_KEY)
+}
 
-  if (sesionActual) {
-    registrarEventoBitacora({
-      modulo: 'Inicio de sesión',
-      accion: 'CIERRE_SESION',
-      detalle,
-      registroId: sesionActual.id,
-    })
-  }
+export function getAuthHeaders(): HeadersInit {
+  const token = getToken()
 
-  eliminarStorage(STORAGE_KEYS.sesion)
+  return token
+    ? {
+        Authorization: `Bearer ${token}`,
+      }
+    : {}
+}
+
+export function isAuthenticated(): boolean {
+  return getToken() !== null
+}
+
+export const iniciarSesion = (credenciales: CredencialesLogin) =>
+  login(credenciales.usuario, credenciales.contrasena)
+
+export function obtenerSesion(): SesionUsuario | null {
+  const token = getToken()
+
+  return token ? crearSesionDesdeToken(token) : null
+}
+
+export function cerrarSesion(): void {
+  logout()
 }
 
 export function estaAutenticado(): boolean {
-  return obtenerSesion() !== null
+  return isAuthenticated()
 }
 
 export function sincronizarSesionUsuario(
   usuario: UsuarioLogin,
 ): SesionUsuario | null {
-  const sesionActual =
-    obtenerStorage<SesionUsuario | null>(
-      STORAGE_KEYS.sesion,
-      null,
-    )
+  const sesionActual = obtenerSesion()
 
   if (!sesionActual) {
     return null
   }
 
-  if (
-    sesionActual.id !== usuario.id
-  ) {
-    return sesionActual
+  return {
+  ...sesionActual,
+  id: usuario.id,
+  usuario: usuario.usuario,
+  nombreCompleto:
+    usuario.nombreCompleto,
+  email: usuario.email,
+  rol: usuario.rol,
   }
-
-  const sesionActualizada:
-    SesionUsuario = {
-      ...sesionActual,
-      usuario: usuario.usuario,
-      nombreCompleto:
-        usuario.nombreCompleto,
-      rol: usuario.rol,
-    }
-
-  guardarStorage(
-    STORAGE_KEYS.sesion,
-    sesionActualizada,
-  )
-
-  return sesionActualizada
 }

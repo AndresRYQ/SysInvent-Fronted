@@ -4,6 +4,8 @@ import {
   Trophy,
 } from 'lucide-react'
 
+import { EmptyState } from '../../common/EmptyState'
+
 import type {
   FilaProductoMasPedido,
 } from '../../../types/reporteProductoMasPedido'
@@ -34,7 +36,7 @@ export function GraficoProductosMasPedidos({
     0
 
   return (
-    <section className="maestro-table-card card border-0 shadow-sm h-100">
+    <section className="table-card card border-0 shadow-sm h-100">
       <div className="card-body p-3">
         <div className="d-flex align-items-center justify-content-between gap-3 mb-4">
           <span className="maestro-kicker">
@@ -48,18 +50,11 @@ export function GraficoProductosMasPedidos({
         </div>
 
         {productos.length === 0 ? (
-          <div className="maestro-empty-state">
-            <PackageSearch size={38} />
-
-            <strong>
-              No existen consumos
-            </strong>
-
-            <span>
-              Registra vales o cambia los
-              filtros del reporte.
-            </span>
-          </div>
+          <EmptyState
+            icon={PackageSearch}
+            title="No existen consumos"
+            description="Registra vales o cambia los filtros del reporte."
+          />
         ) : (
           <div className="d-flex flex-column gap-3">
             {productos.map((producto) => {
@@ -169,3 +164,4 @@ export function GraficoProductosMasPedidos({
     </section>
   )
 }
+

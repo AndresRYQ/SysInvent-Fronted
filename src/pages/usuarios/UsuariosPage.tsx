@@ -1,42 +1,39 @@
 import {
+  useCallback,
+  useEffect,
   useMemo,
   useState,
 } from 'react'
-
 import {
   FiltrosUsuarios,
   type FiltrosUsuariosValores,
 } from '../../components/usuarios/FiltrosUsuarios'
-
 import {
   FormularioUsuario,
 } from '../../components/usuarios/FormularioUsuario'
-
 import {
   TablaUsuarios,
 } from '../../components/usuarios/TablaUsuarios'
-
 import { useAuth } from '../../hooks/useAuth'
-
 import {
-  obtenerRoles,
+  obtenerRolesBackend,
 } from '../../services/rolService'
-
+import type {
+  Rol,
+} from '../../types/rol'
 import {
-  actualizarUsuario,
-  crearUsuario,
+  actualizarUsuarioBackend,
+  crearUsuarioBackend,
   eliminarUsuario,
   obtenerUsuarios,
+  obtenerUsuariosBackend,
 } from '../../services/usuarioService'
-
 import type {
   UsuarioLogin,
 } from '../../types/auth'
-
 import type {
   UsuarioFormData,
 } from '../../types/usuario'
-
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
@@ -93,13 +90,10 @@ export function UsuariosPage() {
   const { sesion } = useAuth()
 
   const [usuarios, setUsuarios] =
-    useState<UsuarioLogin[]>(
-      () => obtenerUsuarios(),
-    )
+  useState<UsuarioLogin[]>([])
 
-  const [roles] = useState(
-    () => obtenerRoles(),
-  )
+  const [roles, setRoles] =
+  useState<Rol[]>([])
 
   const [filtros, setFiltros] =
     useState(FILTROS_INICIALES)
@@ -125,6 +119,49 @@ export function UsuariosPage() {
     tipo: 'success' | 'danger'
     texto: string
   } | null>(null)
+
+
+  const cargarUsuarios =
+  useCallback(async (): Promise<void> => {
+    try {
+      const [
+        resultadoUsuarios,
+        resultadoRoles,
+      ] = await Promise.all([
+        obtenerUsuariosBackend(
+          '',
+          '',
+          undefined,
+          1,
+          100,
+        ),
+        obtenerRolesBackend(
+          '',
+          1,
+          100,
+        ),
+      ])
+
+      setUsuarios(
+        resultadoUsuarios.usuarios,
+      )
+
+      setRoles(
+        resultadoRoles.roles,
+      )
+    } catch (error) {
+      setMensaje({
+        tipo: 'danger',
+        texto:
+          error instanceof Error
+            ? error.message
+            : 'No se pudieron cargar los usuarios.',
+      })
+    }
+  }, [])
+  useEffect(() => {
+    void cargarUsuarios()
+  }, [cargarUsuarios])
 
   const usuariosFiltrados = useMemo(
     () =>
@@ -162,43 +199,42 @@ export function UsuariosPage() {
     pageSize,
   ])
 
-  const manejarGuardado = (
-    datos: UsuarioFormData,
-  ): string | null => {
-    try {
-      if (usuarioEnEdicion) {
-        actualizarUsuario(
-          usuarioEnEdicion.id,
-          datos,
-        )
+ const manejarGuardado = async (
+  datos: UsuarioFormData,
+): Promise<string | null> => {
+  try {
+    const esEdicion =
+      usuarioEnEdicion !== null
 
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Usuario actualizado correctamente.',
-        })
-      } else {
-        crearUsuario(datos)
-
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Usuario registrado correctamente.',
-        })
-      }
-
-      setUsuarios(obtenerUsuarios())
-      setUsuarioEnEdicion(null)
-      setModalAbierto(false)
-      setPage(1)
-
-      return null
-    } catch (error) {
-      return error instanceof Error
-        ? error.message
-        : 'No se pudo guardar el usuario.'
+    if (usuarioEnEdicion) {
+      await actualizarUsuarioBackend(
+        usuarioEnEdicion.id,
+        datos,
+      )
+    } else {
+      await crearUsuarioBackend(datos)
     }
+
+    await cargarUsuarios()
+
+    setMensaje({
+      tipo: 'success',
+      texto: esEdicion
+        ? 'Usuario actualizado correctamente.'
+        : 'Usuario registrado correctamente.',
+    })
+
+    setUsuarioEnEdicion(null)
+    setModalAbierto(false)
+    setPage(1)
+
+    return null
+  } catch (error) {
+    return error instanceof Error
+      ? error.message
+      : 'No se pudo guardar el usuario.'
   }
+}
 
   const manejarEliminacion = (
     usuario: UsuarioLogin,

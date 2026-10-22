@@ -1,372 +1,120 @@
-import type {
-  CentroCosto,
-  CentroCostoFormData,
-} from '../types/centroCosto'
+import type { CentroCosto, CentroCostoFormData } from '../types/centroCosto'
+import {
+  CentrosDeCostoApi,
+  type CustomPageCentroCostoResponse,
+  type MessageResponse,
+} from '../api/generated'
+import { apiConfiguration } from '../api/client'
+import type { CatalogoPaginado } from './catalogoApi'
 
-import { registrarEventoBitacora } from './bitacoraService'
+let centrosEnMemoria: CentroCosto[] = []
+const centroCostoApi = new CentrosDeCostoApi(apiConfiguration)
+const solicitudesEnCurso = new Map<string, Promise<CatalogoPaginado<CentroCosto>>>()
 
-const STORAGE_KEY =
-  'agrihusac_centros_costo'
-
-const VALES_STORAGE_KEY =
-  'agrihusac_vales_consumo'
-
-const CENTROS_INICIALES:
-  CentroCosto[] = [
-    {
-      id: 'CC-001',
-      nombre: 'Administración',
-      descripcion:
-        'Gestión general y dirección de la organización.',
-      estado: true,
-      fechaRegistro: '10/08/2026',
-    },
-    {
-      id: 'CC-002',
-      nombre: 'Producción',
-      descripcion:
-        'Procesos productivos y operaciones de planta.',
-      estado: true,
-      fechaRegistro: '11/08/2026',
-    },
-    {
-      id: 'CC-003',
-      nombre: 'Mantenimiento',
-      descripcion:
-        'Conservación de equipos e instalaciones.',
-      estado: true,
-      fechaRegistro: '12/08/2026',
-    },
-    {
-      id: 'CC-004',
-      nombre: 'Logística',
-      descripcion:
-        'Almacenamiento y distribución de materiales.',
-      estado: true,
-      fechaRegistro: '13/08/2026',
-    },
-    {
-      id: 'CC-005',
-      nombre: 'Ventas',
-      descripcion:
-        'Comercialización y atención de clientes.',
-      estado: false,
-      fechaRegistro: '14/08/2026',
-    },
-  ]
-
-function copiarCentros(
-  centrosCosto: CentroCosto[],
-): CentroCosto[] {
-  return centrosCosto.map(
-    (centroCosto) => ({
-      ...centroCosto,
-    }),
-  )
+export interface ListarCentrosCostoParams {
+  nombre?: string
+  pagina?: number
+  tamPagina?: number
 }
 
-function guardarCentros(
-  centrosCosto: CentroCosto[],
-): void {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(centrosCosto),
-  )
+export function obtenerCentrosCosto(): CentroCosto[] {
+  return centrosEnMemoria.map((centro) => ({ ...centro }))
 }
 
-function normalizarTexto(
-  valor: string | null | undefined,
-): string {
-  return (valor ?? '').trim().toLowerCase()
+function mapearRespuestaCentro(response: CustomPageCentroCostoResponse): CatalogoPaginado<CentroCosto> {
+  const resultado: CatalogoPaginado<CentroCosto> = {
+    datos: (response.datos ?? []).map((centro) => ({
+      id: centro.centroCostoId ?? 0,
+      nombre: centro.nombre ?? '',
+      descripcion: centro.descripcion ?? '',
+      activo: centro.activo ? 1 : 0,
+      fechaRegistro: centro.fechaRegistro,
+    })),
+    paginacion: response.paginacion ?? {},
+  }
+
+  centrosEnMemoria = resultado.datos
+  return resultado
 }
 
-function validarDatos(
-  datos: CentroCostoFormData,
-): void {
+export async function listarCentrosCosto(
+  params: ListarCentrosCostoParams = {},
+): Promise<CatalogoPaginado<CentroCosto>> {
+  const parametros = {
+    nombre: params.nombre?.trim() || undefined,
+    pagina: params.pagina,
+    tamPagina: params.tamPagina,
+  }
+  const clave = JSON.stringify(parametros)
+  const solicitudExistente = solicitudesEnCurso.get(clave)
+
+  if (solicitudExistente) return solicitudExistente
+
+  const solicitud = centroCostoApi
+    .listarCentrosCosto(parametros)
+    .then(mapearRespuestaCentro)
+    .finally(() => solicitudesEnCurso.delete(clave))
+
+  solicitudesEnCurso.set(clave, solicitud)
+  return solicitud
+}
+
+export const listarCentrosCostoApi = listarCentrosCosto
+
+function validar(datos: CentroCostoFormData): void {
   const nombre = datos.nombre.trim()
-  const descripcion =
-    datos.descripcion.trim()
-
-  if (!nombre) {
-    throw new Error(
-      'El nombre del centro de costo es obligatorio.',
-    )
-  }
-
-  if (nombre.length < 2) {
-    throw new Error(
-      'El nombre debe tener al menos 2 caracteres.',
-    )
-  }
-
-  if (nombre.length > 100) {
-    throw new Error(
-      'El nombre no puede superar los 100 caracteres.',
-    )
-  }
-
-  if (!descripcion) {
-    throw new Error(
-      'La descripción es obligatoria.',
-    )
-  }
-
-  if (descripcion.length > 250) {
-    throw new Error(
-      'La descripción no puede superar los 250 caracteres.',
-    )
-  }
+  const descripcion = datos.descripcion.trim()
+  if (!nombre) throw new Error('El nombre del centro de costo es obligatorio.')
+  if (nombre.length < 2) throw new Error('El nombre debe tener al menos 2 caracteres.')
+  if (nombre.length > 150) throw new Error('El nombre no puede superar los 150 caracteres.')
+  if (descripcion.length > 255) throw new Error('La descripción no puede superar los 255 caracteres.')
 }
 
-function crearSiguienteId(
-  centrosCosto: CentroCosto[],
-): string {
-  const numeroMayor =
-    centrosCosto.reduce(
-      (mayor, centroCosto) => {
-        const numero = Number(
-          centroCosto.id.replace(
-            'CC-',
-            '',
-          ),
-        )
-
-        return Number.isNaN(numero)
-          ? mayor
-          : Math.max(mayor, numero)
-      },
-      0,
-    )
-
-  return `CC-${String(
-    numeroMayor + 1,
-  ).padStart(3, '0')}`
+function validarRespuesta(response: MessageResponse): MessageResponse {
+  if (response.success === false) {
+    throw new Error(response.message ?? 'La operación de centros de costo no fue completada.')
+  }
+  return response
 }
 
-function crearFechaActual(): string {
-  return new Intl.DateTimeFormat(
-    'es-PE',
-  ).format(new Date())
-}
-
-function centroCostoEstaEnUso(
-  centroCostoId: string,
-): boolean {
-  try {
-    const datosGuardados =
-      localStorage.getItem(
-        VALES_STORAGE_KEY,
-      )
-
-    if (!datosGuardados) {
-      return false
-    }
-
-    const vales = JSON.parse(
-      datosGuardados,
-    )
-
-    if (!Array.isArray(vales)) {
-      return false
-    }
-
-    return vales.some(
-      (vale) =>
-        typeof vale === 'object' &&
-        vale !== null &&
-        vale.centroCostoId ===
-          centroCostoId,
-    )
-  } catch {
-    return false
-  }
-}
-
-export function obtenerCentrosCosto():
-  CentroCosto[] {
-  const datosGuardados =
-    localStorage.getItem(STORAGE_KEY)
-
-  if (!datosGuardados) {
-    guardarCentros(CENTROS_INICIALES)
-
-    return copiarCentros(
-      CENTROS_INICIALES,
-    )
-  }
-
-  try {
-    const datos = JSON.parse(datosGuardados)
-
-    if (!Array.isArray(datos)) {
-      throw new Error('Formato inválido')
-    }
-
-    return copiarCentros(
-      datos as CentroCosto[],
-    )
-  } catch {
-    guardarCentros(CENTROS_INICIALES)
-
-    return copiarCentros(
-      CENTROS_INICIALES,
-    )
-  }
-}
-
-export function crearCentroCosto(
-  datos: CentroCostoFormData,
-): CentroCosto {
-  validarDatos(datos)
-
-  const centrosCosto =
-    obtenerCentrosCosto()
-
-  const nombreDuplicado =
-    centrosCosto.some(
-      (centroCosto) =>
-        normalizarTexto(
-          centroCosto.nombre,
-        ) ===
-        normalizarTexto(datos.nombre),
-    )
-
-  if (nombreDuplicado) {
-    throw new Error(
-      'Ya existe un centro de costo con ese nombre.',
-    )
-  }
-
-  const nuevoCentro: CentroCosto = {
-    id: crearSiguienteId(
-      centrosCosto,
-    ),
-    nombre: datos.nombre.trim(),
-    descripcion:
-      datos.descripcion.trim(),
-    estado: datos.estado,
-    fechaRegistro: crearFechaActual(),
-  }
-
-  guardarCentros([
-    nuevoCentro,
-    ...centrosCosto,
-  ])
-
-  registrarEventoBitacora({
-    modulo: 'Centros de costo',
-    accion: 'CREAR',
-    detalle:
-      `Se creó el centro de costo "${nuevoCentro.nombre}".`,
-    registroId: nuevoCentro.id,
-  })
-
-  return { ...nuevoCentro }
-}
-
-export function actualizarCentroCosto(
-  id: string,
-  datos: CentroCostoFormData,
-): CentroCosto {
-  validarDatos(datos)
-
-  const centrosCosto =
-    obtenerCentrosCosto()
-
-  const centroActual =
-    centrosCosto.find(
-      (centroCosto) =>
-        centroCosto.id === id,
-    )
-
-  if (!centroActual) {
-    throw new Error(
-      'El centro de costo no existe.',
-    )
-  }
-
-  const nombreDuplicado =
-    centrosCosto.some(
-      (centroCosto) =>
-        centroCosto.id !== id &&
-        normalizarTexto(
-          centroCosto.nombre,
-        ) ===
-          normalizarTexto(
-            datos.nombre,
-          ),
-    )
-
-  if (nombreDuplicado) {
-    throw new Error(
-      'Ya existe otro centro de costo con ese nombre.',
-    )
-  }
-
-  const centroActualizado:
-    CentroCosto = {
-      ...centroActual,
+export async function crearCentroCosto(datos: CentroCostoFormData): Promise<MessageResponse> {
+  validar(datos)
+  return validarRespuesta(await centroCostoApi.registrarCentroCosto({
+    centroCostoRequest: {
       nombre: datos.nombre.trim(),
-      descripcion:
-        datos.descripcion.trim(),
-      estado: datos.estado,
-    }
-
-  guardarCentros(
-    centrosCosto.map(
-      (centroCosto) =>
-        centroCosto.id === id
-          ? centroActualizado
-          : centroCosto,
-    ),
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Centros de costo',
-    accion: 'EDITAR',
-    detalle:
-      `Se actualizó el centro de costo "${centroActualizado.nombre}".`,
-    registroId:
-      centroActualizado.id,
-  })
-
-  return { ...centroActualizado }
+      descripcion: datos.descripcion.trim(),
+    },
+  }))
 }
 
-export function eliminarCentroCosto(
-  id: string,
-): void {
-  const centrosCosto =
-    obtenerCentrosCosto()
+export async function actualizarCentroCosto(
+  id: number,
+  datos: CentroCostoFormData,
+): Promise<MessageResponse> {
+  validar(datos)
+  return validarRespuesta(await centroCostoApi.actualizarCentroCosto({
+    id,
+    centroCostoRequest: {
+      nombre: datos.nombre.trim(),
+      descripcion: datos.descripcion.trim(),
+    },
+  }))
+}
 
-  const centroCosto =
-    centrosCosto.find(
-      (item) => item.id === id,
-    )
+export async function cambiarEstadoCentroCosto(
+  id: number,
+  activo: boolean,
+): Promise<MessageResponse> {
+  return validarRespuesta(await centroCostoApi.cambiarEstadoCentroCosto({
+    id,
+    estadoCatalogoRequest: { activo },
+  }))
+}
 
-  if (!centroCosto) {
-    throw new Error(
-      'El centro de costo no existe.',
-    )
-  }
+export function eliminarCentroCosto(id: number): Promise<MessageResponse> {
+  return cambiarEstadoCentroCosto(id, false)
+}
 
-  if (centroCostoEstaEnUso(id)) {
-    throw new Error(
-      'No puedes eliminar este centro de costo porque está asignado a uno o más vales. Puedes desactivarlo.',
-    )
-  }
-
-  guardarCentros(
-    centrosCosto.filter(
-      (item) => item.id !== id,
-    ),
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Centros de costo',
-    accion: 'ELIMINAR',
-    detalle:
-      `Se eliminó el centro de costo "${centroCosto.nombre}".`,
-    registroId: centroCosto.id,
-  })
+export function reactivarCentroCosto(id: number): Promise<MessageResponse> {
+  return cambiarEstadoCentroCosto(id, true)
 }

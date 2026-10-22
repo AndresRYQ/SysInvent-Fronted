@@ -2,13 +2,16 @@ import {
   Boxes,
   Pencil,
   Plus,
-  ShieldCheck,
+  RotateCcw,
+  Eye,
   Trash2,
 } from 'lucide-react'
 
 import type { ParteEquipo } from '../../types/parteEquipo'
 
+import { EmptyState } from '../common/EmptyState'
 import { TablePagination } from '../ui/TablePagination'
+import { TableLoadingState } from '../ui/TableLoadingState'
 
 interface TablaPartesEquipoProps {
   partesEquipo: ParteEquipo[]
@@ -22,12 +25,19 @@ interface TablaPartesEquipoProps {
   onEliminar: (
     parteEquipo: ParteEquipo,
   ) => void
+  onReactivar: (
+    parteEquipo: ParteEquipo,
+  ) => void
+  onVisualizar: (
+    parteEquipo: ParteEquipo,
+  ) => void
   onPageChange: (
     page: number,
   ) => void
   onPageSizeChange: (
     pageSize: number,
   ) => void
+  loading?: boolean
 }
 
 export function TablaPartesEquipo({
@@ -38,13 +48,16 @@ export function TablaPartesEquipo({
   onAgregar,
   onEditar,
   onEliminar,
+  onReactivar,
+  onVisualizar,
   onPageChange,
   onPageSizeChange,
+  loading = totalItems < 0,
 }: TablaPartesEquipoProps) {
   return (
-    <section className="maestro-table-card card border-0 shadow-sm">
+    <section className="table-card card border-0 shadow-sm">
       <div className="card-body p-0">
-        <div className="maestro-table-header">
+        <div className="table-header">
           <span className="maestro-kicker">
             <Boxes size={16} />
             Listado de partes de equipo
@@ -52,7 +65,7 @@ export function TablaPartesEquipo({
 
           <button
             type="button"
-            className="btn maestro-toolbar-btn"
+            className="btn table-toolbar-btn"
             onClick={onAgregar}
           >
             <Plus size={18} />
@@ -60,11 +73,11 @@ export function TablaPartesEquipo({
           </button>
         </div>
 
-        <div className="table-responsive">
-          <table className="table maestro-table align-middle mb-0">
+        <div className="table-responsive"><TableLoadingState visible={loading} />
+          <table className="table standard-table align-middle mb-0">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>N°</th>
                 <th>Código</th>
                 <th>Nombre</th>
                 <th>Descripción</th>
@@ -82,8 +95,8 @@ export function TablaPartesEquipo({
                   (parte) => (
                     <tr key={parte.id}>
                       <td>
-                        <span className="maestro-id-chip">
-                          {parte.id}
+                        <span className="table-id-chip">
+                          {Number(parte.id)}
                         </span>
                       </td>
 
@@ -94,8 +107,8 @@ export function TablaPartesEquipo({
                       </td>
 
                       <td>
-                        <div className="maestro-cell-main">
-                          <span className="maestro-cell-icon">
+                        <div className="table-cell-main">
+                          <span className="table-cell-icon">
                             <Boxes
                               size={16}
                             />
@@ -110,21 +123,20 @@ export function TablaPartesEquipo({
                       </td>
 
                       <td>
-                        {
-                          parte.fechaRegistro
-                        }
+                        {parte.fechaRegistro ?? '—'}
                       </td>
 
                       <td>
                         <span
                           className={
                             parte.estado
-                              ? 'maestro-status maestro-status--active'
-                              : 'maestro-status maestro-status--inactive'
+                              ? 'status-label status-label--active'
+                              : 'status-label status-label--inactive'
                           }
                         >
-                          <ShieldCheck
-                            size={14}
+                          <span
+                            className="status-label__dot"
+                            aria-hidden="true"
                           />
 
                           {parte.estado
@@ -134,10 +146,10 @@ export function TablaPartesEquipo({
                       </td>
 
                       <td>
-                        <div className="maestro-actions">
-                          <button
+                        <div className="table-actions">
+                          {parte.estado ? <><button type="button" className="btn table-action-btn" title="Visualizar" aria-label={`Visualizar ${parte.nombre}`} onClick={() => onVisualizar(parte)}><Eye size={16} /></button><button
                             type="button"
-                            className="btn maestro-action-btn"
+                            className="btn table-action-btn"
                             title="Editar"
                             aria-label={`Editar ${parte.nombre}`}
                             onClick={() =>
@@ -147,11 +159,11 @@ export function TablaPartesEquipo({
                             <Pencil
                               size={16}
                             />
-                          </button>
+                          </button></> : <><button type="button" className="btn table-action-btn" title="Visualizar" aria-label={`Visualizar ${parte.nombre}`} onClick={() => onVisualizar(parte)}><Eye size={16} /></button><button type="button" className="btn table-action-btn" title="Reactivar" aria-label={`Reactivar ${parte.nombre}`} onClick={() => onReactivar(parte)}><RotateCcw size={16} /></button></>}
 
-                          <button
+                          {parte.estado && <button
                             type="button"
-                            className="btn maestro-action-btn maestro-action-btn--danger"
+                            className="btn table-action-btn table-action-btn--danger"
                             title="Eliminar"
                             aria-label={`Eliminar ${parte.nombre}`}
                             onClick={() =>
@@ -161,7 +173,7 @@ export function TablaPartesEquipo({
                             <Trash2
                               size={16}
                             />
-                          </button>
+                          </button>}
                         </div>
                       </td>
                     </tr>
@@ -170,19 +182,7 @@ export function TablaPartesEquipo({
               ) : (
                 <tr>
                   <td colSpan={7}>
-                    <div className="maestro-empty-state">
-                      <Boxes size={28} />
-
-                      <p className="mb-1">
-                        No se encontraron partes
-                        de equipo
-                      </p>
-
-                      <span>
-                        Ajusta los filtros o
-                        limpia la búsqueda.
-                      </span>
-                    </div>
+                    <EmptyState icon={Boxes} iconSize={28} title="No se encontraron partes de equipo" description="Ajusta los filtros o limpia la búsqueda." />
                   </td>
                 </tr>
               )}

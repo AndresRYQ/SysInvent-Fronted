@@ -1,10 +1,14 @@
+import { Placeholder } from '../../constants/placeholders'
 import {
   Filter,
   RotateCcw,
   Search,
 } from 'lucide-react'
+import Select from 'react-select'
 
 import type { AccionBitacora } from '../../types/bitacora'
+import { crearEstilosSelect } from '../../styles/reactSelectStyles'
+import { DatePickerInput } from '../ui/DatePickerInput'
 
 export interface FiltrosBitacoraValores {
   busqueda: string
@@ -72,7 +76,7 @@ export function FiltrosBitacora({
         <div className="mb-3">
           <span className="maestro-kicker">
             <Filter size={16} />
-            Filtros de auditoría
+            Filtros de búsqueda
           </span>
         </div>
 
@@ -85,7 +89,7 @@ export function FiltrosBitacora({
         >
           <div className="col-12 col-xl-4">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="buscarBitacora"
             >
               Usuario o detalle
@@ -93,9 +97,9 @@ export function FiltrosBitacora({
 
             <input
               id="buscarBitacora"
-              className="form-control maestro-control"
+              className="form-control"
               value={valores.busqueda}
-              placeholder="Buscar registro"
+              placeholder={Placeholder.Buscar}
               onChange={(event) =>
                 onChange(
                   'busqueda',
@@ -107,109 +111,83 @@ export function FiltrosBitacora({
 
           <div className="col-12 col-md-6 col-xl-2">
             <label
-              className="form-label maestro-label"
+              className="form-label"
               htmlFor="moduloBitacora"
             >
               Módulo
             </label>
 
-            <select
-              id="moduloBitacora"
-              className="form-select maestro-control"
-              value={valores.modulo}
-              onChange={(event) =>
-                onChange(
-                  'modulo',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">Todos</option>
+            <Select
+              inputId="moduloBitacora"
+              classNamePrefix="maestro-select"
+              options={modulos.map((modulo) => ({ value: modulo, label: modulo }))}
+              value={modulos.map((modulo) => ({ value: modulo, label: modulo })).find((opcion) => opcion.value === valores.modulo) ?? null}
+              onChange={(opcion) => onChange('modulo', opcion?.value ?? '')}
+              placeholder={Placeholder.Seleccionar}
+              isClearable
+              isSearchable
 
-              {modulos.map((modulo) => (
-                <option
-                  key={modulo}
-                  value={modulo}
-                >
-                  {modulo}
-                </option>
-              ))}
-            </select>
-          </div>
 
-          <div className="col-12 col-md-6 col-xl-2">
-            <label
-              className="form-label maestro-label"
-              htmlFor="accionBitacora"
-            >
-              Acción
-            </label>
-
-            <select
-              id="accionBitacora"
-              className="form-select maestro-control"
-              value={valores.accion}
-              onChange={(event) =>
-                onChange(
-                  'accion',
-                  event.target.value,
-                )
-              }
-            >
-              <option value="">Todas</option>
-
-              {ACCIONES.map((accion) => (
-                <option
-                  key={accion.valor}
-                  value={accion.valor}
-                >
-                  {accion.etiqueta}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="col-12 col-md-6 col-xl-2">
-            <label
-              className="form-label maestro-label"
-              htmlFor="fechaDesdeBitacora"
-            >
-              Desde
-            </label>
-
-            <input
-              id="fechaDesdeBitacora"
-              className="form-control maestro-control"
-              type="date"
-              value={valores.fechaDesde}
-              onChange={(event) =>
-                onChange(
-                  'fechaDesde',
-                  event.target.value,
-                )
-              }
+              menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })}
             />
           </div>
 
           <div className="col-12 col-md-6 col-xl-2">
             <label
-              className="form-label maestro-label"
-              htmlFor="fechaHastaBitacora"
+              className="form-label"
+              htmlFor="accionBitacora"
             >
-              Hasta
+              Acción
             </label>
 
-            <input
+            <Select
+              inputId="accionBitacora"
+              classNamePrefix="maestro-select"
+              options={ACCIONES.map((accion) => ({ value: accion.valor, label: accion.etiqueta }))}
+              value={ACCIONES.map((accion) => ({ value: accion.valor, label: accion.etiqueta })).find((opcion) => opcion.value === valores.accion) ?? null}
+              onChange={(opcion) => onChange('accion', opcion?.value ?? '')}
+              placeholder={Placeholder.Seleccionar}
+              isClearable
+              isSearchable={false}
+
+
+              menuPortalTarget={document.body} styles={crearEstilosSelect({ zIndex: 20 })}
+            />
+          </div>
+
+          <div className="col-12 col-md-6 col-xl-2">
+            <label
+              className="form-label"
+              htmlFor="fechaDesdeBitacora"
+            >
+              Fecha desde
+            </label>
+
+            <DatePickerInput
+              id="fechaDesdeBitacora"
+              value={valores.fechaDesde}
+              maxValue={valores.fechaHasta}
+              rangoEstricto
+              className="form-control"
+              onChange={(value) => onChange('fechaDesde', value)}
+            />
+          </div>
+
+          <div className="col-12 col-md-6 col-xl-2">
+            <label
+              className="form-label"
+              htmlFor="fechaHastaBitacora"
+            >
+              Fecha hasta
+            </label>
+
+            <DatePickerInput
               id="fechaHastaBitacora"
-              className="form-control maestro-control"
-              type="date"
               value={valores.fechaHasta}
-              onChange={(event) =>
-                onChange(
-                  'fechaHasta',
-                  event.target.value,
-                )
-              }
+              minValue={valores.fechaDesde}
+              rangoEstricto
+              className="form-control"
+              onChange={(value) => onChange('fechaHasta', value)}
             />
           </div>
 
@@ -217,7 +195,7 @@ export function FiltrosBitacora({
             <div className="maestro-filter-actions">
               <button
                 type="button"
-                className="btn maestro-btn-secondary maestro-filter-btn"
+                className="btn btn-maestro-secondary"
                 onClick={onLimpiar}
               >
                 <RotateCcw size={18} />
@@ -226,7 +204,7 @@ export function FiltrosBitacora({
 
               <button
                 type="submit"
-                className="btn maestro-btn-primary maestro-filter-btn"
+                className="btn btn-maestro-primary"
               >
                 <Search size={18} />
                 Buscar

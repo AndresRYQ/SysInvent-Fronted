@@ -1,621 +1,189 @@
-import type {
-  Producto,
-  ProductoFormData,
-} from '../types/producto'
+import type { Producto, ProductoFormData } from '../types/producto'
+import {
+  CombosComunesApi,
+  ProductosApi,
+  type CustomPageProductoResponse,
+  type MessageResponse,
+} from '../api/generated'
+import { apiConfiguration } from '../api/client'
+import type { CatalogoPaginado } from './catalogoApi'
 
-import { registrarEventoBitacora } from './bitacoraService'
+let productosEnMemoria: Producto[] = []
+const productosApi = new ProductosApi(apiConfiguration)
+const combosComunesApi = new CombosComunesApi(apiConfiguration)
+const solicitudesEnCurso = new Map<string, Promise<CatalogoPaginado<Producto>>>()
 
-const STORAGE_KEY = 'agrihusac_productos'
-
-const INGRESOS_STORAGE_KEY =
-  'agrihusac_ingresos_almacen'
-
-const STOCK_MIGRATION_KEY =
-  'agrihusac_stock_desde_ingresos_v1'
-
-const PRODUCTOS_INICIALES: Producto[] = [
-  {
-    id: 'PROD-001',
-    codigo: 'HER-001',
-    nombre: 'Taladro industrial',
-    descripcion:
-      'Taladro eléctrico para trabajos de mantenimiento.',
-    tipoProductoId: 'TP-002',
-    categoriaId: 'CAT-001',
-    unidadMedidaId: 'UM-001',
-    proveedorId: 'PROV-001',
-    stockActual: 0,
-    stockMinimo: 0,
-    precioUnitario: 350,
-    estado: true,
-    fechaRegistro: '10/08/2026',
-  },
-  {
-    id: 'PROD-002',
-    codigo: 'SEG-001',
-    nombre: 'Guantes de nitrilo',
-    descripcion:
-      'Guantes para protección durante operaciones.',
-    tipoProductoId: 'TP-001',
-    categoriaId: 'CAT-002',
-    unidadMedidaId: 'UM-005',
-    proveedorId: 'PROV-002',
-    stockActual: 0,
-    stockMinimo: 0,
-    precioUnitario: 28.5,
-    estado: true,
-    fechaRegistro: '11/08/2026',
-  },
-  {
-    id: 'PROD-003',
-    codigo: 'FER-001',
-    nombre: 'Aceite lubricante',
-    descripcion:
-      'Lubricante para equipos y maquinaria.',
-    tipoProductoId: 'TP-001',
-    categoriaId: 'CAT-003',
-    unidadMedidaId: 'UM-003',
-    proveedorId: 'PROV-003',
-    stockActual: 0,
-    stockMinimo: 0,
-    precioUnitario: 45.9,
-    estado: true,
-    fechaRegistro: '12/08/2026',
-  },
-  {
-    id: 'PROD-004',
-    codigo: 'REP-001',
-    nombre: 'Rodamiento industrial',
-    descripcion:
-      'Repuesto para mantenimiento de maquinaria.',
-    tipoProductoId: 'TP-004',
-    categoriaId: 'CAT-004',
-    unidadMedidaId: 'UM-001',
-    proveedorId: 'PROV-003',
-    stockActual: 0,
-    stockMinimo: 0,
-    precioUnitario: 85,
-    estado: true,
-    fechaRegistro: '13/08/2026',
-  },
-]
-
-function copiarProductos(
-  productos: Producto[],
-): Producto[] {
-  return productos.map((producto) => ({
-    ...producto,
-  }))
+export interface ListarProductosParams {
+  nombre?: string
+  pagina?: number
+  tamPagina?: number
 }
 
-function guardarProductos(
-  productos: Producto[],
-): void {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(productos),
-  )
+export interface ListarProductosComboParams {
+  proveedorId: string | number
+  tipoProductoId: string | number
 }
 
-function migrarStockDesdeIngresos(
-  productos: Producto[],
-): Producto[] {
-  const migracionRealizada =
-    localStorage.getItem(
-      STOCK_MIGRATION_KEY,
-    ) === 'true'
+export interface ProductoCombo {
+  id: number
+  descripcion: string
+  unidadMedida: string
+}
 
-  if (migracionRealizada) {
-    return productos
+function convertirIdCombo(valor: string | number): number {
+  const id = Number(String(valor).replace(/^[A-Z]+-0*/i, ''))
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new Error('El identificador del producto no es válido.')
   }
+  return id
+}
 
-  const cantidadesPorProducto =
-    new Map<string, number>()
+export async function listarProductosCombo(
+  params: ListarProductosComboParams,
+): Promise<ProductoCombo[]> {
+  const respuesta = await combosComunesApi.productos({
+    proveedorId: convertirIdCombo(params.proveedorId),
+    tipoProductoId: convertirIdCombo(params.tipoProductoId),
+  })
 
-  try {
-    const datosGuardados =
-      localStorage.getItem(
-        INGRESOS_STORAGE_KEY,
-      )
-
-    if (datosGuardados) {
-      const ingresos = JSON.parse(
-        datosGuardados,
-      )
-
-      if (Array.isArray(ingresos)) {
-        ingresos.forEach((ingreso) => {
-          if (
-            typeof ingreso !== 'object' ||
-            ingreso === null ||
-            ingreso.estado !==
-              'REGISTRADO' ||
-            !Array.isArray(
-              ingreso.detalles,
-            )
-          ) {
-            return
-          }
-
-          ingreso.detalles.forEach(
-            (detalle: unknown) => {
-              if (
-                typeof detalle !==
-                  'object' ||
-                detalle === null
-              ) {
-                return
-              }
-
-              const movimiento =
-                detalle as {
-                  productoId?: unknown
-                  cantidad?: unknown
-                }
-
-              if (
-                typeof movimiento.productoId !==
-                  'string' ||
-                typeof movimiento.cantidad !==
-                  'number' ||
-                !Number.isFinite(
-                  movimiento.cantidad,
-                ) ||
-                movimiento.cantidad <= 0
-              ) {
-                return
-              }
-
-              const cantidadActual =
-                cantidadesPorProducto.get(
-                  movimiento.productoId,
-                ) ?? 0
-
-              cantidadesPorProducto.set(
-                movimiento.productoId,
-                cantidadActual +
-                  movimiento.cantidad,
-              )
-            },
-          )
-        })
-      }
-    }
-  } catch {
-    cantidadesPorProducto.clear()
-  }
-
-  const productosMigrados =
-    productos.map((producto) => ({
-      ...producto,
-      stockActual: Number(
-        (
-          cantidadesPorProducto.get(
-            producto.id,
-          ) ?? 0
-        ).toFixed(3),
-      ),
+  return respuesta
+    .filter((producto) => producto.id != null)
+    .map((producto) => ({
+      id: producto.id as number,
+      descripcion: producto.descripcion ?? '',
+      unidadMedida: producto.value2 ?? '',
     }))
-
-  guardarProductos(productosMigrados)
-
-  localStorage.setItem(
-    STOCK_MIGRATION_KEY,
-    'true',
-  )
-
-  return productosMigrados
 }
 
-function normalizarTexto(
-  valor: string | null | undefined,
-): string {
-  return (valor ?? '').trim().toLowerCase()
+export function obtenerProductos(): Producto[] {
+  return productosEnMemoria.map((producto) => ({ ...producto }))
 }
 
-function validarDatos(
-  datos: ProductoFormData,
-): void {
-  const codigo = datos.codigo
-    .trim()
-    .toUpperCase()
-  const nombre = datos.nombre.trim()
-  const descripcion =
-    datos.descripcion.trim()
-
-  if (!/^[A-Z0-9-]{3,30}$/.test(codigo)) {
-    throw new Error(
-      'El código debe tener entre 3 y 30 caracteres y solo puede contener letras, números y guiones.',
-    )
+function mapearRespuesta(response: CustomPageProductoResponse): CatalogoPaginado<Producto> {
+  const resultado: CatalogoPaginado<Producto> = {
+    datos: (response.datos ?? []).map((producto) => ({
+      productoId: producto.productoId ?? 0,
+      codigo: producto.codigo ?? '',
+      nombre: producto.nombre ?? '',
+      descripcion: producto.descripcion ?? '',
+      tipoProductoId: producto.tipoProductoId ?? 0,
+      categoriaId: producto.categoriaId ?? 0,
+      unidadMedidaId: producto.unidadMedidaId ?? 0,
+      proveedorId: producto.proveedorId ?? 0,
+      stockActual: Number(producto.stockActual ?? 0),
+      stockMinimo: Number(producto.stockMinimo ?? 0),
+      precioUnitario: Number(producto.precioUnitario ?? 0),
+      activo: producto.activo ?? true,
+      fechaRegistro: producto.fechaRegistro ?? '',
+      tipoProductoNombre: producto.tipoProductoNombre,
+      categoriaNombre: producto.categoriaNombre,
+      unidadMedidaNombre: producto.unidadMedidaNombre,
+      proveedorRazonSocial: producto.proveedorRazonSocial,
+    })),
+    paginacion: response.paginacion ?? {},
   }
 
-  if (nombre.length < 2) {
-    throw new Error(
-      'El nombre debe tener al menos 2 caracteres.',
-    )
-  }
-
-  if (nombre.length > 120) {
-    throw new Error(
-      'El nombre no puede superar los 120 caracteres.',
-    )
-  }
-
-  if (descripcion.length < 5) {
-    throw new Error(
-      'La descripción debe tener al menos 5 caracteres.',
-    )
-  }
-
-  if (descripcion.length > 250) {
-    throw new Error(
-      'La descripción no puede superar los 250 caracteres.',
-    )
-  }
-
-  if (!datos.tipoProductoId) {
-    throw new Error(
-      'Selecciona un tipo de producto.',
-    )
-  }
-
-  if (!datos.categoriaId) {
-    throw new Error(
-      'Selecciona una categoría.',
-    )
-  }
-
-  if (!datos.unidadMedidaId) {
-    throw new Error(
-      'Selecciona una unidad de medida.',
-    )
-  }
-
-  if (!datos.proveedorId) {
-    throw new Error(
-      'Selecciona un proveedor.',
-    )
-  }
-
-  if (
-    !Number.isFinite(datos.stockMinimo) ||
-    datos.stockMinimo < 0
-  ) {
-    throw new Error(
-      'El stock mínimo debe ser igual o mayor que cero.',
-    )
-  }
-
-  if (
-    !Number.isFinite(datos.precioUnitario) ||
-    datos.precioUnitario < 0
-  ) {
-    throw new Error(
-      'El precio unitario debe ser igual o mayor que cero.',
-    )
-  }
+  productosEnMemoria = resultado.datos
+  return resultado
 }
 
-function crearSiguienteId(
-  productos: Producto[],
-): string {
-  const numeroMayor = productos.reduce(
-    (mayor, producto) => {
-      const numero = Number(
-        producto.id.replace('PROD-', ''),
-      )
-
-      return Number.isNaN(numero)
-        ? mayor
-        : Math.max(mayor, numero)
-    },
-    0,
-  )
-
-  return `PROD-${String(
-    numeroMayor + 1,
-  ).padStart(3, '0')}`
-}
-
-function crearFechaActual(): string {
-  return new Intl.DateTimeFormat(
-    'es-PE',
-  ).format(new Date())
-}
-
-export function obtenerProductos():
-  Producto[] {
-  const datosGuardados =
-    localStorage.getItem(STORAGE_KEY)
-
-  if (!datosGuardados) {
-    guardarProductos(PRODUCTOS_INICIALES)
-
-    return copiarProductos(
-      migrarStockDesdeIngresos(
-        PRODUCTOS_INICIALES,
-      ),
-    )
+export async function listarProductosApi(
+  params: ListarProductosParams = {},
+): Promise<CatalogoPaginado<Producto>> {
+  const parametros = {
+    nombre: params.nombre?.trim() || undefined,
+    pagina: params.pagina,
+    tamPagina: params.tamPagina,
   }
+  const clave = JSON.stringify(parametros)
+  const solicitudExistente = solicitudesEnCurso.get(clave)
+  if (solicitudExistente) return solicitudExistente
 
-  try {
-    const datos = JSON.parse(datosGuardados)
+  const solicitud = productosApi
+    .listarProductos(parametros)
+    .then(mapearRespuesta)
+    .finally(() => solicitudesEnCurso.delete(clave))
 
-    if (!Array.isArray(datos)) {
-      throw new Error('Formato inválido')
-    }
-
-    return copiarProductos(
-        migrarStockDesdeIngresos(
-          datos as Producto[],
-        ),
-      )
-  } catch {
-    guardarProductos(PRODUCTOS_INICIALES)
-
-    return copiarProductos(
-      migrarStockDesdeIngresos(
-        PRODUCTOS_INICIALES,
-      ),
-    )
-  }
+  solicitudesEnCurso.set(clave, solicitud)
+  return solicitud
 }
 
-export function obtenerProductoPorId(
-  id: string,
-): Producto | null {
-  const producto = obtenerProductos().find(
-    (item) => item.id === id,
-  )
-
+export function obtenerProductoPorId(id: string | number): Producto | null {
+  const producto = productosEnMemoria.find((item) => item.productoId === Number(id))
   return producto ? { ...producto } : null
 }
 
-export function crearProducto(
-  datos: ProductoFormData,
-): Producto {
-  validarDatos(datos)
+function validarDatos(datos: ProductoFormData): void {
+  const codigo = datos.codigo.trim().toUpperCase()
+  const nombre = datos.nombre.trim()
+  const descripcion = datos.descripcion.trim()
 
-  const productos = obtenerProductos()
-  const codigo = datos.codigo
-    .trim()
-    .toUpperCase()
+  if (!/^[A-Z0-9-]{3,30}$/.test(codigo)) throw new Error('El código debe tener entre 3 y 30 caracteres y solo puede contener letras, números y guiones.')
+  if (nombre.length < 2 || nombre.length > 120) throw new Error('El nombre debe tener entre 2 y 120 caracteres.')
+  if (descripcion.length < 5 || descripcion.length > 250) throw new Error('La descripción debe tener entre 5 y 250 caracteres.')
+  if (!datos.tipoProductoId) throw new Error('Selecciona un tipo de producto.')
+  if (!datos.categoriaId) throw new Error('Selecciona una categoría.')
+  if (!datos.unidadMedidaId) throw new Error('Selecciona una unidad de medida.')
+  if (!datos.proveedorId) throw new Error('Selecciona un proveedor.')
+  if (!Number.isFinite(datos.stockMinimo) || datos.stockMinimo < 0) throw new Error('El stock mínimo debe ser igual o mayor que cero.')
+  if (!Number.isFinite(datos.precioUnitario) || datos.precioUnitario < 0) throw new Error('El precio unitario debe ser igual o mayor que cero.')
+}
 
-  const codigoDuplicado = productos.some(
-    (producto) =>
-      producto.codigo.toUpperCase() ===
-      codigo,
-  )
+function convertirId(valor: string | number): number {
+  const id = Number(String(valor).replace(/^[A-Z]+-0*/i, ''))
+  if (!Number.isInteger(id) || id <= 0) throw new Error('El identificador del catálogo no es válido.')
+  return id
+}
 
-  if (codigoDuplicado) {
-    throw new Error(
-      'Ya existe un producto con ese código.',
-    )
-  }
-
-  const nombreDuplicado = productos.some(
-    (producto) =>
-      normalizarTexto(producto.nombre) ===
-      normalizarTexto(datos.nombre),
-  )
-
-  if (nombreDuplicado) {
-    throw new Error(
-      'Ya existe un producto con ese nombre.',
-    )
-  }
-
-  const nuevoProducto: Producto = {
-    id: crearSiguienteId(productos),
-    codigo,
+function construirRequest(datos: ProductoFormData) {
+  return {
+    codigo: datos.codigo.trim().toUpperCase(),
     nombre: datos.nombre.trim(),
-    descripcion: datos.descripcion.trim(),
-    tipoProductoId:
-      datos.tipoProductoId,
-    categoriaId: datos.categoriaId,
-    unidadMedidaId:
-      datos.unidadMedidaId,
-    proveedorId: datos.proveedorId,
-    stockActual: 0,
+    descripcion: datos.descripcion.trim() || undefined,
+    tipoProductoId: convertirId(datos.tipoProductoId),
+    categoriaId: convertirId(datos.categoriaId),
+    unidadMedidaId: convertirId(datos.unidadMedidaId),
+    proveedorId: convertirId(datos.proveedorId),
     stockMinimo: datos.stockMinimo,
-    precioUnitario:
-      datos.precioUnitario,
-    estado: datos.estado,
-    fechaRegistro: crearFechaActual(),
+    precioUnitario: datos.precioUnitario,
   }
-
-  guardarProductos([
-    nuevoProducto,
-    ...productos,
-  ])
-
-  registrarEventoBitacora({
-    modulo: 'Productos',
-    accion: 'CREAR',
-    detalle:
-      `Se creó el producto "${nuevoProducto.nombre}" con código ${nuevoProducto.codigo}.`,
-    registroId: nuevoProducto.id,
-  })
-
-  return { ...nuevoProducto }
 }
 
-export function actualizarProducto(
-  id: string,
-  datos: ProductoFormData,
-): Producto {
+function validarRespuesta(response: MessageResponse): MessageResponse {
+  if (response.success === false) throw new Error(response.message ?? 'La operación de productos no fue completada.')
+  return response
+}
+
+export async function crearProducto(datos: ProductoFormData): Promise<MessageResponse> {
   validarDatos(datos)
-
-  const productos = obtenerProductos()
-
-  const productoActual = productos.find(
-    (producto) => producto.id === id,
-  )
-
-  if (!productoActual) {
-    throw new Error(
-      'El producto no existe.',
-    )
-  }
-
-  const codigo = datos.codigo
-    .trim()
-    .toUpperCase()
-
-  const codigoDuplicado = productos.some(
-    (producto) =>
-      producto.id !== id &&
-      producto.codigo.toUpperCase() ===
-        codigo,
-  )
-
-  if (codigoDuplicado) {
-    throw new Error(
-      'Ya existe otro producto con ese código.',
-    )
-  }
-
-  const nombreDuplicado = productos.some(
-    (producto) =>
-      producto.id !== id &&
-      normalizarTexto(producto.nombre) ===
-        normalizarTexto(datos.nombre),
-  )
-
-  if (nombreDuplicado) {
-    throw new Error(
-      'Ya existe otro producto con ese nombre.',
-    )
-  }
-
-  const productoActualizado: Producto = {
-    ...productoActual,
-    codigo,
-    nombre: datos.nombre.trim(),
-    descripcion: datos.descripcion.trim(),
-    tipoProductoId:
-      datos.tipoProductoId,
-    categoriaId: datos.categoriaId,
-    unidadMedidaId:
-      datos.unidadMedidaId,
-    proveedorId: datos.proveedorId,
-    stockMinimo: datos.stockMinimo,
-    precioUnitario:
-      datos.precioUnitario,
-    estado: datos.estado,
-  }
-
-  guardarProductos(
-    productos.map((producto) =>
-      producto.id === id
-        ? productoActualizado
-        : producto,
-    ),
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Productos',
-    accion: 'EDITAR',
-    detalle:
-      `Se actualizó el producto "${productoActualizado.nombre}" con código ${productoActualizado.codigo}.`,
-    registroId:
-      productoActualizado.id,
-  })
-
-  return { ...productoActualizado }
+  return validarRespuesta(await productosApi.registrarProducto({ productoRequest: construirRequest(datos) }))
 }
 
-export function ajustarStockProducto(
-  id: string,
-  cantidad: number,
-): Producto {
-  if (!Number.isFinite(cantidad)) {
-    throw new Error(
-      'La cantidad de stock no es válida.',
-    )
-  }
-
-  const productos = obtenerProductos()
-
-  const productoActual = productos.find(
-    (producto) => producto.id === id,
-  )
-
-  if (!productoActual) {
-    throw new Error(
-      'El producto no existe.',
-    )
-  }
-
-  const nuevoStock =
-    productoActual.stockActual + cantidad
-
-  if (nuevoStock < 0) {
-    throw new Error(
-      'La operación dejaría el producto sin stock suficiente.',
-    )
-  }
-
-  const productoActualizado: Producto = {
-    ...productoActual,
-    stockActual: Number(
-      nuevoStock.toFixed(3),
-    ),
-  }
-
-  guardarProductos(
-    productos.map((producto) =>
-      producto.id === id
-        ? productoActualizado
-        : producto,
-    ),
-  )
-
-  return { ...productoActualizado }
+export async function actualizarProducto(id: number, datos: ProductoFormData): Promise<MessageResponse> {
+  validarDatos(datos)
+  return validarRespuesta(await productosApi.actualizarProducto({ id, productoRequest: construirRequest(datos) }))
 }
 
-export function obtenerProductosBajoStock():
-  Producto[] {
-  return obtenerProductos().filter(
-    (producto) =>
-      producto.estado &&
-      producto.stockActual <=
-        producto.stockMinimo,
-  )
+export async function ajustarStockProducto(id: number, cantidad: number): Promise<Producto | null> {
+  if (!Number.isFinite(cantidad)) throw new Error('La cantidad de stock no es válida.')
+  const producto = obtenerProductoPorId(id)
+  if (!producto) throw new Error('El producto no existe.')
+  producto.stockActual = Number((producto.stockActual + cantidad).toFixed(3))
+  productosEnMemoria = productosEnMemoria.map((item) => item.productoId === id ? producto : item)
+  return { ...producto }
 }
 
-export function eliminarProducto(
-  id: string,
-): void {
-  const productos = obtenerProductos()
+export function obtenerProductosBajoStock(): Producto[] {
+  return obtenerProductos().filter((producto) => producto.activo && producto.stockActual <= producto.stockMinimo)
+}
 
-  const producto = productos.find(
-    (item) => item.id === id,
-  )
+export async function eliminarProducto(id: number): Promise<MessageResponse> {
+  return validarRespuesta(await productosApi.eliminarProducto({ id }))
+}
 
-  if (!producto) {
-    throw new Error(
-      'El producto no existe.',
-    )
-  }
-
-  if (producto.stockActual > 0) {
-    throw new Error(
-      'No puedes eliminar un producto con stock. Primero debe quedar sin existencias o puedes desactivarlo.',
-    )
-  }
-
-  guardarProductos(
-    productos.filter(
-      (item) => item.id !== id,
-    ),
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Productos',
-    accion: 'ELIMINAR',
-    detalle:
-      `Se eliminó el producto "${producto.nombre}" con código ${producto.codigo}.`,
-    registroId: producto.id,
-  })
+export async function reactivarProducto(id: number): Promise<MessageResponse> {
+  return validarRespuesta(await productosApi.cambiarEstadoProducto({
+    id,
+    estadoCatalogoRequest: { activo: true },
+  }))
 }

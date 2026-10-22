@@ -9,15 +9,12 @@ import {
 } from 'react'
 
 import {
+  AUTH_TOKEN_KEY,
   cerrarSesion,
   iniciarSesion,
   obtenerSesion,
   sincronizarSesionUsuario,
 } from '../services/authService'
-
-import {
-  STORAGE_KEYS,
-} from '../services/storageService'
 
 import type {
   CredencialesLogin,
@@ -25,13 +22,16 @@ import type {
   SesionUsuario,
   UsuarioLogin,
 } from '../types/auth'
+import {
+  AUTH_UNAUTHORIZED_EVENT,
+} from '../services/api'
 
 interface AuthContextType {
   sesion: SesionUsuario | null
 
   login: (
     credenciales: CredencialesLogin,
-  ) => ResultadoLogin
+  ) => Promise<ResultadoLogin>
 
   logout: () => void
 
@@ -49,7 +49,7 @@ type MotivoCierre =
   | 'vencimiento'
 
 const TIEMPO_INACTIVIDAD_MS =
-  2 * 60 * 1000
+  60 * 60 * 1000
 
 const MOTIVO_CIERRE_KEY =
   'agrihusac_motivo_cierre'
@@ -76,26 +76,19 @@ export function AuthProvider({
         )
       }
 
-      const detalle =
-        motivo === 'inactividad'
-          ? 'La sesión se cerró después de 2 minutos de inactividad.'
-          : motivo === 'vencimiento'
-            ? 'La sesión se cerró al alcanzar el tiempo máximo de 5 minutos.'
-            : 'El usuario cerró la sesión manualmente.'
-
-      cerrarSesion(detalle)
+      cerrarSesion()
       setSesion(null)
     },
     [],
   )
 
   const login = useCallback(
-    (
+    async (
       credenciales:
         CredencialesLogin,
-    ): ResultadoLogin => {
+    ): Promise<ResultadoLogin> => {
       const resultado =
-        iniciarSesion(credenciales)
+        await iniciarSesion(credenciales)
 
       if (
         resultado.exitoso &&
@@ -134,9 +127,30 @@ export function AuthProvider({
       [],
     )
 
+  useEffect(() => {
+    const cerrarSesionNoAutorizada =
+      () => {
+        finalizarSesion(
+          'vencimiento',
+        )
+      }
+
+    window.addEventListener(
+      AUTH_UNAUTHORIZED_EVENT,
+      cerrarSesionNoAutorizada,
+    )
+
+    return () => {
+      window.removeEventListener(
+        AUTH_UNAUTHORIZED_EVENT,
+        cerrarSesionNoAutorizada,
+      )
+    }
+  }, [finalizarSesion])
+
   /*
-   * Cierra automáticamente la sesión
-   * cuando se cumplen los 5 minutos.
+   * Cierra automaticamente la sesion
+   * cuando se cumple la hora.
    */
   useEffect(() => {
     if (!sesion) {
@@ -180,8 +194,8 @@ export function AuthProvider({
   ])
 
   /*
-   * Cierra la sesión después de
-   * 2 minutos sin actividad.
+   * Cierra la sesion despues de
+   * 1 hora sin actividad.
    */
   useEffect(() => {
     if (!sesion) {
@@ -262,8 +276,8 @@ export function AuthProvider({
   ])
 
   /*
-   * Sincroniza inicio, cierre y actualización
-   * de sesión entre las pestañas.
+   * Sincroniza inicio, cierre y actualizacion
+   * de sesion entre las pestanas.
    */
   useEffect(() => {
     const sincronizarSesion = (
@@ -271,7 +285,7 @@ export function AuthProvider({
     ) => {
       if (
         evento.key ===
-        STORAGE_KEYS.sesion
+        AUTH_TOKEN_KEY
       ) {
         setSesion(obtenerSesion())
       }
@@ -328,3 +342,4 @@ export function useAuth():
 
   return contexto
 }
+

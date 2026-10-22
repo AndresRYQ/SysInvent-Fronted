@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { IngresoAlmacenForm } from '../../components/ingresos-almacen/IngresoAlmacenForm'
 
-import { crearIngresoAlmacen } from '../../services/ingresoAlmacenService'
+import { registrarIngresoAlmacen } from '../../services/ingresoAlmacenService'
 
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
@@ -29,7 +29,7 @@ export function NuevoIngresoPage() {
 
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn btn-maestro-info"
             onClick={() =>
               navigate('/ingresos-almacen')
             }
@@ -43,15 +43,12 @@ export function NuevoIngresoPage() {
           onCancelar={() =>
             navigate('/ingresos-almacen')
           }
-          onSubmit={(datos) => {
-            const ingreso =
-              crearIngresoAlmacen(datos)
-
+          onSubmit={async (datos) => {
+            const respuesta = await registrarIngresoAlmacen(datos)
             navigate('/ingresos-almacen', {
               replace: true,
               state: {
-                mensaje:
-                  `Ingreso ${ingreso.numeroIngreso} registrado correctamente.`,
+                mensaje: respuesta.message ?? 'Ingreso registrado correctamente.',
               },
             })
           }}
@@ -60,3 +57,5 @@ export function NuevoIngresoPage() {
     </main>
   )
 }
+
+

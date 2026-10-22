@@ -1,5 +1,7 @@
 import { PackageSearch } from 'lucide-react'
 
+import { EmptyState } from '../../common/EmptyState'
+
 import type {
   FilaReporteIngreso,
 } from '../../../types/reporteIngreso'
@@ -55,7 +57,7 @@ export function TablaReporteIngresos({
 }: TablaReporteIngresosProps) {
   return (
     <div className="table-responsive">
-      <table className="table maestro-table align-middle mb-0">
+      <table className="table standard-table align-middle mb-0">
         <thead>
           <tr>
             <th>Nro. ingreso</th>
@@ -84,18 +86,7 @@ export function TablaReporteIngresos({
           {filas.length === 0 ? (
             <tr>
               <td colSpan={11}>
-                <div className="maestro-empty-state">
-                  <PackageSearch size={38} />
-
-                  <strong>
-                    No se encontraron ingresos
-                  </strong>
-
-                  <span>
-                    Cambia los filtros o registra
-                    un ingreso de almacén.
-                  </span>
-                </div>
+                <EmptyState icon={PackageSearch} title="No se encontraron ingresos" description="Cambia los filtros o registra un ingreso de almacén." />
               </td>
             </tr>
           ) : (
@@ -104,7 +95,7 @@ export function TablaReporteIngresos({
                 key={`${fila.ingresoId}-${fila.productoId}`}
               >
                 <td>
-                  <span className="maestro-id-chip">
+                  <span className="table-id-chip">
                     {fila.numeroIngreso}
                   </span>
                 </td>
@@ -176,8 +167,8 @@ export function TablaReporteIngresos({
                     className={
                       fila.estado ===
                       'REGISTRADO'
-                        ? 'maestro-status maestro-status--active'
-                        : 'maestro-status maestro-status--inactive'
+                        ? 'status-label status-label--active'
+                        : 'status-label status-label--inactive'
                     }
                   >
                     {fila.estado ===
@@ -194,3 +185,4 @@ export function TablaReporteIngresos({
     </div>
   )
 }
+

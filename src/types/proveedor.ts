@@ -1,11 +1,12 @@
 export interface Proveedor {
-  id: string
+  id: number
   ruc: string
   razonSocial: string
   correo: string
   telefono: string
   direccion: string
-  estado: boolean
+  activo: 0 | 1
+  estado?: boolean
   fechaRegistro: string
 }
 
@@ -15,5 +16,5 @@ export interface ProveedorFormData {
   correo: string
   telefono: string
   direccion: string
-  estado: boolean
+  estado?: boolean
 }

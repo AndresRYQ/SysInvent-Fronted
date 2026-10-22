@@ -1,331 +1,120 @@
-import type {
-  UnidadMedida,
-  UnidadMedidaFormData,
-} from '../types/unidadMedida'
+import type { UnidadMedida, UnidadMedidaFormData } from '../types/unidadMedida'
+import {
+  UnidadesDeMedidaApi,
+  type CustomPageUnidadMedidaResponse,
+  type MessageResponse,
+} from '../api/generated'
+import { apiConfiguration } from '../api/client'
+import type { CatalogoPaginado } from './catalogoApi'
 
-import { registrarEventoBitacora } from './bitacoraService'
-import { obtenerProductos } from './productoService'
+let unidadesEnMemoria: UnidadMedida[] = []
+const unidadMedidaApi = new UnidadesDeMedidaApi(apiConfiguration)
+const solicitudesEnCurso = new Map<string, Promise<CatalogoPaginado<UnidadMedida>>>()
 
-const STORAGE_KEY =
-  'agrihusac_unidades_medida'
+export interface ListarUnidadesMedidaParams {
+  nombre?: string
+  pagina?: number
+  tamPagina?: number
+}
 
-const UNIDADES_INICIALES:
-  UnidadMedida[] = [
-    {
-      id: 'UM-001',
-      nombre: 'Unidad',
-      descripcion:
-        'Unidad individual de un producto.',
-      estado: true,
-      fechaRegistro: '10/08/2026',
-    },
-    {
-      id: 'UM-002',
-      nombre: 'Kilogramo',
-      descripcion:
-        'Unidad de masa equivalente a mil gramos.',
-      estado: true,
-      fechaRegistro: '11/08/2026',
-    },
-    {
-      id: 'UM-003',
-      nombre: 'Litro',
-      descripcion:
-        'Unidad utilizada para medir volumen.',
-      estado: true,
-      fechaRegistro: '12/08/2026',
-    },
-    {
-      id: 'UM-004',
-      nombre: 'Metro',
-      descripcion:
-        'Unidad utilizada para medir longitud.',
-      estado: true,
-      fechaRegistro: '13/08/2026',
-    },
-    {
-      id: 'UM-005',
-      nombre: 'Caja',
-      descripcion:
-        'Embalaje que contiene varias unidades.',
-      estado: true,
-      fechaRegistro: '14/08/2026',
-    },
-  ]
+export function obtenerUnidadesMedida(): UnidadMedida[] {
+  return unidadesEnMemoria.map((unidad) => ({ ...unidad }))
+}
 
-function copiarUnidades(
-  unidades: UnidadMedida[],
-): UnidadMedida[] {
-  return unidades.map((unidad) => ({
-    ...unidad,
+function mapearRespuestaUnidad(response: CustomPageUnidadMedidaResponse): CatalogoPaginado<UnidadMedida> {
+  const resultado: CatalogoPaginado<UnidadMedida> = {
+    datos: (response.datos ?? []).map((unidad) => ({
+      id: unidad.unidadMedidaId ?? 0,
+      nombre: unidad.nombre ?? '',
+      descripcion: unidad.descripcion ?? '',
+      activo: unidad.activo ? 1 : 0,
+      fechaRegistro: unidad.fechaRegistro,
+    })),
+    paginacion: response.paginacion ?? {},
+  }
+
+  unidadesEnMemoria = resultado.datos
+  return resultado
+}
+
+export async function listarUnidadesMedida(
+  params: ListarUnidadesMedidaParams = {},
+): Promise<CatalogoPaginado<UnidadMedida>> {
+  const parametros = {
+    nombre: params.nombre?.trim() || undefined,
+    pagina: params.pagina,
+    tamPagina: params.tamPagina,
+  }
+  const clave = JSON.stringify(parametros)
+  const solicitudExistente = solicitudesEnCurso.get(clave)
+
+  if (solicitudExistente) return solicitudExistente
+
+  const solicitud = unidadMedidaApi
+    .listarUnidadesMedida(parametros)
+    .then(mapearRespuestaUnidad)
+    .finally(() => solicitudesEnCurso.delete(clave))
+
+  solicitudesEnCurso.set(clave, solicitud)
+  return solicitud
+}
+
+export const listarUnidadesMedidaApi = listarUnidadesMedida
+
+function validar(datos: UnidadMedidaFormData): void {
+  const nombre = datos.nombre.trim()
+  const descripcion = datos.descripcion.trim()
+  if (!nombre) throw new Error('El nombre de la unidad de medida es obligatorio.')
+  if (nombre.length < 2) throw new Error('El nombre debe tener al menos 2 caracteres.')
+  if (nombre.length > 100) throw new Error('El nombre no puede superar los 100 caracteres.')
+  if (descripcion.length > 255) throw new Error('La descripción no puede superar los 255 caracteres.')
+}
+
+function validarRespuesta(response: MessageResponse): MessageResponse {
+  if (response.success === false) {
+    throw new Error(response.message ?? 'La operación de unidades de medida no fue completada.')
+  }
+  return response
+}
+
+export async function crearUnidadMedida(datos: UnidadMedidaFormData): Promise<MessageResponse> {
+  validar(datos)
+  return validarRespuesta(await unidadMedidaApi.registrarUnidadMedida({
+    unidadMedidaRequest: {
+      nombre: datos.nombre.trim(),
+      descripcion: datos.descripcion.trim(),
+    },
   }))
 }
 
-function guardarUnidades(
-  unidades: UnidadMedida[],
-): void {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(unidades),
-  )
-}
-
-function normalizarTexto(
-  valor: string | null | undefined,
-): string {
-  return (valor ?? '').trim().toLowerCase()
-}
-
-function validarDatos(
+export async function actualizarUnidadMedida(
+  id: number,
   datos: UnidadMedidaFormData,
-): void {
-  const nombre = datos.nombre.trim()
-  const descripcion =
-    datos.descripcion.trim()
-
-  if (!nombre) {
-    throw new Error(
-      'El nombre de la unidad de medida es obligatorio.',
-    )
-  }
-
-  if (nombre.length < 2) {
-    throw new Error(
-      'El nombre debe tener al menos 2 caracteres.',
-    )
-  }
-
-  if (nombre.length > 60) {
-    throw new Error(
-      'El nombre no puede superar los 60 caracteres.',
-    )
-  }
-
-  if (!descripcion) {
-    throw new Error(
-      'La descripción es obligatoria.',
-    )
-  }
-
-  if (descripcion.length > 200) {
-    throw new Error(
-      'La descripción no puede superar los 200 caracteres.',
-    )
-  }
-}
-
-function crearSiguienteId(
-  unidades: UnidadMedida[],
-): string {
-  const numeroMayor = unidades.reduce(
-    (mayor, unidad) => {
-      const numero = Number(
-        unidad.id.replace('UM-', ''),
-      )
-
-      return Number.isNaN(numero)
-        ? mayor
-        : Math.max(mayor, numero)
-    },
-    0,
-  )
-
-  return `UM-${String(
-    numeroMayor + 1,
-  ).padStart(3, '0')}`
-}
-
-function crearFechaActual(): string {
-  return new Intl.DateTimeFormat(
-    'es-PE',
-  ).format(new Date())
-}
-
-export function obtenerUnidadesMedida():
-  UnidadMedida[] {
-  const datosGuardados =
-    localStorage.getItem(STORAGE_KEY)
-
-  if (!datosGuardados) {
-    guardarUnidades(UNIDADES_INICIALES)
-
-    return copiarUnidades(
-      UNIDADES_INICIALES,
-    )
-  }
-
-  try {
-    const datos = JSON.parse(datosGuardados)
-
-    if (!Array.isArray(datos)) {
-      throw new Error('Formato inválido')
-    }
-
-    return copiarUnidades(
-      datos as UnidadMedida[],
-    )
-  } catch {
-    guardarUnidades(UNIDADES_INICIALES)
-
-    return copiarUnidades(
-      UNIDADES_INICIALES,
-    )
-  }
-}
-
-export function crearUnidadMedida(
-  datos: UnidadMedidaFormData,
-): UnidadMedida {
-  validarDatos(datos)
-
-  const unidades =
-    obtenerUnidadesMedida()
-
-  const nombreDuplicado =
-    unidades.some(
-      (unidad) =>
-        normalizarTexto(
-          unidad.nombre,
-        ) ===
-        normalizarTexto(datos.nombre),
-    )
-
-  if (nombreDuplicado) {
-    throw new Error(
-      'Ya existe una unidad de medida con ese nombre.',
-    )
-  }
-
-  const nuevaUnidad: UnidadMedida = {
-    id: crearSiguienteId(unidades),
-    nombre: datos.nombre.trim(),
-    descripcion:
-      datos.descripcion.trim(),
-    estado: datos.estado,
-    fechaRegistro: crearFechaActual(),
-  }
-
-  guardarUnidades([
-    nuevaUnidad,
-    ...unidades,
-  ])
-
-  registrarEventoBitacora({
-    modulo: 'Unidades de medida',
-    accion: 'CREAR',
-    detalle:
-      `Se creó la unidad de medida "${nuevaUnidad.nombre}".`,
-    registroId: nuevaUnidad.id,
-  })
-
-  return { ...nuevaUnidad }
-}
-
-export function actualizarUnidadMedida(
-  id: string,
-  datos: UnidadMedidaFormData,
-): UnidadMedida {
-  validarDatos(datos)
-
-  const unidades =
-    obtenerUnidadesMedida()
-
-  const unidadActual = unidades.find(
-    (unidad) => unidad.id === id,
-  )
-
-  if (!unidadActual) {
-    throw new Error(
-      'La unidad de medida no existe.',
-    )
-  }
-
-  const nombreDuplicado =
-    unidades.some(
-      (unidad) =>
-        unidad.id !== id &&
-        normalizarTexto(
-          unidad.nombre,
-        ) ===
-          normalizarTexto(
-            datos.nombre,
-          ),
-    )
-
-  if (nombreDuplicado) {
-    throw new Error(
-      'Ya existe otra unidad de medida con ese nombre.',
-    )
-  }
-
-  const unidadActualizada:
-    UnidadMedida = {
-      ...unidadActual,
+): Promise<MessageResponse> {
+  validar(datos)
+  return validarRespuesta(await unidadMedidaApi.actualizarUnidadMedida({
+    id,
+    unidadMedidaRequest: {
       nombre: datos.nombre.trim(),
-      descripcion:
-        datos.descripcion.trim(),
-      estado: datos.estado,
-    }
-
-  guardarUnidades(
-    unidades.map((unidad) =>
-      unidad.id === id
-        ? unidadActualizada
-        : unidad,
-    ),
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Unidades de medida',
-    accion: 'EDITAR',
-    detalle:
-      `Se actualizó la unidad de medida "${unidadActualizada.nombre}".`,
-    registroId:
-      unidadActualizada.id,
-  })
-
-  return { ...unidadActualizada }
+      descripcion: datos.descripcion.trim(),
+    },
+  }))
 }
 
-export function eliminarUnidadMedida(
-  id: string,
-): void {
-  const unidades =
-    obtenerUnidadesMedida()
+export async function cambiarEstadoUnidadMedida(
+  id: number,
+  activo: boolean,
+): Promise<MessageResponse> {
+  return validarRespuesta(await unidadMedidaApi.cambiarEstadoUnidadMedida({
+    id,
+    estadoCatalogoRequest: { activo },
+  }))
+}
 
-  const unidad = unidades.find(
-    (item) => item.id === id,
-  )
+export function eliminarUnidadMedida(id: number): Promise<MessageResponse> {
+  return cambiarEstadoUnidadMedida(id, false)
+}
 
-  if (!unidad) {
-    throw new Error(
-      'La unidad de medida no existe.',
-    )
-  }
-
-  const estaEnUso =
-    obtenerProductos().some(
-      (producto) =>
-        producto.unidadMedidaId === id,
-    )
-
-  if (estaEnUso) {
-    throw new Error(
-      'No puedes eliminar esta unidad porque está asignada a uno o más productos. Puedes desactivarla.',
-    )
-  }
-
-  guardarUnidades(
-    unidades.filter(
-      (item) => item.id !== id,
-    ),
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Unidades de medida',
-    accion: 'ELIMINAR',
-    detalle:
-      `Se eliminó la unidad de medida "${unidad.nombre}".`,
-    registroId: unidad.id,
-  })
+export function reactivarUnidadMedida(id: number): Promise<MessageResponse> {
+  return cambiarEstadoUnidadMedida(id, true)
 }

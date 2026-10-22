@@ -1,4 +1,9 @@
 import {
+  useEffect,
+  useState,
+} from 'react'
+
+import {
   ArrowDownToLine,
   ArrowUpFromLine,
   X,
@@ -8,8 +13,13 @@ import { obtenerCentrosCosto } from '../../services/centroCostoService'
 import { obtenerDestinos } from '../../services/destinoService'
 import { obtenerPartesEquipo } from '../../services/parteEquipoService'
 import { obtenerUnidadesMedida } from '../../services/unidadMedidaService'
+import { listarDetalleControlAlmacen } from '../../services/kardexService'
+import { TablePagination } from '../ui/TablePagination'
 
-import type { ControlAlmacenProducto } from '../../types/kardex'
+import type {
+  ControlAlmacenProducto,
+  MovimientoAlmacen,
+} from '../../types/kardex'
 
 interface DetalleMovimientosModalProps {
   abierto: boolean
@@ -45,6 +55,38 @@ export function DetalleMovimientosModal({
   producto,
   onClose,
 }: DetalleMovimientosModalProps) {
+  const [movimientos, setMovimientos] = useState<MovimientoAlmacen[]>([])
+  const [pagina, setPagina] = useState(1)
+  const [tamPagina, setTamPagina] = useState(10)
+  const [totalMovimientos, setTotalMovimientos] = useState(0)
+  const [cargando, setCargando] = useState(false)
+
+  useEffect(() => {
+    if (!abierto || !producto) return
+
+    let activo = true
+    setCargando(true)
+
+    listarDetalleControlAlmacen(producto.productoId, pagina, tamPagina)
+      .then((resultado) => {
+        if (!activo) return
+        setMovimientos(resultado.movimientos)
+        setTotalMovimientos(resultado.totalElementos)
+      })
+      .catch(() => {
+        if (!activo) return
+        setMovimientos([])
+        setTotalMovimientos(0)
+      })
+      .finally(() => {
+        if (activo) setCargando(false)
+      })
+
+    return () => {
+      activo = false
+    }
+  }, [abierto, producto?.productoId, pagina, tamPagina])
+
   if (!abierto || !producto) {
     return null
   }
@@ -60,17 +102,16 @@ export function DetalleMovimientosModal({
     obtenerUnidadesMedida()
 
   const unidad =
-    unidadesMedida.find(
+    producto.unidadMedidaNombre ?? unidadesMedida.find(
       (item) =>
-        item.id ===
-        producto.unidadMedidaId,
+        String(item.id) === String(
+        producto.unidadMedidaId),
     )?.nombre ?? 'Sin unidad'
 
   return (
     <div
       className="maestro-modal-backdrop"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="maestro-modal-card"
@@ -158,7 +199,7 @@ export function DetalleMovimientosModal({
           </div>
 
           <div className="table-responsive">
-            <table className="table maestro-table align-middle">
+            <table className="table standard-table align-middle">
               <thead>
                 <tr>
                   <th>Fecha</th>
@@ -174,7 +215,13 @@ export function DetalleMovimientosModal({
               </thead>
 
               <tbody>
-                {producto.movimientos.length ===
+                {cargando ? (
+                  <tr>
+                    <td colSpan={9} className="text-center text-secondary py-4">
+                      Cargando movimientos...
+                    </td>
+                  </tr>
+                ) : movimientos.length ===
                 0 ? (
                   <tr>
                     <td
@@ -186,27 +233,27 @@ export function DetalleMovimientosModal({
                     </td>
                   </tr>
                 ) : (
-                  producto.movimientos.map(
+                  movimientos.map(
                     (movimiento) => {
                       const destino =
                         destinos.find(
                           (item) =>
-                            item.id ===
-                            movimiento.destinoId,
+                            String(item.id) === String(
+                            movimiento.destinoId),
                         )
 
                       const parteEquipo =
                         partesEquipo.find(
                           (item) =>
-                            item.id ===
-                            movimiento.parteEquipoId,
+                            String(item.id) === String(
+                            movimiento.parteEquipoId),
                         )
 
                       const centroCosto =
                         centrosCosto.find(
                           (item) =>
-                            item.id ===
-                            movimiento.centroCostoId,
+                            String(item.id) === String(
+                            movimiento.centroCostoId),
                         )
 
                       return (
@@ -254,7 +301,7 @@ export function DetalleMovimientosModal({
                           </td>
 
                           <td>
-                            <span className="maestro-id-chip">
+                            <span className="table-id-chip">
                               {
                                 movimiento.numeroDocumento
                               }
@@ -267,16 +314,18 @@ export function DetalleMovimientosModal({
                           </td>
 
                           <td>
-                            {destino?.nombre ?? '-'}
+                            {destino?.nombre ?? movimiento.destinoId ?? '-'}
                           </td>
 
                           <td>
                             {parteEquipo?.nombre ??
+                              movimiento.parteEquipoId ??
                               'No aplica'}
                           </td>
 
                           <td>
                             {centroCosto?.nombre ??
+                              movimiento.centroCostoId ??
                               '-'}
                           </td>
 
@@ -290,8 +339,8 @@ export function DetalleMovimientosModal({
                             <span
                               className={
                                 movimiento.afectaStock
-                                  ? 'maestro-status maestro-status--active'
-                                  : 'maestro-status maestro-status--inactive'
+                                  ? 'status-label status-label--active'
+                                  : 'status-label status-label--inactive'
                               }
                             >
                               {movimiento.afectaStock
@@ -307,12 +356,23 @@ export function DetalleMovimientosModal({
               </tbody>
             </table>
           </div>
+
+          <TablePagination
+            totalItems={totalMovimientos}
+            page={pagina}
+            pageSize={tamPagina}
+            onPageChange={setPagina}
+            onPageSizeChange={(size) => {
+              setTamPagina(size)
+              setPagina(1)
+            }}
+          />
         </div>
 
         <div className="maestro-modal-footer">
           <button
             type="button"
-            className="btn maestro-btn-secondary"
+            className="btn btn-maestro-info"
             onClick={onClose}
           >
             <X size={18} />
@@ -323,3 +383,7 @@ export function DetalleMovimientosModal({
     </div>
   )
 }
+
+
+
+

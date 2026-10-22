@@ -2,11 +2,125 @@ import type {
   ControlAlmacenProducto,
   MovimientoAlmacen,
 } from '../types/kardex'
+import {
+  ControlAlmacenControllerApi,
+  type ControlAlmacenListadoResponse,
+} from '../api/generated'
+import { apiConfiguration } from '../api/client'
 
 import { obtenerContactos } from './contactoService'
 import { obtenerIngresosAlmacen } from './ingresoAlmacenService'
 import { obtenerProductos } from './productoService'
-import { obtenerValesConsumo } from './valeConsumoService'
+import { listarVales } from './valeConsumoService'
+import type { ValeConsumo } from '../types/valeConsumo'
+
+const controlAlmacenApi = new ControlAlmacenControllerApi(apiConfiguration)
+type ResultadoControlAlmacen = {
+  datos: ControlAlmacenProducto[]
+  totalElementos: number
+}
+const solicitudesControlEnCurso = new Map<string, Promise<ResultadoControlAlmacen>>()
+type ResultadoDetalleControl = {
+  movimientos: MovimientoAlmacen[]
+  totalElementos: number
+}
+const solicitudesDetalleEnCurso = new Map<string, Promise<ResultadoDetalleControl>>()
+
+export interface ListarControlAlmacenParams {
+  busqueda?: string
+  tipoProductoId?: number
+  categoriaId?: number
+  estado?: string
+  fechaDesde?: Date
+  fechaHasta?: Date
+  pagina?: number
+  tamPagina?: number
+}
+
+function mapearControlListado(
+  producto: ControlAlmacenListadoResponse,
+): ControlAlmacenProducto {
+  return {
+    productoId: producto.productoId ?? 0,
+    codigo: producto.codigo ?? '',
+    nombre: producto.producto ?? '',
+    tipoProductoId: 0,
+    categoriaId: 0,
+    unidadMedidaId: 0,
+    proveedorId: 0,
+    totalEntradas: Number(producto.entradas ?? 0),
+    totalSalidas: Number(producto.salidas ?? 0),
+    stockDisponible: Number(producto.stock ?? 0),
+    estadoStock: producto.estado === 'CON_STOCK' ? 'CON_STOCK' : 'SIN_STOCK',
+    movimientos: [],
+    tipoProductoNombre: producto.tipo,
+    categoriaNombre: producto.categoria,
+    unidadMedidaNombre: producto.unidadMedida,
+    proveedorNombre: producto.proveedor,
+  }
+}
+
+export async function listarControlAlmacen(
+  params: ListarControlAlmacenParams = {},
+): Promise<ResultadoControlAlmacen> {
+  const clave = JSON.stringify(params)
+  const solicitudExistente = solicitudesControlEnCurso.get(clave)
+
+  if (solicitudExistente) return solicitudExistente
+
+  const solicitud = controlAlmacenApi
+    .listar6(params)
+    .then((respuesta) => ({
+      datos: (respuesta.datos ?? []).map(mapearControlListado),
+      totalElementos: respuesta.paginacion?.totalElementos ?? 0,
+    }))
+    .finally(() => solicitudesControlEnCurso.delete(clave))
+
+  solicitudesControlEnCurso.set(clave, solicitud)
+  return solicitud
+}
+
+export async function listarDetalleControlAlmacen(
+  productoId: number,
+  pagina = 1,
+  tamPagina = 10,
+): Promise<ResultadoDetalleControl> {
+  const clave = JSON.stringify({ productoId, pagina, tamPagina })
+  const solicitudExistente = solicitudesDetalleEnCurso.get(clave)
+  if (solicitudExistente) return solicitudExistente
+
+  const solicitud = controlAlmacenApi.detalle({
+    productoId,
+    pagina,
+    tamPagina,
+  }).then((respuesta) => {
+    const movimientos = (respuesta.datos ?? []).map((movimiento, indice) => ({
+      id: `MOV-${productoId}-${indice}`,
+      tipo: movimiento.movimiento?.toUpperCase().includes('SAL') ? 'SALIDA' as const : 'ENTRADA' as const,
+      origen: movimiento.movimiento?.toUpperCase().includes('SAL') ? 'VALE' as const : 'INGRESO' as const,
+      documentoId: movimiento.documento ?? '',
+      numeroDocumento: movimiento.documento ?? '',
+      fecha: movimiento.fecha?.toISOString().slice(0, 10) ?? '',
+      productoId,
+      cantidad: Number(movimiento.cantidad ?? 0),
+      precioUnitario: 0,
+      destinoId: movimiento.destino ?? null,
+      parteEquipoId: movimiento.parteEquipo ?? null,
+      centroCostoId: movimiento.centroCosto ?? null,
+      responsable: movimiento.responsable ?? '',
+      estadoDocumento: movimiento.estado === 'ANULADO' ? 'ANULADO' as const : 'REGISTRADO' as const,
+      afectaStock: movimiento.estado !== 'ANULADO',
+    }))
+
+    return {
+      movimientos,
+      totalElementos: respuesta.paginacion?.totalElementos ?? movimientos.length,
+    }
+  }).finally(() => solicitudesDetalleEnCurso.delete(clave))
+
+  solicitudesDetalleEnCurso.set(clave, solicitud)
+  return solicitud
+}
 
 function redondearCantidad(
   cantidad: number,
@@ -44,7 +158,7 @@ function crearMovimientosEntrada():
   return ingresos.flatMap((ingreso) => {
     const contacto = contactos.find(
       (item) =>
-        item.id === ingreso.contactoId,
+        String(item.id) === String( ingreso.contactoId),
     )
 
     return ingreso.detalles.map(
@@ -77,10 +191,9 @@ function crearMovimientosEntrada():
   })
 }
 
-function crearMovimientosSalida():
-  MovimientoAlmacen[] {
-  const vales = obtenerValesConsumo()
-
+function crearMovimientosSalida(
+  vales: ValeConsumo[],
+): MovimientoAlmacen[] {
   return vales.flatMap((vale) =>
     vale.detalles.flatMap((detalle) =>
       detalle.distribuciones.map(
@@ -124,11 +237,13 @@ function crearMovimientosSalida():
  * También incluye documentos anulados
  * para conservar el historial.
  */
-export function obtenerMovimientosAlmacen():
-  MovimientoAlmacen[] {
+export async function obtenerMovimientosAlmacen(
+  vales?: ValeConsumo[],
+):
+  Promise<MovimientoAlmacen[]> {
   const movimientos = [
     ...crearMovimientosEntrada(),
-    ...crearMovimientosSalida(),
+    ...crearMovimientosSalida(vales ?? await listarVales()),
   ]
 
   return movimientos
@@ -153,12 +268,14 @@ export function obtenerMovimientosAlmacen():
  * Calcula entradas, salidas y saldo
  * para cada producto.
  */
-export function obtenerControlAlmacen():
-  ControlAlmacenProducto[] {
+export async function obtenerControlAlmacen(
+  vales?: ValeConsumo[],
+):
+  Promise<ControlAlmacenProducto[]> {
   const productos = obtenerProductos()
 
   const movimientos =
-    obtenerMovimientosAlmacen()
+    await obtenerMovimientosAlmacen(vales)
 
   return productos
     .map((producto) => {
@@ -166,7 +283,7 @@ export function obtenerControlAlmacen():
         movimientos.filter(
           (movimiento) =>
             movimiento.productoId ===
-            producto.id,
+            producto.productoId,
         )
 
       const totalEntradas =
@@ -206,7 +323,7 @@ export function obtenerControlAlmacen():
 
       const control:
         ControlAlmacenProducto = {
-          productoId: producto.id,
+          productoId: producto.productoId,
           codigo: producto.codigo,
           nombre: producto.nombre,
           tipoProductoId:
@@ -248,64 +365,59 @@ export function obtenerControlAlmacen():
 }
 
 export function obtenerControlProductoPorId(
-  productoId: string,
-): ControlAlmacenProducto | null {
-  const producto =
-    obtenerControlAlmacen().find(
-      (item) =>
-        item.productoId === productoId,
+  productoId: number,
+  vales?: ValeConsumo[],
+): Promise<ControlAlmacenProducto | null> {
+  return obtenerControlAlmacen(vales).then((control) => {
+    const producto = control.find(
+      (item) => item.productoId === productoId,
     )
 
-  return producto
-    ? copiarControlProducto(producto)
-    : null
+    return producto
+      ? copiarControlProducto(producto)
+      : null
+  })
 }
 
 /**
  * Compara el saldo calculado con el
  * stock técnico guardado en Producto.
  */
-export function obtenerDiferenciasStock():
-  Array<{
-    productoId: string
+export function obtenerDiferenciasStock(
+  vales?: ValeConsumo[],
+):
+  Promise<Array<{
+    productoId: number
     codigo: string
     nombre: string
     stockCalculado: number
     stockRegistrado: number
     diferencia: number
-  }> {
+  }>> {
   const productos = obtenerProductos()
-  const controles =
-    obtenerControlAlmacen()
+  return obtenerControlAlmacen(vales).then((controles) =>
+    controles
+      .map((control) => {
+        const producto = productos.find(
+          (item) =>
+            String(item.productoId) === String(control.productoId),
+        )
 
-  return controles
-    .map((control) => {
-      const producto = productos.find(
-        (item) =>
-          item.id ===
-          control.productoId,
-      )
+        const stockRegistrado =
+          producto?.stockActual ?? 0
 
-      const stockRegistrado =
-        producto?.stockActual ?? 0
-
-      return {
-        productoId:
-          control.productoId,
-        codigo: control.codigo,
-        nombre: control.nombre,
-        stockCalculado:
-          control.stockDisponible,
-        stockRegistrado,
-        diferencia:
-          redondearCantidad(
-            stockRegistrado -
-              control.stockDisponible,
+        return {
+          productoId: control.productoId,
+          codigo: control.codigo,
+          nombre: control.nombre,
+          stockCalculado: control.stockDisponible,
+          stockRegistrado,
+          diferencia: redondearCantidad(
+            stockRegistrado - control.stockDisponible,
           ),
-      }
-    })
-    .filter(
-      (resultado) =>
-        resultado.diferencia !== 0,
-    )
+        }
+      })
+      .filter((resultado) => resultado.diferencia !== 0),
+  )
 }
+
