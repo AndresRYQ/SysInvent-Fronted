@@ -11,7 +11,7 @@ Name | Type
 `apePaterno` | string
 `apeMaterno` | string
 `email` | string
-`rolesIds` | Array&lt;number&gt;
+`rolId` | number
 
 ## Example
 
@@ -25,7 +25,7 @@ const example = {
   "apePaterno": null,
   "apeMaterno": null,
   "email": null,
-  "rolesIds": null,
+  "rolId": null,
 } satisfies ActualizarUsuarioRequest
 
 console.log(example)

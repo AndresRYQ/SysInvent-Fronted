@@ -30,7 +30,37 @@ export interface UsuarioResponse {
      * @type {string}
      * @memberof UsuarioResponse
      */
+    codigo?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UsuarioResponse
+     */
     usuario?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UsuarioResponse
+     */
+    dni?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UsuarioResponse
+     */
+    nombres?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UsuarioResponse
+     */
+    apePaterno?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UsuarioResponse
+     */
+    apeMaterno?: string;
     /**
      * 
      * @type {string}
@@ -43,6 +73,18 @@ export interface UsuarioResponse {
      * @memberof UsuarioResponse
      */
     correo?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof UsuarioResponse
+     */
+    rolId?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof UsuarioResponse
+     */
+    nombreRol?: string;
     /**
      * 
      * @type {string}
@@ -81,9 +123,16 @@ export function UsuarioResponseFromJSONTyped(json: any, ignoreDiscriminator: boo
     return {
         
         'usuarioId': json['usuarioId'] == null ? undefined : json['usuarioId'],
+        'codigo': json['codigo'] == null ? undefined : json['codigo'],
         'usuario': json['usuario'] == null ? undefined : json['usuario'],
+        'dni': json['dni'] == null ? undefined : json['dni'],
+        'nombres': json['nombres'] == null ? undefined : json['nombres'],
+        'apePaterno': json['apePaterno'] == null ? undefined : json['apePaterno'],
+        'apeMaterno': json['apeMaterno'] == null ? undefined : json['apeMaterno'],
         'nombreCompleto': json['nombreCompleto'] == null ? undefined : json['nombreCompleto'],
         'correo': json['correo'] == null ? undefined : json['correo'],
+        'rolId': json['rolId'] == null ? undefined : json['rolId'],
+        'nombreRol': json['nombreRol'] == null ? undefined : json['nombreRol'],
         'descripcionRol': json['descripcionRol'] == null ? undefined : json['descripcionRol'],
         'estado': json['estado'] == null ? undefined : json['estado'],
         'estadoDsc': json['estadoDsc'] == null ? undefined : json['estadoDsc'],
@@ -102,9 +151,16 @@ export function UsuarioResponseToJSONTyped(value?: UsuarioResponse | null, ignor
     return {
         
         'usuarioId': value['usuarioId'],
+        'codigo': value['codigo'],
         'usuario': value['usuario'],
+        'dni': value['dni'],
+        'nombres': value['nombres'],
+        'apePaterno': value['apePaterno'],
+        'apeMaterno': value['apeMaterno'],
         'nombreCompleto': value['nombreCompleto'],
         'correo': value['correo'],
+        'rolId': value['rolId'],
+        'nombreRol': value['nombreRol'],
         'descripcionRol': value['descripcionRol'],
         'estado': value['estado'],
         'estadoDsc': value['estadoDsc'],

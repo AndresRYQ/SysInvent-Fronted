@@ -1,11 +1,13 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './ActividadReciente';
+export * from './ActualizarPerfilRequest';
 export * from './ActualizarRolRequest';
 export * from './ActualizarUsuarioRequest';
 export * from './Alerta';
 export * from './BitacoraProjection';
 export * from './BitacoraRequest';
+export * from './CambiarContrasenaRequest';
 export * from './Cards';
 export * from './CategoriaCatalogoRequest';
 export * from './CategoriaCatalogoResponse';
@@ -54,6 +56,7 @@ export * from './LoginResponse';
 export * from './MessageResponse';
 export * from './ParteEquipoRequest';
 export * from './ParteEquipoResponse';
+export * from './PerfilUsuarioResponse';
 export * from './ProductoRequest';
 export * from './ProductoResponse';
 export * from './ProveedorRequest';

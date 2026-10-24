@@ -1,371 +1,134 @@
-import type {
-  Rol,
-  RolFormData,
-} from '../types/rol'
-
-import {
-  guardarStorage,
-  obtenerStorage,
-} from './storageService'
-import { registrarEventoBitacora } from './bitacoraService'
-
-const STORAGE_KEY = 'agrihusac_roles'
+import { ModuloCodigo } from '../constants/modulos'
+import type { Rol, RolFormData } from '../types/rol'
+import { apiFetch } from './api'
 
 export const MODULOS_SISTEMA = [
-  { id: 'roles', nombre: 'Roles' },
-  { id: 'usuarios', nombre: 'Usuarios' },
-  {
-    id: 'tipos-producto',
-    nombre: 'Tipos de producto',
-  },
-  { id: 'proveedores', nombre: 'Proveedores' },
-  {
-    id: 'tipos-documento',
-    nombre: 'Tipos de documento',
-  },
-  { id: 'destinos', nombre: 'Destinos' },
-  { id: 'productos', nombre: 'Productos' },
-  {
-    id: 'unidades-medida',
-    nombre: 'Unidades de medida',
-  },
-  { id: 'categorias', nombre: 'Categorías' },
-  {
-    id: 'centros-costo',
-    nombre: 'Centros de costo',
-  },
-  { id: 'bitacora', nombre: 'Bitácora' },
-  {
-    id: 'reporte-ingresos',
-    nombre: 'Reporte de ingresos',
-  },
-  {
-    id: 'reporte-vales',
-    nombre: 'Reporte de vales',
-  },
-  {
-    id: 'reporte-kardex',
-    nombre: 'Reporte de Kardex',
-  },
-  {
-    id: 'reporte-productos',
-    nombre: 'Productos más pedidos',
-  },
-  { id: 'contactos', nombre: 'Contactos' },
-  {
-    id: 'partes-equipo',
-    nombre: 'Partes de equipo',
-  },
-  {
-    id: 'control-almacen',
-    nombre: 'Control de almacén',
-  },
-  {
-    id: 'vales-consumo',
-    nombre: 'Vales de consumo',
-  },
-  {
-    id: 'ingresos-almacen',
-    nombre: 'Ingresos de almacén',
-  },
-  {
-    id: 'perfil-usuario',
-    nombre: 'Perfil de usuario',
-  },
+  { id: ModuloCodigo.ROLES, backendId: 1, nombre: 'Roles' },
+  { id: ModuloCodigo.USUARIOS, backendId: 2, nombre: 'Usuarios' },
+  { id: ModuloCodigo.TIPOS_PRODUCTO, backendId: 3, nombre: 'Tipos de producto' },
+  { id: ModuloCodigo.PROVEEDORES, backendId: 4, nombre: 'Proveedores' },
+  { id: ModuloCodigo.TIPOS_DOCUMENTO, backendId: 5, nombre: 'Tipos de documento' },
+  { id: ModuloCodigo.DESTINOS, backendId: 6, nombre: 'Destinos' },
+  { id: ModuloCodigo.PRODUCTOS, backendId: 7, nombre: 'Productos' },
+  { id: ModuloCodigo.UNIDADES_MEDIDA, backendId: 8, nombre: 'Unidades de medida' },
+  { id: ModuloCodigo.CATEGORIAS, backendId: 9, nombre: 'Categorías' },
+  { id: ModuloCodigo.CENTROS_COSTO, backendId: 10, nombre: 'Centros de costo' },
+  { id: ModuloCodigo.BITACORA, backendId: 11, nombre: 'Bitácora' },
+  { id: ModuloCodigo.REPORTE_INGRESOS, backendId: 12, nombre: 'Reporte de ingresos' },
+  { id: ModuloCodigo.REPORTE_VALES, backendId: 13, nombre: 'Reporte de vales' },
+  { id: ModuloCodigo.REPORTE_PRODUCTOS, backendId: 14, nombre: 'Productos más pedidos' },
+  { id: ModuloCodigo.CONTACTOS, backendId: 15, nombre: 'Contactos' },
+  { id: ModuloCodigo.PARTES_EQUIPO, backendId: 16, nombre: 'Partes de equipo' },
+  { id: ModuloCodigo.CONTROL_ALMACEN, backendId: 17, nombre: 'Control de almacén' },
+  { id: ModuloCodigo.VALES_CONSUMO, backendId: 18, nombre: 'Vales de consumo' },
+  { id: ModuloCodigo.INGRESOS_ALMACEN, backendId: 19, nombre: 'Ingresos de almacén' },
+  { id: ModuloCodigo.PERFIL_USUARIO, backendId: 20, nombre: 'Perfil de usuario' },
 ] as const
 
-const TODOS_LOS_MODULOS =
-  MODULOS_SISTEMA.map((modulo) => modulo.id)
-
-const ROLES_INICIALES: Rol[] = [
-  {
-    id: 'ROL-001',
-    nombre: 'Administrador',
-    descripcion:
-      'Control total del sistema.',
-    estado: true,
-    usuarios: 1,
-    modulos: [...TODOS_LOS_MODULOS],
-  },
-  {
-    id: 'ROL-002',
-    nombre: 'Almacenero',
-    descripcion:
-      'Gestión operativa del almacén.',
-    estado: true,
-    usuarios: 1,
-    modulos: [
-      'productos',
-      'control-almacen',
-      'vales-consumo',
-      'ingresos-almacen',
-      'perfil-usuario',
-    ],
-  },
-  {
-    id: 'ROL-003',
-    nombre: 'Supervisor',
-    descripcion:
-      'Supervisión y consulta de operaciones.',
-    estado: true,
-    usuarios: 0,
-    modulos: [
-      'bitacora',
-      'control-almacen',
-      'reporte-ingresos',
-      'reporte-vales',
-      'reporte-kardex',
-      'reporte-productos',
-      'perfil-usuario',
-    ],
-  },
-]
-
-function copiarRoles(roles: Rol[]): Rol[] {
-  return roles.map((rol) => ({
-    ...rol,
-    modulos: Array.isArray(rol.modulos)
-  ? [...rol.modulos]
-  : [],
-  }))
+interface PaginaRolesBackend {
+  datos?: Array<{
+    rolId?: number
+    nombre?: string
+    descripcion?: string
+    activo?: boolean
+    usuarios?: number
+    modulos?: number[]
+  }>
 }
 
-export function obtenerRoles(): Rol[] {
-  const guardados = obtenerStorage<Rol[]>(
-    STORAGE_KEY,
-    [],
-  )
-
-  if (guardados.length > 0) {
-    const rolesActualizados = guardados.map((rol) => {
-      const nombre = rol.nombre.trim().toLowerCase()
-      const debeTenerKardex =
-        nombre === 'administrador' ||
-        nombre === 'supervisor'
-      const modulos = Array.isArray(rol.modulos)
-        ? rol.modulos
-        : []
-
-      if (!debeTenerKardex || modulos.includes('reporte-kardex')) {
-        return rol
-      }
-
-      return {
-        ...rol,
-        modulos: [...modulos, 'reporte-kardex'],
-      }
-    })
-
-    if (rolesActualizados.some((rol, index) => rol !== guardados[index])) {
-      guardarStorage(STORAGE_KEY, rolesActualizados)
-    }
-
-    return copiarRoles(rolesActualizados)
-  }
-
-  guardarStorage(
-    STORAGE_KEY,
-    ROLES_INICIALES,
-  )
-
-  return copiarRoles(ROLES_INICIALES)
+interface MensajeBackend {
+  success?: boolean
+  message?: string
 }
 
-function guardarRoles(roles: Rol[]): void {
-  guardarStorage(STORAGE_KEY, roles)
+function codigoModulo(backendId: number): string | undefined {
+  return MODULOS_SISTEMA.find(
+    (modulo) => modulo.backendId === backendId,
+  )?.id
 }
 
-function validarNombre(
-  nombre: string,
-  idActual?: string,
-): void {
-  const normalizado =
-    nombre.trim().toLowerCase()
-
-  const repetido = obtenerRoles().some(
-    (rol) =>
-      rol.id !== idActual &&
-      rol.nombre.trim().toLowerCase() ===
-        normalizado,
-  )
-
-  if (repetido) {
-    throw new Error(
-      'Ya existe un rol con ese nombre.',
-    )
-  }
+function idModulo(codigo: string): number | undefined {
+  return MODULOS_SISTEMA.find(
+    (modulo) => modulo.id === codigo,
+  )?.backendId
 }
 
-function generarId(roles: Rol[]): string {
-  const mayor = roles.reduce(
-    (resultado, rol) => {
-      const numero = Number(
-        rol.id.replace('ROL-', ''),
-      )
-
-      return Number.isNaN(numero)
-        ? resultado
-        : Math.max(resultado, numero)
-    },
-    0,
-  )
-
-  return `ROL-${String(mayor + 1).padStart(
-    3,
-    '0',
-  )}`
-}
-
-export function crearRol(
-  datos: RolFormData,
+function convertirRol(
+  rol: NonNullable<PaginaRolesBackend['datos']>[number],
 ): Rol {
-  validarNombre(datos.nombre)
-
-  const roles = obtenerRoles()
-
-  const nuevo: Rol = {
-    id: generarId(roles),
-    nombre: datos.nombre.trim(),
-    descripcion: datos.descripcion.trim(),
-    estado: datos.estado,
-    usuarios: 0,
-    modulos: [...datos.modulos],
+  return {
+    id: String(rol.rolId ?? ''),
+    nombre: rol.nombre ?? '',
+    descripcion: rol.descripcion ?? '',
+    estado: rol.activo ?? false,
+    usuarios: rol.usuarios ?? 0,
+    modulos: (rol.modulos ?? [])
+      .map(codigoModulo)
+      .filter((modulo): modulo is string => Boolean(modulo)),
   }
+}
 
-  guardarRoles([...roles, nuevo])
+function obtenerIdsModulos(modulos: string[]): number[] {
+  return modulos
+    .map(idModulo)
+    .filter((modulo): modulo is number => modulo !== undefined)
+}
 
-  registrarEventoBitacora({
-    modulo: 'Roles',
-    accion: 'CREAR',
-    detalle: `Se creó el rol "${nuevo.nombre}".`,
-    registroId: nuevo.id,
+export async function obtenerRolesBackend(): Promise<Rol[]> {
+  const respuesta = await apiFetch<PaginaRolesBackend>(
+    '/api/roles?pagina=1&tamPagina=100',
+  )
+
+  return (respuesta.datos ?? []).map(convertirRol)
+}
+
+export async function crearRolBackend(
+  datos: RolFormData,
+): Promise<void> {
+  const respuesta = await apiFetch<MensajeBackend>('/api/roles', {
+    method: 'POST',
+    body: JSON.stringify({
+      nombre: datos.nombre.trim(),
+      descripcion: datos.descripcion.trim(),
+      modulos: obtenerIdsModulos(datos.modulos),
+    }),
   })
 
-  return nuevo
+  if (respuesta.success === false) {
+    throw new Error(respuesta.message ?? 'No se pudo crear el rol.')
+  }
 }
 
-export function actualizarRol(
+export async function actualizarRolBackend(
   id: string,
   datos: RolFormData,
-): Rol {
-  validarNombre(datos.nombre, id)
-
-  const roles = obtenerRoles()
-  const actual = roles.find(
-    (rol) => rol.id === id,
-  )
-
-  if (!actual) {
-    throw new Error(
-      'El rol seleccionado no existe.',
-    )
-  }
-
-  const actualizado: Rol = {
-    ...actual,
-    nombre: datos.nombre.trim(),
-    descripcion: datos.descripcion.trim(),
-    estado: datos.estado,
-    modulos: [...datos.modulos],
-  }
-
-  guardarRoles(
-    roles.map((rol) =>
-      rol.id === id ? actualizado : rol,
-    ),
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Roles',
-    accion: 'EDITAR',
-    detalle: `Se actualizó el rol "${actualizado.nombre}".`,
-    registroId: actualizado.id,
+): Promise<void> {
+  const respuesta = await apiFetch<MensajeBackend>('/api/roles', {
+    method: 'PUT',
+    body: JSON.stringify({
+      rolId: Number(id),
+      nombre: datos.nombre.trim(),
+      descripcion: datos.descripcion.trim(),
+      modulos: obtenerIdsModulos(datos.modulos),
+    }),
   })
 
-  return actualizado
+  if (respuesta.success === false) {
+    throw new Error(respuesta.message ?? 'No se pudo actualizar el rol.')
+  }
+
+  if (!datos.estado) {
+    await eliminarRolBackend(id)
+  }
 }
 
-export function eliminarRol(id: string): void {
-  const roles = obtenerRoles()
-  const rol = roles.find(
-    (item) => item.id === id,
+export async function eliminarRolBackend(id: string): Promise<void> {
+  const respuesta = await apiFetch<MensajeBackend>(
+    `/api/roles?rolId=${encodeURIComponent(id)}&activo=false`,
+    { method: 'DELETE' },
   )
 
-  if (!rol) {
-    throw new Error(
-      'El rol seleccionado no existe.',
-    )
+  if (respuesta.success === false) {
+    throw new Error(respuesta.message ?? 'No se pudo desactivar el rol.')
   }
-
-  if (
-    rol.nombre.trim().toLowerCase() ===
-    'administrador'
-  ) {
-    throw new Error(
-      'El rol Administrador no puede eliminarse.',
-    )
-  }
-
-  if (rol.usuarios > 0) {
-    throw new Error(
-      'No puedes eliminar un rol asignado a usuarios.',
-    )
-  }
-
-  guardarRoles(
-    roles.filter((item) => item.id !== id),
-  )
-
-  registrarEventoBitacora({
-    modulo: 'Roles',
-    accion: 'ELIMINAR',
-    detalle: `Se eliminó el rol "${rol.nombre}".`,
-    registroId: rol.id,
-  })
-}
-
-export function sincronizarConteoUsuarios(
-  usuarios: Array<{ rol: string }>,
-): void {
-  const roles = obtenerRoles()
-
-  const actualizados = roles.map((rol) => ({
-    ...rol,
-    usuarios: usuarios.filter(
-  (usuario) =>
-    (usuario.rol ?? '')
-      .trim()
-      .toLowerCase() ===
-    (rol.nombre ?? '')
-      .trim()
-      .toLowerCase(),
-).length,
-  }))
-
-  guardarRoles(actualizados)
-}
-
-export function tienePermisoModulo(
-  nombreRol: string | null | undefined,
-  moduloId: string,
-): boolean {
-  if (!nombreRol) {
-    return false
-  }
-
-  const nombreNormalizado =
-    nombreRol.trim().toLowerCase()
-
-  const rol = obtenerRoles().find(
-    (item) =>
-      item.nombre.trim().toLowerCase() ===
-      nombreNormalizado,
-  )
-
-  if (!rol || !rol.estado) {
-    return false
-  }
-
-  return Array.isArray(rol.modulos) &&
-    rol.modulos.includes(moduloId)
 }

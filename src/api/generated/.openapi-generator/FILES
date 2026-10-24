@@ -25,12 +25,14 @@ apis/UsuariosApi.ts
 apis/ValeConsumoControllerApi.ts
 apis/index.ts
 docs/ActividadReciente.md
+docs/ActualizarPerfilRequest.md
 docs/ActualizarRolRequest.md
 docs/ActualizarUsuarioRequest.md
 docs/Alerta.md
 docs/BitacoraControllerApi.md
 docs/BitacoraProjection.md
 docs/BitacoraRequest.md
+docs/CambiarContrasenaRequest.md
 docs/Cards.md
 docs/CategorasApi.md
 docs/CategoriaCatalogoRequest.md
@@ -91,6 +93,7 @@ docs/ParteEquipoRequest.md
 docs/ParteEquipoResponse.md
 docs/PartesDeEquipoApi.md
 docs/PerfilControllerApi.md
+docs/PerfilUsuarioResponse.md
 docs/ProductoRequest.md
 docs/ProductoResponse.md
 docs/ProductosApi.md
@@ -124,11 +127,13 @@ docs/ValeConsumoListadoResponse.md
 docs/ValeConsumoRequest.md
 index.ts
 models/ActividadReciente.ts
+models/ActualizarPerfilRequest.ts
 models/ActualizarRolRequest.ts
 models/ActualizarUsuarioRequest.ts
 models/Alerta.ts
 models/BitacoraProjection.ts
 models/BitacoraRequest.ts
+models/CambiarContrasenaRequest.ts
 models/Cards.ts
 models/CategoriaCatalogoRequest.ts
 models/CategoriaCatalogoResponse.ts
@@ -177,6 +182,7 @@ models/LoginResponse.ts
 models/MessageResponse.ts
 models/ParteEquipoRequest.ts
 models/ParteEquipoResponse.ts
+models/PerfilUsuarioResponse.ts
 models/ProductoRequest.ts
 models/ProductoResponse.ts
 models/ProveedorRequest.ts

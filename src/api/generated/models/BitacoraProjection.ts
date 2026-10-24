@@ -24,18 +24,6 @@ export interface BitacoraProjection {
      * @type {string}
      * @memberof BitacoraProjection
      */
-    fechaHora?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof BitacoraProjection
-     */
-    accion?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof BitacoraProjection
-     */
     modulo?: string;
     /**
      * 
@@ -48,6 +36,12 @@ export interface BitacoraProjection {
      * @type {string}
      * @memberof BitacoraProjection
      */
+    accion?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BitacoraProjection
+     */
     nombreUsuario?: string;
     /**
      * 
@@ -55,6 +49,12 @@ export interface BitacoraProjection {
      * @memberof BitacoraProjection
      */
     nombreRol?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BitacoraProjection
+     */
+    fechaHora?: string;
 }
 
 /**
@@ -74,12 +74,12 @@ export function BitacoraProjectionFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'fechaHora': json['fechaHora'] == null ? undefined : json['fechaHora'],
-        'accion': json['accion'] == null ? undefined : json['accion'],
         'modulo': json['modulo'] == null ? undefined : json['modulo'],
         'detalle': json['detalle'] == null ? undefined : json['detalle'],
+        'accion': json['accion'] == null ? undefined : json['accion'],
         'nombreUsuario': json['nombreUsuario'] == null ? undefined : json['nombreUsuario'],
         'nombreRol': json['nombreRol'] == null ? undefined : json['nombreRol'],
+        'fechaHora': json['fechaHora'] == null ? undefined : json['fechaHora'],
     };
 }
 
@@ -94,12 +94,12 @@ export function BitacoraProjectionToJSONTyped(value?: BitacoraProjection | null,
 
     return {
         
-        'fechaHora': value['fechaHora'],
-        'accion': value['accion'],
         'modulo': value['modulo'],
         'detalle': value['detalle'],
+        'accion': value['accion'],
         'nombreUsuario': value['nombreUsuario'],
         'nombreRol': value['nombreRol'],
+        'fechaHora': value['fechaHora'],
     };
 }
 

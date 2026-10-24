@@ -16,17 +16,14 @@ import {
   UserCircle,
 } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
+import { ModuloCodigo } from '../../constants/modulos'
 import { useAuth } from '../../hooks/useAuth'
-
-import {
-  tienePermisoModulo,
-} from '../../services/rolService'
 
 type SidebarItem = {
   label: string
   icon: typeof LayoutDashboard
   to?: string
-  moduleId?: string
+  moduleId?: ModuloCodigo
 }
 
 type SidebarSection = {
@@ -52,19 +49,19 @@ const SECCIONES: SidebarSection[] = [
         to: '/control-almacen',
         label: 'Control de almacén',
         icon: Archive,
-        moduleId: 'control-almacen',
+        moduleId: ModuloCodigo.CONTROL_ALMACEN,
       },
       {
         to: '/vales-consumo',
         label: 'Vales de consumo',
         icon: ClipboardList,
-        moduleId: 'vales-consumo',
+        moduleId: ModuloCodigo.VALES_CONSUMO,
       },
       {
         to: '/ingresos-almacen',
         label: 'Ingresos de almacén',
         icon: PackagePlus,
-        moduleId: 'ingresos-almacen',
+        moduleId: ModuloCodigo.INGRESOS_ALMACEN,
       },
     ],
   },
@@ -75,13 +72,13 @@ const SECCIONES: SidebarSection[] = [
         to: '/reportes/ingresos',
         label: 'Reporte de ingreso',
         icon: FileText,
-        moduleId: 'reporte-ingresos',
+        moduleId: ModuloCodigo.REPORTE_INGRESOS,
       },
       {
         to: '/reportes/vales',
         label: 'Reporte de vale',
         icon: FileText,
-        moduleId: 'reporte-vales',
+        moduleId: ModuloCodigo.REPORTE_VALES,
       },
       {
         to:
@@ -89,7 +86,7 @@ const SECCIONES: SidebarSection[] = [
         label:
           'Reporte de producto más pedido',
         icon: FileText,
-        moduleId: 'reporte-productos',
+        moduleId: ModuloCodigo.REPORTE_PRODUCTOS,
       },
     ],
   },
@@ -100,61 +97,61 @@ const SECCIONES: SidebarSection[] = [
         to: '/proveedores',
         label: 'Proveedores',
         icon: Users,
-        moduleId: 'proveedores',
+        moduleId: ModuloCodigo.PROVEEDORES,
       },
       {
         to: '/productos',
         label: 'Productos',
         icon: Boxes,
-        moduleId: 'productos',
+        moduleId: ModuloCodigo.PRODUCTOS,
       },
       {
         to: '/contactos',
         label: 'Contactos',
         icon: Users,
-        moduleId: 'contactos',
+        moduleId: ModuloCodigo.CONTACTOS,
       },
       {
         to: '/partes-equipo',
         label: 'Partes de equipo',
         icon: Archive,
-        moduleId: 'partes-equipo',
+        moduleId: ModuloCodigo.PARTES_EQUIPO,
       },
       {
         to: '/centros-costo',
         label: 'Centros de costo',
         icon: Coins,
-        moduleId: 'centros-costo',
+        moduleId: ModuloCodigo.CENTROS_COSTO,
       },
       {
         to: '/categorias',
         label: 'Categorías',
         icon: Boxes,
-        moduleId: 'categorias',
+        moduleId: ModuloCodigo.CATEGORIAS,
       },
       {
         to: '/tipos-producto',
         label: 'Tipos de producto',
         icon: Tags,
-        moduleId: 'tipos-producto',
+        moduleId: ModuloCodigo.TIPOS_PRODUCTO,
       },
       {
         to: '/tipos-documento',
         label: 'Tipos de documento',
         icon: FileText,
-        moduleId: 'tipos-documento',
+        moduleId: ModuloCodigo.TIPOS_DOCUMENTO,
       },
       {
         to: '/unidades-medida',
         label: 'Unidades de medida',
         icon: Ruler,
-        moduleId: 'unidades-medida',
+        moduleId: ModuloCodigo.UNIDADES_MEDIDA,
       },
       {
         to: '/destinos',
         label: 'Destinos',
         icon: MapPin,
-        moduleId: 'destinos',
+        moduleId: ModuloCodigo.DESTINOS,
       },
     ],
   },
@@ -165,25 +162,25 @@ const SECCIONES: SidebarSection[] = [
         to: '/bitacora',
         label: 'Bitácora',
         icon: FileText,
-        moduleId: 'bitacora',
+        moduleId: ModuloCodigo.BITACORA,
       },
       {
         to: '/usuarios',
         label: 'Usuarios',
         icon: Users,
-        moduleId: 'usuarios',
+        moduleId: ModuloCodigo.USUARIOS,
       },
       {
         to: '/roles',
         label: 'Roles',
         icon: Shield,
-        moduleId: 'roles',
+        moduleId: ModuloCodigo.ROLES,
       },
       {
         to: '/perfil',
         label: 'Perfil de usuario',
         icon: UserCircle,
-        moduleId: 'perfil-usuario',
+        moduleId: ModuloCodigo.PERFIL_USUARIO,
       },
     ],
   },
@@ -204,20 +201,17 @@ export function Sidebar({
   const { pathname } = useLocation()
   const { sesion } = useAuth()
 
-const seccionesPermitidas =
-  SECCIONES.map((seccion) => ({
+  const mostrarTodosLosModulos = sesion?.rolId === 1
+  const rutasPermitidas = new Set(sesion?.modulos ?? [])
+  const seccionesPermitidas = SECCIONES.map((seccion) => ({
     ...seccion,
     items: seccion.items.filter(
       (item) =>
         !item.moduleId ||
-        tienePermisoModulo(
-          sesion?.rol,
-          item.moduleId,
-        ),
+        mostrarTodosLosModulos ||
+        (item.to && rutasPermitidas.has(item.to)),
     ),
-  })).filter(
-    (seccion) => seccion.items.length > 0,
-  )
+  })).filter((seccion) => seccion.items.length > 0)
  
   const activo = (to: string) =>
     to === '/dashboard' ? pathname === to : pathname.startsWith(to)

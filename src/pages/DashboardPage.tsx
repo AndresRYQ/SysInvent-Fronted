@@ -6,9 +6,6 @@ import {
 } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  tienePermisoModulo,
-} from '../services/rolService'
-import {
   obtenerResumenDashboard,
   type ResumenDashboard,
 } from '../services/dashboardService'
@@ -19,6 +16,7 @@ import { useAuth } from '../hooks/useAuth'
 import '../styles/react-bits.css'
 import '../styles/DashboardPage.css'
 import { DASHBOARD_MOCK } from '../data/dashboardMock'
+import { ModuloCodigo } from '../constants/modulos'
 
 const RESUMEN_VACIO: ResumenDashboard = {
   productosActivos: 0,
@@ -57,7 +55,7 @@ type Metric = {
 }
 
 type Module = {
-  id: string
+  id: ModuloCodigo
   title: string
   description: string
   icon: IconName
@@ -77,7 +75,7 @@ const categories = [
 
 const modules: Module[] = [
   {
-    id: 'proveedores',
+    id: ModuloCodigo.PROVEEDORES,
     title: 'Proveedores',
     description: 'Administración de proveedores.',
     icon: 'users',
@@ -86,7 +84,7 @@ const modules: Module[] = [
     route: '/proveedores',
   },
   {
-    id: 'productos',
+    id: ModuloCodigo.PRODUCTOS,
     title: 'Productos',
     description: 'Administración de productos.',
     icon: 'box',
@@ -95,7 +93,7 @@ const modules: Module[] = [
     route: '/productos',
   },
   {
-    id: 'bitacora',
+    id: ModuloCodigo.BITACORA,
     title: 'Bitácora',
     description: 'Consulta de actividades y cambios.',
     icon: 'audit',
@@ -104,7 +102,7 @@ const modules: Module[] = [
     route: '/bitacora',
   },
   {
-    id: 'contactos',
+    id: ModuloCodigo.CONTACTOS,
     title: 'Contactos',
     description: 'Administración de contactos.',
     icon: 'users',
@@ -113,7 +111,7 @@ const modules: Module[] = [
     route: '/contactos',
   },
   {
-    id: 'partes-equipo',
+    id: ModuloCodigo.PARTES_EQUIPO,
     title: 'Partes de equipo',
     description: 'Administración de partes de equipo.',
     icon: 'box',
@@ -122,7 +120,7 @@ const modules: Module[] = [
     route: '/partes-equipo',
   },
   {
-    id: 'control-almacen',
+    id: ModuloCodigo.CONTROL_ALMACEN,
     title: 'Control de almacén',
     description: 'Control de inventario y movimientos.',
     icon: 'box',
@@ -131,7 +129,7 @@ const modules: Module[] = [
     route: '/control-almacen',
   },
   {
-    id: 'vales-consumo',
+    id: ModuloCodigo.VALES_CONSUMO,
     title: 'Vales de consumo',
     description: 'Administración de vales de consumo.',
     icon: 'order',
@@ -140,7 +138,7 @@ const modules: Module[] = [
     route: '/vales-consumo',
   },
   {
-    id: 'ingresos-almacen',
+    id: ModuloCodigo.INGRESOS_ALMACEN,
     title: 'Ingresos de Almacén',
     description: 'Registro de ingresos.',
     icon: 'entry',
@@ -149,7 +147,7 @@ const modules: Module[] = [
     route: '/ingresos-almacen',
   },
   {
-    id: 'reporte-ingresos',
+    id: ModuloCodigo.REPORTE_INGRESOS,
     title: 'Reporte de ingreso',
     description: 'Consulta de reportes de ingresos.',
     icon: 'report',
@@ -158,7 +156,7 @@ const modules: Module[] = [
     route: '/reportes/ingresos',
   },
   {
-    id: 'reporte-vales',
+    id: ModuloCodigo.REPORTE_VALES,
     title: 'Reporte de vale',
     description: 'Consulta de reportes de vales.',
     icon: 'report',
@@ -167,7 +165,7 @@ const modules: Module[] = [
     route: '/reportes/vales',
   },
   {
-    id: 'reporte-productos',
+    id: ModuloCodigo.REPORTE_PRODUCTOS,
     title: 'Reporte acumulado',
     description: 'Consulta de productos más solicitados.',
     icon: 'chart',
@@ -177,7 +175,7 @@ const modules: Module[] = [
     '/reportes/productos-mas-pedidos',
   },
   {
-    id: 'centros-costo',
+    id: ModuloCodigo.CENTROS_COSTO,
     title: 'Centros de costo',
     description: 'Mantenimiento de centros de costo.',
     icon: 'box',
@@ -186,7 +184,7 @@ const modules: Module[] = [
     route: '/centros-costo',
   },
   {
-    id: 'categorias',
+    id: ModuloCodigo.CATEGORIAS,
     title: 'Categorías',
     description: 'Gestión de categorías.',
     icon: 'box',
@@ -195,7 +193,7 @@ const modules: Module[] = [
     route: '/categorias',
   },
   {
-    id: 'tipos-producto',
+    id: ModuloCodigo.TIPOS_PRODUCTO,
     title: 'Tipos de producto',
     description: 'Administración de tipos de producto.',
     icon: 'box',
@@ -204,7 +202,7 @@ const modules: Module[] = [
     route: '/tipos-producto',
   },
   {
-    id: 'tipos-documento',
+    id: ModuloCodigo.TIPOS_DOCUMENTO,
     title: 'Tipos de documento',
     description: 'Administración de tipos de documento.',
     icon: 'box',
@@ -213,7 +211,7 @@ const modules: Module[] = [
     route: '/tipos-documento',
   },
   {
-    id: 'unidades-medida',
+    id: ModuloCodigo.UNIDADES_MEDIDA,
     title: 'Unidades de medida',
     description: 'Administración de unidades de medida.',
     icon: 'box',
@@ -222,7 +220,7 @@ const modules: Module[] = [
     route: '/unidades-medida',
   },
   {
-    id: 'destinos',
+    id: ModuloCodigo.DESTINOS,
     title: 'Destinos',
     description: 'Administración de destinos.',
     icon: 'box',
@@ -231,7 +229,7 @@ const modules: Module[] = [
     route: '/destinos',
   },
   {
-    id: 'usuarios',
+    id: ModuloCodigo.USUARIOS,
     title: 'Usuarios',
     description: 'Administración de usuarios.',
     icon: 'users',
@@ -240,7 +238,7 @@ const modules: Module[] = [
     route: '/usuarios',
   },
   {
-    id: 'roles',
+    id: ModuloCodigo.ROLES,
     title: 'Roles',
     description: 'Gestión de roles.',
     icon: 'users',
@@ -249,7 +247,7 @@ const modules: Module[] = [
     route: '/roles',
   },
   {
-    id: 'perfil-usuario',
+    id: ModuloCodigo.PERFIL_USUARIO,
     title: 'Perfil de usuario',
     description: 'Consulta y edición del perfil del usuario.',
     icon: 'users',
@@ -541,16 +539,14 @@ function DashboardPage() {
       },
     ).format(new Date())
 
- const modulosPermitidos = useMemo(
-  () =>
-    modules.filter((module) =>
-      tienePermisoModulo(
-        sesion?.rol,
-        module.id,
-      ),
-    ),
-  [sesion?.rol],
-)
+const rutasPermitidas = new Set(sesion?.modulos ?? [])
+const modulosPermitidos =
+  sesion?.rolId === 1
+    ? modules
+    : modules.filter(
+        (module) =>
+          module.route && rutasPermitidas.has(module.route),
+      )
 
 const categoriasPermitidas = useMemo(
   () =>

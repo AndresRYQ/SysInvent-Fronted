@@ -23,8 +23,11 @@ interface FormularioRolProps {
   rol: Rol | null
   onClose: () => void
   onGuardar: (
-    datos: RolFormData,
-  ) => string | null
+  datos: RolFormData,
+  ) =>
+    | string
+    | null
+    | Promise<string | null>
 }
 
 export function FormularioRol({
@@ -64,9 +67,9 @@ export function FormularioRol({
     }))
   }
 
-  const manejarEnvio = (
-    evento: FormEvent<HTMLFormElement>,
-  ) => {
+  const manejarEnvio = async (
+  evento: FormEvent<HTMLFormElement>,
+) => {
     evento.preventDefault()
     setError('')
     const nuevosErrores = { nombre: '', descripcion: '' }
@@ -91,7 +94,7 @@ export function FormularioRol({
       return
     }
 
-    const mensaje = onGuardar(datos)
+    const mensaje = await onGuardar(datos)
 
     if (mensaje) {
       setTipoAlerta('error')

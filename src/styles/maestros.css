@@ -2,6 +2,21 @@
   --font-xs: 0.8rem;
 }
 
+.maestro-fullscreen-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-direction: column;
+  background: rgb(255 255 255 / 78%);
+  backdrop-filter: blur(2px);
+  color: #13342b;
+  font-weight: 700;
+}
+
 .maestro-page-shell {
   position: relative;
   min-height: 100vh;
@@ -430,4 +445,9 @@
 
 .maestro-modal-card--product .card-header {
   display: none;
+}
+.perfil-input-readonly {
+  background-color: #e9ecef !important;
+  color: #6c757d;
+  cursor: not-allowed;
 }
