@@ -40,6 +40,7 @@ import '../../styles/DashboardPage.css'
 import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 import { coincidenIds } from '../../utils/identificadores'
 import '../../styles/maestros.css'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 
 const FILTROS_INICIALES:
   FiltrosControlAlmacen = {
@@ -64,10 +65,12 @@ export function ControlAlmacenPage() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [totalItems, setTotalItems] = useState(0)
+  const [cargando, setCargando] = useState(true)
   useEffect(() => {
     let activo = true
 
     setErrorCarga(null)
+    setCargando(true)
     listarControlAlmacen({
       busqueda: filtrosAplicados.busqueda || undefined,
       tipoProductoId: filtrosAplicados.tipoProductoId
@@ -90,11 +93,13 @@ export function ControlAlmacenPage() {
         if (!activo) return
         setControl(resultado.datos)
         setTotalItems(resultado.totalElementos)
+        setCargando(false)
       })
       .catch((error: unknown) => {
         if (!activo) return
         setControl([])
         setTotalItems(0)
+        setCargando(false)
         setErrorCarga(error instanceof Error ? error.message : 'No se pudo cargar el control de almacén.')
       })
 
@@ -203,6 +208,7 @@ export function ControlAlmacenPage() {
   return (
     <>
       <main className="dashboard-shell maestro-page-shell">
+        <PageLoadingOverlay visible={cargando} mensaje="Cargando control de almacén..." />
         <div className="container-xl px-0 maestro-page-body">
           {errorCarga && (
             <div className="alert alert-danger" role="alert">

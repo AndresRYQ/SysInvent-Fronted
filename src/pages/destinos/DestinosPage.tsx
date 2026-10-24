@@ -11,6 +11,7 @@ import { actualizarDestino, crearDestino, eliminarDestino, listarDestinos, react
 import type { Destino, DestinoFormData } from '../../types/destino'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 
 const INICIALES: FiltrosDestinosValores = { nombre: '', estado: '' }
 
@@ -57,6 +58,7 @@ export function DestinosPage() {
       })
       .catch((e) => {
         if (!activo) return
+        setTotalItems(0)
         mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar los destinos.')
       })
     return () => { activo = false }
@@ -125,6 +127,7 @@ export function DestinosPage() {
   return (
     <div className="destinos-page">
       <main className="dashboard-shell maestro-page-shell">
+        <PageLoadingOverlay visible={totalItems < 0} mensaje="Cargando destinos..." />
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">

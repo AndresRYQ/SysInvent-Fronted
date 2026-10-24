@@ -4,6 +4,7 @@ import { CategoriaFormModal } from '../../components/categorias/CategoriaFormMod
 import { FiltrosCategorias, type FiltrosCategoriasValores } from '../../components/categorias/FiltrosCategorias'
 import { TablaCategorias } from '../../components/categorias/TablaCategorias'
 import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 import { actualizarCategoria, crearCategoria, eliminarCategoria, listarCategorias, reactivarCategoria } from '../../services/categoriaService'
 import type { Categoria, CategoriaFormData } from '../../types/categoria'
 import '../../styles/DashboardPage.css'
@@ -48,6 +49,7 @@ export function CategoriasPage() {
       })
       .catch((e) => {
         if (!activo) return
+        setTotalItems(0)
         mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar las categorías.')
       })
     return () => { activo = false }
@@ -114,6 +116,7 @@ export function CategoriasPage() {
   return (
     <div className="categorias-page">
       <main className="dashboard-shell maestro-page-shell">
+        <PageLoadingOverlay visible={totalItems < 0} mensaje="Cargando categorías..." />
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar"><div className="maestro-topbar__copy"><h1>Categorías</h1><p>Administración de las categorías utilizadas en el inventario.</p></div></section>
           <div className="maestro-panel">

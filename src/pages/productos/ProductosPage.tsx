@@ -47,6 +47,7 @@ import { coincidenIds } from '../../utils/identificadores'
 
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 
 const FILTROS_INICIALES: FiltrosProductosValores = {
   busqueda: '',
@@ -421,6 +422,7 @@ export function ProductosPage() {
     <>
       <div className="productos-page">
       <main className="dashboard-shell maestro-page-shell">
+        <PageLoadingOverlay visible={cargandoProductos} mensaje="Cargando productos..." />
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">

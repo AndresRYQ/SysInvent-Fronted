@@ -37,6 +37,7 @@ import type {
 
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 
 const FILTROS_INICIALES:
   FiltrosRolesValores = {
@@ -75,6 +76,8 @@ function filtrarRoles(
 export function RolesPage() {
   const [roles, setRoles] =
     useState<Rol[]>([])
+
+  const [cargando, setCargando] = useState(true)
 
   const cargaInicialRealizada = useRef(false)
 
@@ -123,6 +126,7 @@ export function RolesPage() {
         })
         setAlertaAbierta(true)
       })
+      .finally(() => setCargando(false))
   }, [])
 
   const rolesFiltrados = useMemo(
@@ -247,6 +251,7 @@ export function RolesPage() {
   return (
     <>
       <main className="dashboard-shell maestro-page-shell roles-page">
+        <PageLoadingOverlay visible={cargando} mensaje="Cargando roles..." />
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">

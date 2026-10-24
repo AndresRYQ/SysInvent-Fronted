@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { ContactoDeleteModal } from '../../components/contactos/ContactoDeleteModal'
 import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 import {
   FiltrosContactos,
   type FiltrosContactosValores,
@@ -165,7 +166,10 @@ export function ContactosPage() {
         if (!cancelado) setProveedores(respuesta.datos)
       })
       .catch((error) => {
-        if (!cancelado) mostrarAlerta('error', obtenerMensajeError(error))
+        if (!cancelado) {
+          setTotalItems(0)
+          mostrarAlerta('error', obtenerMensajeError(error))
+        }
       })
 
     return () => {
@@ -316,6 +320,7 @@ export function ContactosPage() {
     <>
       <div className="contactos-page">
       <main className="dashboard-shell maestro-page-shell">
+        <PageLoadingOverlay visible={totalItems < 0} mensaje="Cargando contactos..." />
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">

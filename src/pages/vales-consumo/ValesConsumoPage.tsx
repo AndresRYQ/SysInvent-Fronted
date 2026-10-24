@@ -45,6 +45,7 @@ import type { ValeConsumo } from '../../types/valeConsumo'
 
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 
 interface FiltrosVales {
   busqueda: string
@@ -392,6 +393,7 @@ export function ValesConsumoPage() {
   return (
     <>
       <main className="dashboard-shell maestro-page-shell">
+        <PageLoadingOverlay visible={cargando} mensaje="Cargando vales de consumo..." />
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">

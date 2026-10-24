@@ -33,6 +33,7 @@ import type {
 
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 
 const FILTROS_INICIALES: Filtros = {
   busqueda: '',
@@ -65,9 +66,11 @@ export function ReporteProductosMasPedidosPage() {
 
   const [pageSize, setPageSize] =
     useState(10)
+  const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
     let activo = true
+    setCargando(true)
 
     listarReporteProductosApi({
       ...filtrosAplicados,
@@ -81,12 +84,14 @@ export function ReporteProductosMasPedidosPage() {
         setFilasApi(resultado.datos)
         setTotalApi(resultado.totalElementos)
         setErrorCarga(null)
+        setCargando(false)
       })
       .catch((error: unknown) => {
         if (!activo) return
         const filtrosVacios = Object.values(filtrosAplicados).every((valor) => !valor)
         setUsarMock(filtrosVacios && page === 1)
         setErrorCarga(error instanceof Error ? error.message : 'No se pudo cargar el reporte de productos.')
+        setCargando(false)
       })
 
     return () => { activo = false }
@@ -223,6 +228,7 @@ export function ReporteProductosMasPedidosPage() {
 
   return (
     <main className="dashboard-shell maestro-page-shell">
+      <PageLoadingOverlay visible={cargando} mensaje="Cargando reporte de productos..." />
       <div className="container-xl px-0 maestro-page-body">
         <section className="maestro-topbar">
           <div className="d-flex align-items-center justify-content-between gap-3 flex-wrap">

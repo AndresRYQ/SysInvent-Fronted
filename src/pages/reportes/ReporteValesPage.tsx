@@ -33,6 +33,7 @@ import type {
 } from '../../types/reporteVale'
 
 import '../../styles/DashboardPage.css'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 import '../../styles/maestros.css'
 
 const FILTROS_INICIALES: Filtros = {
@@ -69,9 +70,11 @@ export function ReporteValesPage() {
 
   const [pageSize, setPageSize] =
     useState(10)
+  const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
     let activo = true
+    setCargando(true)
 
     listarReporteValesApi({
       ...filtrosAplicados,
@@ -85,12 +88,14 @@ export function ReporteValesPage() {
         setFilasApi(resultado.datos)
         setTotalApi(resultado.totalElementos)
         setErrorCarga(null)
+        setCargando(false)
       })
       .catch((error: unknown) => {
         if (!activo) return
         const filtrosVacios = Object.values(filtrosAplicados).every((valor) => !valor)
         setUsarMock(filtrosVacios && page === 1)
         setErrorCarga(error instanceof Error ? error.message : 'No se pudo cargar el reporte de vales.')
+        setCargando(false)
       })
 
     return () => { activo = false }
@@ -261,6 +266,7 @@ export function ReporteValesPage() {
 
   return (
     <main className="dashboard-shell maestro-page-shell">
+      <PageLoadingOverlay visible={cargando} mensaje="Cargando reporte de vales..." />
       <div className="container-xl px-0 maestro-page-body">
         <section className="maestro-topbar">
           <div className="d-flex align-items-center justify-content-between gap-3 flex-wrap">
