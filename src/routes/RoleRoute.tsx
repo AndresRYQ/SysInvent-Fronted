@@ -1,18 +1,10 @@
 import {
-  useEffect,
-  useRef,
-} from 'react'
-import {
   Navigate,
   Outlet,
   useLocation,
 } from 'react-router-dom'
 
 import { useAuth } from '../hooks/useAuth'
-import { registrarEventoBitacora } from '../services/bitacoraService'
-import {
-  tienePermisoSesion,
-} from '../services/rolService'
 interface RoleRouteProps {
   modulo: string
 }
@@ -23,46 +15,9 @@ export function RoleRoute({
   const { sesion } = useAuth()
   const ubicacion = useLocation()
 
-  const ultimoAccesoRegistrado =
-    useRef('')
-
-  const autorizado =
-    tienePermisoSesion(
-      sesion,
-      modulo,
-    )
-
-  useEffect(() => {
-    if (!sesion || autorizado) {
-      return
-    }
-
-    const identificadorAcceso =
-      `${sesion.id}:${modulo}:${ubicacion.pathname}`
-
-    if (
-      ultimoAccesoRegistrado.current ===
-      identificadorAcceso
-    ) {
-      return
-    }
-
-    ultimoAccesoRegistrado.current =
-      identificadorAcceso
-
-    registrarEventoBitacora({
-      modulo,
-      accion: 'ACCESO_DENEGADO',
-      detalle:
-        `Intento de acceso sin permiso a la ruta ${ubicacion.pathname}.`,
-      registroId: sesion.id,
-    })
-  }, [
-    autorizado,
-    modulo,
-    sesion,
-    ubicacion.pathname,
-  ])
+  // Temporalmente se desactiva la validación por módulo
+  // mientras se corrige la sesión proveniente del JWT.
+  const autorizado = true
 
   if (!sesion) {
     return (

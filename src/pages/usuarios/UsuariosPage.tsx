@@ -16,7 +16,7 @@ import {
 } from '../../components/usuarios/TablaUsuarios'
 import { useAuth } from '../../hooks/useAuth'
 import {
-  obtenerRolesBackend,
+  obtenerRoles,
 } from '../../services/rolService'
 import type {
   Rol,
@@ -124,31 +124,21 @@ export function UsuariosPage() {
   const cargarUsuarios =
   useCallback(async (): Promise<void> => {
     try {
-      const [
-        resultadoUsuarios,
-        resultadoRoles,
-      ] = await Promise.all([
-        obtenerUsuariosBackend(
+      const resultadoUsuarios =
+        await obtenerUsuariosBackend(
           '',
           '',
           undefined,
           1,
           100,
-        ),
-        obtenerRolesBackend(
-          '',
-          1,
-          100,
-        ),
-      ])
+        )
+      const resultadoRoles = obtenerRoles()
 
       setUsuarios(
         resultadoUsuarios.usuarios,
       )
 
-      setRoles(
-        resultadoRoles.roles,
-      )
+      setRoles(resultadoRoles)
     } catch (error) {
       setMensaje({
         tipo: 'danger',

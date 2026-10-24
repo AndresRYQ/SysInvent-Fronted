@@ -6,9 +6,6 @@ import {
 } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  tienePermisoSesion,
-} from '../services/rolService'
-import {
   obtenerResumenDashboard,
   type ResumenDashboard,
 } from '../services/dashboardService'
@@ -541,16 +538,9 @@ function DashboardPage() {
       },
     ).format(new Date())
 
- const modulosPermitidos = useMemo(
-  () =>
-    modules.filter((module) =>
-      tienePermisoSesion(
-        sesion,
-        module.id,
-      ),
-    ),
-  [sesion],
-)
+// Temporalmente se muestran todos los módulos
+// mientras se corrige la sesión y sus permisos.
+const modulosPermitidos = modules
 
 const categoriasPermitidas = useMemo(
   () =>

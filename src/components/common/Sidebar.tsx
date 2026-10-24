@@ -16,11 +16,6 @@ import {
   UserCircle,
 } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
-import { useAuth } from '../../hooks/useAuth'
-
-import {
-  tienePermisoSesion,
-} from '../../services/rolService'
 
 type SidebarItem = {
   label: string
@@ -202,22 +197,10 @@ export function Sidebar({
   onToggle,
 }: SidebarProps) {
   const { pathname } = useLocation()
-  const { sesion } = useAuth()
 
-const seccionesPermitidas =
-  SECCIONES.map((seccion) => ({
-    ...seccion,
-    items: seccion.items.filter(
-      (item) =>
-        !item.moduleId ||
-        tienePermisoSesion(
-          sesion,
-          item.moduleId,
-        ),
-    ),
-  })).filter(
-    (seccion) => seccion.items.length > 0,
-  )
+  // Temporalmente se muestran todos los módulos
+  // mientras se corrige la sesión y sus permisos.
+  const seccionesPermitidas = SECCIONES
  
   const activo = (to: string) =>
     to === '/dashboard' ? pathname === to : pathname.startsWith(to)
