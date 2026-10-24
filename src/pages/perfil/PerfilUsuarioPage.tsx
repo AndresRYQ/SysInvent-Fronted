@@ -1,4 +1,6 @@
 import {
+  useEffect,
+  useRef,
   useState,
   type FormEvent,
 } from 'react'
@@ -18,7 +20,7 @@ import { useAuth } from '../../hooks/useAuth'
 
 import {
   actualizarPerfilUsuario,
-  obtenerPerfilUsuario,
+  obtenerPerfilUsuarioBackend,
 } from '../../services/perfilUsuarioService'
 
 import type {
@@ -81,14 +83,12 @@ export function PerfilUsuarioPage() {
   } = useAuth()
 
   const [perfil, setPerfil] =
-    useState<UsuarioLogin | null>(
-      () =>
-        sesion
-          ? obtenerPerfilUsuario(
-              sesion.id,
-            )
-          : null,
-    )
+    useState<UsuarioLogin | null>(null)
+
+  const tokenPerfilCargado = useRef<string | null>(null)
+
+  const [cargando, setCargando] =
+    useState(true)
 
   const [formulario, setFormulario] =
     useState<PerfilUsuarioFormData>(
@@ -118,6 +118,46 @@ export function PerfilUsuarioPage() {
 
   const [mensaje, setMensaje] =
     useState<string | null>(null)
+
+  useEffect(() => {
+    if (!sesion) {
+      tokenPerfilCargado.current = null
+      setPerfil(null)
+      setCargando(false)
+      return
+    }
+
+    if (tokenPerfilCargado.current === sesion.token) {
+      return
+    }
+
+    tokenPerfilCargado.current = sesion.token
+
+    const tokenActual = sesion.token
+    setCargando(true)
+    setError(null)
+
+    obtenerPerfilUsuarioBackend()
+      .then((perfilBackend) => {
+        if (tokenPerfilCargado.current !== tokenActual) {
+          return
+        }
+
+        setPerfil(perfilBackend)
+        setFormulario(crearFormulario(perfilBackend))
+      })
+      .catch((errorActual: unknown) => {
+        if (tokenPerfilCargado.current === tokenActual) {
+          setError(obtenerMensajeError(errorActual))
+          setPerfil(null)
+        }
+      })
+      .finally(() => {
+        if (tokenPerfilCargado.current === tokenActual) {
+          setCargando(false)
+        }
+      })
+  }, [sesion])
 
   function cambiarCampo(
     campo: keyof PerfilUsuarioFormData,
@@ -181,6 +221,18 @@ export function PerfilUsuarioPage() {
     }
   }
 
+  if (cargando) {
+    return (
+      <main className="dashboard-shell maestro-page-shell">
+        <div className="container-xl px-0 maestro-page-body">
+          <div className="alert alert-info" role="status">
+            Cargando perfil...
+          </div>
+        </div>
+      </main>
+    )
+  }
+
   if (!sesion || !perfil) {
     return (
       <main className="dashboard-shell maestro-page-shell">
@@ -189,8 +241,8 @@ export function PerfilUsuarioPage() {
             className="alert alert-danger"
             role="alert"
           >
-            No fue posible cargar el perfil
-            del usuario autenticado.
+            {error ??
+              'No fue posible cargar el perfil del usuario autenticado.'}
           </div>
         </div>
       </main>

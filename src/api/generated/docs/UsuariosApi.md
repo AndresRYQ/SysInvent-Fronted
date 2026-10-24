@@ -7,6 +7,7 @@ All URIs are relative to *http://localhost:8080*
 | [**actualizarEstadoUsuario**](UsuariosApi.md#actualizarestadousuario) | **DELETE** /api/usuarios | Actualizar estado del usuario |
 | [**actualizarUsuario**](UsuariosApi.md#actualizarusuariooperation) | **PUT** /api/usuarios | Actualizar usuario |
 | [**listarUsuarios**](UsuariosApi.md#listarusuarios) | **GET** /api/usuarios | Listar usuarios |
+| [**obtenerPerfil**](UsuariosApi.md#obtenerperfil) | **GET** /api/usuarios/perfil | Obtener perfil del usuario autenticado |
 | [**registrarUsuario**](UsuariosApi.md#registrarusuario) | **POST** /api/usuarios | Registrar usuario |
 
 
@@ -220,6 +221,67 @@ example().catch(console.error);
 ### Return type
 
 [**CustomPageUsuarioResponse**](CustomPageUsuarioResponse.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `*/*`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## obtenerPerfil
+
+> UsuarioResponse obtenerPerfil()
+
+Obtener perfil del usuario autenticado
+
+### Example
+
+```ts
+import {
+  Configuration,
+  UsuariosApi,
+} from '';
+import type { ObtenerPerfilRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new UsuariosApi(config);
+
+  try {
+    const data = await api.obtenerPerfil();
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**UsuarioResponse**](UsuarioResponse.md)
 
 ### Authorization
 

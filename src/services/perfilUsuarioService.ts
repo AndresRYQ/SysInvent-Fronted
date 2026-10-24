@@ -10,21 +10,45 @@ import {
   actualizarUsuario,
   obtenerUsuarios,
 } from './usuarioService'
+import { apiFetch } from './api'
 
-export function obtenerPerfilUsuario(
-  usuarioId: string,
-): UsuarioLogin | null {
-  const usuario =
-    obtenerUsuarios().find(
-      (item) =>
-        item.id === usuarioId,
-    )
+interface PerfilUsuarioBackend {
+  usuarioId?: number
+  usuario?: string
+  dni?: string
+  nombres?: string
+  apePaterno?: string
+  apeMaterno?: string
+  nombreCompleto?: string
+  correo?: string
+  rolId?: number
+  nombreRol?: string
+  estado?: boolean
+}
 
-  return usuario
-    ? {
-        ...usuario,
-      }
-    : null
+export async function obtenerPerfilUsuarioBackend(): Promise<UsuarioLogin> {
+  const respuesta = await apiFetch<PerfilUsuarioBackend>(
+    '/api/usuarios/perfil',
+  )
+
+  return {
+    id: String(respuesta.usuarioId ?? ''),
+    usuario: respuesta.usuario ?? '',
+    dni: respuesta.dni ?? '',
+    nombres: respuesta.nombres ?? '',
+    apePaterno: respuesta.apePaterno ?? '',
+    apeMaterno: respuesta.apeMaterno ?? '',
+    nombreCompleto:
+      respuesta.nombreCompleto ??
+      [respuesta.nombres, respuesta.apePaterno, respuesta.apeMaterno]
+        .filter(Boolean)
+        .join(' '),
+    email: respuesta.correo ?? '',
+    contrasena: '',
+    rolId: respuesta.rolId ?? null,
+    rol: respuesta.nombreRol ?? '',
+    estado: respuesta.estado ?? false,
+  }
 }
 
 export function actualizarPerfilUsuario(

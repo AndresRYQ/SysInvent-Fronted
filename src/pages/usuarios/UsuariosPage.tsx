@@ -16,7 +16,7 @@ import {
 } from '../../components/usuarios/TablaUsuarios'
 import { useAuth } from '../../hooks/useAuth'
 import {
-  obtenerRoles,
+  obtenerRolesBackend,
 } from '../../services/rolService'
 import type {
   Rol,
@@ -132,7 +132,7 @@ export function UsuariosPage() {
           1,
           100,
         )
-      const resultadoRoles = obtenerRoles()
+      const resultadoRoles = await obtenerRolesBackend()
 
       setUsuarios(
         resultadoUsuarios.usuarios,

@@ -28,6 +28,11 @@ import {
     UsuarioRequestFromJSON,
     UsuarioRequestToJSON,
 } from '../models/UsuarioRequest';
+import {
+    type UsuarioResponse,
+    UsuarioResponseFromJSON,
+    UsuarioResponseToJSON,
+} from '../models/UsuarioResponse';
 
 export interface ActualizarEstadoUsuarioRequest {
     idUsuario: number;
@@ -245,6 +250,51 @@ export class UsuariosApi extends runtime.BaseAPI {
      */
     async listarUsuarios(requestParameters: ListarUsuariosRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageUsuarioResponse> {
         const response = await this.listarUsuariosRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for obtenerPerfil without sending the request
+     */
+    async obtenerPerfilRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/usuarios/perfil`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Obtener perfil del usuario autenticado
+     */
+    async obtenerPerfilRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UsuarioResponse>> {
+        const requestOptions = await this.obtenerPerfilRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UsuarioResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Obtener perfil del usuario autenticado
+     */
+    async obtenerPerfil(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UsuarioResponse> {
+        const response = await this.obtenerPerfilRaw(initOverrides);
         return await response.value();
     }
 

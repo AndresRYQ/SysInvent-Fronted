@@ -8,10 +8,6 @@ import type {
   UsuarioFormData,
 } from '../types/usuario'
 import {
-  obtenerRoles,
-  sincronizarConteoUsuarios,
-} from './rolService'
-import {
   guardarStorage,
   obtenerStorage,
   STORAGE_KEYS,
@@ -45,8 +41,6 @@ export function obtenerUsuarios():
     )
   }
 
-  sincronizarConteoUsuarios(usuarios)
-
   return copiarUsuarios(usuarios)
 }
 
@@ -58,7 +52,6 @@ function guardarUsuarios(
     usuarios,
   )
 
-  sincronizarConteoUsuarios(usuarios)
 }
 
 function normalizar(
@@ -114,16 +107,6 @@ function validarDatos(
   if (!datos.rol) {
     throw new Error(
       'Selecciona un rol.',
-    )
-  }
-
-  const rolExiste = obtenerRoles().some(
-    (rol) => rol.nombre === datos.rol,
-  )
-
-  if (!rolExiste) {
-    throw new Error(
-      'El rol seleccionado no existe.',
     )
   }
 
