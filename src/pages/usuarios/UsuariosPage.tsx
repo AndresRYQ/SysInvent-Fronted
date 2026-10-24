@@ -1,42 +1,43 @@
 import {
+  useCallback,
+  useEffect,
   useMemo,
   useState,
 } from 'react'
-
 import {
   FiltrosUsuarios,
   type FiltrosUsuariosValores,
 } from '../../components/usuarios/FiltrosUsuarios'
-
 import {
   FormularioUsuario,
 } from '../../components/usuarios/FormularioUsuario'
-
 import {
   TablaUsuarios,
 } from '../../components/usuarios/TablaUsuarios'
-
+import {
+  SnackbarAlert,
+  useSnackbar,
+} from '../../components/common/SnackbarAlert'
 import { useAuth } from '../../hooks/useAuth'
-
 import {
-  obtenerRoles,
+  obtenerRolesBackend,
 } from '../../services/rolService'
-
+import type {
+  Rol,
+} from '../../types/rol'
 import {
-  actualizarUsuario,
-  crearUsuario,
+  actualizarUsuarioBackend,
+  crearUsuarioBackend,
   eliminarUsuario,
   obtenerUsuarios,
+  obtenerUsuariosBackend,
 } from '../../services/usuarioService'
-
 import type {
   UsuarioLogin,
 } from '../../types/auth'
-
 import type {
   UsuarioFormData,
 } from '../../types/usuario'
-
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
@@ -93,13 +94,10 @@ export function UsuariosPage() {
   const { sesion } = useAuth()
 
   const [usuarios, setUsuarios] =
-    useState<UsuarioLogin[]>(
-      () => obtenerUsuarios(),
-    )
+  useState<UsuarioLogin[]>([])
 
-  const [roles] = useState(
-    () => obtenerRoles(),
-  )
+  const [roles, setRoles] =
+  useState<Rol[]>([])
 
   const [filtros, setFiltros] =
     useState(FILTROS_INICIALES)
@@ -121,10 +119,50 @@ export function UsuariosPage() {
     setUsuarioEnEdicion,
   ] = useState<UsuarioLogin | null>(null)
 
-  const [mensaje, setMensaje] = useState<{
-    tipo: 'success' | 'danger'
-    texto: string
-  } | null>(null)
+  const {
+    mensaje,
+    abierta,
+    mostrarAlerta,
+    cerrarAlerta,
+    limpiarAlerta,
+  } = useSnackbar()
+
+  const [cargando, setCargando] = useState(true)
+
+  const cargarUsuarios =
+  useCallback(async (): Promise<void> => {
+    setCargando(true)
+
+    try {
+      const resultadoUsuarios =
+        await obtenerUsuariosBackend(
+          '',
+          '',
+          undefined,
+          1,
+          100,
+        )
+      const resultadoRoles = await obtenerRolesBackend()
+
+      setUsuarios(
+        resultadoUsuarios.usuarios,
+      )
+
+      setRoles(resultadoRoles)
+    } catch (error) {
+      mostrarAlerta(
+        'error',
+          error instanceof Error
+            ? error.message
+            : 'No se pudieron cargar los usuarios.',
+      )
+    } finally {
+      setCargando(false)
+    }
+  }, [mostrarAlerta])
+  useEffect(() => {
+    void cargarUsuarios()
+  }, [cargarUsuarios])
 
   const usuariosFiltrados = useMemo(
     () =>
@@ -162,43 +200,42 @@ export function UsuariosPage() {
     pageSize,
   ])
 
-  const manejarGuardado = (
-    datos: UsuarioFormData,
-  ): string | null => {
-    try {
-      if (usuarioEnEdicion) {
-        actualizarUsuario(
-          usuarioEnEdicion.id,
-          datos,
-        )
+ const manejarGuardado = async (
+  datos: UsuarioFormData,
+): Promise<string | null> => {
+  try {
+    const esEdicion =
+      usuarioEnEdicion !== null
 
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Usuario actualizado correctamente.',
-        })
-      } else {
-        crearUsuario(datos)
-
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Usuario registrado correctamente.',
-        })
-      }
-
-      setUsuarios(obtenerUsuarios())
-      setUsuarioEnEdicion(null)
-      setModalAbierto(false)
-      setPage(1)
-
-      return null
-    } catch (error) {
-      return error instanceof Error
-        ? error.message
-        : 'No se pudo guardar el usuario.'
+    if (usuarioEnEdicion) {
+      await actualizarUsuarioBackend(
+        usuarioEnEdicion.id,
+        datos,
+      )
+    } else {
+      await crearUsuarioBackend(datos)
     }
+
+    await cargarUsuarios()
+
+    mostrarAlerta(
+      'success',
+      esEdicion
+        ? 'Usuario actualizado correctamente.'
+        : 'Usuario registrado. Se enviaron las credenciales al correo indicado.',
+    )
+
+    setUsuarioEnEdicion(null)
+    setModalAbierto(false)
+    setPage(1)
+
+    return null
+  } catch (error) {
+    return error instanceof Error
+      ? error.message
+      : 'No se pudo guardar el usuario.'
   }
+}
 
   const manejarEliminacion = (
     usuario: UsuarioLogin,
@@ -220,25 +257,27 @@ export function UsuariosPage() {
       setUsuarios(obtenerUsuarios())
       setPage(1)
 
-      setMensaje({
-        tipo: 'success',
-        texto:
-          'Usuario eliminado correctamente.',
-      })
+      mostrarAlerta('success', 'Usuario eliminado correctamente.')
     } catch (error) {
-      setMensaje({
-        tipo: 'danger',
-        texto:
+      mostrarAlerta(
+        'error',
           error instanceof Error
             ? error.message
             : 'No se pudo eliminar el usuario.',
-      })
+      )
     }
   }
 
   return (
     <>
       <main className="dashboard-shell maestro-page-shell">
+        {cargando && (
+          <div className="maestro-fullscreen-loader" role="status" aria-live="polite">
+            <div className="spinner-border text-success" aria-hidden="true" />
+            <span>Cargando usuarios...</span>
+          </div>
+        )}
+
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
@@ -250,15 +289,6 @@ export function UsuariosPage() {
               </p>
             </div>
           </section>
-
-          {mensaje && (
-            <div
-              className={`alert alert-${mensaje.tipo} mt-3 mb-0`}
-              role="status"
-            >
-              {mensaje.texto}
-            </div>
-          )}
 
           <div className="maestro-panel">
             <FiltrosUsuarios
@@ -293,12 +323,12 @@ export function UsuariosPage() {
               onAgregar={() => {
                 setUsuarioEnEdicion(null)
                 setModalAbierto(true)
-                setMensaje(null)
+                limpiarAlerta()
               }}
               onEditar={(usuario) => {
                 setUsuarioEnEdicion(usuario)
                 setModalAbierto(true)
-                setMensaje(null)
+                limpiarAlerta()
               }}
               onEliminar={manejarEliminacion}
               onPageChange={setPage}
@@ -312,6 +342,13 @@ export function UsuariosPage() {
           </div>
         </div>
       </main>
+
+      <SnackbarAlert
+        mensaje={mensaje}
+        abierta={abierta}
+        onClose={cerrarAlerta}
+        onExited={limpiarAlerta}
+      />
 
       {modalAbierto && (
         <FormularioUsuario

@@ -1,5 +1,7 @@
 import {
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react'
 
@@ -22,10 +24,10 @@ import {
 } from '../../components/roles/TablaRoles'
 
 import {
-  actualizarRol,
-  crearRol,
-  eliminarRol,
-  obtenerRoles,
+  actualizarRolBackend,
+  crearRolBackend,
+  eliminarRolBackend,
+  obtenerRolesBackend,
 } from '../../services/rolService'
 
 import type {
@@ -72,7 +74,9 @@ function filtrarRoles(
 
 export function RolesPage() {
   const [roles, setRoles] =
-    useState<Rol[]>(() => obtenerRoles())
+    useState<Rol[]>([])
+
+  const cargaInicialRealizada = useRef(false)
 
   const [filtros, setFiltros] =
     useState(FILTROS_INICIALES)
@@ -100,6 +104,26 @@ export function RolesPage() {
     texto: string
   } | null>(null)
   const [alertaAbierta, setAlertaAbierta] = useState(false)
+
+  useEffect(() => {
+    if (cargaInicialRealizada.current) {
+      return
+    }
+
+    cargaInicialRealizada.current = true
+
+    void obtenerRolesBackend()
+      .then(setRoles)
+      .catch((error: unknown) => {
+        setMensaje({
+          tipo: 'error',
+          texto: error instanceof Error
+            ? error.message
+            : 'No se pudieron cargar los roles.',
+        })
+        setAlertaAbierta(true)
+      })
+  }, [])
 
   const rolesFiltrados = useMemo(
     () =>
@@ -150,12 +174,12 @@ export function RolesPage() {
     setMensaje(null)
   }
 
-  const manejarGuardado = (
+  const manejarGuardado = async (
     datos: RolFormData,
-  ): string | null => {
+  ): Promise<string | null> => {
     try {
       if (rolEnEdicion) {
-        actualizarRol(
+        await actualizarRolBackend(
           rolEnEdicion.id,
           datos,
         )
@@ -167,7 +191,7 @@ export function RolesPage() {
         setAlertaAbierta(true)
 
       } else {
-        crearRol(datos)
+        await crearRolBackend(datos)
 
         setMensaje({
           tipo: 'success',
@@ -176,7 +200,7 @@ export function RolesPage() {
         setAlertaAbierta(true)
       }
 
-      setRoles(obtenerRoles())
+      setRoles(await obtenerRolesBackend())
       setModalAbierto(false)
       setRolEnEdicion(null)
       setPage(1)
@@ -195,12 +219,12 @@ export function RolesPage() {
     setRolAEliminar(rol)
   }
 
-  const confirmarEliminacion = () => {
+  const confirmarEliminacion = async () => {
     if (!rolAEliminar) return
 
     try {
-      eliminarRol(rolAEliminar.id)
-      setRoles(obtenerRoles())
+      await eliminarRolBackend(rolAEliminar.id)
+      setRoles(await obtenerRolesBackend())
       setPage(1)
       setRolAEliminar(null)
       setMensaje({

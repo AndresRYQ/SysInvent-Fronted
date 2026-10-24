@@ -1,11 +1,17 @@
 export interface UsuarioLogin {
   id: string
+  codigo?: string
   usuario: string
   contrasena: string
   email: string
   nombreCompleto: string
   rol: string
   estado: boolean
+  dni?: string
+  nombres?: string
+  apePaterno?: string
+  apeMaterno?: string
+  rolId?: number | null
 }
 
 export interface CredencialesLogin {
@@ -17,7 +23,10 @@ export interface SesionUsuario {
   id: string
   usuario: string
   nombreCompleto: string
+  email: string
+  rolId: number | null
   rol: string
+  modulos: string[]
   token: string
   fechaInicio: string
   fechaExpiracion: string

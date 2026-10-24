@@ -51,10 +51,10 @@ export interface ActualizarUsuarioRequest {
     email: string;
     /**
      * 
-     * @type {Array<number>}
+     * @type {number}
      * @memberof ActualizarUsuarioRequest
      */
-    rolesIds: Array<number>;
+    rolId: number;
 }
 
 /**
@@ -66,7 +66,7 @@ export function instanceOfActualizarUsuarioRequest(value: object): value is Actu
     if (!('apePaterno' in value) || value['apePaterno'] === undefined) return false;
     if (!('apeMaterno' in value) || value['apeMaterno'] === undefined) return false;
     if (!('email' in value) || value['email'] === undefined) return false;
-    if (!('rolesIds' in value) || value['rolesIds'] === undefined) return false;
+    if (!('rolId' in value) || value['rolId'] === undefined) return false;
     return true;
 }
 
@@ -85,7 +85,7 @@ export function ActualizarUsuarioRequestFromJSONTyped(json: any, ignoreDiscrimin
         'apePaterno': json['apePaterno'],
         'apeMaterno': json['apeMaterno'],
         'email': json['email'],
-        'rolesIds': json['rolesIds'],
+        'rolId': json['rolId'],
     };
 }
 
@@ -105,7 +105,7 @@ export function ActualizarUsuarioRequestToJSONTyped(value?: ActualizarUsuarioReq
         'apePaterno': value['apePaterno'],
         'apeMaterno': value['apeMaterno'],
         'email': value['email'],
-        'rolesIds': value['rolesIds'],
+        'rolId': value['rolId'],
     };
 }
 

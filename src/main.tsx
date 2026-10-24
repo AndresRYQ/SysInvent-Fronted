@@ -8,6 +8,8 @@ import App from './App.tsx'
 
 import { registerLocale, setDefaultLocale } from 'react-datepicker'
 
+localStorage.removeItem('agrihusac_roles')
+
 registerLocale('es', es)
 setDefaultLocale('es')
 

@@ -14,15 +14,30 @@
 
 import * as runtime from '../runtime';
 import {
+    type ActualizarPerfilRequest,
+    ActualizarPerfilRequestFromJSON,
+    ActualizarPerfilRequestToJSON,
+} from '../models/ActualizarPerfilRequest';
+import {
     type ActualizarUsuarioRequest,
     ActualizarUsuarioRequestFromJSON,
     ActualizarUsuarioRequestToJSON,
 } from '../models/ActualizarUsuarioRequest';
 import {
+    type CambiarContrasenaRequest,
+    CambiarContrasenaRequestFromJSON,
+    CambiarContrasenaRequestToJSON,
+} from '../models/CambiarContrasenaRequest';
+import {
     type CustomPageUsuarioResponse,
     CustomPageUsuarioResponseFromJSON,
     CustomPageUsuarioResponseToJSON,
 } from '../models/CustomPageUsuarioResponse';
+import {
+    type PerfilUsuarioResponse,
+    PerfilUsuarioResponseFromJSON,
+    PerfilUsuarioResponseToJSON,
+} from '../models/PerfilUsuarioResponse';
 import {
     type UsuarioRequest,
     UsuarioRequestFromJSON,
@@ -34,8 +49,16 @@ export interface ActualizarEstadoUsuarioRequest {
     activo: boolean;
 }
 
+export interface ActualizarPerfilOperationRequest {
+    actualizarPerfilRequest: ActualizarPerfilRequest;
+}
+
 export interface ActualizarUsuarioOperationRequest {
     actualizarUsuarioRequest: ActualizarUsuarioRequest;
+}
+
+export interface CambiarContrasenaOperationRequest {
+    cambiarContrasenaRequest: CambiarContrasenaRequest;
 }
 
 export interface ListarUsuariosRequest {
@@ -125,6 +148,61 @@ export class UsuariosApi extends runtime.BaseAPI {
     }
 
     /**
+     * Creates request options for actualizarPerfil without sending the request
+     */
+    async actualizarPerfilRequestOpts(requestParameters: ActualizarPerfilOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['actualizarPerfilRequest'] == null) {
+            throw new runtime.RequiredError(
+                'actualizarPerfilRequest',
+                'Required parameter "actualizarPerfilRequest" was null or undefined when calling actualizarPerfil().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/usuarios/perfil`;
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ActualizarPerfilRequestToJSON(requestParameters['actualizarPerfilRequest']),
+        };
+    }
+
+    /**
+     * Actualizar perfil del usuario autenticado
+     */
+    async actualizarPerfilRaw(requestParameters: ActualizarPerfilOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        const requestOptions = await this.actualizarPerfilRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * Actualizar perfil del usuario autenticado
+     */
+    async actualizarPerfil(requestParameters: ActualizarPerfilOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.actualizarPerfilRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Creates request options for actualizarUsuario without sending the request
      */
     async actualizarUsuarioRequestOpts(requestParameters: ActualizarUsuarioOperationRequest): Promise<runtime.RequestOpts> {
@@ -178,6 +256,61 @@ export class UsuariosApi extends runtime.BaseAPI {
      */
     async actualizarUsuario(requestParameters: ActualizarUsuarioOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.actualizarUsuarioRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for cambiarContrasena without sending the request
+     */
+    async cambiarContrasenaRequestOpts(requestParameters: CambiarContrasenaOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['cambiarContrasenaRequest'] == null) {
+            throw new runtime.RequiredError(
+                'cambiarContrasenaRequest',
+                'Required parameter "cambiarContrasenaRequest" was null or undefined when calling cambiarContrasena().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/usuarios/perfil/contrasena`;
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CambiarContrasenaRequestToJSON(requestParameters['cambiarContrasenaRequest']),
+        };
+    }
+
+    /**
+     * Cambiar contrasena del usuario autenticado
+     */
+    async cambiarContrasenaRaw(requestParameters: CambiarContrasenaOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        const requestOptions = await this.cambiarContrasenaRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * Cambiar contrasena del usuario autenticado
+     */
+    async cambiarContrasena(requestParameters: CambiarContrasenaOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.cambiarContrasenaRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -245,6 +378,51 @@ export class UsuariosApi extends runtime.BaseAPI {
      */
     async listarUsuarios(requestParameters: ListarUsuariosRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CustomPageUsuarioResponse> {
         const response = await this.listarUsuariosRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for obtenerPerfil without sending the request
+     */
+    async obtenerPerfilRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/usuarios/perfil`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Obtener perfil del usuario autenticado
+     */
+    async obtenerPerfilRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PerfilUsuarioResponse>> {
+        const requestOptions = await this.obtenerPerfilRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PerfilUsuarioResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Obtener perfil del usuario autenticado
+     */
+    async obtenerPerfil(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PerfilUsuarioResponse> {
+        const response = await this.obtenerPerfilRaw(initOverrides);
         return await response.value();
     }
 

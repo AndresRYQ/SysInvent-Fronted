@@ -19,10 +19,18 @@ interface JwtPayload {
   sub?: string
   usuario?: string
   username?: string
+  email?: string
   nombreCompleto?: string
   nombre?: string
   rol?: string
   role?: string
+  rolId?: number
+  nombreRol?: string
+  modulos?: Array<{
+    moduloId?: number
+    nombre?: string
+    ruta?: string
+  }>
   exp?: number
   iat?: number
 }
@@ -74,7 +82,15 @@ function crearSesionDesdeToken(token: string): SesionUsuario {
     payload?.usuario ?? payload?.username ?? payload?.sub ?? 'usuario'
   const nombreCompleto =
     payload?.nombreCompleto ?? payload?.nombre ?? usuario
-  const rol = payload?.rol ?? payload?.role ?? 'Administrador'
+  const rol =
+    payload?.nombreRol ??
+    payload?.rol ??
+    payload?.role ??
+    'Usuario'
+  const modulos =
+    payload?.modulos
+      ?.map((modulo) => modulo.ruta)
+      .filter((ruta): ruta is string => Boolean(ruta)) ?? []
   const fechaInicio = payload?.iat
     ? new Date(payload.iat * 1000).toISOString()
     : new Date().toISOString()
@@ -85,8 +101,11 @@ function crearSesionDesdeToken(token: string): SesionUsuario {
   return {
     id: usuario,
     usuario,
+    email: payload?.email ?? '',
     nombreCompleto,
+    rolId: payload?.rolId ?? null,
     rol,
+    modulos,
     token,
     fechaInicio,
     fechaExpiracion,
@@ -160,7 +179,17 @@ export const iniciarSesion = (credenciales: CredencialesLogin) =>
 export function obtenerSesion(): SesionUsuario | null {
   const token = getToken()
 
-  return token ? crearSesionDesdeToken(token) : null
+  if (!token) {
+    return null
+  }
+
+  const payload = obtenerPayloadJwt(token)
+  if (!payload || (payload.exp && payload.exp * 1000 <= Date.now())) {
+    logout()
+    return null
+  }
+
+  return crearSesionDesdeToken(token)
 }
 
 export function cerrarSesion(): void {

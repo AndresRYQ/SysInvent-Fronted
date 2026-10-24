@@ -5,8 +5,11 @@ All URIs are relative to *http://localhost:8080*
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
 | [**actualizarEstadoUsuario**](UsuariosApi.md#actualizarestadousuario) | **DELETE** /api/usuarios | Actualizar estado del usuario |
+| [**actualizarPerfil**](UsuariosApi.md#actualizarperfiloperation) | **PUT** /api/usuarios/perfil | Actualizar perfil del usuario autenticado |
 | [**actualizarUsuario**](UsuariosApi.md#actualizarusuariooperation) | **PUT** /api/usuarios | Actualizar usuario |
+| [**cambiarContrasena**](UsuariosApi.md#cambiarcontrasenaoperation) | **PUT** /api/usuarios/perfil/contrasena | Cambiar contrasena del usuario autenticado |
 | [**listarUsuarios**](UsuariosApi.md#listarusuarios) | **GET** /api/usuarios | Listar usuarios |
+| [**obtenerPerfil**](UsuariosApi.md#obtenerperfil) | **GET** /api/usuarios/perfil | Obtener perfil del usuario autenticado |
 | [**registrarUsuario**](UsuariosApi.md#registrarusuario) | **POST** /api/usuarios | Registrar usuario |
 
 
@@ -85,6 +88,75 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
+## actualizarPerfil
+
+> object actualizarPerfil(actualizarPerfilRequest)
+
+Actualizar perfil del usuario autenticado
+
+### Example
+
+```ts
+import {
+  Configuration,
+  UsuariosApi,
+} from '';
+import type { ActualizarPerfilOperationRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new UsuariosApi(config);
+
+  const body = {
+    // ActualizarPerfilRequest
+    actualizarPerfilRequest: ...,
+  } satisfies ActualizarPerfilOperationRequest;
+
+  try {
+    const data = await api.actualizarPerfil(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **actualizarPerfilRequest** | [ActualizarPerfilRequest](ActualizarPerfilRequest.md) |  | |
+
+### Return type
+
+**object**
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `*/*`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
 ## actualizarUsuario
 
 > object actualizarUsuario(actualizarUsuarioRequest)
@@ -133,6 +205,75 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **actualizarUsuarioRequest** | [ActualizarUsuarioRequest](ActualizarUsuarioRequest.md) |  | |
+
+### Return type
+
+**object**
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `*/*`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## cambiarContrasena
+
+> object cambiarContrasena(cambiarContrasenaRequest)
+
+Cambiar contrasena del usuario autenticado
+
+### Example
+
+```ts
+import {
+  Configuration,
+  UsuariosApi,
+} from '';
+import type { CambiarContrasenaOperationRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new UsuariosApi(config);
+
+  const body = {
+    // CambiarContrasenaRequest
+    cambiarContrasenaRequest: ...,
+  } satisfies CambiarContrasenaOperationRequest;
+
+  try {
+    const data = await api.cambiarContrasena(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **cambiarContrasenaRequest** | [CambiarContrasenaRequest](CambiarContrasenaRequest.md) |  | |
 
 ### Return type
 
@@ -220,6 +361,67 @@ example().catch(console.error);
 ### Return type
 
 [**CustomPageUsuarioResponse**](CustomPageUsuarioResponse.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `*/*`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## obtenerPerfil
+
+> PerfilUsuarioResponse obtenerPerfil()
+
+Obtener perfil del usuario autenticado
+
+### Example
+
+```ts
+import {
+  Configuration,
+  UsuariosApi,
+} from '';
+import type { ObtenerPerfilRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new UsuariosApi(config);
+
+  try {
+    const data = await api.obtenerPerfil();
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**PerfilUsuarioResponse**](PerfilUsuarioResponse.md)
 
 ### Authorization
 

@@ -9,6 +9,9 @@ Name | Type
 `rolId` | number
 `nombre` | string
 `descripcion` | string
+`activo` | boolean
+`usuarios` | number
+`modulos` | Array&lt;number&gt;
 
 ## Example
 
@@ -20,6 +23,9 @@ const example = {
   "rolId": null,
   "nombre": null,
   "descripcion": null,
+  "activo": null,
+  "usuarios": null,
+  "modulos": null,
 } satisfies RolResponse
 
 console.log(example)

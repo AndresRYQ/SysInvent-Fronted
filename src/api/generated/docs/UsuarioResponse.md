@@ -7,9 +7,16 @@
 Name | Type
 ------------ | -------------
 `usuarioId` | number
+`codigo` | string
 `usuario` | string
+`dni` | string
+`nombres` | string
+`apePaterno` | string
+`apeMaterno` | string
 `nombreCompleto` | string
 `correo` | string
+`rolId` | number
+`nombreRol` | string
 `descripcionRol` | string
 `estado` | boolean
 `estadoDsc` | string
@@ -22,9 +29,16 @@ import type { UsuarioResponse } from ''
 // TODO: Update the object below with actual values
 const example = {
   "usuarioId": null,
+  "codigo": null,
   "usuario": null,
+  "dni": null,
+  "nombres": null,
+  "apePaterno": null,
+  "apeMaterno": null,
   "nombreCompleto": null,
   "correo": null,
+  "rolId": null,
+  "nombreRol": null,
   "descripcionRol": null,
   "estado": null,
   "estadoDsc": null,

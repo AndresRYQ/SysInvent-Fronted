@@ -1,6 +1,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react'
 import { ShieldCheck } from 'lucide-react'
@@ -11,7 +12,7 @@ import {
   type FiltrosBitacoraValores,
 } from '../../components/bitacora/FiltrosBitacora'
 import { TablaBitacora } from '../../components/bitacora/TablaBitacora'
-import { obtenerRegistrosBitacora } from '../../services/bitacoraService'
+import { listarBitacoraBackend } from '../../services/bitacoraService'
 import type { RegistroBitacora } from '../../types/bitacora'
 
 import '../../styles/DashboardPage.css'
@@ -102,9 +103,11 @@ function filtrarRegistros(
 }
 
 export function BitacoraPage() {
-  const [registros] = useState<
-    RegistroBitacora[]
-  >(() => obtenerRegistrosBitacora())
+  const [registros, setRegistros] = useState<RegistroBitacora[]>([])
+  const [totalItems, setTotalItems] = useState(0)
+  const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const consultaCargada = useRef<string | null>(null)
 
   const [filtros, setFiltros] =
     useState<FiltrosBitacoraValores>({
@@ -121,6 +124,42 @@ export function BitacoraPage() {
 
   const [registroSeleccionado, setRegistroSeleccionado] =
     useState<RegistroBitacora | null>(null)
+
+  useEffect(() => {
+    const claveConsulta = JSON.stringify({
+      filtros: filtrosAplicados,
+      page,
+      pageSize,
+    })
+
+    if (consultaCargada.current === claveConsulta) {
+      return
+    }
+
+    consultaCargada.current = claveConsulta
+    setCargando(true)
+    setError(null)
+
+    listarBitacoraBackend({
+      ...filtrosAplicados,
+      pagina: page,
+      tamPagina: pageSize,
+    })
+      .then((resultado) => {
+        setRegistros(resultado.datos)
+        setTotalItems(resultado.total)
+      })
+      .catch((errorActual: unknown) => {
+        setError(
+          errorActual instanceof Error
+            ? errorActual.message
+            : 'No se pudo cargar la bitácora.',
+        )
+        setRegistros([])
+        setTotalItems(0)
+      })
+      .finally(() => setCargando(false))
+  }, [filtrosAplicados, page, pageSize])
 
   const modulos = useMemo(() => {
     return Array.from(
@@ -139,41 +178,7 @@ export function BitacoraPage() {
     )
   }, [registros])
 
-  const registrosFiltrados = useMemo(
-    () =>
-      filtrarRegistros(
-        registros,
-        filtrosAplicados,
-      ),
-    [registros, filtrosAplicados],
-  )
-
-  const totalItems = registrosFiltrados.length
-
-  const registrosPaginados = useMemo(() => {
-    const indiceInicial =
-      (page - 1) * pageSize
-
-    return registrosFiltrados.slice(
-      indiceInicial,
-      indiceInicial + pageSize,
-    )
-  }, [
-    registrosFiltrados,
-    page,
-    pageSize,
-  ])
-
-  useEffect(() => {
-    const totalPaginas = Math.max(
-      1,
-      Math.ceil(totalItems / pageSize),
-    )
-
-    if (page > totalPaginas) {
-      setPage(totalPaginas)
-    }
-  }, [page, pageSize, totalItems])
+  const registrosPaginados = registros
 
   return (
     <>
@@ -205,6 +210,18 @@ export function BitacoraPage() {
           </div>
 
           <div className="maestro-panel">
+            {cargando && (
+              <div className="alert alert-info" role="status">
+                Cargando bitácora...
+              </div>
+            )}
+
+            {error && (
+              <div className="alert alert-danger" role="alert">
+                {error}
+              </div>
+            )}
+
             <FiltrosBitacora
               valores={filtros}
               modulos={modulos}
