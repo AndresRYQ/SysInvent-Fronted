@@ -8,6 +8,7 @@ import { actualizarTipoDocumento, crearTipoDocumento, eliminarTipoDocumento, lis
 import type { TipoDocumento, TipoDocumentoFormData } from '../../types/tipoDocumento'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 
 const INICIALES: FiltrosTiposDocumentoValores = { nombre: '', estado: '' }
 
@@ -50,6 +51,7 @@ export function TiposDocumentoPage() {
       })
       .catch((e) => {
         if (!activo) return
+        setTotalItems(0)
         mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar los tipos de documento.')
       })
     return () => { activo = false }
@@ -110,6 +112,7 @@ export function TiposDocumentoPage() {
   return (
     <div className="tipos-documento-page">
       <main className="dashboard-shell maestro-page-shell">
+        <PageLoadingOverlay visible={totalItems < 0} mensaje="Cargando tipos de documento..." />
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">

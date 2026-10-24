@@ -35,6 +35,7 @@ import { listarIngresosAlmacen } from '../../services/ingresoAlmacenService'
 import { obtenerProveedores } from '../../services/proveedorService'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 
 interface FiltrosIngresos {
   busqueda: string
@@ -128,7 +129,7 @@ export function IngresosAlmacenPage() {
 
   const [ingresos, setIngresos] = useState<Awaited<ReturnType<typeof listarIngresosAlmacen>>['datos']>([])
   const [totalItems, setTotalItems] = useState(0)
-  const [cargando, setCargando] = useState(false)
+  const [cargando, setCargando] = useState(true)
 
   const [filtros, setFiltros] =
     useState<FiltrosIngresos>(
@@ -231,6 +232,7 @@ export function IngresosAlmacenPage() {
   return (
     <>
       <main className="dashboard-shell maestro-page-shell">
+        <PageLoadingOverlay visible={cargando} mensaje="Cargando ingresos de almacén..." />
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">

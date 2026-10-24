@@ -8,6 +8,7 @@ import { actualizarParteEquipo, crearParteEquipo, eliminarParteEquipo, listarPar
 import type { ParteEquipo, ParteEquipoFormData } from '../../types/parteEquipo'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 
 const FILTROS_INICIALES: FiltrosPartesEquipoValores = { busqueda: '', estado: '' }
 
@@ -46,6 +47,7 @@ export function PartesEquipoPage() {
       })
       .catch((e) => {
         if (!activo) return
+        setTotalItems(0)
         mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar las partes de equipo.')
       })
     return () => { activo = false }
@@ -96,6 +98,7 @@ export function PartesEquipoPage() {
   return (
     <div className="partes-equipo-page">
       <main className="dashboard-shell maestro-page-shell">
+        <PageLoadingOverlay visible={totalItems < 0} mensaje="Cargando partes de equipo..." />
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar"><div className="maestro-topbar__copy"><h1>Partes de equipo</h1><p>Administración de partes y componentes utilizados por los equipos del almacén.</p></div></section>
           <div className="maestro-panel"><FiltrosPartesEquipo valores={filtros} onChange={(campo, valor) => setFiltros((actual) => ({ ...actual, [campo]: valor }))} onBuscar={() => { setAplicados({ ...filtros }); setPage(1) }} onLimpiar={() => { setFiltros(FILTROS_INICIALES); setAplicados(FILTROS_INICIALES); setPage(1) }} /></div>

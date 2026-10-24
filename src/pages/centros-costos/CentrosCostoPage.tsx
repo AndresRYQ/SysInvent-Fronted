@@ -8,6 +8,7 @@ import { actualizarCentroCosto, crearCentroCosto, eliminarCentroCosto, listarCen
 import type { CentroCosto, CentroCostoFormData } from '../../types/centroCosto'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 
 const FILTROS_INICIALES: FiltrosCentrosCostoValores = { nombre: '', estado: '' }
 
@@ -46,6 +47,7 @@ export function CentrosCostoPage() {
       })
       .catch((e) => {
         if (!activo) return
+        setTotalItems(0)
         mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar los centros de costo.')
       })
     return () => { activo = false }
@@ -100,6 +102,7 @@ export function CentrosCostoPage() {
   return (
     <div className="centro-costo-page">
       <main className="dashboard-shell maestro-page-shell">
+        <PageLoadingOverlay visible={totalItems < 0} mensaje="Cargando centros de costo..." />
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar"><div className="maestro-topbar__copy"><h1>Centros de costo</h1><p>Administración de áreas responsables del consumo de materiales.</p></div></section>
           <div className="maestro-panel"><FiltrosCentrosCosto valores={filtros} onChange={(campo, valor) => setFiltros((actual) => ({ ...actual, [campo]: valor }))} onBuscar={() => { setAplicados({ ...filtros }); setPage(1) }} onLimpiar={() => { setFiltros(FILTROS_INICIALES); setAplicados(FILTROS_INICIALES); setPage(1) }} /></div>
