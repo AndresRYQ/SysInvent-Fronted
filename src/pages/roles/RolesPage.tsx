@@ -1,36 +1,31 @@
 import {
-  useCallback,
-  useEffect,
   useMemo,
   useState,
 } from 'react'
-
-import Alert from '@mui/material/Alert'
-import Snackbar from '@mui/material/Snackbar'
-import {
-  CheckCircle2,
-  XCircle,
-} from 'lucide-react'
 
 import {
   FiltrosRoles,
   type FiltrosRolesValores,
 } from '../../components/roles/FiltrosRoles'
+import Alert from '@mui/material/Alert'
+import Snackbar from '@mui/material/Snackbar'
+import { CheckCircle2, XCircle } from 'lucide-react'
+
 import {
   FormularioRol,
 } from '../../components/roles/FormularioRol'
-import {
-  RolDeleteModal,
-} from '../../components/roles/RolDeleteModal'
+
+import { RolDeleteModal } from '../../components/roles/RolDeleteModal'
+
 import {
   TablaRoles,
 } from '../../components/roles/TablaRoles'
 
 import {
-  actualizarRolBackend,
-  crearRolBackend,
-  desactivarRolBackend,
-  obtenerRolesBackend,
+  actualizarRol,
+  crearRol,
+  eliminarRol,
+  obtenerRoles,
 } from '../../services/rolService'
 
 import type {
@@ -52,9 +47,7 @@ function filtrarRoles(
   filtros: FiltrosRolesValores,
 ): Rol[] {
   const termino =
-    filtros.busqueda
-      .trim()
-      .toLowerCase()
+    filtros.busqueda.trim().toLowerCase()
 
   return roles.filter((rol) => {
     const coincideTexto =
@@ -68,28 +61,18 @@ function filtrarRoles(
 
     const coincideEstado =
       !filtros.estado ||
-      (
-        filtros.estado === 'activo' &&
-        rol.estado
-      ) ||
-      (
-        filtros.estado === 'inactivo' &&
-        !rol.estado
-      )
+      (filtros.estado === 'activo' &&
+        rol.estado) ||
+      (filtros.estado === 'inactivo' &&
+        !rol.estado)
 
-    return (
-      coincideTexto &&
-      coincideEstado
-    )
+    return coincideTexto && coincideEstado
   })
 }
 
 export function RolesPage() {
   const [roles, setRoles] =
-    useState<Rol[]>([])
-
-  const [cargando, setCargando] =
-    useState(true)
+    useState<Rol[]>(() => obtenerRoles())
 
   const [filtros, setFiltros] =
     useState(FILTROS_INICIALES)
@@ -99,115 +82,59 @@ export function RolesPage() {
     setFiltrosAplicados,
   ] = useState(FILTROS_INICIALES)
 
-  const [page, setPage] =
-    useState(1)
-
+  const [page, setPage] = useState(1)
   const [pageSize, setPageSize] =
     useState(10)
 
-  const [
-    modalAbierto,
-    setModalAbierto,
-  ] = useState(false)
+  const [modalAbierto, setModalAbierto] =
+    useState(false)
 
-  const [
-    rolEnEdicion,
-    setRolEnEdicion,
-  ] = useState<Rol | null>(null)
+  const [rolEnEdicion, setRolEnEdicion] =
+    useState<Rol | null>(null)
 
-  const [
-    rolAEliminar,
-    setRolAEliminar,
-  ] = useState<Rol | null>(null)
+  const [rolAEliminar, setRolAEliminar] =
+    useState<Rol | null>(null)
 
-  const [mensaje, setMensaje] =
-    useState<{
-      tipo: 'success' | 'error'
-      texto: string
-    } | null>(null)
+  const [mensaje, setMensaje] = useState<{
+    tipo: 'success' | 'error'
+    texto: string
+  } | null>(null)
+  const [alertaAbierta, setAlertaAbierta] = useState(false)
 
-  const [
-    alertaAbierta,
-    setAlertaAbierta,
-  ] = useState(false)
-
-  const cargarRoles =
-    useCallback(async (): Promise<void> => {
-      setCargando(true)
-
-      try {
-        const resultado =
-          await obtenerRolesBackend(
-            '',
-            1,
-            100,
-          )
-
-        setRoles(resultado.roles)
-      } catch (error) {
-        setMensaje({
-          tipo: 'error',
-          texto:
-            error instanceof Error
-              ? error.message
-              : 'No se pudieron cargar los roles.',
-        })
-
-        setAlertaAbierta(true)
-        throw error
-      } finally {
-        setCargando(false)
-      }
-    }, [])
-
-  useEffect(() => {
-    void cargarRoles().catch(
-      () => undefined,
-    )
-  }, [cargarRoles])
-
-  const rolesFiltrados =
-    useMemo(
-      () =>
-        filtrarRoles(
-          roles,
-          filtrosAplicados,
-        ),
-      [
+  const rolesFiltrados = useMemo(
+    () =>
+      filtrarRoles(
         roles,
         filtrosAplicados,
-      ],
-    )
-
-  const totalItems =
-    rolesFiltrados.length
-
-  const totalPages =
-    Math.max(
-      1,
-      Math.ceil(
-        totalItems / pageSize,
       ),
+    [roles, filtrosAplicados],
+  )
+
+  const totalItems = rolesFiltrados.length
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalItems / pageSize),
+  )
+
+  const paginaActual = Math.min(
+    page,
+    totalPages,
+  )
+
+  const rolesPaginados = useMemo(() => {
+    const inicio =
+      (paginaActual - 1) * pageSize
+
+    return rolesFiltrados.slice(
+      inicio,
+      inicio + pageSize,
     )
-
-  const paginaActual =
-    Math.min(page, totalPages)
-
-  const rolesPaginados =
-    useMemo(() => {
-      const inicio =
-        (paginaActual - 1) *
-        pageSize
-
-      return rolesFiltrados.slice(
-        inicio,
-        inicio + pageSize,
-      )
-    }, [
-      rolesFiltrados,
-      paginaActual,
-      pageSize,
-    ])
+  }, [
+    rolesFiltrados,
+    paginaActual,
+    pageSize,
+  ])
 
   const abrirNuevo = () => {
     setRolEnEdicion(null)
@@ -216,38 +143,40 @@ export function RolesPage() {
     setMensaje(null)
   }
 
-  const abrirEdicion = (
-    rol: Rol,
-  ) => {
+  const abrirEdicion = (rol: Rol) => {
     setRolEnEdicion(rol)
     setModalAbierto(true)
     setAlertaAbierta(false)
     setMensaje(null)
   }
 
-  const manejarGuardado = async (
+  const manejarGuardado = (
     datos: RolFormData,
-  ): Promise<string | null> => {
+  ): string | null => {
     try {
       if (rolEnEdicion) {
-        await actualizarRolBackend(
+        actualizarRol(
           rolEnEdicion.id,
           datos,
         )
+
+        setMensaje({
+          tipo: 'success',
+          texto: 'Rol actualizado correctamente.',
+        })
+        setAlertaAbierta(true)
+
       } else {
-        await crearRolBackend(datos)
+        crearRol(datos)
+
+        setMensaje({
+          tipo: 'success',
+          texto: 'Rol registrado correctamente.',
+        })
+        setAlertaAbierta(true)
       }
 
-      await cargarRoles()
-
-      setMensaje({
-        tipo: 'success',
-        texto: rolEnEdicion
-          ? 'Rol actualizado correctamente.'
-          : 'Rol registrado correctamente.',
-      })
-
-      setAlertaAbierta(true)
+      setRoles(obtenerRoles())
       setModalAbierto(false)
       setRolEnEdicion(null)
       setPage(1)
@@ -266,62 +195,30 @@ export function RolesPage() {
     setRolAEliminar(rol)
   }
 
-  const confirmarEliminacion =
-    async (): Promise<void> => {
-      if (!rolAEliminar) {
-        return
-      }
+  const confirmarEliminacion = () => {
+    if (!rolAEliminar) return
 
-      try {
-        if (
-          rolAEliminar.nombre
-            .trim()
-            .toLowerCase() ===
-          'administrador'
-        ) {
-          throw new Error(
-            'El rol Administrador no puede desactivarse.',
-          )
-        }
-
-        if (
-          rolAEliminar.usuarios > 0
-        ) {
-          throw new Error(
-            'No puedes desactivar un rol asignado a usuarios.',
-          )
-        }
-
-        await desactivarRolBackend(
-          rolAEliminar.id,
-        )
-
-        await cargarRoles()
-
-        setRolAEliminar(null)
-        setPage(1)
-
-        setMensaje({
-          tipo: 'success',
-          texto:
-            'Rol desactivado correctamente.',
-        })
-
-        setAlertaAbierta(true)
-      } catch (error) {
-        setRolAEliminar(null)
-
-        setMensaje({
-          tipo: 'error',
-          texto:
-            error instanceof Error
-              ? error.message
-              : 'No se pudo desactivar el rol.',
-        })
-
-        setAlertaAbierta(true)
-      }
+    try {
+      eliminarRol(rolAEliminar.id)
+      setRoles(obtenerRoles())
+      setPage(1)
+      setRolAEliminar(null)
+      setMensaje({
+        tipo: 'success',
+        texto: 'Rol eliminado correctamente.',
+      })
+      setAlertaAbierta(true)
+    } catch (error) {
+      setRolAEliminar(null)
+      setMensaje({
+        tipo: 'error',
+        texto: error instanceof Error
+          ? error.message
+          : 'No se pudo eliminar el rol.',
+      })
+      setAlertaAbierta(true)
     }
+  }
 
   return (
     <>
@@ -339,49 +236,18 @@ export function RolesPage() {
           </section>
 
           <Snackbar
-            open={
-              alertaAbierta &&
-              Boolean(mensaje)
-            }
+            open={alertaAbierta && Boolean(mensaje)}
             autoHideDuration={3000}
-            onClose={() =>
-              setAlertaAbierta(false)
-            }
-            slotProps={{
-              transition: {
-                onExited: () =>
-                  setMensaje(null),
-              },
-            }}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'center',
-            }}
+            onClose={() => setAlertaAbierta(false)}
+            slotProps={{ transition: { onExited: () => setMensaje(null) } }}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
           >
             <Alert
-              severity={
-                mensaje?.tipo ??
-                'success'
-              }
-              icon={
-                mensaje?.tipo ===
-                'success'
-                  ? (
-                    <CheckCircle2 fontSize="inherit" />
-                  )
-                  : (
-                    <XCircle fontSize="inherit" />
-                  )
-              }
-              onClose={() =>
-                setAlertaAbierta(false)
-              }
+              severity={mensaje?.tipo ?? 'success'}
+              icon={mensaje?.tipo === 'success' ? <CheckCircle2 fontSize="inherit" /> : <XCircle fontSize="inherit" />}
+              onClose={() => setAlertaAbierta(false)}
               variant="filled"
-              sx={{
-                width: '100%',
-                minWidth: 320,
-                boxShadow: 4,
-              }}
+              sx={{ width: '100%', minWidth: 320, boxShadow: 4 }}
             >
               {mensaje?.texto}
             </Alert>
@@ -390,27 +256,18 @@ export function RolesPage() {
           <div className="maestro-panel">
             <FiltrosRoles
               valores={filtros}
-              onChange={(
-                campo,
-                valor,
-              ) =>
-                setFiltros(
-                  (actual) => ({
-                    ...actual,
-                    [campo]: valor,
-                  }),
-                )
+              onChange={(campo, valor) =>
+                setFiltros((actual) => ({
+                  ...actual,
+                  [campo]: valor,
+                }))
               }
               onBuscar={() => {
-                setFiltrosAplicados(
-                  filtros,
-                )
+                setFiltrosAplicados(filtros)
                 setPage(1)
               }}
               onLimpiar={() => {
-                setFiltros(
-                  FILTROS_INICIALES,
-                )
+                setFiltros(FILTROS_INICIALES)
                 setFiltrosAplicados(
                   FILTROS_INICIALES,
                 )
@@ -420,46 +277,22 @@ export function RolesPage() {
           </div>
 
           <div className="maestro-panel">
-            {cargando ? (
-              <div className="p-4 text-center text-muted">
-                Cargando roles...
-              </div>
-            ) : (
-              <TablaRoles
-                roles={
-                  rolesPaginados
-                }
-                totalItems={
-                  totalItems
-                }
-                page={
-                  paginaActual
-                }
-                pageSize={
-                  pageSize
-                }
-                onAgregar={
-                  abrirNuevo
-                }
-                onEditar={
-                  abrirEdicion
-                }
-                onEliminar={
-                  manejarEliminacion
-                }
-                onPageChange={
-                  setPage
-                }
-                onPageSizeChange={(
-                  nuevoTamano,
-                ) => {
-                  setPageSize(
-                    nuevoTamano,
-                  )
-                  setPage(1)
-                }}
-              />
-            )}
+            <TablaRoles
+              roles={rolesPaginados}
+              totalItems={totalItems}
+              page={paginaActual}
+              pageSize={pageSize}
+              onAgregar={abrirNuevo}
+              onEditar={abrirEdicion}
+              onEliminar={manejarEliminacion}
+              onPageChange={setPage}
+              onPageSizeChange={(
+                nuevoTamano,
+              ) => {
+                setPageSize(nuevoTamano)
+                setPage(1)
+              }}
+            />
           </div>
         </div>
       </main>
@@ -475,23 +308,15 @@ export function RolesPage() {
             setModalAbierto(false)
             setRolEnEdicion(null)
           }}
-          onGuardar={
-            manejarGuardado
-          }
+          onGuardar={manejarGuardado}
         />
       )}
 
       <RolDeleteModal
-        abierto={
-          Boolean(rolAEliminar)
-        }
+        abierto={Boolean(rolAEliminar)}
         rol={rolAEliminar}
-        onClose={() =>
-          setRolAEliminar(null)
-        }
-        onConfirm={
-          confirmarEliminacion
-        }
+        onClose={() => setRolAEliminar(null)}
+        onConfirm={confirmarEliminacion}
       />
     </>
   )

@@ -27,9 +27,6 @@ import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 interface ErroresFormulario {
   usuario: string
   nombreCompleto: string
-  nombres: string
-  apePaterno: string
-  apeMaterno: string
   email: string
   contrasena: string
   rol: string
@@ -40,11 +37,8 @@ interface FormularioUsuarioProps {
   roles: Rol[]
   onClose: () => void
   onGuardar: (
-  datos: UsuarioFormData,
-  ) =>
-    | string
-    | null
-    | Promise<string | null>
+    datos: UsuarioFormData,
+  ) => string | null
 }
 
 export function FormularioUsuario({
@@ -55,41 +49,23 @@ export function FormularioUsuario({
 }: FormularioUsuarioProps) {
   const [datos, setDatos] =
     useState<UsuarioFormData>(() => ({
-      usuario:
-        usuario?.dni ??
-        usuario?.usuario ??
-        '',
+      usuario: usuario?.usuario ?? '',
       nombreCompleto:
         usuario?.nombreCompleto ?? '',
       email: usuario?.email ?? '',
       contrasena: '',
       rol: usuario?.rol ?? '',
       estado: usuario?.estado ?? true,
-
-      dni:
-        usuario?.dni ??
-        usuario?.usuario ??
-        '',
-      nombres: usuario?.nombres ?? '',
-      apePaterno:
-        usuario?.apePaterno ?? '',
-      apeMaterno:
-        usuario?.apeMaterno ?? '',
-      rolId: usuario?.rolId ?? null,
     }))
 
   const [error, setError] = useState('')
-  const [errores, setErrores] =
-    useState<ErroresFormulario>({
-      usuario: '',
-      nombreCompleto: '',
-      nombres: '',
-      apePaterno: '',
-      apeMaterno: '',
-      email: '',
-      contrasena: '',
-      rol: '',
-    })
+  const [errores, setErrores] = useState<ErroresFormulario>({
+    usuario: '',
+    nombreCompleto: '',
+    email: '',
+    contrasena: '',
+    rol: '',
+  })
 
   const rolesDisponibles = roles.filter(
     (rol) =>
@@ -97,81 +73,33 @@ export function FormularioUsuario({
       rol.nombre === usuario?.rol,
   )
 
-const manejarEnvio = async (
-  evento: FormEvent<HTMLFormElement>,
-) => {
+  const manejarEnvio = (
+    evento: FormEvent<HTMLFormElement>,
+  ) => {
     evento.preventDefault()
     setError('')
     const nuevosErrores: ErroresFormulario = {
       usuario: '',
       nombreCompleto: '',
-      nombres: '',
-      apePaterno: '',
-      apeMaterno: '',
       email: '',
       contrasena: '',
       rol: '',
     }
 
-    const dni =
-      (datos.dni ?? datos.usuario).trim()
+    if (!datos.usuario.trim()) nuevosErrores.usuario = 'Campo requerido'
+    if (!datos.nombreCompleto.trim()) nuevosErrores.nombreCompleto = 'Campo requerido'
+    if (!datos.email.trim()) nuevosErrores.email = 'Campo requerido'
+    else if (!/^\S+@\S+\.\S+$/.test(datos.email.trim())) nuevosErrores.email = 'Ingresa un correo válido'
+    if (!datos.rol) nuevosErrores.rol = 'Campo requerido'
+    if (!usuario && !datos.contrasena) nuevosErrores.contrasena = 'Campo requerido'
+    else if (datos.contrasena && datos.contrasena.length < 6) nuevosErrores.contrasena = 'Debe tener al menos 6 caracteres'
 
-    if (!dni) {
-      nuevosErrores.usuario =
-        'Campo requerido'
-    } else if (!/^\d{8}$/.test(dni)) {
-      nuevosErrores.usuario =
-        'El DNI debe contener 8 números'
-    }
-
-    if (!(datos.nombres ?? '').trim()) {
-      nuevosErrores.nombres =
-        'Campo requerido'
-    }
-
-    if (!(datos.apePaterno ?? '').trim()) {
-      nuevosErrores.apePaterno =
-        'Campo requerido'
-    }
-
-    if (!(datos.apeMaterno ?? '').trim()) {
-      nuevosErrores.apeMaterno =
-        'Campo requerido'
-    }
-
-    if (!datos.email.trim()) {
-      nuevosErrores.email =
-        'Campo requerido'
-    } else if (
-      !/^\S+@\S+\.\S+$/.test(
-        datos.email.trim(),
-      )
-    ) {
-      nuevosErrores.email =
-        'Ingresa un correo válido'
-    }
-
-    if (!datos.rolId) {
-      nuevosErrores.rol =
-        'Campo requerido'
-    }
-
-    if (!usuario && !datos.contrasena) {
-      nuevosErrores.contrasena =
-        'Campo requerido'
-    } else if (
-      datos.contrasena &&
-      datos.contrasena.length < 12
-    ) {
-      nuevosErrores.contrasena =
-        'Debe tener al menos 12 caracteres'
-    }
     setErrores(nuevosErrores)
     if (Object.values(nuevosErrores).some(Boolean)) {
       return
     }
 
-   const mensaje = await onGuardar(datos)
+    const mensaje = onGuardar(datos)
 
     if (mensaje) {
       setError(mensaje)
@@ -231,9 +159,10 @@ const manejarEnvio = async (
             <div className="col-12 col-md-6">
               <label
                 className="form-label required"
-                htmlFor="usuarioDni"
+                htmlFor="usuarioNombre"
               >
-                DNI
+                Usuario
+
               </label>
 
               <div className="input-group">
@@ -242,148 +171,50 @@ const manejarEnvio = async (
                 </span>
 
                 <input
-                  id="usuarioDni"
+                  id="usuarioNombre"
                   className={`form-control${errores.usuario ? ' maestro-control--error' : ''}`}
-                  value={
-                    datos.dni ??
-                    datos.usuario
-                  }
-                  placeholder="Ingrese 8 números"
-                  inputMode="numeric"
-                  maxLength={8}
-                  disabled={Boolean(usuario)}
+                  value={datos.usuario}
+                  placeholder={Placeholder.Ingresar}
+                  maxLength={50}
                   autoComplete="username"
                   onChange={(evento) => {
-                    const valor =
-                      evento.target.value.replace(
-                        /\D/g,
-                        '',
-                      )
-
                     setDatos((actual) => ({
                       ...actual,
-                      usuario: valor,
-                      dni: valor,
+                      usuario:
+                        evento.target.value,
                     }))
-
-                    setErrores((actual) => ({
-                      ...actual,
-                      usuario: '',
-                    }))
+                    setErrores((actual) => ({ ...actual, usuario: '' }))
                   }}
                 />
               </div>
-
-              {errores.usuario && (
-                <div className="maestro-field-error">
-                  {errores.usuario}
-                </div>
-              )}
+              {errores.usuario && <div className="maestro-field-error">{errores.usuario}</div>}
             </div>
 
             <div className="col-12 col-md-6">
               <label
                 className="form-label required"
-                htmlFor="usuarioNombres"
+                htmlFor="usuarioNombreCompleto"
               >
-                Nombres
+                Nombre completo
+
               </label>
 
               <input
-                id="usuarioNombres"
-                className={`form-control${errores.nombres ? ' maestro-control--error' : ''}`}
-                value={datos.nombres ?? ''}
+                id="usuarioNombreCompleto"
+                className={`form-control${errores.nombreCompleto ? ' maestro-control--error' : ''}`}
+                value={datos.nombreCompleto}
                 placeholder={Placeholder.Ingresar}
-                maxLength={80}
+                maxLength={100}
                 onChange={(evento) => {
                   setDatos((actual) => ({
                     ...actual,
-                    nombres:
+                    nombreCompleto:
                       evento.target.value,
                   }))
-
-                  setErrores((actual) => ({
-                    ...actual,
-                    nombres: '',
-                  }))
+                  setErrores((actual) => ({ ...actual, nombreCompleto: '' }))
                 }}
               />
-
-              {errores.nombres && (
-                <div className="maestro-field-error">
-                  {errores.nombres}
-                </div>
-              )}
-            </div>
-
-            <div className="col-12 col-md-6">
-              <label
-                className="form-label required"
-                htmlFor="usuarioApePaterno"
-              >
-                Apellido paterno
-              </label>
-
-              <input
-                id="usuarioApePaterno"
-                className={`form-control${errores.apePaterno ? ' maestro-control--error' : ''}`}
-                value={datos.apePaterno ?? ''}
-                placeholder={Placeholder.Ingresar}
-                maxLength={60}
-                onChange={(evento) => {
-                  setDatos((actual) => ({
-                    ...actual,
-                    apePaterno:
-                      evento.target.value,
-                  }))
-
-                  setErrores((actual) => ({
-                    ...actual,
-                    apePaterno: '',
-                  }))
-                }}
-              />
-
-              {errores.apePaterno && (
-                <div className="maestro-field-error">
-                  {errores.apePaterno}
-                </div>
-              )}
-            </div>
-
-            <div className="col-12 col-md-6">
-              <label
-                className="form-label required"
-                htmlFor="usuarioApeMaterno"
-              >
-                Apellido materno
-              </label>
-
-              <input
-                id="usuarioApeMaterno"
-                className={`form-control${errores.apeMaterno ? ' maestro-control--error' : ''}`}
-                value={datos.apeMaterno ?? ''}
-                placeholder={Placeholder.Ingresar}
-                maxLength={60}
-                onChange={(evento) => {
-                  setDatos((actual) => ({
-                    ...actual,
-                    apeMaterno:
-                      evento.target.value,
-                  }))
-
-                  setErrores((actual) => ({
-                    ...actual,
-                    apeMaterno: '',
-                  }))
-                }}
-              />
-
-              {errores.apeMaterno && (
-                <div className="maestro-field-error">
-                  {errores.apeMaterno}
-                </div>
-              )}
+              {errores.nombreCompleto && <div className="maestro-field-error">{errores.nombreCompleto}</div>}
             </div>
 
             <div className="col-12 col-md-6">
@@ -427,53 +258,16 @@ const manejarEnvio = async (
               <Select
                 inputId="usuarioRol"
                 classNamePrefix="maestro-select"
-                options={rolesDisponibles.map(
-                  (rol) => ({
-                    value: Number(rol.id),
-                    label: rol.nombre,
-                  }),
-                )}
-                value={
-                  rolesDisponibles
-                    .map((rol) => ({
-                      value: Number(rol.id),
-                      label: rol.nombre,
-                    }))
-                    .find(
-                      (opcion) =>
-                        opcion.value ===
-                        datos.rolId,
-                    ) ?? null
-                }
+                options={rolesDisponibles.map((rol) => ({ value: rol.nombre, label: rol.nombre }))}
+                value={rolesDisponibles.map((rol) => ({ value: rol.nombre, label: rol.nombre })).find((opcion) => opcion.value === datos.rol) ?? null}
                 onChange={(opcion) => {
-                  const rolSeleccionado =
-                    rolesDisponibles.find(
-                      (rol) =>
-                        Number(rol.id) ===
-                        opcion?.value,
-                    )
-
-                  setDatos((actual) => ({
-                    ...actual,
-                    rolId:
-                      opcion?.value ?? null,
-                    rol:
-                      rolSeleccionado?.nombre ??
-                      '',
-                  }))
-
-                  setErrores((actual) => ({
-                    ...actual,
-                    rol: '',
-                  }))
+                  setDatos((actual) => ({ ...actual, rol: opcion?.value ?? '' }))
+                  setErrores((actual) => ({ ...actual, rol: '' }))
                 }}
                 placeholder={Placeholder.Seleccionar}
                 isSearchable={false}
                 menuPortalTarget={document.body}
-                styles={crearEstilosSelect({
-                  tieneError: Boolean(errores.rol),
-                  zIndex: 1300,
-                })}
+                styles={crearEstilosSelect({ tieneError: Boolean(errores.rol), zIndex: 1300 })}
               />
               {errores.rol && <div className="maestro-field-error">{errores.rol}</div>}
             </div>
@@ -491,7 +285,7 @@ const manejarEnvio = async (
                 className={`form-control${errores.contrasena ? ' maestro-control--error' : ''}`}
                 type="password"
                 value={datos.contrasena}
-                minLength={12}
+                minLength={6}
                 maxLength={80}
                 autoComplete="new-password"
                 placeholder={Placeholder.Ingresar}

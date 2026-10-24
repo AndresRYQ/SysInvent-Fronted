@@ -24,7 +24,7 @@ export interface BitacoraProjection {
      * @type {string}
      * @memberof BitacoraProjection
      */
-    modulo?: string;
+    fechaHora?: string;
     /**
      * 
      * @type {string}
@@ -36,25 +36,25 @@ export interface BitacoraProjection {
      * @type {string}
      * @memberof BitacoraProjection
      */
+    modulo?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BitacoraProjection
+     */
     detalle?: string;
     /**
      * 
      * @type {string}
      * @memberof BitacoraProjection
      */
-    fechaHora?: string;
+    nombreUsuario?: string;
     /**
      * 
      * @type {string}
      * @memberof BitacoraProjection
      */
     nombreRol?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof BitacoraProjection
-     */
-    nombreUsuario?: string;
 }
 
 /**
@@ -74,12 +74,12 @@ export function BitacoraProjectionFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'modulo': json['modulo'] == null ? undefined : json['modulo'],
-        'accion': json['accion'] == null ? undefined : json['accion'],
-        'detalle': json['detalle'] == null ? undefined : json['detalle'],
         'fechaHora': json['fechaHora'] == null ? undefined : json['fechaHora'],
-        'nombreRol': json['nombreRol'] == null ? undefined : json['nombreRol'],
+        'accion': json['accion'] == null ? undefined : json['accion'],
+        'modulo': json['modulo'] == null ? undefined : json['modulo'],
+        'detalle': json['detalle'] == null ? undefined : json['detalle'],
         'nombreUsuario': json['nombreUsuario'] == null ? undefined : json['nombreUsuario'],
+        'nombreRol': json['nombreRol'] == null ? undefined : json['nombreRol'],
     };
 }
 
@@ -94,12 +94,12 @@ export function BitacoraProjectionToJSONTyped(value?: BitacoraProjection | null,
 
     return {
         
-        'modulo': value['modulo'],
-        'accion': value['accion'],
-        'detalle': value['detalle'],
         'fechaHora': value['fechaHora'],
-        'nombreRol': value['nombreRol'],
+        'accion': value['accion'],
+        'modulo': value['modulo'],
+        'detalle': value['detalle'],
         'nombreUsuario': value['nombreUsuario'],
+        'nombreRol': value['nombreRol'],
     };
 }
 

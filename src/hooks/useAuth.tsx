@@ -22,9 +22,6 @@ import type {
   SesionUsuario,
   UsuarioLogin,
 } from '../types/auth'
-import {
-  AUTH_UNAUTHORIZED_EVENT,
-} from '../services/api'
 
 interface AuthContextType {
   sesion: SesionUsuario | null
@@ -126,27 +123,6 @@ export function AuthProvider({
       },
       [],
     )
-
-  useEffect(() => {
-    const cerrarSesionNoAutorizada =
-      () => {
-        finalizarSesion(
-          'vencimiento',
-        )
-      }
-
-    window.addEventListener(
-      AUTH_UNAUTHORIZED_EVENT,
-      cerrarSesionNoAutorizada,
-    )
-
-    return () => {
-      window.removeEventListener(
-        AUTH_UNAUTHORIZED_EVENT,
-        cerrarSesionNoAutorizada,
-      )
-    }
-  }, [finalizarSesion])
 
   /*
    * Cierra automaticamente la sesion

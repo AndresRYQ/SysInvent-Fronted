@@ -9,8 +9,6 @@ export const API_URL =
       : DEFAULT_PRODUCTION_API_URL)).replace(/\/+$/, '')
 
 const AUTH_TOKEN_KEY = 'sysinvent_token'
-export const AUTH_UNAUTHORIZED_EVENT =
-  'sysinvent:unauthorized'
 
 export interface ApiError extends Error {
   status?: number
@@ -59,11 +57,7 @@ export async function apiFetch<T>(
     headers.set('Content-Type', 'application/json')
   }
 
-  const token = localStorage
-    .getItem(AUTH_TOKEN_KEY)
-    ?.trim()
-    .replace(/^Bearer\s+/i, '')
-    .replace(/^["']|["']$/g, '')
+  const token = localStorage.getItem(AUTH_TOKEN_KEY)
 
   if (token && !headers.has('Authorization')) {
     headers.set('Authorization', `Bearer ${token}`)
@@ -100,19 +94,6 @@ export async function apiFetch<T>(
 
       error.status = response.status
       error.data = data
-
-      if (response.status === 401) {
-        localStorage.removeItem(
-          AUTH_TOKEN_KEY,
-        )
-
-        window.dispatchEvent(
-          new Event(
-            AUTH_UNAUTHORIZED_EVENT,
-          ),
-        )
-      }
-
       throw error
     }
 

@@ -37,24 +37,6 @@ export interface RolResponse {
      * @memberof RolResponse
      */
     descripcion?: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof RolResponse
-     */
-    activo?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof RolResponse
-     */
-    usuarios?: number;
-    /**
-     * 
-     * @type {Array<number>}
-     * @memberof RolResponse
-     */
-    modulos?: Array<number>;
 }
 
 /**
@@ -77,9 +59,6 @@ export function RolResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'rolId': json['rolId'] == null ? undefined : json['rolId'],
         'nombre': json['nombre'] == null ? undefined : json['nombre'],
         'descripcion': json['descripcion'] == null ? undefined : json['descripcion'],
-        'activo': json['activo'] == null ? undefined : json['activo'],
-        'usuarios': json['usuarios'] == null ? undefined : json['usuarios'],
-        'modulos': json['modulos'] == null ? undefined : json['modulos'],
     };
 }
 
@@ -97,9 +76,6 @@ export function RolResponseToJSONTyped(value?: RolResponse | null, ignoreDiscrim
         'rolId': value['rolId'],
         'nombre': value['nombre'],
         'descripcion': value['descripcion'],
-        'activo': value['activo'],
-        'usuarios': value['usuarios'],
-        'modulos': value['modulos'],
     };
 }
 

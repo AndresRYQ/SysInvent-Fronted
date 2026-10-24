@@ -15,31 +15,14 @@ import type {
 
 export const AUTH_TOKEN_KEY = 'sysinvent_token'
 
-interface JwtModulo {
-  moduloId?: number
-  nombre?: string
-  ruta?: string
-}
-
-interface JwtRol {
-  rolId?: number
-  nombre?: string
-  modulos?: JwtModulo[]
-}
-
 interface JwtPayload {
   sub?: string
-  usuarioId?: number
   usuario?: string
   username?: string
   nombreCompleto?: string
   nombre?: string
-  email?: string
-  rolId?: number
   rol?: string
   role?: string
-  roles?: JwtRol[]
-  modulos?: JwtModulo[]
   exp?: number
   iat?: number
 }
@@ -85,122 +68,25 @@ function obtenerPayloadJwt(token: string): JwtPayload | null {
   }
 }
 
-function convertirRutaAModuloId(
-  ruta?: string,
-): string | null {
-  if (!ruta) {
-    return null
-  }
-
-  const rutaNormalizada =
-    ruta.trim().replace(/\/+$/, '')
-
-  const equivalencias:
-    Record<string, string> = {
-      '/roles': 'roles',
-      '/usuarios': 'usuarios',
-      '/tipos-producto': 'tipos-producto',
-      '/proveedores': 'proveedores',
-      '/tipos-documento': 'tipos-documento',
-      '/destinos': 'destinos',
-      '/productos': 'productos',
-      '/unidades-medida': 'unidades-medida',
-      '/categorias': 'categorias',
-      '/centros-costos': 'centros-costo',
-      '/bitacora': 'bitacora',
-      '/reportes/ingresos':
-        'reporte-ingresos',
-      '/reportes/vales': 'reporte-vales',
-      '/reportes/productos-mas-pedidos':
-        'reporte-productos',
-      '/contactos': 'contactos',
-      '/partes-equipo': 'partes-equipo',
-      '/control-almacen':
-        'control-almacen',
-      '/vales-consumo': 'vales-consumo',
-      '/ingresos-almacen':
-        'ingresos-almacen',
-      '/perfil': 'perfil-usuario',
-    }
-
-  return equivalencias[rutaNormalizada] ?? null
-}
-
-function crearSesionDesdeToken(
-  token: string,
-): SesionUsuario {
+function crearSesionDesdeToken(token: string): SesionUsuario {
   const payload = obtenerPayloadJwt(token)
-
   const usuario =
-    payload?.usuario ??
-    payload?.username ??
-    payload?.sub ??
-    'usuario'
-
-  const rolPrincipal =
-    payload?.roles?.[0]
-
-  const rol =
-    rolPrincipal?.nombre ??
-    payload?.rol ??
-    payload?.role ??
-    'Sin rol'
-
-  const rolId =
-    rolPrincipal?.rolId ??
-    payload?.rolId ??
-    null
-
-  const modulosToken =
-    payload?.modulos?.length
-      ? payload.modulos
-      : rolPrincipal?.modulos ?? []
-
-  const modulos = Array.from(
-    new Set(
-      modulosToken
-        .map((modulo) =>
-          convertirRutaAModuloId(
-            modulo.ruta,
-          ),
-        )
-        .filter(
-          (moduloId):
-            moduloId is string =>
-              Boolean(moduloId),
-        ),
-    ),
-  )
-
+    payload?.usuario ?? payload?.username ?? payload?.sub ?? 'usuario'
   const nombreCompleto =
-    payload?.nombreCompleto ??
-    payload?.nombre ??
-    usuario
-
+    payload?.nombreCompleto ?? payload?.nombre ?? usuario
+  const rol = payload?.rol ?? payload?.role ?? 'Administrador'
   const fechaInicio = payload?.iat
-    ? new Date(
-        payload.iat * 1000,
-      ).toISOString()
+    ? new Date(payload.iat * 1000).toISOString()
     : new Date().toISOString()
-
   const fechaExpiracion = payload?.exp
-    ? new Date(
-        payload.exp * 1000,
-      ).toISOString()
-    : new Date(
-        Date.now() + 5 * 60 * 1000,
-      ).toISOString()
+    ? new Date(payload.exp * 1000).toISOString()
+    : new Date(Date.now() + 60 * 60 * 1000).toISOString()
 
   return {
-    id: String(
-      payload?.usuarioId ?? usuario,
-    ),
+    id: usuario,
     usuario,
     nombreCompleto,
-    email: payload?.email ?? '',
-    rolId,
     rol,
-    modulos,
     token,
     fechaInicio,
     fechaExpiracion,
@@ -295,12 +181,10 @@ export function sincronizarSesionUsuario(
   }
 
   return {
-  ...sesionActual,
-  id: usuario.id,
-  usuario: usuario.usuario,
-  nombreCompleto:
-    usuario.nombreCompleto,
-  email: usuario.email,
-  rol: usuario.rol,
+    ...sesionActual,
+    id: usuario.id,
+    usuario: usuario.usuario,
+    nombreCompleto: usuario.nombreCompleto,
+    rol: usuario.rol,
   }
 }
