@@ -466,12 +466,6 @@ export async function crearUsuarioBackend(
     )
   }
 
-  if (datos.contrasena.length < 12) {
-    throw new Error(
-      'La contraseña debe tener al menos 12 caracteres.',
-    )
-  }
-
   const respuesta =
     await apiFetch<MensajeUsuarioBackend>(
       '/api/usuarios',
@@ -486,9 +480,7 @@ export async function crearUsuarioBackend(
             datos.email
               .trim()
               .toLowerCase(),
-          contrasena:
-            datos.contrasena,
-          rolesIds: [datos.rolId],
+          rolId: datos.rolId,
         }),
       },
     )
@@ -555,7 +547,7 @@ export async function actualizarUsuarioBackend(
             datos.email
               .trim()
               .toLowerCase(),
-          rolesIds: [datos.rolId],
+          rolId: datos.rolId,
         }),
       },
     )

@@ -19,6 +19,7 @@ interface JwtPayload {
   sub?: string
   usuario?: string
   username?: string
+  email?: string
   nombreCompleto?: string
   nombre?: string
   rol?: string
@@ -100,6 +101,7 @@ function crearSesionDesdeToken(token: string): SesionUsuario {
   return {
     id: usuario,
     usuario,
+    email: payload?.email ?? '',
     nombreCompleto,
     rolId: payload?.rolId ?? null,
     rol,

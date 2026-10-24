@@ -14,6 +14,10 @@ import {
 import {
   TablaUsuarios,
 } from '../../components/usuarios/TablaUsuarios'
+import {
+  SnackbarAlert,
+  useSnackbar,
+} from '../../components/common/SnackbarAlert'
 import { useAuth } from '../../hooks/useAuth'
 import {
   obtenerRolesBackend,
@@ -115,14 +119,20 @@ export function UsuariosPage() {
     setUsuarioEnEdicion,
   ] = useState<UsuarioLogin | null>(null)
 
-  const [mensaje, setMensaje] = useState<{
-    tipo: 'success' | 'danger'
-    texto: string
-  } | null>(null)
+  const {
+    mensaje,
+    abierta,
+    mostrarAlerta,
+    cerrarAlerta,
+    limpiarAlerta,
+  } = useSnackbar()
 
+  const [cargando, setCargando] = useState(true)
 
   const cargarUsuarios =
   useCallback(async (): Promise<void> => {
+    setCargando(true)
+
     try {
       const resultadoUsuarios =
         await obtenerUsuariosBackend(
@@ -140,15 +150,16 @@ export function UsuariosPage() {
 
       setRoles(resultadoRoles)
     } catch (error) {
-      setMensaje({
-        tipo: 'danger',
-        texto:
+      mostrarAlerta(
+        'error',
           error instanceof Error
             ? error.message
             : 'No se pudieron cargar los usuarios.',
-      })
+      )
+    } finally {
+      setCargando(false)
     }
-  }, [])
+  }, [mostrarAlerta])
   useEffect(() => {
     void cargarUsuarios()
   }, [cargarUsuarios])
@@ -207,12 +218,12 @@ export function UsuariosPage() {
 
     await cargarUsuarios()
 
-    setMensaje({
-      tipo: 'success',
-      texto: esEdicion
+    mostrarAlerta(
+      'success',
+      esEdicion
         ? 'Usuario actualizado correctamente.'
-        : 'Usuario registrado correctamente.',
-    })
+        : 'Usuario registrado. Se enviaron las credenciales al correo indicado.',
+    )
 
     setUsuarioEnEdicion(null)
     setModalAbierto(false)
@@ -246,25 +257,27 @@ export function UsuariosPage() {
       setUsuarios(obtenerUsuarios())
       setPage(1)
 
-      setMensaje({
-        tipo: 'success',
-        texto:
-          'Usuario eliminado correctamente.',
-      })
+      mostrarAlerta('success', 'Usuario eliminado correctamente.')
     } catch (error) {
-      setMensaje({
-        tipo: 'danger',
-        texto:
+      mostrarAlerta(
+        'error',
           error instanceof Error
             ? error.message
             : 'No se pudo eliminar el usuario.',
-      })
+      )
     }
   }
 
   return (
     <>
       <main className="dashboard-shell maestro-page-shell">
+        {cargando && (
+          <div className="maestro-fullscreen-loader" role="status" aria-live="polite">
+            <div className="spinner-border text-success" aria-hidden="true" />
+            <span>Cargando usuarios...</span>
+          </div>
+        )}
+
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
@@ -276,15 +289,6 @@ export function UsuariosPage() {
               </p>
             </div>
           </section>
-
-          {mensaje && (
-            <div
-              className={`alert alert-${mensaje.tipo} mt-3 mb-0`}
-              role="status"
-            >
-              {mensaje.texto}
-            </div>
-          )}
 
           <div className="maestro-panel">
             <FiltrosUsuarios
@@ -319,12 +323,12 @@ export function UsuariosPage() {
               onAgregar={() => {
                 setUsuarioEnEdicion(null)
                 setModalAbierto(true)
-                setMensaje(null)
+                limpiarAlerta()
               }}
               onEditar={(usuario) => {
                 setUsuarioEnEdicion(usuario)
                 setModalAbierto(true)
-                setMensaje(null)
+                limpiarAlerta()
               }}
               onEliminar={manejarEliminacion}
               onPageChange={setPage}
@@ -338,6 +342,13 @@ export function UsuariosPage() {
           </div>
         </div>
       </main>
+
+      <SnackbarAlert
+        mensaje={mensaje}
+        abierta={abierta}
+        onClose={cerrarAlerta}
+        onExited={limpiarAlerta}
+      />
 
       {modalAbierto && (
         <FormularioUsuario

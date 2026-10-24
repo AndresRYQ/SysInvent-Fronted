@@ -11,8 +11,7 @@ Name | Type
 `apePaterno` | string
 `apeMaterno` | string
 `email` | string
-`contrasena` | string
-`rolesIds` | Array&lt;number&gt;
+`rolId` | number
 
 ## Example
 
@@ -26,8 +25,7 @@ const example = {
   "apePaterno": null,
   "apeMaterno": null,
   "email": null,
-  "contrasena": null,
-  "rolesIds": null,
+  "rolId": null,
 } satisfies UsuarioRequest
 
 console.log(example)
