@@ -431,3 +431,8 @@
 .maestro-modal-card--product .card-header {
   display: none;
 }
+.perfil-input-readonly {
+  background-color: #e9ecef !important;
+  color: #6c757d;
+  cursor: not-allowed;
+}

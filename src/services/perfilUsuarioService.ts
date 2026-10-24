@@ -6,14 +6,10 @@ import type {
   PerfilUsuarioFormData,
 } from '../types/usuario'
 
-import {
-  actualizarUsuario,
-  obtenerUsuarios,
-} from './usuarioService'
 import { apiFetch } from './api'
 
 interface PerfilUsuarioBackend {
-  usuarioId?: number
+  codigo?: string
   usuario?: string
   dni?: string
   nombres?: string
@@ -21,9 +17,29 @@ interface PerfilUsuarioBackend {
   apeMaterno?: string
   nombreCompleto?: string
   correo?: string
-  rolId?: number
   nombreRol?: string
   estado?: boolean
+}
+
+export async function actualizarPerfilUsuarioBackend(
+  datos: PerfilUsuarioFormData,
+): Promise<void> {
+  const respuesta = await apiFetch<{ success?: boolean; message?: string }>(
+    '/api/usuarios/perfil',
+    {
+      method: 'PUT',
+      body: JSON.stringify({
+        nombres: datos.nombres,
+        apePaterno: datos.apePaterno,
+        apeMaterno: datos.apeMaterno,
+        email: datos.email,
+      }),
+    },
+  )
+
+  if (respuesta.success === false) {
+    throw new Error(respuesta.message ?? 'No se pudo actualizar el perfil.')
+  }
 }
 
 export async function obtenerPerfilUsuarioBackend(): Promise<UsuarioLogin> {
@@ -32,7 +48,8 @@ export async function obtenerPerfilUsuarioBackend(): Promise<UsuarioLogin> {
   )
 
   return {
-    id: String(respuesta.usuarioId ?? ''),
+    id: '',
+    codigo: respuesta.codigo ?? '',
     usuario: respuesta.usuario ?? '',
     dni: respuesta.dni ?? '',
     nombres: respuesta.nombres ?? '',
@@ -45,13 +62,13 @@ export async function obtenerPerfilUsuarioBackend(): Promise<UsuarioLogin> {
         .join(' '),
     email: respuesta.correo ?? '',
     contrasena: '',
-    rolId: respuesta.rolId ?? null,
     rol: respuesta.nombreRol ?? '',
     estado: respuesta.estado ?? false,
   }
 }
 
-export function actualizarPerfilUsuario(
+/* Legacy local profile update removed: profile changes now use the backend endpoint. */
+/* export function actualizarPerfilUsuario(
   usuarioId: string,
   datos: PerfilUsuarioFormData,
 ): UsuarioLogin {
@@ -119,7 +136,7 @@ export function actualizarPerfilUsuario(
     {
       usuario: datos.usuario,
       nombreCompleto:
-        datos.nombreCompleto,
+        datos.nombres,
       email: datos.email,
       contrasena:
         deseaCambiarContrasena
@@ -129,5 +146,5 @@ export function actualizarPerfilUsuario(
       estado: usuarioActual.estado,
     },
   )
-}
+} */
 

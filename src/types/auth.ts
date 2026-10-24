@@ -1,5 +1,6 @@
 export interface UsuarioLogin {
   id: string
+  codigo?: string
   usuario: string
   contrasena: string
   email: string

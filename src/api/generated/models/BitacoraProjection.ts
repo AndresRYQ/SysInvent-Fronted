@@ -24,13 +24,13 @@ export interface BitacoraProjection {
      * @type {string}
      * @memberof BitacoraProjection
      */
-    accion?: string;
+    modulo?: string;
     /**
      * 
      * @type {string}
      * @memberof BitacoraProjection
      */
-    modulo?: string;
+    accion?: string;
     /**
      * 
      * @type {string}
@@ -48,13 +48,13 @@ export interface BitacoraProjection {
      * @type {string}
      * @memberof BitacoraProjection
      */
-    nombreRol?: string;
+    nombreUsuario?: string;
     /**
      * 
      * @type {string}
      * @memberof BitacoraProjection
      */
-    nombreUsuario?: string;
+    nombreRol?: string;
 }
 
 /**
@@ -74,12 +74,12 @@ export function BitacoraProjectionFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'accion': json['accion'] == null ? undefined : json['accion'],
         'modulo': json['modulo'] == null ? undefined : json['modulo'],
+        'accion': json['accion'] == null ? undefined : json['accion'],
         'detalle': json['detalle'] == null ? undefined : json['detalle'],
         'fechaHora': json['fechaHora'] == null ? undefined : json['fechaHora'],
-        'nombreRol': json['nombreRol'] == null ? undefined : json['nombreRol'],
         'nombreUsuario': json['nombreUsuario'] == null ? undefined : json['nombreUsuario'],
+        'nombreRol': json['nombreRol'] == null ? undefined : json['nombreRol'],
     };
 }
 
@@ -94,12 +94,12 @@ export function BitacoraProjectionToJSONTyped(value?: BitacoraProjection | null,
 
     return {
         
-        'accion': value['accion'],
         'modulo': value['modulo'],
+        'accion': value['accion'],
         'detalle': value['detalle'],
         'fechaHora': value['fechaHora'],
-        'nombreRol': value['nombreRol'],
         'nombreUsuario': value['nombreUsuario'],
+        'nombreRol': value['nombreRol'],
     };
 }
 

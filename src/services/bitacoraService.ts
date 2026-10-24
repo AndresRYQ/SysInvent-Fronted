@@ -4,6 +4,7 @@ import type {
 } from '../types/bitacora'
 
 import type { SesionUsuario } from '../types/auth'
+import { apiFetch } from './api'
 
 const STORAGE_KEY = 'agrihusac_bitacora'
 const SESION_STORAGE_KEY = 'agrihusac_sesion'
@@ -135,4 +136,18 @@ export function registrarEventoBitacora(
   ])
 
   return { ...nuevoRegistro }
+}
+
+export async function registrarEventoBitacoraBackend(
+  evento: EventoBitacoraInput,
+): Promise<void> {
+  await apiFetch('/api/bitacora', {
+    method: 'POST',
+    body: JSON.stringify({
+      modulo: evento.modulo,
+      accion: evento.accion,
+      detalle: evento.detalle,
+      registroId: evento.registroId ?? null,
+    }),
+  })
 }

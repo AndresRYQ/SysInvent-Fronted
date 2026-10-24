@@ -15,11 +15,15 @@ import {
   UserCircle,
   UserRound,
 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+
+import { ConfirmacionModal } from '../../components/common/ConfirmacionModal'
+import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
 
 import { useAuth } from '../../hooks/useAuth'
 
 import {
-  actualizarPerfilUsuario,
+  actualizarPerfilUsuarioBackend,
   obtenerPerfilUsuarioBackend,
 } from '../../services/perfilUsuarioService'
 
@@ -67,8 +71,9 @@ function crearFormulario(
 ): PerfilUsuarioFormData {
   return {
     usuario: usuario.usuario,
-    nombreCompleto:
-      usuario.nombreCompleto,
+    nombres: usuario.nombres ?? '',
+    apePaterno: usuario.apePaterno ?? '',
+    apeMaterno: usuario.apeMaterno ?? '',
     email: usuario.email,
     contrasenaActual: '',
     nuevaContrasena: '',
@@ -97,7 +102,9 @@ export function PerfilUsuarioPage() {
           ? crearFormulario(perfil)
           : {
               usuario: '',
-              nombreCompleto: '',
+              nombres: '',
+              apePaterno: '',
+              apeMaterno: '',
               email: '',
               contrasenaActual: '',
               nuevaContrasena: '',
@@ -116,8 +123,16 @@ export function PerfilUsuarioPage() {
   const [error, setError] =
     useState<string | null>(null)
 
-  const [mensaje, setMensaje] =
-    useState<string | null>(null)
+  const {
+    mensaje,
+    abierta,
+    mostrarAlerta,
+    cerrarAlerta,
+    limpiarAlerta,
+  } = useSnackbar()
+
+  const [confirmacionAbierta, setConfirmacionAbierta] =
+    useState(false)
 
   useEffect(() => {
     if (!sesion) {
@@ -169,13 +184,24 @@ export function PerfilUsuarioPage() {
     }))
 
     setError(null)
-    setMensaje(null)
   }
 
   function guardar(
     event: FormEvent<HTMLFormElement>,
   ): void {
     event.preventDefault()
+
+    if (!sesion || !perfil) {
+      setError('No se encontró la sesión actual.')
+      return
+    }
+
+    setError(null)
+    setConfirmacionAbierta(true)
+  }
+
+  async function confirmarGuardado(
+  ): Promise<void> {
 
     if (!sesion || !perfil) {
       setError(
@@ -186,14 +212,22 @@ export function PerfilUsuarioPage() {
 
     setGuardando(true)
     setError(null)
-    setMensaje(null)
 
     try {
-      const actualizado =
-        actualizarPerfilUsuario(
-          sesion.id,
-          formulario,
-        )
+      await actualizarPerfilUsuarioBackend(formulario)
+
+      const actualizado: UsuarioLogin = {
+        ...perfil,
+        nombres: formulario.nombres,
+        apePaterno: formulario.apePaterno,
+        apeMaterno: formulario.apeMaterno,
+        nombreCompleto: [
+          formulario.nombres,
+          formulario.apePaterno,
+          formulario.apeMaterno,
+        ].filter(Boolean).join(' '),
+        email: formulario.email,
+      }
 
       setPerfil(actualizado)
 
@@ -207,11 +241,14 @@ export function PerfilUsuarioPage() {
         ),
       )
 
-      setMensaje(
+      setConfirmacionAbierta(false)
+      mostrarAlerta(
+        'success',
         'Tu perfil se actualizó correctamente.',
       )
     } catch (errorActual) {
-      setError(
+      mostrarAlerta(
+        'error',
         obtenerMensajeError(
           errorActual,
         ),
@@ -368,11 +405,11 @@ export function PerfilUsuarioPage() {
 
                       <div>
                         <small className="d-block text-secondary">
-                          Identificador
+                          Código
                         </small>
 
                         <span>
-                          {perfil.id}
+                          {perfil.codigo || perfil.id}
                         </span>
                       </div>
                     </div>
@@ -414,15 +451,6 @@ export function PerfilUsuarioPage() {
                     </div>
                   )}
 
-                  {mensaje && (
-                    <div
-                      className="alert alert-success"
-                      role="status"
-                    >
-                      {mensaje}
-                    </div>
-                  )}
-
                   <form onSubmit={guardar}>
                     <div className="row g-3">
                       <div className="col-12 col-md-6">
@@ -435,16 +463,36 @@ export function PerfilUsuarioPage() {
 
                         <input
                           id="perfilUsuario"
-                          className="form-control maestro-control"
+                          className="form-control maestro-control perfil-input-readonly"
                           value={
                             formulario.usuario
                           }
                           autoComplete="username"
                           maxLength={60}
                           required
+                          readOnly
+                        />
+                      </div>
+
+                      <div className="col-12 col-md-6">
+                        <label
+                          className="form-label"
+                          htmlFor="perfilNombres"
+                        >
+                          Nombres
+                        </label>
+
+                        <input
+                          id="perfilNombres"
+                          className="form-control maestro-control"
+                          value={
+                            formulario.nombres
+                          }
+                          maxLength={120}
+                          required
                           onChange={(event) =>
                             cambiarCampo(
-                              'usuario',
+                              'nombres',
                               event.target.value,
                             )
                           }
@@ -454,22 +502,43 @@ export function PerfilUsuarioPage() {
                       <div className="col-12 col-md-6">
                         <label
                           className="form-label"
-                          htmlFor="perfilNombre"
+                          htmlFor="perfilApePaterno"
                         >
-                          Nombre completo
+                          Apellido paterno
                         </label>
 
                         <input
-                          id="perfilNombre"
+                          id="perfilApePaterno"
                           className="form-control maestro-control"
-                          value={
-                            formulario.nombreCompleto
-                          }
-                          maxLength={120}
+                          value={formulario.apePaterno}
+                          maxLength={80}
                           required
                           onChange={(event) =>
                             cambiarCampo(
-                              'nombreCompleto',
+                              'apePaterno',
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </div>
+
+                      <div className="col-12 col-md-6">
+                        <label
+                          className="form-label"
+                          htmlFor="perfilApeMaterno"
+                        >
+                          Apellido materno
+                        </label>
+
+                        <input
+                          id="perfilApeMaterno"
+                          className="form-control maestro-control"
+                          value={formulario.apeMaterno}
+                          maxLength={80}
+                          required
+                          onChange={(event) =>
+                            cambiarCampo(
+                              'apeMaterno',
                               event.target.value,
                             )
                           }
@@ -504,6 +573,7 @@ export function PerfilUsuarioPage() {
                       </div>
                     </div>
 
+                    {false && <>
                     <hr className="my-4" />
 
                     <div className="d-flex align-items-center justify-content-between gap-3 flex-wrap mb-3">
@@ -634,6 +704,17 @@ export function PerfilUsuarioPage() {
                         />
                       </div>
                     </div>
+                    </>}
+
+                    <div className="d-flex justify-content-end mt-4">
+                      {false && <Link
+                        to="/perfil/seguridad"
+                        className="btn btn-maestro-info"
+                      >
+                        <KeyRound size={18} />
+                        Gestionar contraseña
+                      </Link>}
+                    </div>
 
                     <div className="d-flex justify-content-end mt-4">
                       <button
@@ -655,6 +736,22 @@ export function PerfilUsuarioPage() {
           </div>
         </div>
       </div>
+
+      <SnackbarAlert
+        mensaje={mensaje}
+        abierta={abierta}
+        onClose={cerrarAlerta}
+        onExited={limpiarAlerta}
+      />
+
+      <ConfirmacionModal
+        abierto={confirmacionAbierta}
+        titulo="Confirmar actualización"
+        mensaje="¿Deseas guardar los cambios de tu perfil?"
+        onClose={() => setConfirmacionAbierta(false)}
+        onConfirm={confirmarGuardado}
+        confirmando={guardando}
+      />
     </main>
   )
 }
