@@ -31,6 +31,7 @@ import type {
 
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 
 const FILTROS_INICIALES: Filtros = {
   busqueda: '',
@@ -63,9 +64,11 @@ export function ReporteIngresosPage() {
 
   const [pageSize, setPageSize] =
     useState(10)
+  const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
     let activo = true
+    setCargando(true)
 
     listarReporteIngresosApi({
       ...filtrosAplicados,
@@ -77,12 +80,14 @@ export function ReporteIngresosPage() {
         setFilas(resultado.datos)
         setTotalApi(resultado.totalElementos)
         setErrorCarga(null)
+        setCargando(false)
       })
       .catch((error: unknown) => {
         if (!activo) return
         setErrorCarga(error instanceof Error ? error.message : 'No se pudo cargar el reporte de ingresos.')
         setFilas([])
         setTotalApi(0)
+        setCargando(false)
       })
 
     return () => { activo = false }
@@ -211,6 +216,7 @@ export function ReporteIngresosPage() {
 
   return (
     <main className="dashboard-shell maestro-page-shell">
+      <PageLoadingOverlay visible={cargando} mensaje="Cargando reporte de ingresos..." />
       <div className="container-xl px-0 maestro-page-body">
         <section className="maestro-topbar">
           <div className="d-flex align-items-center justify-content-between gap-3 flex-wrap">

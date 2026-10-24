@@ -15,6 +15,7 @@ import {
 import type { Proveedor, ProveedorFormData } from '../../types/proveedor'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 
 const INICIALES: FiltrosProveedoresValores = { busqueda: '', estado: '' }
 
@@ -49,7 +50,10 @@ export function ProveedoresPage() {
         setTotalItems(respuesta.paginacion.totalElementos ?? datos.length)
       })
       .catch((error) => {
-        if (!cancelado) mostrarAlerta('error', error instanceof Error ? error.message : 'No se pudieron cargar los proveedores.')
+        if (!cancelado) {
+          setTotalItems(0)
+          mostrarAlerta('error', error instanceof Error ? error.message : 'No se pudieron cargar los proveedores.')
+        }
       })
     return () => { cancelado = true }
   }, [aplicados, page, pageSize])
@@ -102,6 +106,7 @@ export function ProveedoresPage() {
 
   return <div className="proveedores-page">
     <main className="dashboard-shell maestro-page-shell">
+      <PageLoadingOverlay visible={totalItems < 0} mensaje="Cargando proveedores..." />
       <div className="container-xl px-0 maestro-page-body">
         <section className="maestro-topbar"><div className="maestro-topbar__copy"><h1>Proveedores</h1><p>Administración de proveedores y datos de contacto comercial.</p></div></section>
         <div className="maestro-panel">

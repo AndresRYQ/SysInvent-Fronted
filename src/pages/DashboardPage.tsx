@@ -9,6 +9,7 @@ import {
   obtenerResumenDashboard,
   type ResumenDashboard,
 } from '../services/dashboardService'
+import { PageLoadingOverlay } from '../components/common/PageLoadingOverlay'
 import AnimatedContent from '../components/ui/AnimatedContent'
 import CountUp from '../components/ui/CountUp'
 import SpotlightCard from '../components/ui/SpotlightCard'
@@ -396,6 +397,7 @@ function DashboardPage() {
   const [errorResumen, setErrorResumen] =
     useState<string | null>(null)
   const [usarMock, setUsarMock] = useState(false)
+  const [cargandoResumen, setCargandoResumen] = useState(true)
 
   useEffect(() => {
     let activo = true
@@ -412,6 +414,7 @@ function DashboardPage() {
 
           setUsarMock(respuestaVacia)
           setResumenCargado(resumen)
+          setCargandoResumen(false)
         }
       })
       .catch((error: unknown) => {
@@ -424,6 +427,7 @@ function DashboardPage() {
                 : 'Mostrando datos de demostración.'
             }`,
           )
+          setCargandoResumen(false)
         }
       })
 
@@ -578,6 +582,7 @@ const filteredModules =
 
   return (
     <main className="dashboard-shell">
+      <PageLoadingOverlay visible={cargandoResumen} mensaje="Cargando resumen..." />
       {errorResumen && (
         <div className="alert alert-danger" role="alert">
           {errorResumen}

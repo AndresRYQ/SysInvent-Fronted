@@ -17,6 +17,7 @@ import type { RegistroBitacora } from '../../types/bitacora'
 
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 
 const FILTROS_INICIALES: FiltrosBitacoraValores = {
   busqueda: '',
@@ -183,6 +184,7 @@ export function BitacoraPage() {
   return (
     <>
       <main className="dashboard-shell maestro-page-shell">
+        <PageLoadingOverlay visible={cargando} mensaje="Cargando bitácora..." />
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar">
             <div className="maestro-topbar__copy">
@@ -210,12 +212,6 @@ export function BitacoraPage() {
           </div>
 
           <div className="maestro-panel">
-            {cargando && (
-              <div className="alert alert-info" role="status">
-                Cargando bitácora...
-              </div>
-            )}
-
             {error && (
               <div className="alert alert-danger" role="alert">
                 {error}

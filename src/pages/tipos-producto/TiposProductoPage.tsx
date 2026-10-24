@@ -8,6 +8,7 @@ import { actualizarTipoProducto, crearTipoProducto, eliminarTipoProducto, listar
 import type { TipoProducto, TipoProductoFormData } from '../../types/tipoProducto'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
+import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 
 const FILTROS_INICIALES: FiltrosTiposProductoValores = { nombre: '', estado: '' }
 
@@ -52,6 +53,7 @@ export function TiposProductoPage() {
       })
       .catch((e) => {
         if (!activo) return
+        setTotalItems(0)
         mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar los tipos de producto.')
       })
     return () => { activo = false }
@@ -120,6 +122,7 @@ export function TiposProductoPage() {
   return (
     <div className="tipos-producto-page">
       <main className="dashboard-shell maestro-page-shell">
+        <PageLoadingOverlay visible={totalItems < 0} mensaje="Cargando tipos de producto..." />
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar"><div className="maestro-topbar__copy"><h1>Tipos de producto</h1><p>Administración de los tipos de producto utilizados en el inventario.</p></div></section>
           <div className="maestro-panel">

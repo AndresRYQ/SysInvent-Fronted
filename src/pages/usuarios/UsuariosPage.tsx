@@ -18,6 +18,9 @@ import {
   SnackbarAlert,
   useSnackbar,
 } from '../../components/common/SnackbarAlert'
+import {
+  ConfirmacionModal,
+} from '../../components/common/ConfirmacionModal'
 import { useAuth } from '../../hooks/useAuth'
 import {
   obtenerRolesBackend,
@@ -114,6 +117,14 @@ export function UsuariosPage() {
   const [modalAbierto, setModalAbierto] =
     useState(false)
 
+  const [confirmacionAbierta, setConfirmacionAbierta] =
+    useState(false)
+
+  const [datosPendientes, setDatosPendientes] =
+    useState<UsuarioFormData | null>(null)
+
+  const [guardando, setGuardando] = useState(false)
+
   const [
     usuarioEnEdicion,
     setUsuarioEnEdicion,
@@ -200,42 +211,68 @@ export function UsuariosPage() {
     pageSize,
   ])
 
- const manejarGuardado = async (
-  datos: UsuarioFormData,
-): Promise<string | null> => {
-  try {
-    const esEdicion =
-      usuarioEnEdicion !== null
+  const solicitarGuardado = (
+    datos: UsuarioFormData,
+  ): null => {
+    setDatosPendientes(datos)
+    setConfirmacionAbierta(true)
+    return null
+  }
 
-    if (usuarioEnEdicion) {
-      await actualizarUsuarioBackend(
-        usuarioEnEdicion.id,
-        datos,
-      )
-    } else {
-      await crearUsuarioBackend(datos)
+  const confirmarGuardado = async (): Promise<void> => {
+    if (!datosPendientes || guardando) {
+      return
     }
 
-    await cargarUsuarios()
+    const datos = datosPendientes
+    const usuarioId = usuarioEnEdicion?.id
+    const esEdicion = usuarioId !== undefined
 
-    mostrarAlerta(
-      'success',
-      esEdicion
-        ? 'Usuario actualizado correctamente.'
-        : 'Usuario registrado. Se enviaron las credenciales al correo indicado.',
-    )
-
-    setUsuarioEnEdicion(null)
+    setConfirmacionAbierta(false)
     setModalAbierto(false)
-    setPage(1)
+    setGuardando(true)
+    setCargando(true)
 
-    return null
-  } catch (error) {
-    return error instanceof Error
-      ? error.message
-      : 'No se pudo guardar el usuario.'
+    try {
+      if (usuarioId !== undefined) {
+        await actualizarUsuarioBackend(
+          usuarioId,
+          datos,
+        )
+      } else {
+        await crearUsuarioBackend(datos)
+      }
+
+      await cargarUsuarios()
+
+      mostrarAlerta(
+        'success',
+        esEdicion
+          ? 'Usuario actualizado correctamente.'
+          : 'Usuario registrado. Se enviaron las credenciales al correo indicado.',
+      )
+
+      setPage(1)
+    } catch (error) {
+      mostrarAlerta(
+        'error',
+        error instanceof Error
+          ? error.message
+          : 'No se pudo guardar el usuario.',
+      )
+    } finally {
+      setDatosPendientes(null)
+      setUsuarioEnEdicion(null)
+      setGuardando(false)
+      setCargando(false)
+    }
   }
-}
+
+  /*
+   * El formulario solo solicita el guardado; la llamada al backend se hace
+   * después de confirmar explícitamente en el modal.
+   */
+  const manejarGuardado = solicitarGuardado
 
   const manejarEliminacion = (
     usuario: UsuarioLogin,
@@ -274,7 +311,11 @@ export function UsuariosPage() {
         {cargando && (
           <div className="maestro-fullscreen-loader" role="status" aria-live="polite">
             <div className="spinner-border text-success" aria-hidden="true" />
-            <span>Cargando usuarios...</span>
+            <span>
+              {guardando
+                ? 'Guardando usuario...'
+                : 'Cargando usuarios...'}
+            </span>
           </div>
         )}
 
@@ -361,10 +402,38 @@ export function UsuariosPage() {
           onClose={() => {
             setModalAbierto(false)
             setUsuarioEnEdicion(null)
+            setDatosPendientes(null)
+            setConfirmacionAbierta(false)
           }}
           onGuardar={manejarGuardado}
         />
       )}
+
+      <ConfirmacionModal
+        abierto={confirmacionAbierta}
+        titulo={
+          usuarioEnEdicion
+            ? 'Confirmar actualización'
+            : 'Confirmar registro'
+        }
+        mensaje={
+          usuarioEnEdicion
+            ? '¿Deseas guardar los cambios de este usuario?'
+            : '¿Deseas registrar este usuario? Se enviarán sus credenciales al correo indicado.'
+        }
+        onClose={() => {
+          if (guardando) {
+            return
+          }
+
+          setConfirmacionAbierta(false)
+          setDatosPendientes(null)
+        }}
+        onConfirm={() => {
+          void confirmarGuardado()
+        }}
+        confirmando={guardando}
+      />
     </>
   )
 }
