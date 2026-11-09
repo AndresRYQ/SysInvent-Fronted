@@ -87,8 +87,8 @@ function validar(datos: ContactoFormData): void {
   if (nombre.length > 255) throw new Error('El nombre completo no puede superar los 255 caracteres.')
   if (cargo.length > 150) throw new Error('El cargo no puede superar los 150 caracteres.')
   const digitosTelefono = telefono.replace(/\D/g, '')
-  if (telefono && (digitosTelefono.length < 7 || digitosTelefono.length > 30)) {
-    throw new Error('Ingresa un teléfono válido.')
+  if (telefono && !/^9\d{8}$/.test(digitosTelefono)) {
+    throw new Error('El teléfono debe tener 9 dígitos y comenzar con 9.')
   }
   if (correo && !/^\S+@\S+\.\S+$/.test(correo)) throw new Error('Ingresa un correo válido.')
 }

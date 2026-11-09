@@ -159,12 +159,9 @@ export function FormularioContacto({
     if (!telefono) {
       nuevosErrores.telefono =
         'Campo requerido'
-    } else if (
-      numerosTelefono.length < 7 ||
-      numerosTelefono.length > 15
-    ) {
+    } else if (!/^9\d{8}$/.test(numerosTelefono)) {
       nuevosErrores.telefono =
-        'Ingresa un teléfono válido'
+        'El teléfono debe tener 9 dígitos y comenzar con 9'
     }
 
     if (!correo) {
@@ -417,14 +414,14 @@ export function FormularioContacto({
                       : ''
                   }`}
                   type="tel"
-                  maxLength={30}
+                  inputMode="numeric"
+                  maxLength={9}
                   value={form.telefono}
                   placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
                     setForm((actual) => ({
                       ...actual,
-                      telefono:
-                        event.target.value,
+                      telefono: event.target.value.replace(/\D/g, ''),
                     }))
 
                     setErrores(
@@ -435,7 +432,7 @@ export function FormularioContacto({
                     )
                   }}
                 />
-                <CharacterCounter value={form.telefono} maxLength={30} />
+                <CharacterCounter value={form.telefono} maxLength={9} />
 
                 {errores.telefono && (
                   <div className="maestro-field-error">

@@ -455,6 +455,11 @@
   --bs-gutter-y: 0.75rem;
 }
 
+/* Mantiene uniforme el espaciado vertical de los campos en formularios maestros. */
+.maestro-modal-body .row > [class*="col-"] {
+  margin-top: 12px;
+}
+
 .character-counter,
 .maestro-field-error {
   display: inline-block;

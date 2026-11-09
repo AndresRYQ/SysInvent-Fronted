@@ -78,7 +78,7 @@ function validar(datos: ProveedorFormData): void {
   if (razonSocial.length > 255) throw new Error('La razón social no puede superar los 255 caracteres.')
   if (datos.correo.trim() && !/^\S+@\S+\.\S+$/.test(datos.correo.trim())) throw new Error('Ingresa un correo electrónico válido.')
   const telefono = datos.telefono.replace(/\D/g, '')
-  if (datos.telefono.trim() && (telefono.length < 7 || telefono.length > 9)) throw new Error('Ingresa un teléfono válido.')
+  if (datos.telefono.trim() && !/^9\d{8}$/.test(telefono)) throw new Error('El teléfono debe tener 9 dígitos y comenzar con 9.')
   if (datos.direccion.trim().length < 5) throw new Error('La dirección debe tener al menos 5 caracteres.')
   if (datos.direccion.trim().length > 255) throw new Error('La dirección no puede superar los 255 caracteres.')
 }

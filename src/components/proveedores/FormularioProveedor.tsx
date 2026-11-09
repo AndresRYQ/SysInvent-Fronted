@@ -120,11 +120,9 @@ export function FormularioProveedor({
     const numerosTelefono =
       telefono.replace(/\D/g, '')
 
-    if (
-      numerosTelefono.length !== 9
-    ) {
+    if (!/^9\d{8}$/.test(numerosTelefono)) {
       nuevosErrores.telefono =
-        'Ingresa un número de teléfono válido'
+        'El teléfono debe tener 9 dígitos y comenzar con 9'
     }
 
     if (direccion.length < 5) {

@@ -120,9 +120,11 @@ export function FormularioUsuario({ usuario, roles, onClose, onGuardar }: Formul
               <div className="input-group">
                 <span className="input-group-text"><UserRound size={16} /></span>
                 <input id="usuarioDni" className={`form-control${errores.dni ? ' maestro-control--error' : ''}${usuario ? ' bg-light' : ''}`} value={datos.dni} placeholder="Ingresa 8 dígitos" inputMode="numeric" maxLength={8} readOnly={Boolean(usuario)} onChange={(evento) => actualizarCampo('dni', evento.target.value.replace(/\D/g, ''))} />
+              </div>
+              <div className="d-flex justify-content-between align-items-start">
+                {renderError(errores.dni) || <span />}
                 <CharacterCounter value={datos.dni ?? ''} maxLength={8} />
               </div>
-              {renderError(errores.dni)}
             </div>
 
             <div className="col-12 col-md-6">
