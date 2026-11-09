@@ -1,4 +1,5 @@
 import { Placeholder } from '../../constants/placeholders'
+import { CharacterCounter } from '../common/CharacterCounter'
 import { useEffect, useState } from 'react'
 import { Save, X } from 'lucide-react'
 import type { CentroCosto, CentroCostoFormData } from '../../types/centroCosto'
@@ -54,15 +55,16 @@ export function CentroCostoFormModal({ abierto, centroCosto, error, soloLectura 
             {error && <div className="alert alert-danger py-2" role="alert">{error}</div>}
             <div className="mb-3">
               <label className="form-label required" htmlFor="centroCostoNombreModal">Nombre de centro de costo</label>
-              <input id="centroCostoNombreModal" className={`form-control${errores.nombre ? ' maestro-control--error' : ''}`} value={form.nombre} placeholder={Placeholder.Ingresar} disabled={soloLectura} onChange={(event) => actualizar('nombre', event.target.value)} />
+              <input id="centroCostoNombreModal" className={`form-control${errores.nombre ? ' maestro-control--error' : ''}`} value={form.nombre} placeholder={Placeholder.Ingresar} disabled={soloLectura} maxLength={150} onChange={(event) => actualizar('nombre', event.target.value)} />
+              <CharacterCounter value={form.nombre} maxLength={150} />
               {errores.nombre && <div className="maestro-field-error">Campo requerido</div>}
             </div>
             <div>
               <label className="form-label required" htmlFor="centroCostoDescripcionModal">Descripción</label>
-              <textarea id="centroCostoDescripcionModal" className={`form-control${errores.descripcion ? ' maestro-control--error' : ''}`} value={form.descripcion} placeholder={Placeholder.Ingresar} disabled={soloLectura} maxLength={250} rows={2} onChange={(event) => actualizar('descripcion', event.target.value)} />
+              <textarea id="centroCostoDescripcionModal" className={`form-control${errores.descripcion ? ' maestro-control--error' : ''}`} value={form.descripcion} placeholder={Placeholder.Ingresar} disabled={soloLectura} maxLength={255} rows={2} onChange={(event) => actualizar('descripcion', event.target.value)} />
               <div className="d-flex justify-content-between">
                 <div>{errores.descripcion && <span className="maestro-field-error">Campo requerido</span>}</div>
-                <small className="text-muted">{form.descripcion.length}/250</small>
+                <CharacterCounter value={form.descripcion} maxLength={255} />
               </div>
             </div>
           </div>
