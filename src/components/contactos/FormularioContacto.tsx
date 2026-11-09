@@ -1,4 +1,5 @@
 import { Placeholder } from '../../constants/placeholders'
+import { CharacterCounter } from '../common/CharacterCounter'
 import {
   useEffect,
   useState,
@@ -324,7 +325,7 @@ export function FormularioContacto({
                       : ''
                   }`}
                   type="text"
-                  maxLength={120}
+                  maxLength={255}
                   value={
                     form.nombreCompleto
                   }
@@ -344,6 +345,7 @@ export function FormularioContacto({
                     )
                   }}
                 />
+                <CharacterCounter value={form.nombreCompleto} maxLength={255} />
 
                 {errores.nombreCompleto && (
                   <div className="maestro-field-error">
@@ -371,7 +373,7 @@ export function FormularioContacto({
                       : ''
                   }`}
                   type="text"
-                  maxLength={80}
+                  maxLength={150}
                   value={form.cargo}
                   placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
@@ -389,6 +391,7 @@ export function FormularioContacto({
                     )
                   }}
                 />
+                <CharacterCounter value={form.cargo} maxLength={150} />
 
                 {errores.cargo && (
                   <div className="maestro-field-error">
@@ -414,7 +417,7 @@ export function FormularioContacto({
                       : ''
                   }`}
                   type="tel"
-                  maxLength={20}
+                  maxLength={30}
                   value={form.telefono}
                   placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
@@ -432,6 +435,7 @@ export function FormularioContacto({
                     )
                   }}
                 />
+                <CharacterCounter value={form.telefono} maxLength={30} />
 
                 {errores.telefono && (
                   <div className="maestro-field-error">
@@ -457,7 +461,7 @@ export function FormularioContacto({
                       : ''
                   }`}
                   type="email"
-                  maxLength={120}
+                  maxLength={150}
                   value={form.correo}
                   placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
@@ -475,6 +479,7 @@ export function FormularioContacto({
                     )
                   }}
                 />
+                <CharacterCounter value={form.correo} maxLength={150} />
 
                 {errores.correo && (
                   <div className="maestro-field-error">

@@ -1,4 +1,5 @@
 import { Placeholder } from '../../constants/placeholders'
+import { CharacterCounter } from '../common/CharacterCounter'
 import Select from 'react-select'
 import { Save, UserRound, X } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
@@ -119,31 +120,36 @@ export function FormularioUsuario({ usuario, roles, onClose, onGuardar }: Formul
               <div className="input-group">
                 <span className="input-group-text"><UserRound size={16} /></span>
                 <input id="usuarioDni" className={`form-control${errores.dni ? ' maestro-control--error' : ''}${usuario ? ' bg-light' : ''}`} value={datos.dni} placeholder="Ingresa 8 dígitos" inputMode="numeric" maxLength={8} readOnly={Boolean(usuario)} onChange={(evento) => actualizarCampo('dni', evento.target.value.replace(/\D/g, ''))} />
+                <CharacterCounter value={datos.dni ?? ''} maxLength={8} />
               </div>
               {renderError(errores.dni)}
             </div>
 
             <div className="col-12 col-md-6">
               <label className="form-label required" htmlFor="usuarioNombres">Nombres</label>
-              <input id="usuarioNombres" className={`form-control${errores.nombres ? ' maestro-control--error' : ''}`} value={datos.nombres} placeholder={Placeholder.Ingresar} maxLength={100} onChange={(evento) => actualizarCampo('nombres', evento.target.value)} />
+              <input id="usuarioNombres" className={`form-control${errores.nombres ? ' maestro-control--error' : ''}`} value={datos.nombres} placeholder={Placeholder.Ingresar} maxLength={255} onChange={(evento) => actualizarCampo('nombres', evento.target.value)} />
+              <CharacterCounter value={datos.nombres ?? ''} maxLength={255} />
               {renderError(errores.nombres)}
             </div>
 
             <div className="col-12 col-md-6">
               <label className="form-label required" htmlFor="usuarioApePaterno">Apellido paterno</label>
-              <input id="usuarioApePaterno" className={`form-control${errores.apePaterno ? ' maestro-control--error' : ''}`} value={datos.apePaterno} placeholder={Placeholder.Ingresar} maxLength={100} onChange={(evento) => actualizarCampo('apePaterno', evento.target.value)} />
+              <input id="usuarioApePaterno" className={`form-control${errores.apePaterno ? ' maestro-control--error' : ''}`} value={datos.apePaterno} placeholder={Placeholder.Ingresar} maxLength={255} onChange={(evento) => actualizarCampo('apePaterno', evento.target.value)} />
+              <CharacterCounter value={datos.apePaterno ?? ''} maxLength={255} />
               {renderError(errores.apePaterno)}
             </div>
 
             <div className="col-12 col-md-6">
               <label className="form-label required" htmlFor="usuarioApeMaterno">Apellido materno</label>
-              <input id="usuarioApeMaterno" className={`form-control${errores.apeMaterno ? ' maestro-control--error' : ''}`} value={datos.apeMaterno} placeholder={Placeholder.Ingresar} maxLength={100} onChange={(evento) => actualizarCampo('apeMaterno', evento.target.value)} />
+              <input id="usuarioApeMaterno" className={`form-control${errores.apeMaterno ? ' maestro-control--error' : ''}`} value={datos.apeMaterno} placeholder={Placeholder.Ingresar} maxLength={255} onChange={(evento) => actualizarCampo('apeMaterno', evento.target.value)} />
+              <CharacterCounter value={datos.apeMaterno ?? ''} maxLength={255} />
               {renderError(errores.apeMaterno)}
             </div>
 
             <div className="col-12 col-md-6">
               <label className="form-label required" htmlFor="usuarioEmail">Correo</label>
-              <input id="usuarioEmail" className={`form-control${errores.email ? ' maestro-control--error' : ''}`} type="email" value={datos.email} placeholder={Placeholder.Ingresar} maxLength={120} autoComplete="email" onChange={(evento) => actualizarCampo('email', evento.target.value)} />
+              <input id="usuarioEmail" className={`form-control${errores.email ? ' maestro-control--error' : ''}`} type="email" value={datos.email} placeholder={Placeholder.Ingresar} maxLength={255} autoComplete="email" onChange={(evento) => actualizarCampo('email', evento.target.value)} />
+              <CharacterCounter value={datos.email} maxLength={255} />
               {renderError(errores.email)}
             </div>
 

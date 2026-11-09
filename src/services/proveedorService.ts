@@ -75,12 +75,12 @@ function validar(datos: ProveedorFormData): void {
   if (!/^\d{11}$/.test(datos.ruc.trim())) throw new Error('El RUC debe contener exactamente 11 números.')
   const razonSocial = datos.razonSocial.trim()
   if (razonSocial.length < 2) throw new Error('La razón social debe tener al menos 2 caracteres.')
-  if (razonSocial.length > 120) throw new Error('La razón social no puede superar los 120 caracteres.')
+  if (razonSocial.length > 255) throw new Error('La razón social no puede superar los 255 caracteres.')
   if (datos.correo.trim() && !/^\S+@\S+\.\S+$/.test(datos.correo.trim())) throw new Error('Ingresa un correo electrónico válido.')
   const telefono = datos.telefono.replace(/\D/g, '')
-  if (datos.telefono.trim() && (telefono.length < 7 || telefono.length > 15)) throw new Error('Ingresa un teléfono válido.')
+  if (datos.telefono.trim() && (telefono.length < 7 || telefono.length > 9)) throw new Error('Ingresa un teléfono válido.')
   if (datos.direccion.trim().length < 5) throw new Error('La dirección debe tener al menos 5 caracteres.')
-  if (datos.direccion.trim().length > 200) throw new Error('La dirección no puede superar los 200 caracteres.')
+  if (datos.direccion.trim().length > 255) throw new Error('La dirección no puede superar los 255 caracteres.')
 }
 
 function validarRespuesta(response: MessageResponse): MessageResponse {

@@ -1,4 +1,5 @@
 import { Placeholder } from '../../constants/placeholders'
+import { CharacterCounter } from '../common/CharacterCounter'
 import {
   useEffect,
   useState,
@@ -224,12 +225,10 @@ export function FormularioProveedor({
                 }))
               }}
             />
-
-            {errores.ruc && (
-              <div className="maestro-field-error">
-                {errores.ruc}
-              </div>
-            )}
+            <div className="d-flex justify-content-between align-items-start">
+              {errores.ruc ? <div className="maestro-field-error">{errores.ruc}</div> : <span />}
+              <CharacterCounter value={form.ruc} maxLength={11} />
+            </div>
           </div>
 
           <div className="col-12 col-lg-8">
@@ -250,7 +249,7 @@ export function FormularioProveedor({
                   : ''
               }`}
               type="text"
-              maxLength={120}
+              maxLength={255}
               placeholder={Placeholder.Ingresar}
               value={form.razonSocial}
               aria-invalid={Boolean(
@@ -269,12 +268,10 @@ export function FormularioProveedor({
                 }))
               }}
             />
-
-            {errores.razonSocial && (
-              <div className="maestro-field-error">
-                {errores.razonSocial}
-              </div>
-            )}
+            <div className="d-flex justify-content-between align-items-start">
+              {errores.razonSocial ? <div className="maestro-field-error">{errores.razonSocial}</div> : <span />}
+              <CharacterCounter value={form.razonSocial} maxLength={255} />
+            </div>
           </div>
 
           <div className="col-12 col-lg-6">
@@ -295,7 +292,7 @@ export function FormularioProveedor({
                   : ''
               }`}
               type="email"
-              maxLength={120}
+              maxLength={150}
               placeholder={Placeholder.Ingresar}
               value={form.correo}
               aria-invalid={Boolean(
@@ -313,12 +310,10 @@ export function FormularioProveedor({
                 }))
               }}
             />
-
-            {errores.correo && (
-              <div className="maestro-field-error">
-                {errores.correo}
-              </div>
-            )}
+            <div className="d-flex justify-content-between align-items-start">
+              {errores.correo ? <div className="maestro-field-error">{errores.correo}</div> : <span />}
+              <CharacterCounter value={form.correo} maxLength={150} />
+            </div>
           </div>
 
           <div className="col-12 col-lg-6">
@@ -361,12 +356,10 @@ export function FormularioProveedor({
                 }))
               }}
             />
-
-            {errores.telefono && (
-              <div className="maestro-field-error">
-                {errores.telefono}
-              </div>
-            )}
+            <div className="d-flex justify-content-between align-items-start">
+              {errores.telefono ? <div className="maestro-field-error">{errores.telefono}</div> : <span />}
+              <CharacterCounter value={form.telefono} maxLength={9} />
+            </div>
           </div>
 
           <div className="col-12">
@@ -387,7 +380,7 @@ export function FormularioProveedor({
                   : ''
               }`}
               rows={3}
-              maxLength={200}
+              maxLength={255}
               placeholder={Placeholder.Ingresar}
               value={form.direccion}
               aria-invalid={Boolean(
@@ -406,19 +399,9 @@ export function FormularioProveedor({
                 }))
               }}
             />
-
             <div className="d-flex justify-content-between">
-              <div>
-                {errores.direccion && (
-                  <span className="maestro-field-error">
-                    {errores.direccion}
-                  </span>
-                )}
-              </div>
-
-              <small className="text-muted">
-                {form.direccion.length}/200
-              </small>
+              {errores.direccion ? <div className="maestro-field-error">{errores.direccion}</div> : <span />}
+              <CharacterCounter value={form.direccion} maxLength={255} />
             </div>
           </div>
 

@@ -451,3 +451,19 @@
   color: #6c757d;
   cursor: not-allowed;
 }
+.row.g-4 {
+  --bs-gutter-y: 0.75rem;
+}
+
+.character-counter,
+.maestro-field-error {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.character-counter {
+  float: right;
+  margin-left: 0.5rem;
+  text-align: right;
+}
+

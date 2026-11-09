@@ -84,10 +84,10 @@ function validar(datos: ContactoFormData): void {
   const correo = datos.correo.trim()
 
   if (nombre.length < 3) throw new Error('El nombre completo debe tener al menos 3 caracteres.')
-  if (nombre.length > 120) throw new Error('El nombre completo no puede superar los 120 caracteres.')
-  if (cargo.length > 80) throw new Error('El cargo no puede superar los 80 caracteres.')
+  if (nombre.length > 255) throw new Error('El nombre completo no puede superar los 255 caracteres.')
+  if (cargo.length > 150) throw new Error('El cargo no puede superar los 150 caracteres.')
   const digitosTelefono = telefono.replace(/\D/g, '')
-  if (telefono && (digitosTelefono.length < 7 || digitosTelefono.length > 15)) {
+  if (telefono && (digitosTelefono.length < 7 || digitosTelefono.length > 30)) {
     throw new Error('Ingresa un teléfono válido.')
   }
   if (correo && !/^\S+@\S+\.\S+$/.test(correo)) throw new Error('Ingresa un correo válido.')

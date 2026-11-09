@@ -1,4 +1,5 @@
 import { Placeholder } from '../../constants/placeholders'
+import { CharacterCounter } from '../common/CharacterCounter'
 import {
   useEffect,
   useState,
@@ -236,7 +237,7 @@ export function FormularioParteEquipo({
                       : ''
                   }`}
                   type="text"
-                  maxLength={30}
+                  maxLength={50}
                   value={form.codigo}
                   placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
@@ -255,6 +256,7 @@ export function FormularioParteEquipo({
                     )
                   }}
                 />
+                <CharacterCounter value={form.codigo} maxLength={50} />
 
                 {errores.codigo && (
                   <div className="maestro-field-error">
@@ -280,7 +282,7 @@ export function FormularioParteEquipo({
                       : ''
                   }`}
                   type="text"
-                  maxLength={120}
+                  maxLength={150}
                   value={form.nombre}
                   placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
@@ -298,6 +300,7 @@ export function FormularioParteEquipo({
                     )
                   }}
                 />
+                <CharacterCounter value={form.nombre} maxLength={150} />
 
                 {errores.nombre && (
                   <div className="maestro-field-error">
@@ -323,7 +326,7 @@ export function FormularioParteEquipo({
                       : ''
                   }`}
                   rows={4}
-                  maxLength={250}
+                  maxLength={255}
                   value={
                     form.descripcion
                   }
@@ -354,13 +357,7 @@ export function FormularioParteEquipo({
                     )}
                   </div>
 
-                  <small className="text-muted">
-                    {
-                      form.descripcion
-                        .length
-                    }
-                    /250
-                  </small>
+                  <CharacterCounter value={form.descripcion} maxLength={255} />
                 </div>
               </div>
 

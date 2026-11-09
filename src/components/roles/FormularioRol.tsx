@@ -1,4 +1,5 @@
 import { Placeholder } from '../../constants/placeholders'
+import { CharacterCounter } from '../common/CharacterCounter'
 import Alert from '@mui/material/Alert'
 import {
   Save,
@@ -164,7 +165,7 @@ export function FormularioRol({
                 className={`form-control${errores.nombre ? ' maestro-control--error' : ''}`}
                 value={datos.nombre}
                 placeholder={Placeholder.Ingresar}
-                maxLength={60}
+                maxLength={255}
                 onChange={(evento) => {
                   setDatos((actual) => ({
                     ...actual,
@@ -174,6 +175,7 @@ export function FormularioRol({
                   setErrores((actual) => ({ ...actual, nombre: '' }))
                 }}
               />
+                <CharacterCounter value={datos.nombre} maxLength={255} />
               {errores.nombre && <div className="maestro-field-error">{errores.nombre}</div>}
             </div>
 
@@ -190,7 +192,7 @@ export function FormularioRol({
                 id="rolDescripcion"
                 className={`form-control${errores.descripcion ? ' maestro-control--error' : ''}`}
                 rows={3}
-                maxLength={200}
+                maxLength={255}
                 value={datos.descripcion}
                 placeholder={Placeholder.Ingresar}
                 onChange={(evento) => {
@@ -202,6 +204,7 @@ export function FormularioRol({
                   setErrores((actual) => ({ ...actual, descripcion: '' }))
                 }}
               />
+              <CharacterCounter value={datos.descripcion} maxLength={255} />
               {errores.descripcion && <div className="maestro-field-error">{errores.descripcion}</div>}
             </div>
 
