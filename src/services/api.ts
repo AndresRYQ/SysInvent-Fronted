@@ -1,3 +1,7 @@
+import {
+  AUTH_TOKEN_KEY,
+  notificarSesionNoAutorizada,
+} from './authSession'
 
 const DEFAULT_LOCAL_API_URL = 'http://localhost:8080'
 const DEFAULT_PRODUCTION_API_URL = 'https://sysinvent-backend.onrender.com'
@@ -10,8 +14,6 @@ export const API_URL = (
     ? DEFAULT_LOCAL_API_URL
     : DEFAULT_PRODUCTION_API_URL)
 ).replace(/\/+$/, '')
-
-const AUTH_TOKEN_KEY = 'sysinvent_token'
 
 export interface ApiError extends Error {
   status?: number
@@ -71,6 +73,10 @@ export async function apiFetch<T>(
       ...options,
       headers,
     })
+
+    if (response.status === 401) {
+      notificarSesionNoAutorizada()
+    }
 
     const contentType = response.headers.get('content-type') ?? ''
     const data = contentType.includes('application/json')
