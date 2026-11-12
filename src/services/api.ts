@@ -2,11 +2,14 @@
 const DEFAULT_LOCAL_API_URL = 'http://localhost:8080'
 const DEFAULT_PRODUCTION_API_URL = 'https://sysinvent-backend.onrender.com'
 
-export const API_URL =
-  (import.meta.env.VITE_API_URL ||
-    (import.meta.env.DEV
-      ? DEFAULT_LOCAL_API_URL
-      : DEFAULT_PRODUCTION_API_URL)).replace(/\/+$/, '')
+const CONFIGURED_API_URL = import.meta.env.VITE_API_URL?.trim()
+
+export const API_URL = (
+  CONFIGURED_API_URL ||
+  (import.meta.env.DEV
+    ? DEFAULT_LOCAL_API_URL
+    : DEFAULT_PRODUCTION_API_URL)
+).replace(/\/+$/, '')
 
 const AUTH_TOKEN_KEY = 'sysinvent_token'
 
