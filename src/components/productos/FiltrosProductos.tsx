@@ -39,7 +39,7 @@ export function FiltrosProductos({ valores, tiposProducto, categorias, onChange,
         <form className="row g-3" onSubmit={(event) => { event.preventDefault(); onBuscar() }}>
           <div className="col-12 col-xl-6">
             <label className="form-label maestro-label" htmlFor="buscarProducto">Código o nombre</label>
-            <input id="buscarProducto" className="form-control maestro-control" value={valores.busqueda} placeholder="Buscar producto" onChange={(event) => onChange('busqueda', event.target.value)} />
+            <input id="buscarProducto" maxLength={255} className="form-control maestro-control" value={valores.busqueda} placeholder="Buscar producto" onChange={(event) => onChange('busqueda', event.target.value)} />
           </div>
           <div className="col-12 col-md-4 col-xl-2">
             <label className="form-label maestro-label" htmlFor="filtroTipoProducto">Tipo</label>

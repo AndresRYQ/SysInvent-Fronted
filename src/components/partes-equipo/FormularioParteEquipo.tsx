@@ -109,12 +109,12 @@ export function FormularioParteEquipo({
       nuevosErrores.codigo =
         'Campo requerido'
     } else if (
-      !/^[A-Z0-9-]{3,30}$/.test(
+      !/^[A-Z0-9-]{3,50}$/.test(
         codigo,
       )
     ) {
       nuevosErrores.codigo =
-        'Usa entre 3 y 30 letras, números o guiones'
+        'Usa entre 3 y 50 letras, números o guiones'
     }
 
     if (!nombre) {
@@ -123,9 +123,9 @@ export function FormularioParteEquipo({
     } else if (nombre.length < 2) {
       nuevosErrores.nombre =
         'Debe tener al menos 2 caracteres'
-    } else if (nombre.length > 120) {
+    } else if (nombre.length > 150) {
       nuevosErrores.nombre =
-        'No puede superar los 120 caracteres'
+        'No puede superar los 150 caracteres'
     }
 
     if (!descripcion) {
@@ -137,10 +137,10 @@ export function FormularioParteEquipo({
       nuevosErrores.descripcion =
         'Debe tener al menos 5 caracteres'
     } else if (
-      descripcion.length > 250
+      descripcion.length > 255
     ) {
       nuevosErrores.descripcion =
-        'No puede superar los 250 caracteres'
+        'No puede superar los 255 caracteres'
     }
 
     setErrores(nuevosErrores)

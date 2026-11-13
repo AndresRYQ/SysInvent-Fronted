@@ -49,6 +49,7 @@ export function FiltrosCentrosCosto({
 
             <input
               id="nombreCentroCosto"
+              maxLength={150}
               className="form-control"
               type="text"
               value={valores.nombre}
