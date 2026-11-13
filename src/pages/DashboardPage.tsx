@@ -175,6 +175,15 @@ const modules: Module[] = [
     '/reportes/productos-mas-pedidos',
   },
   {
+    id: ModuloCodigo.REPORTE_KARDEX,
+    title: 'Reporte de Kardex',
+    description: 'Entradas, salidas y saldos por producto.',
+    icon: 'report',
+    tone: 'blue',
+    category: 'Reportes',
+    route: '/reportes/kardex',
+  },
+  {
     id: ModuloCodigo.CENTROS_COSTO,
     title: 'Centros de costo',
     description: 'Mantenimiento de centros de costo.',

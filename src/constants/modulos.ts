@@ -13,6 +13,7 @@ export enum ModuloCodigo {
   REPORTE_INGRESOS = 'reporte-ingresos',
   REPORTE_VALES = 'reporte-vales',
   REPORTE_PRODUCTOS = 'reporte-productos',
+  REPORTE_KARDEX = 'reporte-kardex',
   CONTACTOS = 'contactos',
   PARTES_EQUIPO = 'partes-equipo',
   CONTROL_ALMACEN = 'control-almacen',

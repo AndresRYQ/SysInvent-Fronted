@@ -88,6 +88,12 @@ const SECCIONES: SidebarSection[] = [
         icon: FileText,
         moduleId: ModuloCodigo.REPORTE_PRODUCTOS,
       },
+      {
+        to: '/reportes/kardex',
+        label: 'Reporte de Kardex',
+        icon: FileText,
+        moduleId: ModuloCodigo.REPORTE_KARDEX,
+      },
     ],
   },
   {
