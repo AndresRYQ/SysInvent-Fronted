@@ -1215,3 +1215,12 @@
     flex-direction: column;
   }
 }
+
+/* Mensaje cuando el dashboard no tiene datos que mostrar */
+.dashboard-empty {
+  margin: 0;
+  padding: 1rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+}

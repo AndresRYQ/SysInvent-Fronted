@@ -16,7 +16,6 @@ import SpotlightCard from '../components/ui/SpotlightCard'
 import { useAuth } from '../hooks/useAuth'
 import '../styles/react-bits.css'
 import '../styles/DashboardPage.css'
-import { DASHBOARD_MOCK } from '../data/dashboardMock'
 import { ModuloCodigo } from '../constants/modulos'
 
 const RESUMEN_VACIO: ResumenDashboard = {
@@ -174,6 +173,15 @@ const modules: Module[] = [
     category: 'Reportes',
      route:
     '/reportes/productos-mas-pedidos',
+  },
+  {
+    id: ModuloCodigo.REPORTE_KARDEX,
+    title: 'Reporte de Kardex',
+    description: 'Entradas, salidas y saldos por producto.',
+    icon: 'report',
+    tone: 'blue',
+    category: 'Reportes',
+    route: '/reportes/kardex',
   },
   {
     id: ModuloCodigo.CENTROS_COSTO,
@@ -396,8 +404,10 @@ function DashboardPage() {
     useState<ResumenDashboard | null>(null)
   const [errorResumen, setErrorResumen] =
     useState<string | null>(null)
-  const [usarMock, setUsarMock] = useState(false)
   const [cargandoResumen, setCargandoResumen] = useState(true)
+  const [actualizadoEn, setActualizadoEn] =
+    useState<Date | null>(null)
+  const [recargas, setRecargas] = useState(0)
 
   useEffect(() => {
     let activo = true
@@ -405,27 +415,20 @@ function DashboardPage() {
     obtenerResumenDashboard()
       .then((resumen) => {
         if (activo) {
-          const respuestaVacia =
-            resumen.productosActivos === 0 &&
-            resumen.ingresosDelMes === 0 &&
-            resumen.valesDelMes === 0 &&
-            resumen.movimientosHoy === 0 &&
-            resumen.movimientosRecientes.length === 0
-
-          setUsarMock(respuestaVacia)
           setResumenCargado(resumen)
+          setErrorResumen(null)
+          setActualizadoEn(new Date())
           setCargandoResumen(false)
         }
       })
       .catch((error: unknown) => {
         if (activo) {
-          setUsarMock(true)
           setErrorResumen(
-            `No se pudo cargar el resumen real. ${
+            `No se pudieron cargar los indicadores del inventario. ${
               error instanceof Error
                 ? error.message
-                : 'Mostrando datos de demostración.'
-            }`,
+                : ''
+            }`.trim(),
           )
           setCargandoResumen(false)
         }
@@ -434,12 +437,17 @@ function DashboardPage() {
     return () => {
       activo = false
     }
-  }, [])
+  }, [recargas])
 
   const resumenDashboard =
-    usarMock
-      ? DASHBOARD_MOCK
-      : resumenCargado ?? RESUMEN_VACIO
+    resumenCargado ?? RESUMEN_VACIO
+
+  const horaActualizacion = actualizadoEn
+    ? new Intl.DateTimeFormat('es-PE', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(actualizadoEn)
+    : null
 
   const metrics: Metric[] = [
     {
@@ -460,7 +468,7 @@ function DashboardPage() {
         resumenDashboard
           .productosSinStock,
       detail:
-        'Requieren reposición',
+        `${resumenDashboard.productosStockBajo} con stock bajo · ${resumenDashboard.productosSinStock} sin stock`,
       status: 'alert',
       icon: 'clipboard',
       tone: 'orange',
@@ -513,7 +521,9 @@ function DashboardPage() {
       .map((movimiento) => ({
         id: movimiento.id,
         date: movimiento.fecha,
+        time: movimiento.hora ?? '',
         type: movimiento.tipo,
+        description: movimiento.descripcion ?? '',
         document:
           movimiento.documento,
         product:
@@ -584,14 +594,21 @@ const filteredModules =
     <main className="dashboard-shell">
       <PageLoadingOverlay visible={cargandoResumen} mensaje="Cargando resumen..." />
       {errorResumen && (
-        <div className="alert alert-danger" role="alert">
-          {errorResumen}
-        </div>
-      )}
-
-      {usarMock && (
-        <div className="alert alert-info" role="status">
-          Mostrando datos de demostración en el panel principal.
+        <div
+          className="alert alert-danger d-flex align-items-center justify-content-between gap-3 flex-wrap"
+          role="alert"
+        >
+          <span>{errorResumen}</span>
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-danger"
+            onClick={() => {
+              setCargandoResumen(true)
+              setRecargas((valor) => valor + 1)
+            }}
+          >
+            Reintentar
+          </button>
         </div>
       )}
 
@@ -692,12 +709,21 @@ const filteredModules =
               <h2>Alertas del inventario</h2>
             </div>
 
-            <span className="local-badge">
-              Datos locales
-            </span>
+            {horaActualizacion && (
+              <span className="local-badge">
+                Actualizado {horaActualizacion}
+              </span>
+            )}
           </header>
 
           <div className="alerts-list">
+            {dashboardAlerts.length === 0 && (
+              <p className="dashboard-empty" role="status">
+                {errorResumen
+                  ? 'No se pudieron obtener las alertas del inventario.'
+                  : 'No existen alertas del inventario.'}
+              </p>
+            )}
             {dashboardAlerts.map((alert) => (
               <div
                 className="alert-item"
@@ -742,9 +768,25 @@ const filteredModules =
               </thead>
 
               <tbody>
+                {recentMovements.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="dashboard-empty" role="status">
+                      {errorResumen
+                        ? 'No se pudo obtener la actividad reciente.'
+                        : 'Aún no se registran movimientos de inventario.'}
+                    </td>
+                  </tr>
+                )}
                 {recentMovements.map((movement) => (
                   <tr key={movement.id}>
-                    <td>{movement.date}</td>
+                    <td>
+                      {movement.date}
+                      {movement.time && (
+                        <small className="d-block text-muted">
+                          {movement.time}
+                        </small>
+                      )}
+                    </td>
 
                     <td>
                       <span
@@ -753,6 +795,7 @@ const filteredModules =
                             ? 'movement-badge movement-badge--entry'
                             : 'movement-badge movement-badge--voucher'
                         }
+                        title={movement.description || undefined}
                       >
                         {movement.type}
                       </span>

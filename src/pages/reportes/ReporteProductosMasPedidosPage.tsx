@@ -15,16 +15,9 @@ import { ResumenProductosMasPedidos } from '../../components/reportes/productos-
 import { TablaProductosMasPedidos } from '../../components/reportes/productos-mas-pedidos/TablaProductosMasPedidos'
 import { TablePagination } from '../../components/ui/TablePagination'
 
-import { obtenerCategorias } from '../../services/categoriaService'
-import { obtenerDestinos } from '../../services/destinoService'
-
-import {
-  obtenerProductosMasPedidos,
-} from '../../services/reporteProductoMasPedidoService'
 import { listarReporteProductosApi } from '../../services/reportesApiService'
+import { useFiltrosReporte } from '../../hooks/useFiltrosReporte'
 
-import { obtenerTiposProducto } from '../../services/tipoProductoService'
-import { REPORTE_VALES_MOCK } from '../../data/reporteValesMock'
 import type { FilaProductoMasPedido } from '../../types/reporteProductoMasPedido'
 
 import type {
@@ -47,7 +40,6 @@ const FILTROS_INICIALES: Filtros = {
 export function ReporteProductosMasPedidosPage() {
   const [filasApi, setFilasApi] = useState<FilaProductoMasPedido[]>([])
   const [totalApi, setTotalApi] = useState(0)
-  const [usarMock, setUsarMock] = useState(false)
   const [errorCarga, setErrorCarga] = useState<string | null>(null)
 
   const [filtros, setFiltros] =
@@ -79,8 +71,6 @@ export function ReporteProductosMasPedidosPage() {
     })
       .then((resultado) => {
         if (!activo) return
-        const filtrosVacios = Object.values(filtrosAplicados).every((valor) => !valor)
-        setUsarMock(filtrosVacios && resultado.datos.length === 0 && page === 1)
         setFilasApi(resultado.datos)
         setTotalApi(resultado.totalElementos)
         setErrorCarga(null)
@@ -88,8 +78,8 @@ export function ReporteProductosMasPedidosPage() {
       })
       .catch((error: unknown) => {
         if (!activo) return
-        const filtrosVacios = Object.values(filtrosAplicados).every((valor) => !valor)
-        setUsarMock(filtrosVacios && page === 1)
+        setFilasApi([])
+        setTotalApi(0)
         setErrorCarga(error instanceof Error ? error.message : 'No se pudo cargar el reporte de productos.')
         setCargando(false)
       })
@@ -97,87 +87,30 @@ export function ReporteProductosMasPedidosPage() {
     return () => { activo = false }
   }, [filtrosAplicados, page, pageSize])
 
-  const tiposProducto = useMemo(
-    () =>
-      obtenerTiposProducto()
-        .map((tipo) => ({
-          id: String(tipo.id),
-          nombre: tipo.nombre,
-        }))
-        .sort((primero, segundo) =>
-          primero.nombre.localeCompare(
-            segundo.nombre,
-            'es',
-          ),
-        ),
-    [],
-  )
+  const { catalogos, errorCatalogos } = useFiltrosReporte()
+  const tiposProducto = catalogos.tiposProducto
+  const categorias = catalogos.categorias
+  const destinos = catalogos.destinos
 
-  const categorias = useMemo(
-    () =>
-      obtenerCategorias()
-        .map((categoria) => ({
-          id: String(categoria.id),
-          nombre: categoria.nombre,
-        }))
-        .sort((primero, segundo) =>
-          primero.nombre.localeCompare(
-            segundo.nombre,
-            'es',
-          ),
-        ),
-    [],
-  )
+  const filas = filasApi
 
-  const destinos = useMemo(
-    () =>
-      obtenerDestinos()
-        .map((destino) => ({
-          id: String(destino.id),
-          nombre: destino.nombre,
-        }))
-        .sort((primero, segundo) =>
-          primero.nombre.localeCompare(
-            segundo.nombre,
-            'es',
-          ),
-        ),
-    [],
-  )
-
-  const filasMock = useMemo(
-    () => obtenerProductosMasPedidos(FILTROS_INICIALES, REPORTE_VALES_MOCK),
-    [],
-  )
-
-  const filas = usarMock ? filasMock : filasApi
+  // El producto más pedido es el de posición 1 del ranking (primera página).
+  const lider = filas.find((fila) => fila.posicion === 1)
 
   const resumen = useMemo(() => ({
-    totalProductos: usarMock ? filas.length : totalApi,
+    totalProductos: totalApi,
     totalVales: filas.reduce((total, fila) => total + fila.numeroVales, 0),
     totalDistribuciones: filas.reduce((total, fila) => total + fila.numeroDistribuciones, 0),
     totalValorizado: filas.reduce((total, fila) => total + fila.totalValorizado, 0),
-    productoMasPedido: filas[0]?.producto ?? 'Sin registros',
-    cantidadProductoMasPedido: filas[0]?.cantidadSolicitada ?? 0,
-    unidadProductoMasPedido: filas[0]?.unidadMedida ?? '',
-  }), [filas, totalApi, usarMock])
+    productoMasPedido: lider?.producto ?? (filas.length ? 'Ver primera página' : 'Sin registros'),
+    cantidadProductoMasPedido: lider?.cantidadSolicitada ?? 0,
+    unidadProductoMasPedido: lider?.unidadMedida ?? '',
+  }), [filas, lider, totalApi])
 
-  const totalItems = usarMock ? filas.length : totalApi
+  const totalItems = totalApi
 
-  const filasPaginadas = useMemo(
-    () => {
-      const inicio =
-        (page - 1) * pageSize
-
-      return usarMock ? filas.slice(inicio, inicio + pageSize) : filas
-    },
-    [
-      filas,
-      page,
-      pageSize,
-      usarMock,
-    ],
-  )
+  // El backend ya devuelve la página solicitada.
+  const filasPaginadas = filas
 
   useEffect(() => {
     const totalPaginas = Math.max(
@@ -257,15 +190,9 @@ export function ReporteProductosMasPedidosPage() {
           </div>
         )}
 
-        {usarMock && (
-          <div className="alert alert-info" role="status">
-            Mostrando datos de demostración para validar el ranking de productos.
-          </div>
-        )}
-
-        {usarMock && (
-          <div className="alert alert-info" role="status">
-            Mostrando datos de demostración para validar el ranking de productos.
+        {errorCatalogos && (
+          <div className="alert alert-warning" role="alert">
+            {errorCatalogos}
           </div>
         )}
 
