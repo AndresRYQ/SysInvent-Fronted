@@ -46,6 +46,7 @@ export interface CambiarEstadoCentroCostoRequest {
 
 export interface ListarCentrosCostoRequest {
     nombre?: string;
+    estado?: boolean;
     pagina?: number;
     tamPagina?: number;
 }
@@ -193,6 +194,10 @@ export class CentrosDeCostoApi extends runtime.BaseAPI {
 
         if (requestParameters['nombre'] != null) {
             queryParameters['nombre'] = requestParameters['nombre'];
+        }
+
+        if (requestParameters['estado'] != null) {
+            queryParameters['estado'] = requestParameters['estado'];
         }
 
         if (requestParameters['pagina'] != null) {

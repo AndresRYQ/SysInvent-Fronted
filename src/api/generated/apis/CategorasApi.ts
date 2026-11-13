@@ -70,6 +70,7 @@ export interface ListarCategoriasRequest {
 
 export interface ListarCategoriasCatalogoRequest {
     nombre?: string;
+    estado?: boolean;
     pagina?: number;
     tamPagina?: number;
 }
@@ -391,6 +392,10 @@ export class CategorasApi extends runtime.BaseAPI {
 
         if (requestParameters['nombre'] != null) {
             queryParameters['nombre'] = requestParameters['nombre'];
+        }
+
+        if (requestParameters['estado'] != null) {
+            queryParameters['estado'] = requestParameters['estado'];
         }
 
         if (requestParameters['pagina'] != null) {

@@ -157,7 +157,7 @@ example().catch(console.error);
 
 ## listarPartesEquipo
 
-> CustomPageParteEquipoResponse listarPartesEquipo(nombre, pagina, tamPagina)
+> CustomPageParteEquipoResponse listarPartesEquipo(nombre, estado, pagina, tamPagina)
 
 Listar partes de equipo
 
@@ -181,6 +181,8 @@ async function example() {
   const body = {
     // string (optional)
     nombre: nombre_example,
+    // boolean (optional)
+    estado: true,
     // number (optional)
     pagina: 56,
     // number (optional)
@@ -205,6 +207,7 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **nombre** | `string` |  | [Optional] [Defaults to `undefined`] |
+| **estado** | `boolean` |  | [Optional] [Defaults to `undefined`] |
 | **pagina** | `number` |  | [Optional] [Defaults to `1`] |
 | **tamPagina** | `number` |  | [Optional] [Defaults to `10`] |
 

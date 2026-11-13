@@ -176,14 +176,19 @@ export function ValeConsumoForm({
     let cancelado = false
 
     async function cargarCatalogos(): Promise<void> {
-      const resultados = await Promise.allSettled([
-        listarCentrosCostoApi(),
-        listarDestinosApi(),
-        listarPartesEquipoApi(),
-        listarTiposProductoApi(),
-        listarProductosApi(),
-        listarUnidadesMedidaApi(),
-      ])
+      const parametrosCatalogo = {
+          pagina: 1,
+          tamPagina: 100,
+        }
+
+        const resultados = await Promise.allSettled([
+          listarCentrosCostoApi(parametrosCatalogo),
+          listarDestinosApi(parametrosCatalogo),
+          listarPartesEquipoApi(parametrosCatalogo),
+          listarTiposProductoApi(parametrosCatalogo),
+          listarProductosApi(parametrosCatalogo),
+          listarUnidadesMedidaApi(parametrosCatalogo),
+        ])
 
       if (cancelado) return
 

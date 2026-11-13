@@ -43,6 +43,7 @@ export function TiposProductoPage() {
     setTotalItems(-1)
     listarTiposProducto({
       nombre: filtrosAplicados.nombre,
+      estado: filtrosAplicados.estado,
       pagina: page,
       tamPagina: pageSize,
     })
@@ -57,7 +58,13 @@ export function TiposProductoPage() {
         mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar los tipos de producto.')
       })
     return () => { activo = false }
-  }, [filtrosAplicados.nombre, page, pageSize, recarga])
+  }, [
+        filtrosAplicados.nombre,
+        filtrosAplicados.estado,
+        page,
+        pageSize,
+        recarga,
+      ])
 
   const recargar = () => {
     setPage(1)
@@ -136,7 +143,7 @@ export function TiposProductoPage() {
           <div className="maestro-panel">
             <TablaTiposProducto
               tiposProducto={filtrados}
-              totalItems={filtrosAplicados.estado ? filtrados.length : totalItems}
+              totalItems={totalItems}
               page={page}
               pageSize={pageSize}
               onAgregar={() => { setTipoProductoEnEdicion(null); setModoVisualizacion(false); setErrorFormulario(''); setModalFormOpen(true) }}

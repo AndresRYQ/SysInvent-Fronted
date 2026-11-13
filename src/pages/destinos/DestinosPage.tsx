@@ -148,7 +148,7 @@ export function DestinosPage() {
           <div className="maestro-panel">
             <TablaDestinos
               destinos={filtrados}
-              totalItems={aplicados.estado ? filtrados.length : totalItems}
+              totalItems={totalItems}
               page={page}
               pageSize={pageSize}
               onAgregar={() => { setSeleccionado(null); setSoloLectura(false); setError(''); setFormOpen(true) }}

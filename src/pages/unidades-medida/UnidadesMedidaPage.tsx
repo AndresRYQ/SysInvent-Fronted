@@ -42,6 +42,7 @@ export function UnidadesMedidaPage() {
     setTotalItems(-1)
     listarUnidadesMedida({
       nombre: aplicados.nombre,
+      estado: aplicados.estado,
       pagina: page,
       tamPagina: pageSize,
     })
@@ -56,7 +57,13 @@ export function UnidadesMedidaPage() {
         mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar las unidades de medida.')
       })
     return () => { activo = false }
-  }, [aplicados.nombre, page, pageSize, recarga])
+  }, [
+        aplicados.nombre,
+        aplicados.estado,
+        page,
+        pageSize,
+        recarga,
+      ])
 
   const recargar = () => {
     setPage(1)
@@ -134,7 +141,7 @@ export function UnidadesMedidaPage() {
           <div className="maestro-panel">
             <TablaUnidadesMedida
               unidades={filtrados}
-              totalItems={aplicados.estado ? filtrados.length : totalItems}
+              totalItems={totalItems}
               page={page}
               pageSize={pageSize}
               onAgregar={() => { setSeleccionada(null); setSoloLectura(false); setError(''); setFormOpen(true) }}

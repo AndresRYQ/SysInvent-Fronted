@@ -39,7 +39,12 @@ export function PartesEquipoPage() {
 
   useEffect(() => {
     let activo = true
-    listarPartesEquipo({ nombre: aplicados.busqueda, pagina: page, tamPagina: pageSize })
+    listarPartesEquipo({
+      nombre: aplicados.busqueda,
+      estado: aplicados.estado,
+      pagina: page,
+      tamPagina: pageSize,
+    })
       .then((resultado) => {
         if (!activo) return
         setPartes(resultado.datos)
@@ -51,7 +56,11 @@ export function PartesEquipoPage() {
         mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar las partes de equipo.')
       })
     return () => { activo = false }
-  }, [aplicados.busqueda, page, pageSize, recarga])
+  }, [aplicados.busqueda,
+  aplicados.estado,
+    page,
+    pageSize,
+    recarga,])
 
   const recargar = () => {
     setPage(1)
@@ -102,7 +111,7 @@ export function PartesEquipoPage() {
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar"><div className="maestro-topbar__copy"><h1>Partes de equipo</h1><p>Administración de partes y componentes utilizados por los equipos del almacén.</p></div></section>
           <div className="maestro-panel"><FiltrosPartesEquipo valores={filtros} onChange={(campo, valor) => setFiltros((actual) => ({ ...actual, [campo]: valor }))} onBuscar={() => { setAplicados({ ...filtros }); setPage(1) }} onLimpiar={() => { setFiltros(FILTROS_INICIALES); setAplicados(FILTROS_INICIALES); setPage(1) }} /></div>
-          <div className="maestro-panel"><TablaPartesEquipo partesEquipo={filtrados} totalItems={aplicados.estado ? filtrados.length : totalItems} page={page} pageSize={pageSize} onAgregar={() => { setSeleccionado(null); setSoloLectura(false); setError(''); setFormOpen(true) }} onEditar={(item) => { setSeleccionado(item); setSoloLectura(false); setError(''); setFormOpen(true) }} onVisualizar={(item) => { setSeleccionado(item); setSoloLectura(true); setError(''); setFormOpen(true) }} onEliminar={(item) => { setObjetivo(item); setModoConfirmacion('desactivar'); setConfirmOpen(true) }} onReactivar={(item) => { setObjetivo(item); setModoConfirmacion('reactivar'); setConfirmOpen(true) }} onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(1) }} /></div>
+          <div className="maestro-panel"><TablaPartesEquipo partesEquipo={filtrados} totalItems={totalItems} page={page} pageSize={pageSize} onAgregar={() => { setSeleccionado(null); setSoloLectura(false); setError(''); setFormOpen(true) }} onEditar={(item) => { setSeleccionado(item); setSoloLectura(false); setError(''); setFormOpen(true) }} onVisualizar={(item) => { setSeleccionado(item); setSoloLectura(true); setError(''); setFormOpen(true) }} onEliminar={(item) => { setObjetivo(item); setModoConfirmacion('desactivar'); setConfirmOpen(true) }} onReactivar={(item) => { setObjetivo(item); setModoConfirmacion('reactivar'); setConfirmOpen(true) }} onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(1) }} /></div>
         </div>
       </main>
       <FormularioParteEquipo abierto={formOpen} parteEquipo={seleccionado} error={error} soloLectura={soloLectura} onClose={cerrarFormulario} onSubmit={guardar} />
