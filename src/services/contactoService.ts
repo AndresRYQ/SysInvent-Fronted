@@ -14,6 +14,7 @@ const solicitudesEnCurso = new Map<string, Promise<CatalogoPaginado<Contacto>>>(
 export interface ListarContactosParams {
   nombre?: string
   proveedorId?: string | number
+  estado?: string
   pagina?: number
   tamPagina?: number
 }
@@ -57,11 +58,20 @@ export async function listarContactos(
     : Number(String(params.proveedorId).replace(/^PROV-0*/i, ''))
 
   const parametros = {
-    nombre: params.nombre?.trim() || undefined,
-    proveedorId: Number.isFinite(proveedorId) ? proveedorId : undefined,
-    pagina: params.pagina,
-    tamPagina: params.tamPagina,
-  }
+  nombre: params.nombre?.trim() || undefined,
+  proveedorId:
+    Number.isFinite(proveedorId)
+      ? proveedorId
+      : undefined,
+  estado:
+    params.estado === 'activo'
+      ? true
+      : params.estado === 'inactivo'
+        ? false
+        : undefined,
+  pagina: params.pagina,
+  tamPagina: params.tamPagina,
+}
   const clave = JSON.stringify(parametros)
   const solicitudExistente = solicitudesEnCurso.get(clave)
   if (solicitudExistente) return solicitudExistente

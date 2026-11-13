@@ -19,11 +19,6 @@ import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
 
 const INICIALES: FiltrosProveedoresValores = { busqueda: '', estado: '' }
 
-function filtrarEstado(lista: Proveedor[], estado: string): Proveedor[] {
-  if (!estado) return lista
-  return lista.filter((proveedor) => estado === 'activo' ? proveedor.activo === 1 : proveedor.activo === 0)
-}
-
 export function ProveedoresPage() {
   const [lista, setLista] = useState<Proveedor[]>([])
   const [totalItems, setTotalItems] = useState(-1)
@@ -42,13 +37,20 @@ export function ProveedoresPage() {
 
   useEffect(() => {
     let cancelado = false
-    listarProveedores({ nombre: aplicados.busqueda, pagina: page, tamPagina: pageSize })
-      .then((respuesta) => {
-        if (cancelado) return
-        const datos = filtrarEstado(respuesta.datos, aplicados.estado)
-        setLista(datos)
-        setTotalItems(respuesta.paginacion.totalElementos ?? datos.length)
+    listarProveedores({
+        nombre: aplicados.busqueda,
+        estado: aplicados.estado,
+        pagina: page,
+        tamPagina: pageSize,
       })
+        .then((respuesta) => {
+          if (cancelado) return
+          setLista(respuesta.datos)
+          setTotalItems(
+            respuesta.paginacion.totalElementos ??
+            respuesta.datos.length,
+          )
+        })
       .catch((error) => {
         if (!cancelado) {
           setTotalItems(0)
@@ -58,13 +60,19 @@ export function ProveedoresPage() {
     return () => { cancelado = true }
   }, [aplicados, page, pageSize])
 
-  const recargar = () => {
-    void listarProveedores({ nombre: aplicados.busqueda, pagina: page, tamPagina: pageSize })
-      .then((respuesta) => {
-        const datos = filtrarEstado(respuesta.datos, aplicados.estado)
-        setLista(datos)
-        setTotalItems(respuesta.paginacion.totalElementos ?? datos.length)
-      })
+ const recargar = () => {
+    void listarProveedores({
+      nombre: aplicados.busqueda,
+      estado: aplicados.estado,
+      pagina: page,
+      tamPagina: pageSize,
+    }).then((respuesta) => {
+      setLista(respuesta.datos)
+      setTotalItems(
+        respuesta.paginacion.totalElementos ??
+        respuesta.datos.length,
+      )
+    })
   }
 
   const cerrarForm = () => { setFormOpen(false); setFormProveedor(null); setSoloLectura(false); setFormError('') }

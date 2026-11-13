@@ -15,6 +15,9 @@ const solicitudesEnCurso = new Map<string, Promise<CatalogoPaginado<Producto>>>(
 
 export interface ListarProductosParams {
   nombre?: string
+  tipoProductoId?: string | number
+  categoriaId?: string | number
+  estado?: string
   pagina?: number
   tamPagina?: number
 }
@@ -91,10 +94,26 @@ export async function listarProductosApi(
   params: ListarProductosParams = {},
 ): Promise<CatalogoPaginado<Producto>> {
   const parametros = {
-    nombre: params.nombre?.trim() || undefined,
-    pagina: params.pagina,
-    tamPagina: params.tamPagina,
-  }
+  nombre: params.nombre?.trim() || undefined,
+  tipoProductoId:
+    params.tipoProductoId === undefined ||
+    params.tipoProductoId === ''
+      ? undefined
+      : convertirId(params.tipoProductoId),
+  categoriaId:
+    params.categoriaId === undefined ||
+    params.categoriaId === ''
+      ? undefined
+      : convertirId(params.categoriaId),
+  estado:
+    params.estado === 'activo'
+      ? true
+      : params.estado === 'inactivo'
+        ? false
+        : undefined,
+  pagina: params.pagina,
+  tamPagina: params.tamPagina,
+}
   const clave = JSON.stringify(parametros)
   const solicitudExistente = solicitudesEnCurso.get(clave)
   if (solicitudExistente) return solicitudExistente
