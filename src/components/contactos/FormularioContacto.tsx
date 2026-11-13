@@ -137,9 +137,9 @@ export function FormularioContacto({
     } else if (nombre.length < 3) {
       nuevosErrores.nombreCompleto =
         'Debe tener al menos 3 caracteres'
-    } else if (nombre.length > 120) {
+    } else if (nombre.length > 255) {
       nuevosErrores.nombreCompleto =
-        'No puede superar los 120 caracteres'
+        'No puede superar los 255 caracteres'
     }
 
     if (!cargo) {
@@ -148,9 +148,9 @@ export function FormularioContacto({
     } else if (cargo.length < 2) {
       nuevosErrores.cargo =
         'Debe tener al menos 2 caracteres'
-    } else if (cargo.length > 80) {
+    } else if (cargo.length > 150) {
       nuevosErrores.cargo =
-        'No puede superar los 80 caracteres'
+        'No puede superar los 150 caracteres'
     }
 
     const numerosTelefono =

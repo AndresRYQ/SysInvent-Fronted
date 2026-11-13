@@ -103,9 +103,9 @@ export function FormularioProveedor({
     if (razonSocial.length < 2) {
       nuevosErrores.razonSocial =
         'Debe tener al menos 2 caracteres'
-    } else if (razonSocial.length > 120) {
+    } else if (razonSocial.length > 255) {
       nuevosErrores.razonSocial =
-        'No puede superar los 120 caracteres'
+        'No puede superar los 255 caracteres'
     }
 
     if (
@@ -128,9 +128,9 @@ export function FormularioProveedor({
     if (direccion.length < 5) {
       nuevosErrores.direccion =
         'Debe tener al menos 5 caracteres'
-    } else if (direccion.length > 200) {
+    } else if (direccion.length > 255) {
       nuevosErrores.direccion =
-        'No puede superar los 200 caracteres'
+        'No puede superar los 255 caracteres'
     }
 
     setErrores(nuevosErrores)

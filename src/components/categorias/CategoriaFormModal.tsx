@@ -38,9 +38,9 @@ export function CategoriaFormModal({ abierto, categoria, error, soloLectura = fa
     const descripcion = form.descripcion.trim()
     if (!nombre) nuevos.nombre = 'Campo requerido'
     else if (nombre.length < 2) nuevos.nombre = 'Debe tener al menos 2 caracteres'
-    else if (nombre.length > 80) nuevos.nombre = 'No puede superar los 80 caracteres'
+    else if (nombre.length > 100) nuevos.nombre = 'No puede superar los 100 caracteres'
     if (!descripcion) nuevos.descripcion = 'Campo requerido'
-    else if (descripcion.length > 200) nuevos.descripcion = 'No puede superar los 200 caracteres'
+    else if (descripcion.length > 255) nuevos.descripcion = 'No puede superar los 255 caracteres'
     setErrores(nuevos)
     return !nuevos.nombre && !nuevos.descripcion
   }

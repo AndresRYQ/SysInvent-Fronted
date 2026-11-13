@@ -98,9 +98,9 @@ export function FormularioProducto({ producto, soloLectura = false, error, catal
   function validar(): boolean {
     const siguiente: Errores = { ...SIN_ERRORES }
     const codigo = form.codigo.trim().toUpperCase()
-    if (!/^[A-Z0-9-]{3,30}$/.test(codigo)) siguiente.codigo = 'Utiliza entre 3 y 30 letras, números o guiones'
-    if (form.nombre.trim().length < 2 || form.nombre.trim().length > 120) siguiente.nombre = 'El nombre debe tener entre 2 y 120 caracteres'
-    if (form.descripcion.trim().length < 5 || form.descripcion.trim().length > 250) siguiente.descripcion = 'La descripción debe tener entre 5 y 250 caracteres'
+    if (!/^[A-Z0-9-]{3,50}$/.test(codigo)) siguiente.codigo = 'Utiliza entre 3 y 50 letras, números o guiones'
+    if (form.nombre.trim().length < 2 || form.nombre.trim().length > 255) siguiente.nombre = 'El nombre debe tener entre 2 y 255 caracteres'
+    if (form.descripcion.trim().length < 5 || form.descripcion.trim().length > 255) siguiente.descripcion = 'La descripción debe tener entre 5 y 255 caracteres'
     if (!form.tipoProductoId) siguiente.tipoProductoId = 'Selecciona un tipo de producto'
     if (!form.categoriaId) siguiente.categoriaId = 'Selecciona una categoría'
     if (!form.unidadMedidaId) siguiente.unidadMedidaId = 'Selecciona una unidad de medida'
