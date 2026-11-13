@@ -14,16 +14,12 @@ import { ResumenReporteIngresos } from '../../components/reportes/ingresos/Resum
 import { TablaReporteIngresos } from '../../components/reportes/ingresos/TablaReporteIngresos'
 import { TablePagination } from '../../components/ui/TablePagination'
 
-import { obtenerProductos } from '../../services/productoService'
-import { obtenerProveedores } from '../../services/proveedorService'
-
 import {
   obtenerFilasReporteIngresos,
   obtenerResumenReporteIngresos,
 } from '../../services/reporteIngresoService'
 import { listarReporteIngresosApi } from '../../services/reportesApiService'
-
-import { obtenerTiposProducto } from '../../services/tipoProductoService'
+import { useFiltrosReporte } from '../../hooks/useFiltrosReporte'
 
 import type {
   FiltrosReporteIngresos as Filtros,
@@ -93,58 +89,10 @@ export function ReporteIngresosPage() {
     return () => { activo = false }
   }, [filtrosAplicados, page, pageSize])
 
-  const proveedores = useMemo(
-    () =>
-      obtenerProveedores()
-        .map((proveedor) => ({
-          id: String(proveedor.id),
-          nombre:
-            proveedor.razonSocial,
-        }))
-        .sort((primero, segundo) =>
-          primero.nombre.localeCompare(
-            segundo.nombre,
-            'es',
-          ),
-        ),
-    [],
-  )
-
-  const tiposProducto = useMemo(
-    () =>
-      obtenerTiposProducto()
-        .map((tipo) => ({
-          id: String(tipo.id),
-          nombre: tipo.nombre,
-        }))
-        .sort((primero, segundo) =>
-          primero.nombre.localeCompare(
-            segundo.nombre,
-            'es',
-          ),
-        ),
-    [],
-  )
-
-  const productos = useMemo(
-    () =>
-      obtenerProductos()
-        .map((producto) => ({
-          id: String(producto.productoId),
-          codigo: producto.codigo,
-          nombre: producto.nombre,
-          tipoProductoId: String(
-            producto.tipoProductoId,
-          ).replace(/^TP-0*/, ''),
-        }))
-        .sort((primero, segundo) =>
-          primero.nombre.localeCompare(
-            segundo.nombre,
-            'es',
-          ),
-        ),
-    [],
-  )
+  const { catalogos, errorCatalogos } = useFiltrosReporte()
+  const proveedores = catalogos.proveedores
+  const tiposProducto = catalogos.tiposProducto
+  const productos = catalogos.productos
 
   const filasFiltradas = filas
 
@@ -240,6 +188,12 @@ export function ReporteIngresosPage() {
         {errorCarga && (
           <div className="alert alert-danger" role="alert">
             {errorCarga}
+          </div>
+        )}
+
+        {errorCatalogos && (
+          <div className="alert alert-warning" role="alert">
+            {errorCatalogos}
           </div>
         )}
 

@@ -14,18 +14,12 @@ import { ResumenReporteVales } from '../../components/reportes/vales/ResumenRepo
 import { TablaReporteVales } from '../../components/reportes/vales/TablaReporteVales'
 import { TablePagination } from '../../components/ui/TablePagination'
 
-import { obtenerCentrosCosto } from '../../services/centroCostoService'
-import { obtenerDestinos } from '../../services/destinoService'
-import { obtenerPartesEquipo } from '../../services/parteEquipoService'
-import { obtenerProductos } from '../../services/productoService'
-
 import {
   obtenerResumenReporteVales,
 } from '../../services/reporteValeService'
 import { listarReporteValesApi } from '../../services/reportesApiService'
+import { useFiltrosReporte } from '../../hooks/useFiltrosReporte'
 
-import { obtenerTiposProducto } from '../../services/tipoProductoService'
-import { REPORTE_VALES_MOCK } from '../../data/reporteValesMock'
 import type { FilaReporteVale } from '../../types/reporteVale'
 
 import type {
@@ -51,7 +45,6 @@ const FILTROS_INICIALES: Filtros = {
 export function ReporteValesPage() {
   const [filasApi, setFilasApi] = useState<FilaReporteVale[]>([])
   const [totalApi, setTotalApi] = useState(0)
-  const [usarMock, setUsarMock] = useState(false)
   const [errorCarga, setErrorCarga] = useState<string | null>(null)
 
   const [filtros, setFiltros] =
@@ -83,8 +76,6 @@ export function ReporteValesPage() {
     })
       .then((resultado) => {
         if (!activo) return
-        const filtrosVacios = Object.values(filtrosAplicados).every((valor) => !valor)
-        setUsarMock(filtrosVacios && resultado.datos.length === 0 && page === 1)
         setFilasApi(resultado.datos)
         setTotalApi(resultado.totalElementos)
         setErrorCarga(null)
@@ -92,8 +83,8 @@ export function ReporteValesPage() {
       })
       .catch((error: unknown) => {
         if (!activo) return
-        const filtrosVacios = Object.values(filtrosAplicados).every((valor) => !valor)
-        setUsarMock(filtrosVacios && page === 1)
+        setFilasApi([])
+        setTotalApi(0)
         setErrorCarga(error instanceof Error ? error.message : 'No se pudo cargar el reporte de vales.')
         setCargando(false)
       })
@@ -101,92 +92,14 @@ export function ReporteValesPage() {
     return () => { activo = false }
   }, [filtrosAplicados, page, pageSize])
 
-  const filas = usarMock ? REPORTE_VALES_MOCK : filasApi
+  const filas = filasApi
 
-  const centrosCosto = useMemo(
-    () =>
-      obtenerCentrosCosto()
-        .map((centro) => ({
-          id: String(centro.id),
-          nombre: centro.nombre,
-        }))
-        .sort((primero, segundo) =>
-          primero.nombre.localeCompare(
-            segundo.nombre,
-            'es',
-          ),
-        ),
-    [],
-  )
-
-  const destinos = useMemo(
-    () =>
-      obtenerDestinos()
-        .map((destino) => ({
-          id: String(destino.id),
-          nombre: destino.nombre,
-        }))
-        .sort((primero, segundo) =>
-          primero.nombre.localeCompare(
-            segundo.nombre,
-            'es',
-          ),
-        ),
-    [],
-  )
-
-  const partesEquipo = useMemo(
-    () =>
-      obtenerPartesEquipo()
-        .map((parte) => ({
-          id: String(parte.id),
-          codigo: parte.codigo,
-          nombre: parte.nombre,
-        }))
-        .sort((primero, segundo) =>
-          primero.nombre.localeCompare(
-            segundo.nombre,
-            'es',
-          ),
-        ),
-    [],
-  )
-
-  const tiposProducto = useMemo(
-    () =>
-      obtenerTiposProducto()
-        .map((tipo) => ({
-          id: String(tipo.id),
-          nombre: tipo.nombre,
-        }))
-        .sort((primero, segundo) =>
-          primero.nombre.localeCompare(
-            segundo.nombre,
-            'es',
-          ),
-        ),
-    [],
-  )
-
-  const productos = useMemo(
-    () =>
-      obtenerProductos()
-        .map((producto) => ({
-          id: String(producto.productoId),
-          codigo: producto.codigo,
-          nombre: producto.nombre,
-          tipoProductoId: String(
-            producto.tipoProductoId,
-          ).replace(/^TP-0*/, ''),
-        }))
-        .sort((primero, segundo) =>
-          primero.nombre.localeCompare(
-            segundo.nombre,
-            'es',
-          ),
-        ),
-    [],
-  )
+  const { catalogos, errorCatalogos } = useFiltrosReporte()
+  const centrosCosto = catalogos.centrosCosto
+  const destinos = catalogos.destinos
+  const partesEquipo = catalogos.partesEquipo
+  const tiposProducto = catalogos.tiposProducto
+  const productos = catalogos.productos
 
   const filasFiltradas = filas
 
@@ -198,24 +111,10 @@ export function ReporteValesPage() {
     [filasFiltradas],
   )
 
-  const totalItems = usarMock ? filasFiltradas.length : totalApi
+  const totalItems = totalApi
 
-  const filasPaginadas = useMemo(
-    () => {
-      const inicio =
-        (page - 1) * pageSize
-
-      return usarMock
-        ? filasFiltradas.slice(inicio, inicio + pageSize)
-        : filasFiltradas
-    },
-    [
-      filasFiltradas,
-      page,
-      pageSize,
-      usarMock,
-    ],
-  )
+  // El backend ya devuelve la página solicitada.
+  const filasPaginadas = filasFiltradas
 
   useEffect(() => {
     const totalPaginas = Math.max(
@@ -294,9 +193,9 @@ export function ReporteValesPage() {
           </div>
         )}
 
-        {usarMock && (
-          <div className="alert alert-info" role="status">
-            Mostrando datos de demostración para validar las columnas del reporte.
+        {errorCatalogos && (
+          <div className="alert alert-warning" role="alert">
+            {errorCatalogos}
           </div>
         )}
 
