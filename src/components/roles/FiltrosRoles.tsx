@@ -41,6 +41,7 @@ export function FiltrosRoles({
 
             <input
               id="busquedaRol"
+              maxLength={255}
               className="form-control"
               type="text"
               value={valores.busqueda}

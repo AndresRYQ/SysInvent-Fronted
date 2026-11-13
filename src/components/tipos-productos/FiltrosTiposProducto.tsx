@@ -43,6 +43,7 @@ export function FiltrosTiposProducto({
 
             <input
               id="nombreTipoProducto"
+              maxLength={100}
               className="form-control"
               type="text"
               value={valores.nombre}

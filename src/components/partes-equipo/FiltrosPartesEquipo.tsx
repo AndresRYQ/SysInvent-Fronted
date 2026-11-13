@@ -50,6 +50,7 @@ export function FiltrosPartesEquipo({
 
             <input
               id="buscarParteEquipo"
+              maxLength={150}
               className="form-control"
               type="text"
               value={valores.busqueda}

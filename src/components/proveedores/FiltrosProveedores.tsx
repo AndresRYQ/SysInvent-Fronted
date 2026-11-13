@@ -54,6 +54,7 @@ export function FiltrosProveedores({
 
             <input
               id="buscarProveedor"
+              maxLength={255}
               className="form-control"
               type="text"
               value={valores.busqueda}

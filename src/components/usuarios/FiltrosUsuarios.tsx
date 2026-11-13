@@ -48,6 +48,7 @@ export function FiltrosUsuarios({
 
             <input
               id="busquedaUsuario"
+              maxLength={255}
               className="form-control"
               type="text"
               value={valores.busqueda}
