@@ -402,7 +402,6 @@ function DashboardPage() {
 
   useEffect(() => {
     let activo = true
-    setCargandoResumen(true)
 
     obtenerResumenDashboard()
       .then((resumen) => {
@@ -594,7 +593,10 @@ const filteredModules =
           <button
             type="button"
             className="btn btn-sm btn-outline-danger"
-            onClick={() => setRecargas((valor) => valor + 1)}
+            onClick={() => {
+              setCargandoResumen(true)
+              setRecargas((valor) => valor + 1)
+            }}
           >
             Reintentar
           </button>
