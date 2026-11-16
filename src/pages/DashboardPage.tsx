@@ -62,6 +62,7 @@ type Module = {
   tone: string
   category: string
   route?: string
+  rutasPermiso?: string[]
 }
 
 const categories = [
@@ -122,7 +123,8 @@ const modules: Module[] = [
   {
     id: ModuloCodigo.CONTROL_ALMACEN,
     title: 'Control de almacén',
-    description: 'Control de inventario y movimientos.',
+    description:
+      'Control de inventario y movimientos.',
     icon: 'box',
     tone: 'green',
     category: 'Inventario',
@@ -165,6 +167,20 @@ const modules: Module[] = [
     route: '/reportes/vales',
   },
   {
+    id: ModuloCodigo.REPORTE_KARDEX,
+    title: 'Reporte Kardex',
+    description:
+      'Consulta de movimientos y trazabilidad del inventario.',
+    icon: 'report',
+    tone: 'blue',
+    category: 'Reportes',
+    route: '/reportes/kardex',
+    rutasPermiso: [
+      '/reportes/kardex',
+      '/control-almacen',
+    ],
+  },
+  {
     id: ModuloCodigo.REPORTE_PRODUCTOS,
     title: 'Reporte acumulado',
     description: 'Consulta de productos más solicitados.',
@@ -181,7 +197,7 @@ const modules: Module[] = [
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
-    route: '/centros-costo',
+    route: '/centros-costos',
   },
   {
     id: ModuloCodigo.CATEGORIAS,
@@ -534,10 +550,18 @@ const rutasPermitidas = new Set(sesion?.modulos ?? [])
 const modulosPermitidos =
   sesion?.rolId === 1
     ? modules
-    : modules.filter(
-        (module) =>
-          module.route && rutasPermitidas.has(module.route),
-      )
+    : modules.filter((module) => {
+        const rutasDelPermiso =
+          module.rutasPermiso ??
+          (module.route
+            ? [module.route]
+            : [])
+
+        return rutasDelPermiso.some(
+          (ruta) =>
+            rutasPermitidas.has(ruta),
+        )
+      })
 
 const categoriasPermitidas = useMemo(
   () =>

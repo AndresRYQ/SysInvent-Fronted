@@ -220,7 +220,7 @@ export function ValeConsumoForm({
         aplicarResultadoCatalogo(
           resultados[4],
           'Productos cargados',
-          '/api/v1/productos',
+          '/api/v1/catalogos/productos',
           setProductos,
         ),
         aplicarResultadoCatalogo(

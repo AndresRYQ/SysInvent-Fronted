@@ -7,7 +7,7 @@ import {
 import { useAuth } from '../hooks/useAuth'
 
 interface RoleRouteProps {
-  modulo: string
+  modulo: string | string[]
 }
 
 const RUTAS_ESPECIALES: Record<string, string> = {
@@ -60,15 +60,22 @@ export function RoleRoute({
     )
   }
 
-  const rutaModulo =
-    obtenerRutaModulo(modulo)
+  const modulosRequeridos =
+    Array.isArray(modulo)
+      ? modulo
+      : [modulo]
+
+  const rutasPermitidas = new Set(
+    sesion.modulos.map(normalizarRuta),
+  )
 
   const autorizado =
     sesion.rolId === 1 ||
-    sesion.modulos.some(
-      (rutaPermitida) =>
-        normalizarRuta(rutaPermitida) ===
-        rutaModulo,
+    modulosRequeridos.some(
+      (codigo) =>
+        rutasPermitidas.has(
+          obtenerRutaModulo(codigo),
+        ),
     )
 
   if (!autorizado) {

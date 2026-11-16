@@ -12,7 +12,6 @@ export * from './IngresoAlmacenControllerApi';
 export * from './KardexApi';
 export * from './LoginApi';
 export * from './PartesDeEquipoApi';
-export * from './PerfilControllerApi';
 export * from './ProductosApi';
 export * from './ProveedoresApi';
 export * from './ReporteIngresoControllerApi';

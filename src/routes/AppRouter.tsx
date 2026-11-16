@@ -114,12 +114,21 @@ export function AppRouter() {
 
               <Route
                 element={
-                  <RoleRoute modulo="centros-costo" />
+                  <RoleRoute modulo="centros-costos" />
                 }
               >
                 <Route
-                  path="/centros-costo"
+                  path="/centros-costos"
                   element={<CentrosCostoPage />}
+                />
+                <Route
+                  path="/centros-costo"
+                  element={
+                    <Navigate
+                      to="/centros-costos"
+                      replace
+                    />
+                  }
                 />
               </Route>
 
@@ -209,7 +218,12 @@ export function AppRouter() {
 
               <Route
                 element={
-                  <RoleRoute modulo="reporte-kardex" />
+                  <RoleRoute
+                    modulo={[
+                      'reporte-kardex',
+                      'control-almacen',
+                    ]}
+                  />
                 }
               >
                 <Route
