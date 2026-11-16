@@ -8,7 +8,7 @@ Name | Type
 ------------ | -------------
 `ingresoAlmacenId` | number
 `numeroIngreso` | string
-`fechaIngreso` | string
+`fechaIngreso` | Date
 `proveedor` | string
 `documento` | string
 `tipoProducto` | string

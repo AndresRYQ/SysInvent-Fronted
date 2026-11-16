@@ -7,9 +7,9 @@
 Name | Type
 ------------ | -------------
 `accion` | string
+`detalle` | string
 `registroId` | string
 `modulo` | string
-`detalle` | string
 `bitacoraId` | number
 `fechaHora` | Date
 `nombreRol` | string
@@ -23,9 +23,9 @@ import type { BitacoraProjection } from ''
 // TODO: Update the object below with actual values
 const example = {
   "accion": null,
+  "detalle": null,
   "registroId": null,
   "modulo": null,
-  "detalle": null,
   "bitacoraId": null,
   "fechaHora": null,
   "nombreRol": null,

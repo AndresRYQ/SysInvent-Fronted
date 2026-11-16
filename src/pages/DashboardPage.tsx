@@ -16,7 +16,6 @@ import SpotlightCard from '../components/ui/SpotlightCard'
 import { useAuth } from '../hooks/useAuth'
 import '../styles/react-bits.css'
 import '../styles/DashboardPage.css'
-import { DASHBOARD_MOCK } from '../data/dashboardMock'
 import { ModuloCodigo } from '../constants/modulos'
 
 const RESUMEN_VACIO: ResumenDashboard = {
@@ -396,40 +395,30 @@ function DashboardPage() {
     useState<ResumenDashboard | null>(null)
   const [errorResumen, setErrorResumen] =
     useState<string | null>(null)
-  const [usarMock, setUsarMock] = useState(false)
   const [cargandoResumen, setCargandoResumen] = useState(true)
 
   useEffect(() => {
     let activo = true
 
-    obtenerResumenDashboard()
-      .then((resumen) => {
-        if (activo) {
-          const respuestaVacia =
-            resumen.productosActivos === 0 &&
-            resumen.ingresosDelMes === 0 &&
-            resumen.valesDelMes === 0 &&
-            resumen.movimientosHoy === 0 &&
-            resumen.movimientosRecientes.length === 0
-
-          setUsarMock(respuestaVacia)
-          setResumenCargado(resumen)
-          setCargandoResumen(false)
-        }
-      })
-      .catch((error: unknown) => {
-        if (activo) {
-          setUsarMock(true)
-          setErrorResumen(
-            `No se pudo cargar el resumen real. ${
-              error instanceof Error
-                ? error.message
-                : 'Mostrando datos de demostración.'
-            }`,
-          )
-          setCargandoResumen(false)
-        }
-      })
+  obtenerResumenDashboard()
+  .then((resumen) => {
+    if (activo) {
+      setResumenCargado(resumen)
+      setCargandoResumen(false)
+    }
+  })
+  .catch((error: unknown) => {
+    if (activo) {
+      setErrorResumen(
+        `No se pudo cargar el resumen. ${
+          error instanceof Error
+            ? error.message
+            : 'Inténtalo nuevamente.'
+        }`,
+      )
+      setCargandoResumen(false)
+    }
+  })
 
     return () => {
       activo = false
@@ -437,9 +426,7 @@ function DashboardPage() {
   }, [])
 
   const resumenDashboard =
-    usarMock
-      ? DASHBOARD_MOCK
-      : resumenCargado ?? RESUMEN_VACIO
+  resumenCargado ?? RESUMEN_VACIO
 
   const metrics: Metric[] = [
     {
@@ -586,12 +573,6 @@ const filteredModules =
       {errorResumen && (
         <div className="alert alert-danger" role="alert">
           {errorResumen}
-        </div>
-      )}
-
-      {usarMock && (
-        <div className="alert alert-info" role="status">
-          Mostrando datos de demostración en el panel principal.
         </div>
       )}
 

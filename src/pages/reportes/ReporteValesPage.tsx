@@ -25,7 +25,6 @@ import {
 import { listarReporteValesApi } from '../../services/reportesApiService'
 
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
-import { REPORTE_VALES_MOCK } from '../../data/reporteValesMock'
 import type { FilaReporteVale } from '../../types/reporteVale'
 
 import type {
@@ -51,7 +50,6 @@ const FILTROS_INICIALES: Filtros = {
 export function ReporteValesPage() {
   const [filasApi, setFilasApi] = useState<FilaReporteVale[]>([])
   const [totalApi, setTotalApi] = useState(0)
-  const [usarMock, setUsarMock] = useState(false)
   const [errorCarga, setErrorCarga] = useState<string | null>(null)
 
   const [filtros, setFiltros] =
@@ -83,8 +81,6 @@ export function ReporteValesPage() {
     })
       .then((resultado) => {
         if (!activo) return
-        const filtrosVacios = Object.values(filtrosAplicados).every((valor) => !valor)
-        setUsarMock(filtrosVacios && resultado.datos.length === 0 && page === 1)
         setFilasApi(resultado.datos)
         setTotalApi(resultado.totalElementos)
         setErrorCarga(null)
@@ -92,16 +88,17 @@ export function ReporteValesPage() {
       })
       .catch((error: unknown) => {
         if (!activo) return
-        const filtrosVacios = Object.values(filtrosAplicados).every((valor) => !valor)
-        setUsarMock(filtrosVacios && page === 1)
-        setErrorCarga(error instanceof Error ? error.message : 'No se pudo cargar el reporte de vales.')
-        setCargando(false)
+          setFilasApi([])
+          setTotalApi(0)
+          setErrorCarga(
+            error instanceof Error ? error.message : 'No se pudo cargar el reporte de vales.')
+          setCargando(false)
       })
 
     return () => { activo = false }
   }, [filtrosAplicados, page, pageSize])
 
-  const filas = usarMock ? REPORTE_VALES_MOCK : filasApi
+  const filas = filasApi
 
   const centrosCosto = useMemo(
     () =>
@@ -198,24 +195,9 @@ export function ReporteValesPage() {
     [filasFiltradas],
   )
 
-  const totalItems = usarMock ? filasFiltradas.length : totalApi
+  const totalItems = totalApi
 
-  const filasPaginadas = useMemo(
-    () => {
-      const inicio =
-        (page - 1) * pageSize
-
-      return usarMock
-        ? filasFiltradas.slice(inicio, inicio + pageSize)
-        : filasFiltradas
-    },
-    [
-      filasFiltradas,
-      page,
-      pageSize,
-      usarMock,
-    ],
-  )
+  const filasPaginadas = filasFiltradas
 
   useEffect(() => {
     const totalPaginas = Math.max(
@@ -291,12 +273,6 @@ export function ReporteValesPage() {
         {errorCarga && (
           <div className="alert alert-danger" role="alert">
             {errorCarga}
-          </div>
-        )}
-
-        {usarMock && (
-          <div className="alert alert-info" role="status">
-            Mostrando datos de demostración para validar las columnas del reporte.
           </div>
         )}
 
