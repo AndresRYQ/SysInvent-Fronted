@@ -2,7 +2,6 @@ import type {
   IngresoAlmacenDetalle,
   IngresoAlmacenFormData,
   IngresoAlmacenListado,
-  IngresoAlmacenRegistro,
 } from '../types/ingresoAlmacen'
 import {
   IngresoAlmacenControllerApi,
@@ -13,9 +12,6 @@ import {
 import type { DetalleIngresoAlmacenResponse } from '../api/generated/models/DetalleIngresoAlmacenResponse'
 import type { IngresoAlmacenResponse } from '../api/generated/models/IngresoAlmacenResponse'
 import { apiConfiguration } from '../api/client'
-
-const STORAGE_KEY =
-  'agrihusac_ingresos_almacen'
 
 const ingresoAlmacenApi =
   new IngresoAlmacenControllerApi(apiConfiguration)
@@ -185,77 +181,3 @@ export async function consultarIngresoAlmacenPorId(
     ),
   }
 }
-
-function normalizarProductoId(
-  id: unknown,
-): number {
-  return Number(
-    String(id ?? '').replace(/^PROD-0*/i, ''),
-  )
-}
-
-function copiarIngreso(
-  ingreso: IngresoAlmacenRegistro,
-): IngresoAlmacenRegistro {
-  return {
-    ...ingreso,
-    detalles: ingreso.detalles.map(
-      (detalle) => ({
-        ...detalle,
-        productoId: normalizarProductoId(
-          detalle.productoId,
-        ),
-      }),
-    ),
-  }
-}
-
-function esIngresoValido(
-  valor: unknown,
-): valor is IngresoAlmacenRegistro {
-  if (
-    typeof valor !== 'object' ||
-    valor === null
-  ) {
-    return false
-  }
-
-  const ingreso =
-    valor as Partial<IngresoAlmacenRegistro>
-
-  return (
-    typeof ingreso.id === 'string' &&
-    typeof ingreso.numeroIngreso === 'string' &&
-    Array.isArray(ingreso.detalles)
-  )
-}
-
-function obtenerIngresosReales():
-  IngresoAlmacenRegistro[] {
-  const datosGuardados =
-    localStorage.getItem(STORAGE_KEY)
-
-  if (!datosGuardados) {
-    return []
-  }
-
-  try {
-    const datos = JSON.parse(datosGuardados)
-
-    if (!Array.isArray(datos)) {
-      return []
-    }
-
-    return datos
-      .filter(esIngresoValido)
-      .map(copiarIngreso)
-  } catch {
-    return []
-  }
-}
-
-export function obtenerIngresosAlmacen():
-  IngresoAlmacenRegistro[] {
-  return obtenerIngresosReales()
-}
-
