@@ -7,12 +7,14 @@ import type { SesionUsuario } from '../types/auth'
 import { apiFetch } from './api'
 
 interface BitacoraBackend {
+  bitacoraId?: number
   modulo?: string
   accion?: string
   detalle?: string
   fechaHora?: string
   nombreUsuario?: string
   nombreRol?: string
+  registroId?: string | null
 }
 
 interface PaginaBitacoraBackend {
@@ -197,7 +199,10 @@ export async function listarBitacoraBackend(
   )
 
   const datos = (respuesta.datos ?? []).map((registro, indice) => ({
-    id: `BIT-${filtros.pagina}-${indice}`,
+    id:
+    registro.bitacoraId !== undefined
+      ? `BIT-${registro.bitacoraId}`
+      : `BIT-${filtros.pagina}-${indice}`,
     fechaHora: registro.fechaHora ?? '',
     usuario: registro.nombreUsuario ?? '',
     nombreCompleto: registro.nombreUsuario ?? '',
@@ -205,7 +210,7 @@ export async function listarBitacoraBackend(
     modulo: registro.modulo ?? '',
     accion: (registro.accion ?? 'EDITAR') as RegistroBitacora['accion'],
     detalle: registro.detalle ?? '',
-    registroId: null,
+    registroId: registro.registroId ?? null,
   }))
 
   return {

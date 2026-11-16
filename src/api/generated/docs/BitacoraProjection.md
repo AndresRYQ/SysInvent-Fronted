@@ -6,12 +6,14 @@
 
 Name | Type
 ------------ | -------------
+`accion` | string
+`registroId` | string
 `modulo` | string
 `detalle` | string
-`accion` | string
-`nombreUsuario` | string
+`bitacoraId` | number
+`fechaHora` | Date
 `nombreRol` | string
-`fechaHora` | string
+`nombreUsuario` | string
 
 ## Example
 
@@ -20,12 +22,14 @@ import type { BitacoraProjection } from ''
 
 // TODO: Update the object below with actual values
 const example = {
+  "accion": null,
+  "registroId": null,
   "modulo": null,
   "detalle": null,
-  "accion": null,
-  "nombreUsuario": null,
-  "nombreRol": null,
+  "bitacoraId": null,
   "fechaHora": null,
+  "nombreRol": null,
+  "nombreUsuario": null,
 } satisfies BitacoraProjection
 
 console.log(example)

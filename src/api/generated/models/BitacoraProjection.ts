@@ -24,6 +24,18 @@ export interface BitacoraProjection {
      * @type {string}
      * @memberof BitacoraProjection
      */
+    accion?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BitacoraProjection
+     */
+    registroId?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BitacoraProjection
+     */
     modulo?: string;
     /**
      * 
@@ -32,17 +44,17 @@ export interface BitacoraProjection {
      */
     detalle?: string;
     /**
-     * 
-     * @type {string}
+     *
+     * @type {number}
      * @memberof BitacoraProjection
      */
-    accion?: string;
+    bitacoraId?: number;
     /**
-     * 
-     * @type {string}
+     *
+     * @type {Date}
      * @memberof BitacoraProjection
      */
-    nombreUsuario?: string;
+    fechaHora?: Date;
     /**
      * 
      * @type {string}
@@ -54,7 +66,7 @@ export interface BitacoraProjection {
      * @type {string}
      * @memberof BitacoraProjection
      */
-    fechaHora?: string;
+    nombreUsuario?: string;
 }
 
 /**
@@ -74,12 +86,14 @@ export function BitacoraProjectionFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
+        'accion': json['accion'] == null ? undefined : json['accion'],
+        'registroId': json['registroId'] == null ? undefined : json['registroId'],
         'modulo': json['modulo'] == null ? undefined : json['modulo'],
         'detalle': json['detalle'] == null ? undefined : json['detalle'],
-        'accion': json['accion'] == null ? undefined : json['accion'],
-        'nombreUsuario': json['nombreUsuario'] == null ? undefined : json['nombreUsuario'],
+        'bitacoraId': json['bitacoraId'] == null ? undefined : json['bitacoraId'],
+        'fechaHora': json['fechaHora'] == null ? undefined : (new Date(json['fechaHora'])),
         'nombreRol': json['nombreRol'] == null ? undefined : json['nombreRol'],
-        'fechaHora': json['fechaHora'] == null ? undefined : json['fechaHora'],
+        'nombreUsuario': json['nombreUsuario'] == null ? undefined : json['nombreUsuario'],
     };
 }
 
@@ -94,12 +108,14 @@ export function BitacoraProjectionToJSONTyped(value?: BitacoraProjection | null,
 
     return {
         
+        'accion': value['accion'],
+        'registroId': value['registroId'],
         'modulo': value['modulo'],
         'detalle': value['detalle'],
-        'accion': value['accion'],
-        'nombreUsuario': value['nombreUsuario'],
+        'bitacoraId': value['bitacoraId'],
+        'fechaHora': value['fechaHora'] == null ? value['fechaHora'] : value['fechaHora'].toISOString(),
         'nombreRol': value['nombreRol'],
-        'fechaHora': value['fechaHora'],
+        'nombreUsuario': value['nombreUsuario'],
     };
 }
 
