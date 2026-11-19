@@ -15,6 +15,9 @@ const solicitudesEnCurso = new Map<string, Promise<CatalogoPaginado<Producto>>>(
 
 export interface ListarProductosParams {
   nombre?: string
+  tipoProductoId?: string | number
+  categoriaId?: string | number
+  estado?: string
   pagina?: number
   tamPagina?: number
 }
@@ -91,10 +94,26 @@ export async function listarProductosApi(
   params: ListarProductosParams = {},
 ): Promise<CatalogoPaginado<Producto>> {
   const parametros = {
-    nombre: params.nombre?.trim() || undefined,
-    pagina: params.pagina,
-    tamPagina: params.tamPagina,
-  }
+  nombre: params.nombre?.trim() || undefined,
+  tipoProductoId:
+    params.tipoProductoId === undefined ||
+    params.tipoProductoId === ''
+      ? undefined
+      : convertirId(params.tipoProductoId),
+  categoriaId:
+    params.categoriaId === undefined ||
+    params.categoriaId === ''
+      ? undefined
+      : convertirId(params.categoriaId),
+  estado:
+    params.estado === 'activo'
+      ? true
+      : params.estado === 'inactivo'
+        ? false
+        : undefined,
+  pagina: params.pagina,
+  tamPagina: params.tamPagina,
+}
   const clave = JSON.stringify(parametros)
   const solicitudExistente = solicitudesEnCurso.get(clave)
   if (solicitudExistente) return solicitudExistente
@@ -118,9 +137,9 @@ function validarDatos(datos: ProductoFormData): void {
   const nombre = datos.nombre.trim()
   const descripcion = datos.descripcion.trim()
 
-  if (!/^[A-Z0-9-]{3,30}$/.test(codigo)) throw new Error('El código debe tener entre 3 y 30 caracteres y solo puede contener letras, números y guiones.')
-  if (nombre.length < 2 || nombre.length > 120) throw new Error('El nombre debe tener entre 2 y 120 caracteres.')
-  if (descripcion.length < 5 || descripcion.length > 250) throw new Error('La descripción debe tener entre 5 y 250 caracteres.')
+  if (!/^[A-Z0-9-]{3,50}$/.test(codigo)) throw new Error('El código debe tener entre 3 y 50 caracteres y solo puede contener letras, números y guiones.')
+  if (nombre.length < 2 || nombre.length > 255) throw new Error('El nombre debe tener entre 2 y 255 caracteres.')
+  if (descripcion.length < 5 || descripcion.length > 255) throw new Error('La descripción debe tener entre 5 y 255 caracteres.')
   if (!datos.tipoProductoId) throw new Error('Selecciona un tipo de producto.')
   if (!datos.categoriaId) throw new Error('Selecciona una categoría.')
   if (!datos.unidadMedidaId) throw new Error('Selecciona una unidad de medida.')

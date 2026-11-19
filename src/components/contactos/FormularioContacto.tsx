@@ -1,4 +1,5 @@
 import { Placeholder } from '../../constants/placeholders'
+import { CharacterCounter } from '../common/CharacterCounter'
 import {
   useEffect,
   useState,
@@ -158,12 +159,9 @@ export function FormularioContacto({
     if (!telefono) {
       nuevosErrores.telefono =
         'Campo requerido'
-    } else if (
-      numerosTelefono.length < 7 ||
-      numerosTelefono.length > 15
-    ) {
+    } else if (!/^9\d{8}$/.test(numerosTelefono)) {
       nuevosErrores.telefono =
-        'Ingresa un teléfono válido'
+        'El teléfono debe tener 9 dígitos y comenzar con 9'
     }
 
     if (!correo) {
@@ -324,7 +322,7 @@ export function FormularioContacto({
                       : ''
                   }`}
                   type="text"
-                  maxLength={120}
+                  maxLength={255}
                   value={
                     form.nombreCompleto
                   }
@@ -344,6 +342,7 @@ export function FormularioContacto({
                     )
                   }}
                 />
+                <CharacterCounter value={form.nombreCompleto} maxLength={255} />
 
                 {errores.nombreCompleto && (
                   <div className="maestro-field-error">
@@ -371,7 +370,7 @@ export function FormularioContacto({
                       : ''
                   }`}
                   type="text"
-                  maxLength={80}
+                  maxLength={150}
                   value={form.cargo}
                   placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
@@ -389,6 +388,7 @@ export function FormularioContacto({
                     )
                   }}
                 />
+                <CharacterCounter value={form.cargo} maxLength={150} />
 
                 {errores.cargo && (
                   <div className="maestro-field-error">
@@ -414,14 +414,14 @@ export function FormularioContacto({
                       : ''
                   }`}
                   type="tel"
-                  maxLength={20}
+                  inputMode="numeric"
+                  maxLength={9}
                   value={form.telefono}
                   placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
                     setForm((actual) => ({
                       ...actual,
-                      telefono:
-                        event.target.value,
+                      telefono: event.target.value.replace(/\D/g, ''),
                     }))
 
                     setErrores(
@@ -432,6 +432,7 @@ export function FormularioContacto({
                     )
                   }}
                 />
+                <CharacterCounter value={form.telefono} maxLength={9} />
 
                 {errores.telefono && (
                   <div className="maestro-field-error">
@@ -457,7 +458,7 @@ export function FormularioContacto({
                       : ''
                   }`}
                   type="email"
-                  maxLength={120}
+                  maxLength={150}
                   value={form.correo}
                   placeholder={Placeholder.Ingresar}
                   onChange={(event) => {
@@ -475,6 +476,7 @@ export function FormularioContacto({
                     )
                   }}
                 />
+                <CharacterCounter value={form.correo} maxLength={150} />
 
                 {errores.correo && (
                   <div className="maestro-field-error">

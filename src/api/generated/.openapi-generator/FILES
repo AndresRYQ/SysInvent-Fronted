@@ -10,7 +10,6 @@ apis/IngresoAlmacenControllerApi.ts
 apis/KardexApi.ts
 apis/LoginApi.ts
 apis/PartesDeEquipoApi.ts
-apis/PerfilControllerApi.ts
 apis/ProductosApi.ts
 apis/ProveedoresApi.ts
 apis/ReporteIngresoControllerApi.ts
@@ -92,7 +91,6 @@ docs/MessageResponse.md
 docs/ParteEquipoRequest.md
 docs/ParteEquipoResponse.md
 docs/PartesDeEquipoApi.md
-docs/PerfilControllerApi.md
 docs/PerfilUsuarioResponse.md
 docs/ProductoRequest.md
 docs/ProductoResponse.md

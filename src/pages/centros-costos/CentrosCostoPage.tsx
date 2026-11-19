@@ -39,7 +39,12 @@ export function CentrosCostoPage() {
 
   useEffect(() => {
     let activo = true
-    listarCentrosCosto({ nombre: aplicados.nombre, pagina: page, tamPagina: pageSize })
+    listarCentrosCosto({
+      nombre: aplicados.nombre,
+      estado: aplicados.estado,
+      pagina: page,
+      tamPagina: pageSize,
+    })
       .then((resultado) => {
         if (!activo) return
         setCentros(resultado.datos)
@@ -51,7 +56,13 @@ export function CentrosCostoPage() {
         mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar los centros de costo.')
       })
     return () => { activo = false }
-  }, [aplicados.nombre, page, pageSize, recarga])
+  }, [
+    aplicados.nombre,
+    aplicados.estado,
+    page,
+    pageSize,
+    recarga,
+  ])
 
   const recargar = () => {
     setPage(1)
@@ -106,7 +117,7 @@ export function CentrosCostoPage() {
         <div className="container-xl px-0 maestro-page-body">
           <section className="maestro-topbar"><div className="maestro-topbar__copy"><h1>Centros de costo</h1><p>Administración de áreas responsables del consumo de materiales.</p></div></section>
           <div className="maestro-panel"><FiltrosCentrosCosto valores={filtros} onChange={(campo, valor) => setFiltros((actual) => ({ ...actual, [campo]: valor }))} onBuscar={() => { setAplicados({ ...filtros }); setPage(1) }} onLimpiar={() => { setFiltros(FILTROS_INICIALES); setAplicados(FILTROS_INICIALES); setPage(1) }} /></div>
-          <div className="maestro-panel"><TablaCentrosCosto centrosCosto={filtrados} totalItems={aplicados.estado ? filtrados.length : totalItems} page={page} pageSize={pageSize} onAgregar={() => { setSeleccionado(null); setSoloLectura(false); setError(''); setFormOpen(true) }} onEditar={(item) => { setSeleccionado(item); setSoloLectura(false); setError(''); setFormOpen(true) }} onVisualizar={(item) => { setSeleccionado(item); setSoloLectura(true); setError(''); setFormOpen(true) }} onEliminar={(item) => { setObjetivo(item); setDeleteOpen(true) }} onReactivar={(item) => { setObjetivo(item); setReactivarOpen(true) }} onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(1) }} /></div>
+          <div className="maestro-panel"><TablaCentrosCosto centrosCosto={filtrados} totalItems={totalItems} page={page} pageSize={pageSize} onAgregar={() => { setSeleccionado(null); setSoloLectura(false); setError(''); setFormOpen(true) }} onEditar={(item) => { setSeleccionado(item); setSoloLectura(false); setError(''); setFormOpen(true) }} onVisualizar={(item) => { setSeleccionado(item); setSoloLectura(true); setError(''); setFormOpen(true) }} onEliminar={(item) => { setObjetivo(item); setDeleteOpen(true) }} onReactivar={(item) => { setObjetivo(item); setReactivarOpen(true) }} onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(1) }} /></div>
         </div>
       </main>
       <SnackbarAlert mensaje={mensaje} abierta={abierta} onClose={cerrarAlerta} onExited={limpiarAlerta} />

@@ -4,27 +4,22 @@ import {
   useCallback,
   useState,
 } from 'react'
-
 import {
   useLocation,
   useNavigate,
 } from 'react-router-dom'
-
 import {
   FiltrosProductos,
   type FiltrosProductosValores,
   type OpcionFiltroProducto,
 } from '../../components/productos/FiltrosProductos'
-
 import {
   TablaProductos,
   type ProductoFila,
 } from '../../components/productos/TablaProductos'
-
 import { ProductoDeleteModal } from '../../components/productos/ProductoDeleteModal'
 import { FormularioProducto } from '../../components/productos/FormularioProducto'
 import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
-
 import {
   actualizarProducto,
   crearProducto,
@@ -32,19 +27,15 @@ import {
   listarProductosApi,
   reactivarProducto,
 } from '../../services/productoService'
-
 import { listarProveedores } from '../../services/proveedorService'
 import { listarTiposProducto } from '../../services/tipoProductoService'
 import { listarUnidadesMedida } from '../../services/unidadMedidaService'
 import { listarCategorias } from '../../services/categoriaService'
-
 import type { Producto } from '../../types/producto'
 import type { Categoria } from '../../types/categoria'
 import type { Proveedor } from '../../types/proveedor'
 import type { TipoProducto } from '../../types/tipoProducto'
 import type { UnidadMedida } from '../../types/unidadMedida'
-import { coincidenIds } from '../../utils/identificadores'
-
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
@@ -113,6 +104,7 @@ export function ProductosPage() {
   const location = useLocation()
 
   const [productos, setProductos] = useState<Producto[]>([])
+  const [totalItems, setTotalItems] = useState(-1)
   const [cargandoProductos, setCargandoProductos] = useState(true)
 
   const [tiposProducto, setTiposProducto] = useState<TipoProducto[]>([])
@@ -190,14 +182,31 @@ export function ProductosPage() {
   const { mensaje, abierta, mostrarAlerta, cerrarAlerta, limpiarAlerta } = useSnackbar()
 
   const cargarProductos = useCallback(async (): Promise<void> => {
-    setCargandoProductos(true)
+  setCargandoProductos(true)
+
     try {
-      const resultado = await listarProductosApi({ pagina: 1, tamPagina: 100 })
+      const resultado = await listarProductosApi({
+        nombre: filtrosAplicados.busqueda,
+        tipoProductoId: filtrosAplicados.tipoProductoId,
+        categoriaId: filtrosAplicados.categoriaId,
+        estado: filtrosAplicados.estado,
+        pagina: page,
+        tamPagina: pageSize,
+      })
+
       setProductos(resultado.datos)
+      setTotalItems(
+        resultado.paginacion.totalElementos ??
+        resultado.datos.length,
+      )
     } finally {
       setCargandoProductos(false)
     }
-  }, [])
+  }, [
+    filtrosAplicados,
+    page,
+    pageSize,
+  ])
 
   useEffect(() => {
     void cargarProductos().catch((error) => {
@@ -274,79 +283,6 @@ export function ProductosPage() {
     categorias,
     unidadesMedida,
     proveedores,
-  ])
-
-  const productosFiltrados = useMemo(() => {
-    const busqueda =
-      filtrosAplicados.busqueda
-        .trim()
-        .toLowerCase()
-
-    return productosConDetalle.filter(
-      (producto) => {
-        const coincideBusqueda =
-          !busqueda ||
-          producto.codigo
-            .toLowerCase()
-            .includes(busqueda) ||
-          producto.nombre
-            .toLowerCase()
-            .includes(busqueda) ||
-          producto.descripcion
-            .toLowerCase()
-            .includes(busqueda)
-
-        const coincideTipo =
-          !filtrosAplicados.tipoProductoId ||
-          coincidenIds(
-            producto.tipoProductoId,
-            filtrosAplicados.tipoProductoId,
-            'TP-',
-          )
-
-        const coincideCategoria =
-          !filtrosAplicados.categoriaId ||
-          coincidenIds(
-            producto.categoriaId,
-            filtrosAplicados.categoriaId,
-            'CAT-',
-          )
-
-        const coincideEstado =
-          !filtrosAplicados.estado ||
-          (filtrosAplicados.estado ===
-            'activo' &&
-            producto.activo) ||
-          (filtrosAplicados.estado ===
-            'inactivo' &&
-            !producto.activo)
-
-        return (
-          coincideBusqueda &&
-          coincideTipo &&
-          coincideCategoria &&
-          coincideEstado
-        )
-      },
-    )
-  }, [
-    productosConDetalle,
-    filtrosAplicados,
-  ])
-
-  const totalItems = cargandoProductos ? -1 : productosFiltrados.length
-
-  const productosPaginados = useMemo(() => {
-    const startIndex = (page - 1) * pageSize
-
-    return productosFiltrados.slice(
-      startIndex,
-      startIndex + pageSize,
-    )
-  }, [
-    productosFiltrados,
-    page,
-    pageSize,
   ])
 
   useEffect(() => {
@@ -464,7 +400,7 @@ export function ProductosPage() {
 
           <div className="maestro-panel">
             <TablaProductos
-              productos={productosPaginados}
+              productos={productosConDetalle}
               totalItems={totalItems}
               page={page}
               pageSize={pageSize}

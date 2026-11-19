@@ -1,6 +1,6 @@
 # ContactosApi
 
-All URIs are relative to *http://localhost:8080*
+All URIs are relative to *http://localhost:8085*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
@@ -157,7 +157,7 @@ example().catch(console.error);
 
 ## listarContactos
 
-> CustomPageContactoResponse listarContactos(nombre, proveedorId, pagina, tamPagina)
+> CustomPageContactoResponse listarContactos(nombre, proveedorId, estado, pagina, tamPagina)
 
 Listar contactos
 
@@ -183,6 +183,8 @@ async function example() {
     nombre: nombre_example,
     // number (optional)
     proveedorId: 56,
+    // boolean (optional)
+    estado: true,
     // number (optional)
     pagina: 56,
     // number (optional)
@@ -208,6 +210,7 @@ example().catch(console.error);
 |------------- | ------------- | ------------- | -------------|
 | **nombre** | `string` |  | [Optional] [Defaults to `undefined`] |
 | **proveedorId** | `number` |  | [Optional] [Defaults to `undefined`] |
+| **estado** | `boolean` |  | [Optional] [Defaults to `undefined`] |
 | **pagina** | `number` |  | [Optional] [Defaults to `1`] |
 | **tamPagina** | `number` |  | [Optional] [Defaults to `10`] |
 

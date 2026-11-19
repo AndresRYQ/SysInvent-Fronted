@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Save, X } from 'lucide-react'
 import { Placeholder } from '../../constants/placeholders'
+import { CharacterCounter } from '../common/CharacterCounter'
 import type { TipoDocumento, TipoDocumentoFormData } from '../../types/tipoDocumento'
 
 interface Props {
@@ -53,12 +54,13 @@ export function TipoDocumentoFormModal({ abierto, tipoDocumento, error, soloLect
             {error && <div className="alert alert-danger py-2">{error}</div>}
             <div className="mb-3">
               <label className="form-label required" htmlFor="tipoDocumentoNombreModal">Nombre del tipo de documento</label>
-              <input id="tipoDocumentoNombreModal" className={`form-control${errores.nombre ? ' maestro-control--error' : ''}`} value={form.nombre} placeholder={Placeholder.Ingresar} disabled={soloLectura} maxLength={80} onChange={(event) => cambiar('nombre', event.target.value)} />
+              <input id="tipoDocumentoNombreModal" className={`form-control${errores.nombre ? ' maestro-control--error' : ''}`} value={form.nombre} placeholder={Placeholder.Ingresar} disabled={soloLectura} maxLength={100} onChange={(event) => cambiar('nombre', event.target.value)} />
+              <CharacterCounter value={form.nombre} maxLength={100} />
               {errores.nombre && <div className="maestro-field-error">{errores.nombre}</div>}
             </div>
             <label className="form-label required" htmlFor="tipoDocumentoDescripcionModal">Descripción</label>
-            <textarea id="tipoDocumentoDescripcionModal" className={`form-control${errores.descripcion ? ' maestro-control--error' : ''}`} value={form.descripcion} placeholder={Placeholder.Ingresar} disabled={soloLectura} maxLength={250} rows={2} onChange={(event) => cambiar('descripcion', event.target.value)} />
-            <div className="d-flex justify-content-between"><span className="maestro-field-error">{errores.descripcion}</span><small className="text-muted">{form.descripcion.length}/250</small></div>
+            <textarea id="tipoDocumentoDescripcionModal" className={`form-control${errores.descripcion ? ' maestro-control--error' : ''}`} value={form.descripcion} placeholder={Placeholder.Ingresar} disabled={soloLectura} maxLength={255} rows={2} onChange={(event) => cambiar('descripcion', event.target.value)} />
+            <div className="d-flex justify-content-between"><span className="maestro-field-error">{errores.descripcion}</span><CharacterCounter value={form.descripcion} maxLength={255} /></div>
           </div>
           {!soloLectura && <div className="maestro-modal-footer"><button type="button" className="btn btn-maestro-danger" onClick={onClose}><X size={18} />Cancelar</button><button type="submit" className="btn btn-maestro-primary"><Save size={18} />{tipoDocumento ? 'Guardar cambios' : 'Registrar'}</button></div>}
         </form>

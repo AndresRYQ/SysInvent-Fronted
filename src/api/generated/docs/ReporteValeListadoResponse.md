@@ -8,7 +8,7 @@ Name | Type
 ------------ | -------------
 `valeConsumoId` | number
 `numeroVale` | string
-`fechaVale` | string
+`fechaVale` | Date
 `centroCosto` | string
 `solicitante` | string
 `codigoProducto` | string

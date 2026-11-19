@@ -23,6 +23,7 @@ export const MODULOS_SISTEMA = [
   { id: ModuloCodigo.VALES_CONSUMO, backendId: 18, nombre: 'Vales de consumo' },
   { id: ModuloCodigo.INGRESOS_ALMACEN, backendId: 19, nombre: 'Ingresos de almacén' },
   { id: ModuloCodigo.PERFIL_USUARIO, backendId: 20, nombre: 'Perfil de usuario' },
+  { id: ModuloCodigo.REPORTE_KARDEX, backendId: 21, nombre: 'Reporte Kardex',},
 ] as const
 
 interface PaginaRolesBackend {

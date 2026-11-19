@@ -14,6 +14,7 @@ const solicitudesEnCurso = new Map<string, Promise<CatalogoPaginado<Contacto>>>(
 export interface ListarContactosParams {
   nombre?: string
   proveedorId?: string | number
+  estado?: string
   pagina?: number
   tamPagina?: number
 }
@@ -57,11 +58,20 @@ export async function listarContactos(
     : Number(String(params.proveedorId).replace(/^PROV-0*/i, ''))
 
   const parametros = {
-    nombre: params.nombre?.trim() || undefined,
-    proveedorId: Number.isFinite(proveedorId) ? proveedorId : undefined,
-    pagina: params.pagina,
-    tamPagina: params.tamPagina,
-  }
+  nombre: params.nombre?.trim() || undefined,
+  proveedorId:
+    Number.isFinite(proveedorId)
+      ? proveedorId
+      : undefined,
+  estado:
+    params.estado === 'activo'
+      ? true
+      : params.estado === 'inactivo'
+        ? false
+        : undefined,
+  pagina: params.pagina,
+  tamPagina: params.tamPagina,
+}
   const clave = JSON.stringify(parametros)
   const solicitudExistente = solicitudesEnCurso.get(clave)
   if (solicitudExistente) return solicitudExistente
@@ -84,11 +94,11 @@ function validar(datos: ContactoFormData): void {
   const correo = datos.correo.trim()
 
   if (nombre.length < 3) throw new Error('El nombre completo debe tener al menos 3 caracteres.')
-  if (nombre.length > 120) throw new Error('El nombre completo no puede superar los 120 caracteres.')
-  if (cargo.length > 80) throw new Error('El cargo no puede superar los 80 caracteres.')
+  if (nombre.length > 255) throw new Error('El nombre completo no puede superar los 255 caracteres.')
+  if (cargo.length > 150) throw new Error('El cargo no puede superar los 150 caracteres.')
   const digitosTelefono = telefono.replace(/\D/g, '')
-  if (telefono && (digitosTelefono.length < 7 || digitosTelefono.length > 15)) {
-    throw new Error('Ingresa un teléfono válido.')
+  if (telefono && !/^9\d{8}$/.test(digitosTelefono)) {
+    throw new Error('El teléfono debe tener 9 dígitos y comenzar con 9.')
   }
   if (correo && !/^\S+@\S+\.\S+$/.test(correo)) throw new Error('Ingresa un correo válido.')
 }

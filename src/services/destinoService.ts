@@ -72,9 +72,9 @@ function validar(datos: DestinoFormData): void {
   const descripcion = datos.descripcion.trim()
   if (!nombre) throw new Error('El nombre del destino es obligatorio.')
   if (nombre.length < 2) throw new Error('El nombre debe tener al menos 2 caracteres.')
-  if (nombre.length > 100) throw new Error('El nombre no puede superar los 100 caracteres.')
+  if (nombre.length > 150) throw new Error('El nombre no puede superar los 150 caracteres.')
   if (!descripcion) throw new Error('La descripción es obligatoria.')
-  if (descripcion.length > 250) throw new Error('La descripción no puede superar los 250 caracteres.')
+  if (descripcion.length > 255) throw new Error('La descripción no puede superar los 255 caracteres.')
 }
 
 function validarRespuesta(response: MessageResponse): MessageResponse {

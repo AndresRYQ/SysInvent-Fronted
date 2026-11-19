@@ -16,7 +16,6 @@ import SpotlightCard from '../components/ui/SpotlightCard'
 import { useAuth } from '../hooks/useAuth'
 import '../styles/react-bits.css'
 import '../styles/DashboardPage.css'
-import { DASHBOARD_MOCK } from '../data/dashboardMock'
 import { ModuloCodigo } from '../constants/modulos'
 
 const RESUMEN_VACIO: ResumenDashboard = {
@@ -63,6 +62,7 @@ type Module = {
   tone: string
   category: string
   route?: string
+  rutasPermiso?: string[]
 }
 
 const categories = [
@@ -123,7 +123,8 @@ const modules: Module[] = [
   {
     id: ModuloCodigo.CONTROL_ALMACEN,
     title: 'Control de almacén',
-    description: 'Control de inventario y movimientos.',
+    description:
+      'Control de inventario y movimientos.',
     icon: 'box',
     tone: 'green',
     category: 'Inventario',
@@ -166,6 +167,20 @@ const modules: Module[] = [
     route: '/reportes/vales',
   },
   {
+    id: ModuloCodigo.REPORTE_KARDEX,
+    title: 'Reporte Kardex',
+    description:
+      'Consulta de movimientos y trazabilidad del inventario.',
+    icon: 'report',
+    tone: 'blue',
+    category: 'Reportes',
+    route: '/reportes/kardex',
+    rutasPermiso: [
+      '/reportes/kardex',
+      '/control-almacen',
+    ],
+  },
+  {
     id: ModuloCodigo.REPORTE_PRODUCTOS,
     title: 'Reporte acumulado',
     description: 'Consulta de productos más solicitados.',
@@ -182,7 +197,7 @@ const modules: Module[] = [
     icon: 'box',
     tone: 'green',
     category: 'Maestros',
-    route: '/centros-costo',
+    route: '/centros-costos',
   },
   {
     id: ModuloCodigo.CATEGORIAS,
@@ -396,40 +411,30 @@ function DashboardPage() {
     useState<ResumenDashboard | null>(null)
   const [errorResumen, setErrorResumen] =
     useState<string | null>(null)
-  const [usarMock, setUsarMock] = useState(false)
   const [cargandoResumen, setCargandoResumen] = useState(true)
 
   useEffect(() => {
     let activo = true
 
-    obtenerResumenDashboard()
-      .then((resumen) => {
-        if (activo) {
-          const respuestaVacia =
-            resumen.productosActivos === 0 &&
-            resumen.ingresosDelMes === 0 &&
-            resumen.valesDelMes === 0 &&
-            resumen.movimientosHoy === 0 &&
-            resumen.movimientosRecientes.length === 0
-
-          setUsarMock(respuestaVacia)
-          setResumenCargado(resumen)
-          setCargandoResumen(false)
-        }
-      })
-      .catch((error: unknown) => {
-        if (activo) {
-          setUsarMock(true)
-          setErrorResumen(
-            `No se pudo cargar el resumen real. ${
-              error instanceof Error
-                ? error.message
-                : 'Mostrando datos de demostración.'
-            }`,
-          )
-          setCargandoResumen(false)
-        }
-      })
+  obtenerResumenDashboard()
+  .then((resumen) => {
+    if (activo) {
+      setResumenCargado(resumen)
+      setCargandoResumen(false)
+    }
+  })
+  .catch((error: unknown) => {
+    if (activo) {
+      setErrorResumen(
+        `No se pudo cargar el resumen. ${
+          error instanceof Error
+            ? error.message
+            : 'Inténtalo nuevamente.'
+        }`,
+      )
+      setCargandoResumen(false)
+    }
+  })
 
     return () => {
       activo = false
@@ -437,9 +442,7 @@ function DashboardPage() {
   }, [])
 
   const resumenDashboard =
-    usarMock
-      ? DASHBOARD_MOCK
-      : resumenCargado ?? RESUMEN_VACIO
+  resumenCargado ?? RESUMEN_VACIO
 
   const metrics: Metric[] = [
     {
@@ -547,10 +550,18 @@ const rutasPermitidas = new Set(sesion?.modulos ?? [])
 const modulosPermitidos =
   sesion?.rolId === 1
     ? modules
-    : modules.filter(
-        (module) =>
-          module.route && rutasPermitidas.has(module.route),
-      )
+    : modules.filter((module) => {
+        const rutasDelPermiso =
+          module.rutasPermiso ??
+          (module.route
+            ? [module.route]
+            : [])
+
+        return rutasDelPermiso.some(
+          (ruta) =>
+            rutasPermitidas.has(ruta),
+        )
+      })
 
 const categoriasPermitidas = useMemo(
   () =>
@@ -586,12 +597,6 @@ const filteredModules =
       {errorResumen && (
         <div className="alert alert-danger" role="alert">
           {errorResumen}
-        </div>
-      )}
-
-      {usarMock && (
-        <div className="alert alert-info" role="status">
-          Mostrando datos de demostración en el panel principal.
         </div>
       )}
 
