@@ -36,6 +36,12 @@ export interface Cards {
      * @type {number}
      * @memberof Cards
      */
+    productosSinStock?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Cards
+     */
     ingresosMes?: number;
     /**
      * 
@@ -70,6 +76,7 @@ export function CardsFromJSONTyped(json: any, ignoreDiscriminator: boolean): Car
         
         'productosActivos': json['productosActivos'] == null ? undefined : json['productosActivos'],
         'stockCritico': json['stockCritico'] == null ? undefined : json['stockCritico'],
+        'productosSinStock': json['productosSinStock'] == null ? undefined : json['productosSinStock'],
         'ingresosMes': json['ingresosMes'] == null ? undefined : json['ingresosMes'],
         'valesMes': json['valesMes'] == null ? undefined : json['valesMes'],
         'movimientosHoy': json['movimientosHoy'] == null ? undefined : json['movimientosHoy'],
@@ -89,6 +96,7 @@ export function CardsToJSONTyped(value?: Cards | null, ignoreDiscriminator: bool
         
         'productosActivos': value['productosActivos'],
         'stockCritico': value['stockCritico'],
+        'productosSinStock': value['productosSinStock'],
         'ingresosMes': value['ingresosMes'],
         'valesMes': value['valesMes'],
         'movimientosHoy': value['movimientosHoy'],

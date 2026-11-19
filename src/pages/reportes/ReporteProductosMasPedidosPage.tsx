@@ -17,16 +17,9 @@ import { TablePagination } from '../../components/ui/TablePagination'
 
 import { obtenerCategorias } from '../../services/categoriaService'
 import { obtenerDestinos } from '../../services/destinoService'
-
-import {
-  obtenerProductosMasPedidos,
-} from '../../services/reporteProductoMasPedidoService'
 import { listarReporteProductosApi } from '../../services/reportesApiService'
-
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
-import { REPORTE_VALES_MOCK } from '../../data/reporteValesMock'
 import type { FilaProductoMasPedido } from '../../types/reporteProductoMasPedido'
-
 import type {
   FiltrosProductosMasPedidos as Filtros,
 } from '../../types/reporteProductoMasPedido'
@@ -47,7 +40,6 @@ const FILTROS_INICIALES: Filtros = {
 export function ReporteProductosMasPedidosPage() {
   const [filasApi, setFilasApi] = useState<FilaProductoMasPedido[]>([])
   const [totalApi, setTotalApi] = useState(0)
-  const [usarMock, setUsarMock] = useState(false)
   const [errorCarga, setErrorCarga] = useState<string | null>(null)
 
   const [filtros, setFiltros] =
@@ -79,8 +71,6 @@ export function ReporteProductosMasPedidosPage() {
     })
       .then((resultado) => {
         if (!activo) return
-        const filtrosVacios = Object.values(filtrosAplicados).every((valor) => !valor)
-        setUsarMock(filtrosVacios && resultado.datos.length === 0 && page === 1)
         setFilasApi(resultado.datos)
         setTotalApi(resultado.totalElementos)
         setErrorCarga(null)
@@ -88,8 +78,8 @@ export function ReporteProductosMasPedidosPage() {
       })
       .catch((error: unknown) => {
         if (!activo) return
-        const filtrosVacios = Object.values(filtrosAplicados).every((valor) => !valor)
-        setUsarMock(filtrosVacios && page === 1)
+        setFilasApi([])
+        setTotalApi(0)
         setErrorCarga(error instanceof Error ? error.message : 'No se pudo cargar el reporte de productos.')
         setCargando(false)
       })
@@ -145,41 +135,35 @@ export function ReporteProductosMasPedidosPage() {
     [],
   )
 
-  const filasMock = useMemo(
-    () => obtenerProductosMasPedidos(FILTROS_INICIALES, REPORTE_VALES_MOCK),
-    [],
-  )
+  const filas = filasApi
 
-  const filas = usarMock ? filasMock : filasApi
+const resumen = useMemo(() => ({
+  totalProductos: totalApi,
+  totalVales: filas.reduce(
+    (total, fila) => total + fila.numeroVales,
+    0,
+  ),
+  totalDistribuciones: filas.reduce(
+    (total, fila) => total + fila.numeroDistribuciones,
+    0,
+  ),
+  totalValorizado: filas.reduce(
+    (total, fila) => total + fila.totalValorizado,
+    0,
+  ),
+  productoMasPedido:
+    filas[0]?.producto ?? 'Sin registros',
+  cantidadProductoMasPedido:
+    filas[0]?.cantidadSolicitada ?? 0,
+  unidadProductoMasPedido:
+    filas[0]?.unidadMedida ?? '',
+}), [filas, totalApi])
 
-  const resumen = useMemo(() => ({
-    totalProductos: usarMock ? filas.length : totalApi,
-    totalVales: filas.reduce((total, fila) => total + fila.numeroVales, 0),
-    totalDistribuciones: filas.reduce((total, fila) => total + fila.numeroDistribuciones, 0),
-    totalValorizado: filas.reduce((total, fila) => total + fila.totalValorizado, 0),
-    productoMasPedido: filas[0]?.producto ?? 'Sin registros',
-    cantidadProductoMasPedido: filas[0]?.cantidadSolicitada ?? 0,
-    unidadProductoMasPedido: filas[0]?.unidadMedida ?? '',
-  }), [filas, totalApi, usarMock])
+const totalItems = totalApi
 
-  const totalItems = usarMock ? filas.length : totalApi
+const filasPaginadas = filas
 
-  const filasPaginadas = useMemo(
-    () => {
-      const inicio =
-        (page - 1) * pageSize
-
-      return usarMock ? filas.slice(inicio, inicio + pageSize) : filas
-    },
-    [
-      filas,
-      page,
-      pageSize,
-      usarMock,
-    ],
-  )
-
-  useEffect(() => {
+useEffect(() => {
     const totalPaginas = Math.max(
       1,
       Math.ceil(
@@ -254,18 +238,6 @@ export function ReporteProductosMasPedidosPage() {
         {errorCarga && (
           <div className="alert alert-danger" role="alert">
             {errorCarga}
-          </div>
-        )}
-
-        {usarMock && (
-          <div className="alert alert-info" role="status">
-            Mostrando datos de demostración para validar el ranking de productos.
-          </div>
-        )}
-
-        {usarMock && (
-          <div className="alert alert-info" role="status">
-            Mostrando datos de demostración para validar el ranking de productos.
           </div>
         )}
 

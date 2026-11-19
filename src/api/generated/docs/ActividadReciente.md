@@ -6,7 +6,7 @@
 
 Name | Type
 ------------ | -------------
-`fecha` | string
+`fecha` | Date
 `tipo` | string
 `documento` | string
 `producto` | string

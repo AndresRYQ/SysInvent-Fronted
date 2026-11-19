@@ -9,7 +9,6 @@ import {
 } from '../../components/contactos/FiltrosContactos'
 import { FormularioContacto } from '../../components/contactos/FormularioContacto'
 import { TablaContactos } from '../../components/contactos/TablaContactos'
-
 import {
   actualizarContacto,
   crearContacto,
@@ -17,17 +16,12 @@ import {
   listarContactos,
   reactivarContacto,
 } from '../../services/contactoService'
-
 import { listarProveedores } from '../../services/proveedorService'
-import { coincidenIds } from '../../utils/identificadores'
-
 import type {
   Contacto,
   ContactoFormData,
 } from '../../types/contacto'
-
 import type { Proveedor } from '../../types/proveedor'
-
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
 
@@ -37,71 +31,6 @@ const FILTROS_INICIALES:
     proveedorId: '',
     estado: '',
   }
-
-function filtrarContactos(
-  contactos: Contacto[],
-  proveedores: Proveedor[],
-  filtros: FiltrosContactosValores,
-): Contacto[] {
-  const busqueda = filtros.busqueda
-    .trim()
-    .toLowerCase()
-
-  return contactos.filter(
-    (contacto) => {
-      const nombreProveedor =
-        proveedores.find(
-          (proveedor) =>
-          coincidenIds(
-            proveedor.id,
-            contacto.proveedorId,
-            'PROV-',
-          ),
-        )?.razonSocial ?? ''
-
-      const coincideBusqueda =
-        !busqueda ||
-        contacto.nombreCompleto
-          .toLowerCase()
-          .includes(busqueda) ||
-        contacto.cargo
-          .toLowerCase()
-          .includes(busqueda) ||
-        contacto.telefono
-          .toLowerCase()
-          .includes(busqueda) ||
-        contacto.correo
-          .toLowerCase()
-          .includes(busqueda) ||
-        nombreProveedor
-          .toLowerCase()
-          .includes(busqueda)
-
-      const coincideProveedor =
-        !filtros.proveedorId ||
-        coincidenIds(
-          contacto.proveedorId,
-          filtros.proveedorId,
-          'PROV-',
-        )
-
-      const coincideEstado =
-        !filtros.estado ||
-        (filtros.estado ===
-          'activo' &&
-          contacto.activo === 1) ||
-        (filtros.estado ===
-          'inactivo' &&
-          contacto.activo === 0)
-
-      return (
-        coincideBusqueda &&
-        coincideProveedor &&
-        coincideEstado
-      )
-    },
-  )
-}
 
 function obtenerMensajeError(
   error: unknown,
@@ -191,26 +120,41 @@ export function ContactosPage() {
 
   useEffect(() => {
     let cancelado = false
-    listarContactos({ nombre: filtrosAplicados.busqueda, pagina: page, tamPagina: pageSize })
-      .then((respuesta) => {
-        if (cancelado) return
-        const datos = filtrarContactos(respuesta.datos, proveedores, { ...filtrosAplicados, busqueda: '' })
-        setContactos(datos)
-        setTotalItems(respuesta.paginacion.totalElementos ?? datos.length)
-      })
+    listarContactos({
+    nombre: filtrosAplicados.busqueda,
+    proveedorId: filtrosAplicados.proveedorId,
+    estado: filtrosAplicados.estado,
+    pagina: page,
+    tamPagina: pageSize,
+  })
+    .then((respuesta) => {
+      if (cancelado) return
+      setContactos(respuesta.datos)
+      setTotalItems(
+        respuesta.paginacion.totalElementos ??
+        respuesta.datos.length,
+      )
+    })
       .catch((error) => {
         if (!cancelado) mostrarAlerta('error', obtenerMensajeError(error))
       })
     return () => { cancelado = true }
-  }, [page, pageSize, filtrosAplicados, proveedores])
+  }, [page, pageSize, filtrosAplicados])
 
   function recargarContactos(): void {
-    void listarContactos({ nombre: filtrosAplicados.busqueda, pagina: page, tamPagina: pageSize })
-      .then((respuesta) => {
-        const datos = filtrarContactos(respuesta.datos, proveedores, { ...filtrosAplicados, busqueda: '' })
-        setContactos(datos)
-        setTotalItems(respuesta.paginacion.totalElementos ?? datos.length)
-      })
+    void listarContactos({
+      nombre: filtrosAplicados.busqueda,
+      proveedorId: filtrosAplicados.proveedorId,
+      estado: filtrosAplicados.estado,
+      pagina: page,
+      tamPagina: pageSize,
+    }).then((respuesta) => {
+      setContactos(respuesta.datos)
+      setTotalItems(
+        respuesta.paginacion.totalElementos ??
+        respuesta.datos.length,
+      )
+    })
   }
 
   function abrirFormularioNuevo(): void {

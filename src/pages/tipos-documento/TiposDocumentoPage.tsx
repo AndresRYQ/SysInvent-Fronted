@@ -41,6 +41,7 @@ export function TiposDocumentoPage() {
     let activo = true
     listarTiposDocumento({
       nombre: aplicados.nombre,
+      estado: aplicados.estado,
       pagina: page,
       tamPagina: pageSize,
     })
@@ -55,7 +56,13 @@ export function TiposDocumentoPage() {
         mostrarAlerta('error', e instanceof Error ? e.message : 'No se pudieron cargar los tipos de documento.')
       })
     return () => { activo = false }
-  }, [aplicados.nombre, page, pageSize, recarga])
+  }, [
+    aplicados.nombre,
+    aplicados.estado,
+    page,
+    pageSize,
+    recarga,
+  ])
 
   const recargar = () => {
     setPage(1)
@@ -133,7 +140,7 @@ export function TiposDocumentoPage() {
           <div className="maestro-panel">
             <TablaTiposDocumento
               tiposDocumento={filtrados}
-              totalItems={aplicados.estado ? filtrados.length : totalItems}
+              totalItems={totalItems}
               page={page}
               pageSize={pageSize}
               onAgregar={() => { setSeleccionado(null); setSoloLectura(false); setError(''); setFormOpen(true) }}

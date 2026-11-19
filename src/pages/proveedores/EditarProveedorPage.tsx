@@ -43,11 +43,11 @@ export function EditarProveedorPage() {
 
   useEffect(() => {
     document.title = soloLectura ? 'Visualizar proveedor | AGRIHUSAC' : 'Editar proveedor | AGRIHUSAC'
-  }, [])
+  }, [soloLectura])
 
-  function guardarCambios(
+  async function guardarCambios(
     datos: ProveedorFormData,
-  ): void {
+  ): Promise<void> {
     if (!id) {
       setError(
         'No se encontró el identificador del proveedor.',
@@ -56,7 +56,7 @@ export function EditarProveedorPage() {
     }
 
     try {
-      actualizarProveedor(id, datos)
+      await actualizarProveedor(id, datos)
 
       navigate('/proveedores', { replace: true })
     } catch (errorGuardado) {

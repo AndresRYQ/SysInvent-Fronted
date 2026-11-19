@@ -1,14 +1,46 @@
+import {
+  AUTH_TOKEN_KEY,
+  notificarSesionNoAutorizada,
+} from './authSession'
 
-const DEFAULT_LOCAL_API_URL = 'http://localhost:8080'
+const DEFAULT_LOCAL_API_URL = 'http://localhost:8085'
 const DEFAULT_PRODUCTION_API_URL = 'https://sysinvent-backend.onrender.com'
 
-export const API_URL =
-  (import.meta.env.VITE_API_URL ||
-    (import.meta.env.DEV
-      ? DEFAULT_LOCAL_API_URL
-      : DEFAULT_PRODUCTION_API_URL)).replace(/\/+$/, '')
+const CONFIGURED_API_URL = import.meta.env.VITE_API_URL?.trim()
 
-const AUTH_TOKEN_KEY = 'sysinvent_token'
+const solicitudesGetEnCurso = new Map<string, Promise<Response>>()
+
+export const API_URL = (
+  CONFIGURED_API_URL ||
+  (import.meta.env.DEV
+    ? DEFAULT_LOCAL_API_URL
+    : DEFAULT_PRODUCTION_API_URL)
+).replace(/\/+$/, '')
+
+export function fetchConDedupe(
+  url: string,
+  init: RequestInit = {},
+): Promise<Response> {
+  const method = (init.method ?? 'GET').toUpperCase()
+
+  if (method !== 'GET' && method !== 'HEAD') {
+    return fetch(url, init)
+  }
+
+  const solicitudExistente = solicitudesGetEnCurso.get(url)
+
+  if (solicitudExistente) {
+    return solicitudExistente.then((response) => response.clone())
+  }
+
+  const solicitud = fetch(url, init).finally(() => {
+    solicitudesGetEnCurso.delete(url)
+  })
+
+  solicitudesGetEnCurso.set(url, solicitud)
+
+  return solicitud.then((response) => response.clone())
+}
 
 export interface ApiError extends Error {
   status?: number
@@ -64,10 +96,14 @@ export async function apiFetch<T>(
   }
 
   try {
-    const response = await fetch(buildUrl(endpoint), {
+    const response = await fetchConDedupe(buildUrl(endpoint), {
       ...options,
       headers,
     })
+
+    if (response.status === 401) {
+      notificarSesionNoAutorizada()
+    }
 
     const contentType = response.headers.get('content-type') ?? ''
     const data = contentType.includes('application/json')

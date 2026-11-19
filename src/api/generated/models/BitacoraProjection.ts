@@ -24,6 +24,18 @@ export interface BitacoraProjection {
      * @type {string}
      * @memberof BitacoraProjection
      */
+    registroId?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BitacoraProjection
+     */
+    accion?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BitacoraProjection
+     */
     modulo?: string;
     /**
      * 
@@ -33,10 +45,16 @@ export interface BitacoraProjection {
     detalle?: string;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof BitacoraProjection
      */
-    accion?: string;
+    bitacoraId?: number;
+    /**
+     * 
+     * @type {Date}
+     * @memberof BitacoraProjection
+     */
+    fechaHora?: Date;
     /**
      * 
      * @type {string}
@@ -49,12 +67,6 @@ export interface BitacoraProjection {
      * @memberof BitacoraProjection
      */
     nombreRol?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof BitacoraProjection
-     */
-    fechaHora?: string;
 }
 
 /**
@@ -74,12 +86,14 @@ export function BitacoraProjectionFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
+        'registroId': json['registroId'] == null ? undefined : json['registroId'],
+        'accion': json['accion'] == null ? undefined : json['accion'],
         'modulo': json['modulo'] == null ? undefined : json['modulo'],
         'detalle': json['detalle'] == null ? undefined : json['detalle'],
-        'accion': json['accion'] == null ? undefined : json['accion'],
+        'bitacoraId': json['bitacoraId'] == null ? undefined : json['bitacoraId'],
+        'fechaHora': json['fechaHora'] == null ? undefined : (new Date(json['fechaHora'])),
         'nombreUsuario': json['nombreUsuario'] == null ? undefined : json['nombreUsuario'],
         'nombreRol': json['nombreRol'] == null ? undefined : json['nombreRol'],
-        'fechaHora': json['fechaHora'] == null ? undefined : json['fechaHora'],
     };
 }
 
@@ -94,12 +108,14 @@ export function BitacoraProjectionToJSONTyped(value?: BitacoraProjection | null,
 
     return {
         
+        'registroId': value['registroId'],
+        'accion': value['accion'],
         'modulo': value['modulo'],
         'detalle': value['detalle'],
-        'accion': value['accion'],
+        'bitacoraId': value['bitacoraId'],
+        'fechaHora': value['fechaHora'] == null ? value['fechaHora'] : value['fechaHora'].toISOString(),
         'nombreUsuario': value['nombreUsuario'],
         'nombreRol': value['nombreRol'],
-        'fechaHora': value['fechaHora'],
     };
 }
 

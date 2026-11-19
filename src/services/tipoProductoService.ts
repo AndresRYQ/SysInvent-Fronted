@@ -13,6 +13,7 @@ const solicitudesEnCurso = new Map<string, Promise<CatalogoPaginado<TipoProducto
 
 export interface ListarTiposProductoParams {
   nombre?: string
+  estado?: string
   pagina?: number
   tamPagina?: number
 }
@@ -41,10 +42,17 @@ export async function listarTiposProducto(
   params: ListarTiposProductoParams = {},
 ): Promise<CatalogoPaginado<TipoProducto>> {
   const parametros = {
-    nombre: params.nombre?.trim() || undefined,
-    pagina: params.pagina,
-    tamPagina: params.tamPagina,
+  nombre: params.nombre?.trim() || undefined,
+  estado:
+    params.estado === 'activo'
+      ? true
+      : params.estado === 'inactivo'
+        ? false
+        : undefined,
+  pagina: params.pagina,
+  tamPagina: params.tamPagina,
   }
+
   const clave = JSON.stringify(parametros)
   const solicitudExistente = solicitudesEnCurso.get(clave)
 

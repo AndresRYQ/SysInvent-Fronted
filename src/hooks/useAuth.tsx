@@ -7,7 +7,6 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-
 import {
   AUTH_TOKEN_KEY,
   cerrarSesion,
@@ -15,13 +14,15 @@ import {
   obtenerSesion,
   sincronizarSesionUsuario,
 } from '../services/authService'
-
 import type {
   CredencialesLogin,
   ResultadoLogin,
   SesionUsuario,
   UsuarioLogin,
 } from '../types/auth'
+import {
+  AUTH_SESSION_INVALID_EVENT,
+} from '../services/authSession'
 
 interface AuthContextType {
   sesion: SesionUsuario | null
@@ -44,6 +45,7 @@ interface AuthProviderProps {
 type MotivoCierre =
   | 'inactividad'
   | 'vencimiento'
+  | 'sesion-invalida'
 
 const TIEMPO_INACTIVIDAD_MS =
   60 * 60 * 1000
@@ -279,6 +281,28 @@ export function AuthProvider({
       )
     }
   }, [])
+
+  /*
+* Cierra la sesión cuando el backend
+* rechaza el JWT con estado 401.
+*/
+  useEffect(() => {
+    const cerrarPorSesionInvalida = () => {
+      finalizarSesion('sesion-invalida')
+    }
+
+    window.addEventListener(
+      AUTH_SESSION_INVALID_EVENT,
+      cerrarPorSesionInvalida,
+    )
+
+    return () => {
+      window.removeEventListener(
+        AUTH_SESSION_INVALID_EVENT,
+        cerrarPorSesionInvalida,
+      )
+    }
+  }, [finalizarSesion])
 
   const valorContexto =
     useMemo<AuthContextType>(

@@ -21,7 +21,6 @@ import {
 import {
   ConfirmacionModal,
 } from '../../components/common/ConfirmacionModal'
-import { useAuth } from '../../hooks/useAuth'
 import {
   obtenerRolesBackend,
 } from '../../services/rolService'
@@ -31,8 +30,7 @@ import type {
 import {
   actualizarUsuarioBackend,
   crearUsuarioBackend,
-  eliminarUsuario,
-  obtenerUsuarios,
+  actualizarEstadoUsuarioBackend,
   obtenerUsuariosBackend,
 } from '../../services/usuarioService'
 import type {
@@ -46,10 +44,10 @@ import '../../styles/maestros.css'
 
 const FILTROS_INICIALES:
   FiltrosUsuariosValores = {
-    busqueda: '',
-    rol: '',
-    estado: '',
-  }
+  busqueda: '',
+  rol: '',
+  estado: '',
+}
 
 function filtrarUsuarios(
   usuarios: UsuarioLogin[],
@@ -94,13 +92,12 @@ function filtrarUsuarios(
 }
 
 export function UsuariosPage() {
-  const { sesion } = useAuth()
 
   const [usuarios, setUsuarios] =
-  useState<UsuarioLogin[]>([])
+    useState<UsuarioLogin[]>([])
 
   const [roles, setRoles] =
-  useState<Rol[]>([])
+    useState<Rol[]>([])
 
   const [filtros, setFiltros] =
     useState(FILTROS_INICIALES)
@@ -141,36 +138,36 @@ export function UsuariosPage() {
   const [cargando, setCargando] = useState(true)
 
   const cargarUsuarios =
-  useCallback(async (): Promise<void> => {
-    setCargando(true)
+    useCallback(async (): Promise<void> => {
+      setCargando(true)
 
-    try {
-      const resultadoUsuarios =
-        await obtenerUsuariosBackend(
-          '',
-          '',
-          undefined,
-          1,
-          100,
+      try {
+        const resultadoUsuarios =
+          await obtenerUsuariosBackend(
+            '',
+            '',
+            undefined,
+            1,
+            100,
+          )
+        const resultadoRoles = await obtenerRolesBackend()
+
+        setUsuarios(
+          resultadoUsuarios.usuarios,
         )
-      const resultadoRoles = await obtenerRolesBackend()
 
-      setUsuarios(
-        resultadoUsuarios.usuarios,
-      )
-
-      setRoles(resultadoRoles)
-    } catch (error) {
-      mostrarAlerta(
-        'error',
+        setRoles(resultadoRoles)
+      } catch (error) {
+        mostrarAlerta(
+          'error',
           error instanceof Error
             ? error.message
             : 'No se pudieron cargar los usuarios.',
-      )
-    } finally {
-      setCargando(false)
-    }
-  }, [mostrarAlerta])
+        )
+      } finally {
+        setCargando(false)
+      }
+    }, [mostrarAlerta])
   useEffect(() => {
     void cargarUsuarios()
   }, [cargarUsuarios])
@@ -274,11 +271,11 @@ export function UsuariosPage() {
    */
   const manejarGuardado = solicitarGuardado
 
-  const manejarEliminacion = (
+  const manejarEliminacion = async (
     usuario: UsuarioLogin,
-  ) => {
+  ): Promise<void> => {
     const confirmado = window.confirm(
-      `¿Deseas eliminar al usuario "${usuario.usuario}"?`,
+      `¿Deseas desactivar al usuario "${usuario.usuario}"?`,
     )
 
     if (!confirmado) {
@@ -286,25 +283,27 @@ export function UsuariosPage() {
     }
 
     try {
-      eliminarUsuario(
+      await actualizarEstadoUsuarioBackend(
         usuario.id,
-        sesion?.id,
+        false,
       )
 
-      setUsuarios(obtenerUsuarios())
+      await cargarUsuarios()
       setPage(1)
 
-      mostrarAlerta('success', 'Usuario eliminado correctamente.')
+      mostrarAlerta(
+        'success',
+        'Usuario desactivado correctamente.',
+      )
     } catch (error) {
       mostrarAlerta(
         'error',
-          error instanceof Error
-            ? error.message
-            : 'No se pudo eliminar el usuario.',
+        error instanceof Error
+          ? error.message
+          : 'No se pudo desactivar el usuario.',
       )
     }
   }
-
   return (
     <>
       <main className="dashboard-shell maestro-page-shell">

@@ -8,6 +8,7 @@ Name | Type
 ------------ | -------------
 `productosActivos` | number
 `stockCritico` | number
+`productosSinStock` | number
 `ingresosMes` | number
 `valesMes` | number
 `movimientosHoy` | number
@@ -21,6 +22,7 @@ import type { Cards } from ''
 const example = {
   "productosActivos": null,
   "stockCritico": null,
+  "productosSinStock": null,
   "ingresosMes": null,
   "valesMes": null,
   "movimientosHoy": null,

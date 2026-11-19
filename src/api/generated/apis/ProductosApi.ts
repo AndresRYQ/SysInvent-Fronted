@@ -50,6 +50,9 @@ export interface EliminarProductoRequest {
 
 export interface ListarProductosRequest {
     nombre?: string;
+    tipoProductoId?: number;
+    categoriaId?: number;
+    estado?: boolean;
     pagina?: number;
     tamPagina?: number;
 }
@@ -254,6 +257,18 @@ export class ProductosApi extends runtime.BaseAPI {
 
         if (requestParameters['nombre'] != null) {
             queryParameters['nombre'] = requestParameters['nombre'];
+        }
+
+        if (requestParameters['tipoProductoId'] != null) {
+            queryParameters['tipoProductoId'] = requestParameters['tipoProductoId'];
+        }
+
+        if (requestParameters['categoriaId'] != null) {
+            queryParameters['categoriaId'] = requestParameters['categoriaId'];
+        }
+
+        if (requestParameters['estado'] != null) {
+            queryParameters['estado'] = requestParameters['estado'];
         }
 
         if (requestParameters['pagina'] != null) {

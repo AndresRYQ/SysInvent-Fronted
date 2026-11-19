@@ -18,7 +18,6 @@ import { obtenerProductos } from '../../services/productoService'
 import { obtenerProveedores } from '../../services/proveedorService'
 
 import {
-  obtenerFilasReporteIngresos,
   obtenerResumenReporteIngresos,
 } from '../../services/reporteIngresoService'
 import { listarReporteIngresosApi } from '../../services/reportesApiService'
@@ -26,6 +25,7 @@ import { listarReporteIngresosApi } from '../../services/reportesApiService'
 import { obtenerTiposProducto } from '../../services/tipoProductoService'
 
 import type {
+  FilaReporteIngreso,
   FiltrosReporteIngresos as Filtros,
 } from '../../types/reporteIngreso'
 
@@ -44,7 +44,7 @@ const FILTROS_INICIALES: Filtros = {
 }
 
 export function ReporteIngresosPage() {
-  const [filas, setFilas] = useState<ReturnType<typeof obtenerFilasReporteIngresos>>([])
+  const [filas, setFilas] = useState<FilaReporteIngreso[]>([])
   const [totalApi, setTotalApi] = useState(0)
   const [errorCarga, setErrorCarga] = useState<string | null>(null)
 

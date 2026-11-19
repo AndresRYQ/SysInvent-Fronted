@@ -130,10 +130,54 @@ export function calcularTotalVale(vale: ValeConsumo): number {
 }
 
 export async function listarVales(): Promise<ValeConsumo[]> {
-  const response = (await valeApi.listar()) as ApiResponse<
-    ValeConsumoResponse[]
-  >
-  return response.data.map(mapearVale)
+  const tamPagina = 100
+
+  const primeraPagina = await valeApi.listar({
+    pagina: 1,
+    tamPagina,
+  })
+
+  const resumenes = [
+    ...(primeraPagina.datos ?? []),
+  ]
+
+  const totalElementos =
+    primeraPagina.paginacion?.totalElementos ??
+    resumenes.length
+
+  const totalPaginas = Math.ceil(
+    totalElementos / tamPagina,
+  )
+
+  if (totalPaginas > 1) {
+    const paginasRestantes = await Promise.all(
+      Array.from(
+        { length: totalPaginas - 1 },
+        (_, indice) =>
+          valeApi.listar({
+            pagina: indice + 2,
+            tamPagina,
+          }),
+      ),
+    )
+
+    paginasRestantes.forEach((pagina) => {
+      resumenes.push(...(pagina.datos ?? []))
+    })
+  }
+
+  const ids = resumenes
+    .map((vale) => vale.id)
+    .filter(
+      (id): id is number =>
+        typeof id === 'number',
+    )
+
+  return Promise.all(
+    ids.map((id) =>
+      obtenerValePorId(String(id)),
+    ),
+  )
 }
 
 export async function obtenerValePorId(
