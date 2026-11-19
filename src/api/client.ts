@@ -4,6 +4,7 @@ import {
 } from './generated'
 import {
   API_URL,
+  fetchConDedupe,
   type ApiError,
 } from '../services/api'
 import {
@@ -81,6 +82,7 @@ const responseInterceptor: Middleware = {
 export const apiConfiguration =
   new Configuration({
     basePath: API_URL,
+    fetchApi: fetchConDedupe,
     accessToken: () =>
       localStorage
         .getItem(AUTH_TOKEN_KEY)

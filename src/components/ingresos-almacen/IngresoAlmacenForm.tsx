@@ -54,6 +54,32 @@ interface DetalleTemporal {
   precioUnitario: string
 }
 
+interface ErroresIngreso {
+  fechaIngreso: string
+  proveedorId: string
+  contactoId: string
+  tipoDocumentoId: string
+  numeroDocumento: string
+  detalleTipoProductoId: string
+  detalleProductoId: string
+  cantidad: string
+  precioUnitario: string
+  detalles: string
+}
+
+const SIN_ERRORES: ErroresIngreso = {
+  fechaIngreso: '',
+  proveedorId: '',
+  contactoId: '',
+  tipoDocumentoId: '',
+  numeroDocumento: '',
+  detalleTipoProductoId: '',
+  detalleProductoId: '',
+  cantidad: '',
+  precioUnitario: '',
+  detalles: '',
+}
+
 const DETALLE_INICIAL: DetalleTemporal = {
   tipoProductoId: '',
   productoId: '',
@@ -178,6 +204,18 @@ export function IngresoAlmacenForm({
 
   const [error, setError] =
     useState<string | null>(null)
+
+  const [errores, setErrores] =
+    useState<ErroresIngreso>(SIN_ERRORES)
+
+  function limpiarError(
+    campo: keyof ErroresIngreso,
+  ): void {
+    setErrores((actuales) => ({
+      ...actuales,
+      [campo]: '',
+    }))
+  }
 
   useEffect(() => {
     let cancelado = false
@@ -469,6 +507,8 @@ export function IngresoAlmacenForm({
     setProductosComboSeleccionados({})
     setDetalle(DETALLE_INICIAL)
     setError(null)
+    limpiarError('proveedorId')
+    limpiarError('contactoId')
   }
 
   function cambiarTipoProducto(
@@ -483,6 +523,7 @@ export function IngresoAlmacenForm({
     }))
 
     setError(null)
+    limpiarError('detalleTipoProductoId')
   }
 
   function cambiarProducto(
@@ -501,25 +542,31 @@ export function IngresoAlmacenForm({
     }))
 
     setError(null)
+    limpiarError('detalleProductoId')
   }
 
   function agregarDetalle(): void {
     if (!proveedorId) {
-      setError(
-        'Selecciona primero un proveedor.',
-      )
+      setErrores((actuales) => ({
+        ...actuales,
+        proveedorId: 'Selecciona primero un proveedor.',
+      }))
       return
     }
 
     if (!detalle.tipoProductoId) {
-      setError(
-        'Selecciona un tipo de producto.',
-      )
+      setErrores((actuales) => ({
+        ...actuales,
+        detalleTipoProductoId: 'Selecciona un tipo de producto.',
+      }))
       return
     }
 
     if (!detalle.productoId) {
-      setError('Selecciona un producto.')
+      setErrores((actuales) => ({
+        ...actuales,
+        detalleProductoId: 'Selecciona un producto.',
+      }))
       return
     }
 
@@ -535,9 +582,10 @@ export function IngresoAlmacenForm({
       !Number.isFinite(cantidad) ||
       cantidad <= 0
     ) {
-      setError(
-        'La cantidad debe ser mayor que cero.',
-      )
+      setErrores((actuales) => ({
+        ...actuales,
+        cantidad: 'La cantidad debe ser mayor que cero.',
+      }))
       return
     }
 
@@ -545,9 +593,10 @@ export function IngresoAlmacenForm({
       !Number.isFinite(precioUnitario) ||
       precioUnitario < 0
     ) {
-      setError(
-        'El precio unitario no es válido.',
-      )
+      setErrores((actuales) => ({
+        ...actuales,
+        precioUnitario: 'El precio unitario no es válido.',
+      }))
       return
     }
 
@@ -599,6 +648,7 @@ export function IngresoAlmacenForm({
     }))
 
     setError(null)
+    setErrores(SIN_ERRORES)
   }
 
   function eliminarDetalle(
@@ -618,41 +668,43 @@ export function IngresoAlmacenForm({
     event.preventDefault()
     setError(null)
 
+    const siguientesErrores: ErroresIngreso = {
+      ...SIN_ERRORES,
+    }
+
     if (!fechaIngreso) {
-      setError(
-        'Selecciona la fecha del ingreso.',
-      )
-      return
+      siguientesErrores.fechaIngreso =
+        'Selecciona la fecha del ingreso.'
     }
 
     if (!proveedorId) {
-      setError('Selecciona un proveedor.')
-      return
+      siguientesErrores.proveedorId =
+        'Selecciona un proveedor.'
     }
 
     if (!contactoId) {
-      setError('Selecciona un contacto.')
-      return
+      siguientesErrores.contactoId =
+        'Selecciona un contacto.'
     }
 
     if (!tipoDocumentoId) {
-      setError(
-        'Selecciona un tipo de documento.',
-      )
-      return
+      siguientesErrores.tipoDocumentoId =
+        'Selecciona un tipo de documento.'
     }
 
-    if (!/^\d{7}$/.test(numeroDocumento)) {
-      setError(
-        'El número de documento debe tener exactamente 7 dígitos.',
-      )
-      return
+    if (!numeroDocumento.trim()) {
+      siguientesErrores.numeroDocumento =
+        'Ingresa el número de documento.'
     }
 
     if (detalles.length === 0) {
-      setError(
-        'Agrega al menos un producto.',
-      )
+      siguientesErrores.detalles =
+        'Agrega al menos un producto.'
+    }
+
+    setErrores(siguientesErrores)
+
+    if (Object.values(siguientesErrores).some(Boolean)) {
       return
     }
 
@@ -678,16 +730,15 @@ export function IngresoAlmacenForm({
 
   return (
     <form
-      className="maestro-panel p-4"
+      className="maestro-panel ingreso-form"
       onSubmit={guardar}
       noValidate
     >
-      <div className="d-flex justify-content-between align-items-start gap-3 mb-4">
+      <section className="ingreso-form-card">
+        <div className="d-flex justify-content-between align-items-start gap-3 mb-4">
         <div>
           <h2 className="h5 mb-1">
-            {ingreso
-              ? 'Editar ingreso'
-              : 'Nuevo ingreso'}
+            Datos del ingreso
           </h2>
 
           <p className="text-secondary mb-0">
@@ -701,31 +752,34 @@ export function IngresoAlmacenForm({
             {ingreso.numeroIngreso}
           </span>
         )}
-      </div>
-
-      {error && (
-        <div
-          className="alert alert-danger"
-          role="alert"
-        >
-          {error}
         </div>
-      )}
 
-      <div className="row g-3">
+        {error && (
+          <div
+            className="alert alert-danger"
+            role="alert"
+          >
+            {error}
+          </div>
+        )}
+
+        <div className="row g-3">
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label required"
             htmlFor="ingresoFecha"
           >
-            Fecha de ingreso *
+            Fecha de ingreso
           </label>
 
           <DatePicker
             id="ingresoFecha"
-            className="form-control maestro-control"
+            className={`form-control maestro-control${errores.fechaIngreso ? ' maestro-control--error' : ''}`}
             selected={convertirFechaASeleccion(fechaIngreso)}
-            onChange={(fecha: Date | null) => setFechaIngreso(convertirSeleccionAFecha(fecha))}
+            onChange={(fecha: Date | null) => {
+              setFechaIngreso(convertirSeleccionAFecha(fecha))
+              limpiarError('fechaIngreso')
+            }}
             dateFormat="dd/MM/yyyy"
             locale="es"
             placeholderText={Placeholder.Fecha}
@@ -735,20 +789,25 @@ export function IngresoAlmacenForm({
             }
             autoComplete="off"
           />
+          {errores.fechaIngreso && (
+            <div className="maestro-field-error">
+              {errores.fechaIngreso}
+            </div>
+          )}
         </div>
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label required"
             htmlFor="ingresoProveedor"
           >
-            Proveedor *
+            Proveedor
           </label>
 
           <Select
             inputId="ingresoProveedor"
             classNamePrefix="maestro-select"
-            styles={crearEstilosSelect()}
+            styles={crearEstilosSelect({ tieneError: Boolean(errores.proveedorId) })}
             placeholder={cargandoProveedores ? 'Cargando proveedores...' : 'Seleccione'}
             isLoading={cargandoProveedores}
             isClearable
@@ -771,20 +830,25 @@ export function IngresoAlmacenForm({
               }))[0] ?? null}
             onChange={(option) => cambiarProveedor(option?.value ?? '')}
           />
+          {errores.proveedorId && (
+            <div className="maestro-field-error">
+              {errores.proveedorId}
+            </div>
+          )}
         </div>
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label required"
             htmlFor="ingresoContacto"
           >
-            Contacto *
+            Contacto
           </label>
 
           <Select
             inputId="ingresoContacto"
             classNamePrefix="maestro-select"
-            styles={crearEstilosSelect()}
+            styles={crearEstilosSelect({ tieneError: Boolean(errores.contactoId) })}
             placeholder={cargandoContactos ? 'Cargando contactos...' : 'Seleccione'}
             isClearable
             isLoading={cargandoContactos}
@@ -799,22 +863,30 @@ export function IngresoAlmacenForm({
                 value: String(contacto.id),
                 label: contacto.nombreCompleto,
               }))[0] ?? null}
-            onChange={(option) => setContactoId(option?.value ?? '')}
+            onChange={(option) => {
+              setContactoId(option?.value ?? '')
+              limpiarError('contactoId')
+            }}
           />
+          {errores.contactoId && (
+            <div className="maestro-field-error">
+              {errores.contactoId}
+            </div>
+          )}
         </div>
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label required"
             htmlFor="ingresoTipoDocumento"
           >
-            Tipo de documento *
+            Tipo de documento
           </label>
 
           <Select
             inputId="ingresoTipoDocumento"
             classNamePrefix="maestro-select"
-            styles={crearEstilosSelect()}
+            styles={crearEstilosSelect({ tieneError: Boolean(errores.tipoDocumentoId) })}
             placeholder={cargandoTiposDocumento ? 'Cargando tipos de documento...' : 'Seleccione'}
             isLoading={cargandoTiposDocumento}
             isClearable
@@ -835,34 +907,42 @@ export function IngresoAlmacenForm({
                 value: String(tipo.id),
                 label: tipo.nombre,
               }))[0] ?? null}
-            onChange={(option) => setTipoComprobanteId(option?.value ?? '')}
+            onChange={(option) => {
+              setTipoComprobanteId(option?.value ?? '')
+              limpiarError('tipoDocumentoId')
+            }}
           />
+          {errores.tipoDocumentoId && (
+            <div className="maestro-field-error">
+              {errores.tipoDocumentoId}
+            </div>
+          )}
         </div>
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label required"
             htmlFor="ingresoNumeroDocumento"
           >
-            Número de documento *
+            Número de documento
           </label>
 
           <input
             id="ingresoNumeroDocumento"
-            className="form-control maestro-control"
+            className={`form-control maestro-control${errores.numeroDocumento ? ' maestro-control--error' : ''}`}
             type="text"
-            maxLength={7}
-            inputMode="numeric"
-            pattern="[0-9]{7}"
+            maxLength={50}
             value={numeroDocumento}
-            onChange={(event) =>
-              setNumeroDocumento(
-                event.target.value
-                  .replace(/\D/g, '')
-                  .slice(0, 7),
-              )
-            }
+            onChange={(event) => {
+              setNumeroDocumento(event.target.value)
+              limpiarError('numeroDocumento')
+            }}
           />
+          {errores.numeroDocumento && (
+            <div className="maestro-field-error">
+              {errores.numeroDocumento}
+            </div>
+          )}
         </div>
 
         <div className="col-12">
@@ -886,27 +966,41 @@ export function IngresoAlmacenForm({
             }
           />
         </div>
-      </div>
+        </div>
+      </section>
 
-      <hr className="my-4" />
+      <section className="ingreso-form-card ingreso-products-card">
+        <div className="ingreso-section-heading">
+          <div>
+            <h3 className="h5 mb-1">
+              Agregar productos
+            </h3>
+            <p className="text-secondary mb-0">
+              Añade los productos recibidos y define sus cantidades y precios.
+            </p>
+          </div>
+          <Plus size={22} aria-hidden="true" />
+        </div>
 
-      <h3 className="h6 mb-3">
-        Agregar productos
-      </h3>
+        {errores.detalles && (
+          <div className="maestro-field-error mb-3">
+            {errores.detalles}
+          </div>
+        )}
 
-      <div className="row g-3 align-items-end">
+        <div className="row g-3 align-items-end">
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label required"
             htmlFor="detalleTipoProducto"
           >
-            Tipo de producto *
+            Tipo de producto
           </label>
 
           <Select
             inputId="detalleTipoProducto"
             classNamePrefix="maestro-select"
-            styles={crearEstilosSelect()}
+            styles={crearEstilosSelect({ tieneError: Boolean(errores.detalleTipoProductoId) })}
             placeholder="Seleccione"
             isClearable
             isLoading={cargandoTiposProducto}
@@ -925,20 +1019,25 @@ export function IngresoAlmacenForm({
               }))[0] ?? null}
             onChange={(option) => cambiarTipoProducto(option?.value ?? '')}
           />
+          {errores.detalleTipoProductoId && (
+            <div className="maestro-field-error">
+              {errores.detalleTipoProductoId}
+            </div>
+          )}
         </div>
 
         <div className="col-12 col-md-4">
           <label
-            className="form-label"
+            className="form-label required"
             htmlFor="detalleProducto"
           >
-            Producto *
+            Producto
           </label>
 
           <Select
             inputId="detalleProducto"
             classNamePrefix="maestro-select"
-            styles={crearEstilosSelect()}
+            styles={crearEstilosSelect({ tieneError: Boolean(errores.detalleProductoId) })}
             placeholder="Seleccione"
             isClearable
             isLoading={cargandoProductos}
@@ -955,6 +1054,11 @@ export function IngresoAlmacenForm({
               }))[0] ?? null}
             onChange={(option) => cambiarProducto(option?.value ?? '')}
           />
+          {errores.detalleProductoId && (
+            <div className="maestro-field-error">
+              {errores.detalleProductoId}
+            </div>
+          )}
         </div>
 
         <div className="col-12 col-md-3">
@@ -976,52 +1080,64 @@ export function IngresoAlmacenForm({
 
         <div className="col-12 col-md-3">
           <label
-            className="form-label"
+            className="form-label required"
             htmlFor="detalleCantidad"
           >
-            Cantidad *
+            Cantidad
           </label>
 
           <input
             id="detalleCantidad"
-            className="form-control maestro-control"
+            className={`form-control maestro-control${errores.cantidad ? ' maestro-control--error' : ''}`}
             type="number"
             min="0.001"
             step="0.001"
             value={detalle.cantidad}
-            onChange={(event) =>
+            onChange={(event) => {
               setDetalle((actual) => ({
                 ...actual,
                 cantidad:
                   event.target.value,
               }))
-            }
+              limpiarError('cantidad')
+            }}
           />
+          {errores.cantidad && (
+            <div className="maestro-field-error">
+              {errores.cantidad}
+            </div>
+          )}
         </div>
 
         <div className="col-12 col-md-3">
           <label
-            className="form-label"
+            className="form-label required"
             htmlFor="detallePrecio"
           >
-            Precio unitario *
+            Precio unitario
           </label>
 
           <input
             id="detallePrecio"
-            className="form-control maestro-control"
+            className={`form-control maestro-control${errores.precioUnitario ? ' maestro-control--error' : ''}`}
             type="number"
             min="0"
             step="0.01"
             value={detalle.precioUnitario}
-            onChange={(event) =>
+            onChange={(event) => {
               setDetalle((actual) => ({
                 ...actual,
                 precioUnitario:
                   event.target.value,
               }))
-            }
+              limpiarError('precioUnitario')
+            }}
           />
+          {errores.precioUnitario && (
+            <div className="maestro-field-error">
+              {errores.precioUnitario}
+            </div>
+          )}
         </div>
 
         <div className="col-12 col-md-3">
@@ -1034,9 +1150,9 @@ export function IngresoAlmacenForm({
             Agregar
           </button>
         </div>
-      </div>
+        </div>
 
-      <div className="table-responsive mt-4">
+        <div className="table-responsive mt-4">
         <table className="table align-middle">
           <thead>
             <tr>
@@ -1159,7 +1275,8 @@ export function IngresoAlmacenForm({
             </tr>
           </tfoot>
         </table>
-      </div>
+        </div>
+      </section>
 
       <div className="d-flex justify-content-end gap-2 mt-4">
         <button

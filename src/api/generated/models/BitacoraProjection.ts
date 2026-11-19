@@ -24,7 +24,19 @@ export interface BitacoraProjection {
      * @type {string}
      * @memberof BitacoraProjection
      */
+    registroId?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BitacoraProjection
+     */
     accion?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BitacoraProjection
+     */
+    modulo?: string;
     /**
      * 
      * @type {string}
@@ -33,24 +45,12 @@ export interface BitacoraProjection {
     detalle?: string;
     /**
      * 
-     * @type {string}
-     * @memberof BitacoraProjection
-     */
-    registroId?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof BitacoraProjection
-     */
-    modulo?: string;
-    /**
-     *
      * @type {number}
      * @memberof BitacoraProjection
      */
     bitacoraId?: number;
     /**
-     *
+     * 
      * @type {Date}
      * @memberof BitacoraProjection
      */
@@ -60,13 +60,13 @@ export interface BitacoraProjection {
      * @type {string}
      * @memberof BitacoraProjection
      */
-    nombreRol?: string;
+    nombreUsuario?: string;
     /**
      * 
      * @type {string}
      * @memberof BitacoraProjection
      */
-    nombreUsuario?: string;
+    nombreRol?: string;
 }
 
 /**
@@ -86,14 +86,14 @@ export function BitacoraProjectionFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'accion': json['accion'] == null ? undefined : json['accion'],
-        'detalle': json['detalle'] == null ? undefined : json['detalle'],
         'registroId': json['registroId'] == null ? undefined : json['registroId'],
+        'accion': json['accion'] == null ? undefined : json['accion'],
         'modulo': json['modulo'] == null ? undefined : json['modulo'],
+        'detalle': json['detalle'] == null ? undefined : json['detalle'],
         'bitacoraId': json['bitacoraId'] == null ? undefined : json['bitacoraId'],
         'fechaHora': json['fechaHora'] == null ? undefined : (new Date(json['fechaHora'])),
-        'nombreRol': json['nombreRol'] == null ? undefined : json['nombreRol'],
         'nombreUsuario': json['nombreUsuario'] == null ? undefined : json['nombreUsuario'],
+        'nombreRol': json['nombreRol'] == null ? undefined : json['nombreRol'],
     };
 }
 
@@ -108,14 +108,14 @@ export function BitacoraProjectionToJSONTyped(value?: BitacoraProjection | null,
 
     return {
         
-        'accion': value['accion'],
-        'detalle': value['detalle'],
         'registroId': value['registroId'],
+        'accion': value['accion'],
         'modulo': value['modulo'],
+        'detalle': value['detalle'],
         'bitacoraId': value['bitacoraId'],
         'fechaHora': value['fechaHora'] == null ? value['fechaHora'] : value['fechaHora'].toISOString(),
-        'nombreRol': value['nombreRol'],
         'nombreUsuario': value['nombreUsuario'],
+        'nombreRol': value['nombreRol'],
     };
 }
 

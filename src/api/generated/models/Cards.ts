@@ -38,7 +38,7 @@ export interface Cards {
      */
     productosSinStock?: number;
     /**
-     *
+     * 
      * @type {number}
      * @memberof Cards
      */

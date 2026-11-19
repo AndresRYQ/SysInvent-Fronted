@@ -566,7 +566,7 @@ export function IngresosAlmacenPage() {
                               </td>
 
                               <td>
-                                <div className="table-actions">
+                                <div className="table-actions d-flex gap-1">
                                   <button
                                     type="button"
                                     className="btn table-action-btn"
@@ -579,22 +579,22 @@ export function IngresosAlmacenPage() {
                                   >
                                     <Eye size={16} />
                                   </button>
+                                  <button
+                                    type="button"
+                                    className="btn table-action-btn"
+                                    title="Editar ingreso"
+                                    disabled={
+                                      ingreso.estado === 'ANULADO'
+                                    }
+                                    onClick={() =>
+                                      navigate(
+                                        `/ingresos-almacen/${ingreso.id}/editar`,
+                                      )
+                                    }
+                                  >
+                                    <Pencil size={16} />
+                                  </button>
                                 </div>
-                                <button
-                                  type="button"
-                                  className="btn table-action-btn"
-                                  title="Editar ingreso"
-                                  disabled={
-                                    ingreso.estado === 'ANULADO'
-                                  }
-                                  onClick={() =>
-                                    navigate(
-                                      `/ingresos-almacen/${ingreso.id}/editar`,
-                                    )
-                                  }
-                                >
-                                  <Pencil size={16} />
-                                </button>
                               </td>
                             </tr>
                           ),

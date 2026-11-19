@@ -100,7 +100,7 @@ export function DetalleIngresoPage() {
   return (
     <main className="dashboard-shell maestro-page-shell">
       <div className="container-xl px-0 maestro-page-body">
-        <section className="maestro-topbar">
+        <section className="maestro-topbar ingreso-form-topbar">
           <div className="maestro-topbar__copy">
             <h1>Detalle de ingreso</h1>
 

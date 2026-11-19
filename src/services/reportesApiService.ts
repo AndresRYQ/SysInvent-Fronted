@@ -16,6 +16,25 @@ const dashboardApi = new DashboardControllerApi(apiConfiguration)
 const reporteIngresoApi = new ReporteIngresoControllerApi(apiConfiguration)
 const reporteValeApi = new ReporteValeControllerApi(apiConfiguration)
 const reporteProductoApi = new ReporteProductoMasPedidoControllerApi(apiConfiguration)
+const solicitudesReportesEnCurso = new Map<string, Promise<unknown>>()
+
+function ejecutarUnaVez<T>(
+  clave: string,
+  ejecutar: () => Promise<T>,
+): Promise<T> {
+  const solicitudExistente = solicitudesReportesEnCurso.get(clave) as
+    | Promise<T>
+    | undefined
+
+  if (solicitudExistente) return solicitudExistente
+
+  const solicitud = ejecutar().finally(() => {
+    solicitudesReportesEnCurso.delete(clave)
+  })
+
+  solicitudesReportesEnCurso.set(clave, solicitud)
+  return solicitud
+}
 
 function idOpcional(valor: string): number | undefined {
   if (!valor) return undefined
@@ -85,7 +104,7 @@ export interface ReporteFiltrosApi {
 }
 
 export async function listarReporteValesApi(filtros: ReporteFiltrosApi) {
-  const response = await reporteValeApi.listar1({
+  const parametros = {
     busqueda: filtros.busqueda || undefined,
     centroCostoId: idOpcional(filtros.centroCostoId ?? ''),
     destinoId: idOpcional(filtros.destinoId ?? ''),
@@ -97,7 +116,11 @@ export async function listarReporteValesApi(filtros: ReporteFiltrosApi) {
     fechaHasta: fechaOpcional(filtros.fechaHasta ?? ''),
     pagina: filtros.pagina,
     tamPagina: filtros.tamPagina,
-  })
+  }
+  const response = await ejecutarUnaVez(
+    `reporte-vales:${JSON.stringify(parametros)}`,
+    () => reporteValeApi.listar1(parametros),
+  )
 
   const datos: FilaReporteVale[] = (response.datos ?? []).map((item, index) => ({
     valeId: String(item.valeConsumoId ?? `VALE-${index + 1}`),
@@ -131,7 +154,7 @@ export async function listarReporteValesApi(filtros: ReporteFiltrosApi) {
 }
 
 export async function listarReporteIngresosApi(filtros: ReporteFiltrosApi) {
-  const response = await reporteIngresoApi.listar3({
+  const parametros = {
     busqueda: filtros.busqueda || undefined,
     proveedorId: idOpcional(filtros.proveedorId ?? ''),
     tipoProductoId: idOpcional(filtros.tipoProductoId ?? ''),
@@ -141,7 +164,11 @@ export async function listarReporteIngresosApi(filtros: ReporteFiltrosApi) {
     fechaHasta: fechaOpcional(filtros.fechaHasta ?? ''),
     pagina: filtros.pagina,
     tamPagina: filtros.tamPagina,
-  })
+  }
+  const response = await ejecutarUnaVez(
+    `reporte-ingresos:${JSON.stringify(parametros)}`,
+    () => reporteIngresoApi.listar3(parametros),
+  )
 
   const datos: FilaReporteIngreso[] = (response.datos ?? []).map((item, index) => ({
     ingresoId: String(item.ingresoAlmacenId ?? `ING-${index + 1}`),
@@ -170,7 +197,7 @@ export async function listarReporteIngresosApi(filtros: ReporteFiltrosApi) {
 }
 
 export async function listarReporteProductosApi(filtros: ReporteFiltrosApi) {
-  const response = await reporteProductoApi.listar2({
+  const parametros = {
     busqueda: filtros.busqueda || undefined,
     tipoProductoId: idOpcional(filtros.tipoProductoId ?? ''),
     categoriaId: idOpcional(filtros.categoriaId ?? ''),
@@ -179,7 +206,11 @@ export async function listarReporteProductosApi(filtros: ReporteFiltrosApi) {
     fechaHasta: fechaOpcional(filtros.fechaHasta ?? ''),
     pagina: filtros.pagina,
     tamPagina: filtros.tamPagina,
-  })
+  }
+  const response = await ejecutarUnaVez(
+    `reporte-productos:${JSON.stringify(parametros)}`,
+    () => reporteProductoApi.listar2(parametros),
+  )
   const datos: FilaProductoMasPedido[] = (response.datos ?? []).map((item, index) => ({
     posicion: Number(item.posicion ?? index + 1),
     productoId: Number(item.productoId ?? 0),
@@ -243,13 +274,17 @@ export interface FilaReporteKardex {
 export async function listarReporteKardexApi(
   filtros: FiltrosReporteKardexApi,
 ): Promise<FilaReporteKardex[]> {
-  const response = await reportesApi.obtener1({
+  const parametros = {
     productoId: idOpcional(filtros.productoId ?? ''),
     desde: fechaOpcional(filtros.fechaDesde ?? ''),
     hasta: fechaOpcional(filtros.fechaHasta ?? ''),
     tipoMovimiento:
       filtros.tipoMovimiento || undefined,
-  }) as RespuestaKardexApi
+  }
+  const response = await ejecutarUnaVez(
+    `reporte-kardex:${JSON.stringify(parametros)}`,
+    () => reportesApi.obtener1(parametros),
+  ) as RespuestaKardexApi
 
   if (response.success === false) {
     throw new Error(
