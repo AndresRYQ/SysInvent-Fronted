@@ -24,6 +24,11 @@ import {
     IngresoAlmacenRequestToJSON,
 } from '../models/IngresoAlmacenRequest';
 
+export interface Actualizar1Request {
+    id: number;
+    ingresoAlmacenRequest: IngresoAlmacenRequest;
+}
+
 export interface Crear1Request {
     ingresoAlmacenRequest: IngresoAlmacenRequest;
 }
@@ -46,6 +51,67 @@ export interface Obtener2Request {
  * 
  */
 export class IngresoAlmacenControllerApi extends runtime.BaseAPI {
+
+    /**
+     * Creates request options for actualizar1 without sending the request
+     */
+    async actualizar1RequestOpts(requestParameters: Actualizar1Request): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling actualizar1().'
+            );
+        }
+
+        if (requestParameters['ingresoAlmacenRequest'] == null) {
+            throw new runtime.RequiredError(
+                'ingresoAlmacenRequest',
+                'Required parameter "ingresoAlmacenRequest" was null or undefined when calling actualizar1().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/ingresos-almacen/{id}`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: IngresoAlmacenRequestToJSON(requestParameters['ingresoAlmacenRequest']),
+        };
+    }
+
+    /**
+     */
+    async actualizar1Raw(requestParameters: Actualizar1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        const requestOptions = await this.actualizar1RequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     */
+    async actualizar1(requestParameters: Actualizar1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.actualizar1Raw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Creates request options for crear1 without sending the request

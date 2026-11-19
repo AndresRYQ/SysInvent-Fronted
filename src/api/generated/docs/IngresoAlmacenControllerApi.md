@@ -4,10 +4,83 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
+| [**actualizar1**](IngresoAlmacenControllerApi.md#actualizar1) | **PUT** /api/ingresos-almacen/{id} |  |
 | [**crear1**](IngresoAlmacenControllerApi.md#crear1) | **POST** /api/ingresos-almacen |  |
 | [**listar4**](IngresoAlmacenControllerApi.md#listar4) | **GET** /api/ingresos-almacen |  |
 | [**obtener2**](IngresoAlmacenControllerApi.md#obtener2) | **GET** /api/ingresos-almacen/{id} |  |
 
+
+
+## actualizar1
+
+> object actualizar1(id, ingresoAlmacenRequest)
+
+
+
+### Example
+
+```ts
+import {
+  Configuration,
+  IngresoAlmacenControllerApi,
+} from '';
+import type { Actualizar1Request } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new IngresoAlmacenControllerApi(config);
+
+  const body = {
+    // number
+    id: 56,
+    // IngresoAlmacenRequest
+    ingresoAlmacenRequest: ...,
+  } satisfies Actualizar1Request;
+
+  try {
+    const data = await api.actualizar1(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` |  | [Defaults to `undefined`] |
+| **ingresoAlmacenRequest** | [IngresoAlmacenRequest](IngresoAlmacenRequest.md) |  | |
+
+### Return type
+
+**object**
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `*/*`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
 ## crear1

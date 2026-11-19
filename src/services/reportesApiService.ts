@@ -3,6 +3,7 @@ import {
   ReporteIngresoControllerApi,
   ReporteProductoMasPedidoControllerApi,
   ReporteValeControllerApi,
+  ReportesApi,
 } from '../api/generated'
 import { apiConfiguration } from '../api/client'
 import type { FilaReporteIngreso } from '../types/reporteIngreso'
@@ -10,6 +11,7 @@ import type { FilaReporteVale } from '../types/reporteVale'
 import type { FilaProductoMasPedido } from '../types/reporteProductoMasPedido'
 import type { ResumenDashboard } from './dashboardService'
 
+const reportesApi = new ReportesApi(apiConfiguration)
 const dashboardApi = new DashboardControllerApi(apiConfiguration)
 const reporteIngresoApi = new ReporteIngresoControllerApi(apiConfiguration)
 const reporteValeApi = new ReporteValeControllerApi(apiConfiguration)
@@ -25,6 +27,16 @@ function fechaOpcional(valor: string): Date | undefined {
   return valor ? new Date(`${valor}T00:00:00Z`) : undefined
 }
 
+function fechaComoTexto(
+  valor?: string | Date,
+): string {
+  if (!valor) return ''
+
+  return valor instanceof Date
+    ? valor.toISOString()
+    : valor
+}
+
 function paginacionTotal(paginacion?: { totalElementos?: number }): number {
   return Number(paginacion?.totalElementos ?? 0)
 }
@@ -34,7 +46,7 @@ export async function obtenerDashboardApi(): Promise<ResumenDashboard> {
   return {
     productosActivos: Number(response.cards?.productosActivos ?? 0),
     productosStockBajo: Number(response.cards?.stockCritico ?? 0),
-    productosSinStock: 0,
+    productosSinStock: Number(response.cards?.productosSinStock ?? 0),
     ingresosDelMes: Number(response.cards?.ingresosMes ?? 0),
     valesDelMes: Number(response.cards?.valesMes ?? 0),
     movimientosHoy: Number(response.cards?.movimientosHoy ?? 0),
@@ -46,7 +58,7 @@ export async function obtenerDashboardApi(): Promise<ResumenDashboard> {
     })),
     movimientosRecientes: (response.actividadReciente ?? []).map((movimiento, index) => ({
       id: `actividad-${index + 1}`,
-      fecha: movimiento.fecha ?? '',
+      fecha: fechaComoTexto(movimiento.fecha),
       tipo: movimiento.tipo?.toUpperCase().includes('INGRES') ? 'Ingreso' as const : 'Vale' as const,
       documento: movimiento.documento ?? '',
       producto: movimiento.producto ?? '',
@@ -86,12 +98,14 @@ export async function listarReporteValesApi(filtros: ReporteFiltrosApi) {
     pagina: filtros.pagina,
     tamPagina: filtros.tamPagina,
   })
+
   const datos: FilaReporteVale[] = (response.datos ?? []).map((item, index) => ({
     valeId: String(item.valeConsumoId ?? `VALE-${index + 1}`),
     detalleId: `DET-${item.valeConsumoId ?? index}-${index}`,
     distribucionId: `DIS-${item.valeConsumoId ?? index}-${index}`,
     numeroVale: item.numeroVale ?? '',
-    fechaVale: item.fechaVale ?? '',
+    fechaVale:
+    fechaComoTexto(item.fechaVale).slice(0, 10),
     estado: item.estado === 'ANULADO' ? 'ANULADO' : 'REGISTRADO',
     centroCostoId: '',
     centroCosto: item.centroCosto ?? '',
@@ -128,10 +142,12 @@ export async function listarReporteIngresosApi(filtros: ReporteFiltrosApi) {
     pagina: filtros.pagina,
     tamPagina: filtros.tamPagina,
   })
+
   const datos: FilaReporteIngreso[] = (response.datos ?? []).map((item, index) => ({
     ingresoId: String(item.ingresoAlmacenId ?? `ING-${index + 1}`),
     numeroIngreso: item.numeroIngreso ?? '',
-    fechaIngreso: item.fechaIngreso ?? '',
+    fechaIngreso:
+    fechaComoTexto(item.fechaIngreso).slice(0, 10),
     estado: item.estado === 'ANULADO' ? 'ANULADO' : 'REGISTRADO',
     tipoDocumento: '',
     numeroDocumento: item.documento ?? '',
@@ -182,4 +198,111 @@ export async function listarReporteProductosApi(filtros: ReporteFiltrosApi) {
     participacion: Number(item.participacion ?? 0),
   }))
   return { datos, totalElementos: paginacionTotal(response.paginacion) }
+}
+
+interface MovimientoKardexApi {
+  id?: number
+  productoId?: number
+  codigoProducto?: string
+  nombreProducto?: string
+  tipoMovimiento?: string
+  fechaMovimiento?: string
+  cantidad?: number
+  saldoNuevo?: number
+  usuarioResponsable?: string
+  numeroDocumento?: string
+}
+
+interface RespuestaKardexApi {
+  success?: boolean
+  message?: string
+  data?: MovimientoKardexApi[]
+}
+
+export interface FiltrosReporteKardexApi {
+  productoId?: string
+  tipoMovimiento?: string
+  fechaDesde?: string
+  fechaHasta?: string
+}
+
+export interface FilaReporteKardex {
+  id: string
+  productoId: number
+  codigoProducto: string
+  producto: string
+  fecha: string
+  tipo: 'Entrada' | 'Salida'
+  ingreso: number
+  salida: number
+  stock: number
+  responsable: string
+  numeroDocumento: string
+}
+
+export async function listarReporteKardexApi(
+  filtros: FiltrosReporteKardexApi,
+): Promise<FilaReporteKardex[]> {
+  const response = await reportesApi.obtener1({
+    productoId: idOpcional(filtros.productoId ?? ''),
+    desde: fechaOpcional(filtros.fechaDesde ?? ''),
+    hasta: fechaOpcional(filtros.fechaHasta ?? ''),
+    tipoMovimiento:
+      filtros.tipoMovimiento || undefined,
+  }) as RespuestaKardexApi
+
+  if (response.success === false) {
+    throw new Error(
+      response.message ??
+        'No se pudo cargar el reporte Kardex.',
+    )
+  }
+
+  const movimientos = Array.isArray(response.data)
+    ? response.data
+    : []
+
+  return movimientos.map((movimiento, indice) => {
+    const tipoMovimiento =
+      movimiento.tipoMovimiento?.toUpperCase() ?? ''
+
+    const esEntrada =
+      tipoMovimiento.includes('ENTRADA')
+
+    const cantidad = Number(
+      movimiento.cantidad ?? 0,
+    )
+
+    return {
+      id: String(
+        movimiento.id ??
+          `MOV-${indice + 1}`,
+      ),
+      productoId: Number(
+        movimiento.productoId ?? 0,
+      ),
+      codigoProducto:
+        movimiento.codigoProducto ?? '',
+      producto:
+        movimiento.nombreProducto ??
+        'Producto no encontrado',
+      fecha:
+        movimiento.fechaMovimiento?.slice(0, 10) ??
+        '',
+      tipo:
+        esEntrada
+          ? 'Entrada' as const
+          : 'Salida' as const,
+      ingreso: esEntrada ? cantidad : 0,
+      salida: esEntrada ? 0 : cantidad,
+      stock: Number(
+        movimiento.saldoNuevo ?? 0,
+      ),
+      responsable:
+        movimiento.usuarioResponsable ??
+        'Sin responsable',
+      numeroDocumento:
+        movimiento.numeroDocumento ?? '',
+    }
+  })
 }

@@ -228,7 +228,7 @@ example().catch(console.error);
 
 ## listarProductos
 
-> CustomPageProductoResponse listarProductos(nombre, pagina, tamPagina)
+> CustomPageProductoResponse listarProductos(nombre, tipoProductoId, categoriaId, estado, pagina, tamPagina)
 
 Listar productos
 
@@ -253,6 +253,12 @@ async function example() {
     // string (optional)
     nombre: nombre_example,
     // number (optional)
+    tipoProductoId: 56,
+    // number (optional)
+    categoriaId: 56,
+    // boolean (optional)
+    estado: true,
+    // number (optional)
     pagina: 56,
     // number (optional)
     tamPagina: 56,
@@ -276,6 +282,9 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **nombre** | `string` |  | [Optional] [Defaults to `undefined`] |
+| **tipoProductoId** | `number` |  | [Optional] [Defaults to `undefined`] |
+| **categoriaId** | `number` |  | [Optional] [Defaults to `undefined`] |
+| **estado** | `boolean` |  | [Optional] [Defaults to `undefined`] |
 | **pagina** | `number` |  | [Optional] [Defaults to `1`] |
 | **tamPagina** | `number` |  | [Optional] [Defaults to `10`] |
 

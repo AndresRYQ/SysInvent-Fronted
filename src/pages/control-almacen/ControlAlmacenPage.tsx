@@ -194,16 +194,14 @@ export function ControlAlmacenPage() {
   const productosSinStock =
     control.length - productosConStock
 
-  const movimientosActivos =
-    control.reduce(
-      (total, producto) =>
-        total +
-        producto.movimientos.filter(
-          (movimiento) =>
-            movimiento.afectaStock,
-        ).length,
-      0,
-    )
+  const unidadesMovilizadas =
+  control.reduce(
+    (total, producto) =>
+      total +
+      producto.totalEntradas +
+      producto.totalSalidas,
+    0,
+  )
 
   return (
     <>
@@ -293,11 +291,11 @@ export function ControlAlmacenPage() {
               <div className="card border-0 shadow-sm h-100">
                 <div className="card-body">
                   <span className="text-secondary small">
-                    Movimientos activos
+                    Unidades movilizadas
                   </span>
 
                   <strong className="d-block fs-3 mt-1">
-                    {movimientosActivos}
+                    {unidadesMovilizadas}
                   </strong>
                 </div>
               </div>

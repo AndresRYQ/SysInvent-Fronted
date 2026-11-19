@@ -47,6 +47,7 @@ export interface CambiarEstadoContactoRequest {
 export interface ListarContactosRequest {
     nombre?: string;
     proveedorId?: number;
+    estado?: boolean;
     pagina?: number;
     tamPagina?: number;
 }
@@ -198,6 +199,10 @@ export class ContactosApi extends runtime.BaseAPI {
 
         if (requestParameters['proveedorId'] != null) {
             queryParameters['proveedorId'] = requestParameters['proveedorId'];
+        }
+
+        if (requestParameters['estado'] != null) {
+            queryParameters['estado'] = requestParameters['estado'];
         }
 
         if (requestParameters['pagina'] != null) {

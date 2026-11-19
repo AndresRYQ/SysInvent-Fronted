@@ -4,7 +4,6 @@ import {
   Route,
   Routes,
 } from 'react-router-dom'
-
 import { AuthProvider } from '../hooks/useAuth'
 import { MainLayout } from '../layouts/MainLayout'
 import { AccessDeniedPage } from '../pages/AccessDeniedPage'
@@ -33,7 +32,7 @@ import { ContactosPage } from '../pages/contactos/ContactosPage'
 import { PartesEquipoPage } from '../pages/partes-equipo/PartesEquipoPage'
 import { PerfilUsuarioPage } from '../pages/perfil/PerfilUsuarioPage'
 import { ControlAlmacenPage } from '../pages/control-almacen/ControlAlmacenPage'
-import { EditarIngresoPage } from '../pages/ingresos-almacen/EditarIngresoPage'
+import { DetalleIngresoPage } from '../pages/ingresos-almacen/DetalleIngresoPage'
 import { NuevoIngresoPage } from '../pages/ingresos-almacen/NuevoIngresoPage'
 import { ReporteIngresosPage } from '../pages/reportes/ReporteIngresosPage'
 import { ReporteProductosMasPedidosPage } from '../pages/reportes/ReporteProductosMasPedidosPage'
@@ -41,6 +40,7 @@ import { ReporteValesPage } from '../pages/reportes/ReporteValesPage'
 import { ReportesKardexPage } from '../pages/reportes/ReportesKardexPage'
 import { EditarValePage } from '../pages/vales-consumo/EditarValePage'
 import { NuevoValePage } from '../pages/vales-consumo/NuevoValePage'
+import { EditarIngresoPage } from '../pages/ingresos-almacen/EditarIngresoPage'
 
 export function AppRouter() {
   return (
@@ -114,12 +114,21 @@ export function AppRouter() {
 
               <Route
                 element={
-                  <RoleRoute modulo="centros-costo" />
+                  <RoleRoute modulo="centros-costos" />
                 }
               >
                 <Route
-                  path="/centros-costo"
+                  path="/centros-costos"
                   element={<CentrosCostoPage />}
+                />
+                <Route
+                  path="/centros-costo"
+                  element={
+                    <Navigate
+                      to="/centros-costos"
+                      replace
+                    />
+                  }
                 />
               </Route>
 
@@ -187,6 +196,11 @@ export function AppRouter() {
                   element={<NuevoIngresoPage />}
                 />
                 <Route
+                  path="/ingresos-almacen/:id"
+                  element={<DetalleIngresoPage />}
+                />
+
+                <Route
                   path="/ingresos-almacen/:id/editar"
                   element={<EditarIngresoPage />}
                 />
@@ -204,7 +218,12 @@ export function AppRouter() {
 
               <Route
                 element={
-                  <RoleRoute modulo="reporte-kardex" />
+                  <RoleRoute
+                    modulo={[
+                      'reporte-kardex',
+                      'control-almacen',
+                    ]}
+                  />
                 }
               >
                 <Route

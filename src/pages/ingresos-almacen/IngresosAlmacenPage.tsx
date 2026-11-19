@@ -5,11 +5,11 @@ import {
   useState,
 } from 'react'
 import { createPortal } from 'react-dom'
-
 import {
   CalendarDays,
   Filter,
   PackagePlus,
+  Eye,
   Pencil,
   Plus,
   RotateCcw,
@@ -18,20 +18,16 @@ import {
 } from 'lucide-react'
 import Select from 'react-select'
 import DatePicker from 'react-datepicker'
-
 import {
   useLocation,
   useNavigate,
 } from 'react-router-dom'
-
 import { TablePagination } from '../../components/ui/TablePagination'
 import { EmptyState } from '../../components/common/EmptyState'
 import { SnackbarAlert, useSnackbar } from '../../components/common/SnackbarAlert'
 import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 import { ValidadorRangoFechas } from '../../utils/ValidadorRangoFechas'
-
 import { listarIngresosAlmacen } from '../../services/ingresoAlmacenService'
-
 import { obtenerProveedores } from '../../services/proveedorService'
 import '../../styles/DashboardPage.css'
 import '../../styles/maestros.css'
@@ -574,23 +570,31 @@ export function IngresosAlmacenPage() {
                                   <button
                                     type="button"
                                     className="btn table-action-btn"
-                                    title="Editar"
-                                    disabled={
-                                      ingreso.estado ===
-                                      'ANULADO'
-                                    }
+                                    title="Ver detalle"
                                     onClick={() =>
                                       navigate(
-                                        `/ingresos-almacen/${ingreso.id}/editar`,
+                                        `/ingresos-almacen/${ingreso.id}`,
                                       )
                                     }
                                   >
-                                    <Pencil
-                                      size={16}
-                                    />
+                                    <Eye size={16} />
                                   </button>
-
                                 </div>
+                                <button
+                                  type="button"
+                                  className="btn table-action-btn"
+                                  title="Editar ingreso"
+                                  disabled={
+                                    ingreso.estado === 'ANULADO'
+                                  }
+                                  onClick={() =>
+                                    navigate(
+                                      `/ingresos-almacen/${ingreso.id}/editar`,
+                                    )
+                                  }
+                                >
+                                  <Pencil size={16} />
+                                </button>
                               </td>
                             </tr>
                           ),

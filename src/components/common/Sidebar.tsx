@@ -24,6 +24,7 @@ type SidebarItem = {
   icon: typeof LayoutDashboard
   to?: string
   moduleId?: ModuloCodigo
+  rutasPermiso?: string[]
 }
 
 type SidebarSection = {
@@ -68,6 +69,16 @@ const SECCIONES: SidebarSection[] = [
   {
     label: 'Reportes',
     items: [
+      {
+        to: '/reportes/kardex',
+        label: 'Reporte Kardex',
+        icon: FileText,
+        moduleId: ModuloCodigo.REPORTE_KARDEX,
+        rutasPermiso: [
+          '/reportes/kardex',
+          '/control-almacen',
+        ],
+      },
       {
         to: '/reportes/ingresos',
         label: 'Reporte de ingreso',
@@ -118,7 +129,7 @@ const SECCIONES: SidebarSection[] = [
         moduleId: ModuloCodigo.PARTES_EQUIPO,
       },
       {
-        to: '/centros-costo',
+        to: '/centros-costos',
         label: 'Centros de costo',
         icon: Coins,
         moduleId: ModuloCodigo.CENTROS_COSTO,
@@ -205,12 +216,23 @@ export function Sidebar({
   const rutasPermitidas = new Set(sesion?.modulos ?? [])
   const seccionesPermitidas = SECCIONES.map((seccion) => ({
     ...seccion,
-    items: seccion.items.filter(
-      (item) =>
+    items: seccion.items.filter((item) => {
+      if (
         !item.moduleId ||
-        mostrarTodosLosModulos ||
-        (item.to && rutasPermitidas.has(item.to)),
-    ),
+        mostrarTodosLosModulos
+      ) {
+        return true
+      }
+
+      const rutasDelPermiso =
+        item.rutasPermiso ??
+        (item.to ? [item.to] : [])
+
+      return rutasDelPermiso.some(
+        (ruta) =>
+          rutasPermitidas.has(ruta),
+      )
+    }),
   })).filter((seccion) => seccion.items.length > 0)
  
   const activo = (to: string) =>

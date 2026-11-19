@@ -1,7 +1,7 @@
 import { Placeholder } from '../../constants/placeholders'
-import {  useEffect,  useState,  type FormEvent,} from 'react'
-import {  AlertCircle,  Eye,  EyeOff,  LoaderCircle,  LockKeyhole,  UserRound,} from 'lucide-react'
-import {  Navigate,  useLocation,  useNavigate,} from 'react-router-dom'
+import { useEffect, useState, type FormEvent, } from 'react'
+import { AlertCircle, Eye, EyeOff, LoaderCircle, LockKeyhole, UserRound, } from 'lucide-react'
+import { Navigate, useLocation, useNavigate, } from 'react-router-dom'
 import logoAgrihusac from '../../assets/images/logoagr.png'
 import { useAuth } from '../../hooks/useAuth'
 import './LoginPage.css'
@@ -88,30 +88,36 @@ export function LoginPage() {
   ] = useState(0)
 
   useEffect(() => {
-  document.title =
-    'Iniciar sesión | AGRIHUSAC'
+    document.title =
+      'Iniciar sesión | AGRIHUSAC'
 
-  const motivoCierre =
-    sessionStorage.getItem(
+    const motivoCierre =
+      sessionStorage.getItem(
+        'agrihusac_motivo_cierre',
+      )
+
+    if (motivoCierre === 'inactividad') {
+      setMensajeError(
+        'Tu sesión se cerró por inactividad. Inicia sesión nuevamente.',
+      )
+    }
+
+    if (motivoCierre === 'vencimiento') {
+      setMensajeError(
+        'Tu sesión ha vencido. Inicia sesión nuevamente.',
+      )
+    }
+
+    if (motivoCierre === 'sesion-invalida') {
+      setMensajeError(
+        'Tu sesión ya no es válida. Inicia sesión nuevamente.',
+      )
+    }
+
+    sessionStorage.removeItem(
       'agrihusac_motivo_cierre',
     )
-
-  if (motivoCierre === 'inactividad') {
-    setMensajeError(
-      'Tu sesión se cerró después de 2 minutos de inactividad. Inicia sesión nuevamente.',
-    )
-  }
-
-  if (motivoCierre === 'vencimiento') {
-    setMensajeError(
-      'Tu sesión alcanzó el tiempo máximo de 1 hora. Inicia sesión nuevamente.',
-    )
-  }
-
-  sessionStorage.removeItem(
-    'agrihusac_motivo_cierre',
-  )
-}, [])
+  }, [])
 
   /*
    * Actualiza el contador del bloqueo
@@ -188,39 +194,39 @@ export function LoginPage() {
     setEnviando(true)
 
     const resultado = await login({
-        usuario,
-        contrasena,
+      usuario,
+      contrasena,
+    })
+
+    setEnviando(false)
+
+    if (!resultado.exitoso) {
+      setErroresCampos({
+        usuario: true,
+        contrasena: true,
       })
+      setMensajeError(
+        resultado.mensaje,
+      )
 
-      setEnviando(false)
+      setBloqueadoHasta(
+        resultado.bloqueadoHasta,
+      )
 
-      if (!resultado.exitoso) {
-        setErroresCampos({
-          usuario: true,
-          contrasena: true,
-        })
-        setMensajeError(
-          resultado.mensaje,
-        )
+      return
+    }
 
-        setBloqueadoHasta(
-          resultado.bloqueadoHasta,
-        )
+    const estado = location.state as
+      | EstadoNavegacion
+      | null
 
-        return
-      }
+    const rutaDestino =
+      estado?.desde?.pathname ??
+      '/dashboard'
 
-      const estado = location.state as
-        | EstadoNavegacion
-        | null
-
-      const rutaDestino =
-        estado?.desde?.pathname ??
-        '/dashboard'
-
-      navigate(rutaDestino, {
-        replace: true,
-      })
+    navigate(rutaDestino, {
+      replace: true,
+    })
   }
 
   const formularioBloqueado =

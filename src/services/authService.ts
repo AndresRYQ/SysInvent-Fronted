@@ -5,15 +5,15 @@ import {
   type LoginResponse,
 } from '../api/generated'
 import { apiConfiguration } from '../api/client'
-
 import type {
   CredencialesLogin,
   ResultadoLogin,
   SesionUsuario,
   UsuarioLogin,
 } from '../types/auth'
+import { AUTH_TOKEN_KEY } from './authSession'
 
-export const AUTH_TOKEN_KEY = 'sysinvent_token'
+export { AUTH_TOKEN_KEY } from './authSession'
 
 interface JwtPayload {
   sub?: string

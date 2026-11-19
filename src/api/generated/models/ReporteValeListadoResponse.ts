@@ -33,10 +33,10 @@ export interface ReporteValeListadoResponse {
     numeroVale?: string;
     /**
      * 
-     * @type {string}
+     * @type {Date}
      * @memberof ReporteValeListadoResponse
      */
-    fechaVale?: string;
+    fechaVale?: Date;
     /**
      * 
      * @type {string}
@@ -124,7 +124,7 @@ export function ReporteValeListadoResponseFromJSONTyped(json: any, ignoreDiscrim
         
         'valeConsumoId': json['valeConsumoId'] == null ? undefined : json['valeConsumoId'],
         'numeroVale': json['numeroVale'] == null ? undefined : json['numeroVale'],
-        'fechaVale': json['fechaVale'] == null ? undefined : json['fechaVale'],
+        'fechaVale': json['fechaVale'] == null ? undefined : (new Date(json['fechaVale'])),
         'centroCosto': json['centroCosto'] == null ? undefined : json['centroCosto'],
         'solicitante': json['solicitante'] == null ? undefined : json['solicitante'],
         'codigoProducto': json['codigoProducto'] == null ? undefined : json['codigoProducto'],
@@ -152,7 +152,7 @@ export function ReporteValeListadoResponseToJSONTyped(value?: ReporteValeListado
         
         'valeConsumoId': value['valeConsumoId'],
         'numeroVale': value['numeroVale'],
-        'fechaVale': value['fechaVale'],
+        'fechaVale': value['fechaVale'] == null ? value['fechaVale'] : value['fechaVale'].toISOString().substring(0,10),
         'centroCosto': value['centroCosto'],
         'solicitante': value['solicitante'],
         'codigoProducto': value['codigoProducto'],

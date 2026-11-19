@@ -28,6 +28,36 @@ export interface DetalleIngresoAlmacen {
   precioUnitario: number
 }
 
+export interface DetalleIngresoAlmacenConsulta {
+  id: number
+  productoId: number
+  codigoProducto: string
+  nombreProducto: string
+  unidadMedida: string
+  cantidad: number
+  precioUnitario: number
+  subtotal: number
+  stockResultante: number
+}
+
+export interface IngresoAlmacenDetalle {
+  id: number
+  numeroIngreso: string
+  fechaIngreso: string
+  fechaRegistro: string
+  proveedorId: number
+  proveedor: string
+  contactoId: number
+  contacto: string
+  tipoDocumentoId: number
+  tipoDocumento: string
+  numeroDocumento: string
+  observacion: string
+  estado: EstadoIngresoAlmacen
+  total: number
+  detalles: DetalleIngresoAlmacenConsulta[]
+}
+
 /**
  * Datos utilizados para agregar un producto
  * al formulario de ingreso.

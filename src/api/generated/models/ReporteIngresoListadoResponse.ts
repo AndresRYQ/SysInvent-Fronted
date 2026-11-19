@@ -33,10 +33,10 @@ export interface ReporteIngresoListadoResponse {
     numeroIngreso?: string;
     /**
      * 
-     * @type {string}
+     * @type {Date}
      * @memberof ReporteIngresoListadoResponse
      */
-    fechaIngreso?: string;
+    fechaIngreso?: Date;
     /**
      * 
      * @type {string}
@@ -112,7 +112,7 @@ export function ReporteIngresoListadoResponseFromJSONTyped(json: any, ignoreDisc
         
         'ingresoAlmacenId': json['ingresoAlmacenId'] == null ? undefined : json['ingresoAlmacenId'],
         'numeroIngreso': json['numeroIngreso'] == null ? undefined : json['numeroIngreso'],
-        'fechaIngreso': json['fechaIngreso'] == null ? undefined : json['fechaIngreso'],
+        'fechaIngreso': json['fechaIngreso'] == null ? undefined : (new Date(json['fechaIngreso'])),
         'proveedor': json['proveedor'] == null ? undefined : json['proveedor'],
         'documento': json['documento'] == null ? undefined : json['documento'],
         'tipoProducto': json['tipoProducto'] == null ? undefined : json['tipoProducto'],
@@ -138,7 +138,7 @@ export function ReporteIngresoListadoResponseToJSONTyped(value?: ReporteIngresoL
         
         'ingresoAlmacenId': value['ingresoAlmacenId'],
         'numeroIngreso': value['numeroIngreso'],
-        'fechaIngreso': value['fechaIngreso'],
+        'fechaIngreso': value['fechaIngreso'] == null ? value['fechaIngreso'] : value['fechaIngreso'].toISOString().substring(0,10),
         'proveedor': value['proveedor'],
         'documento': value['documento'],
         'tipoProducto': value['tipoProducto'],
