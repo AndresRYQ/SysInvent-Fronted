@@ -27,7 +27,7 @@ interface Props {
 }
 
 interface Opcion { id: string | number; nombre: string; estado?: boolean; activo?: 0 | 1 }
-interface Errores { codigo: string; nombre: string; descripcion: string; tipoProductoId: string; categoriaId: string; unidadMedidaId: string; proveedorId: string; precioUnitario: string }
+interface Errores { codigo: string; nombre: string; descripcion: string; tipoProductoId: string; categoriaId: string; unidadMedidaId: string; proveedorId: string; stockMinimo: string; precioUnitario: string }
 
 const CATEGORIAS: Opcion[] = [
   { id: 'CAT-001', nombre: 'Herramientas' },
@@ -37,7 +37,7 @@ const CATEGORIAS: Opcion[] = [
   { id: 'CAT-005', nombre: 'Limpieza' },
 ]
 const INICIAL: ProductoFormData = { codigo: '', nombre: '', descripcion: '', tipoProductoId: '', categoriaId: '', unidadMedidaId: '', proveedorId: '', stockMinimo: 0, precioUnitario: 0, estado: true }
-const SIN_ERRORES: Errores = { codigo: '', nombre: '', descripcion: '', tipoProductoId: '', categoriaId: '', unidadMedidaId: '', proveedorId: '', precioUnitario: '' }
+const SIN_ERRORES: Errores = { codigo: '', nombre: '', descripcion: '', tipoProductoId: '', categoriaId: '', unidadMedidaId: '', proveedorId: '', stockMinimo: '', precioUnitario: '' }
 
 function opcionesLocales(clave: string, iniciales: Opcion[]): Opcion[] {
   try {
@@ -105,6 +105,7 @@ export function FormularioProducto({ producto, soloLectura = false, error, catal
     if (!form.categoriaId) siguiente.categoriaId = 'Selecciona una categoría'
     if (!form.unidadMedidaId) siguiente.unidadMedidaId = 'Selecciona una unidad de medida'
     if (!form.proveedorId) siguiente.proveedorId = 'Selecciona un proveedor'
+    if (!Number.isFinite(form.stockMinimo) || form.stockMinimo < 0) siguiente.stockMinimo = 'Ingresa un stock mínimo válido'
     if (!Number.isFinite(form.precioUnitario) || form.precioUnitario < 0) siguiente.precioUnitario = 'Ingresa un precio válido'
     setErrores(siguiente)
     return Object.values(siguiente).every((valor) => !valor)
@@ -128,6 +129,7 @@ export function FormularioProducto({ producto, soloLectura = false, error, catal
             <div className="col-12 col-md-4"><label className="form-label maestro-label required" htmlFor="productoCategoria">Categoría</label><Select inputId="productoCategoria" classNamePrefix="maestro-select" options={opcionesSelect(categorias)} value={opcionesSelect(categorias).find((item) => item.value === String(form.categoriaId)) ?? null} onChange={(item) => cambiar('categoriaId', item?.value ?? '')} placeholder="Seleccionar" isDisabled={soloLectura} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ tieneError: Boolean(errores.categoriaId), zIndex: 1300 })} />{errores.categoriaId && <div className="maestro-field-error">{errores.categoriaId}</div>}</div>
             <div className="col-12 col-md-4"><label className="form-label maestro-label required" htmlFor="productoUnidad">Unidad de medida</label><Select inputId="productoUnidad" classNamePrefix="maestro-select" options={opcionesSelect(unidades)} value={opcionesSelect(unidades).find((item) => item.value === String(form.unidadMedidaId)) ?? null} onChange={(item) => cambiar('unidadMedidaId', item?.value ?? '')} placeholder="Seleccionar" isDisabled={soloLectura} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ tieneError: Boolean(errores.unidadMedidaId), zIndex: 1300 })} />{errores.unidadMedidaId && <div className="maestro-field-error">{errores.unidadMedidaId}</div>}</div>
             <div className="col-12 col-md-4"><label className="form-label maestro-label required" htmlFor="productoProveedor">Proveedor</label><Select inputId="productoProveedor" classNamePrefix="maestro-select" options={proveedores.map((item) => ({ value: String(item.id), label: item.razonSocial }))} value={proveedores.map((item) => ({ value: String(item.id), label: item.razonSocial })).find((item) => item.value === String(form.proveedorId) || idCompatible(String(form.proveedorId), item.value, 'PROV-')) ?? null} onChange={(item) => cambiar('proveedorId', item?.value ?? '')} placeholder="Seleccionar" isDisabled={soloLectura} isClearable isSearchable menuPortalTarget={document.body} styles={crearEstilosSelect({ tieneError: Boolean(errores.proveedorId), zIndex: 1300 })} />{errores.proveedorId && <div className="maestro-field-error">{errores.proveedorId}</div>}</div>
+            <div className="col-12 col-lg-4"><label className="form-label maestro-label required" htmlFor="productoStockMinimo">Stock mínimo</label><input id="productoStockMinimo" className={`form-control maestro-control${errores.stockMinimo ? ' maestro-control--error' : ''}`} type="number" min="0" step="0.01" value={form.stockMinimo} onChange={(e) => cambiar('stockMinimo', e.target.value === '' ? 0 : Number(e.target.value))} />{errores.stockMinimo && <div className="maestro-field-error">{errores.stockMinimo}</div>}</div>
             <div className="col-12 col-lg-4"><label className="form-label maestro-label required" htmlFor="productoPrecio">Precio unitario</label><div className="input-group"><span className="input-group-text">S/</span><input id="productoPrecio" className={`form-control maestro-control${errores.precioUnitario ? ' maestro-control--error' : ''}`} type="number" min="0" step="0.01" value={form.precioUnitario} onChange={(e) => cambiar('precioUnitario', e.target.value === '' ? 0 : Number(e.target.value))} /></div>{errores.precioUnitario && <div className="maestro-field-error">{errores.precioUnitario}</div>}</div>
             <div className="col-12"><label className="form-label maestro-label required" htmlFor="productoDescripcion">Descripción</label><textarea id="productoDescripcion" className={`form-control maestro-control${errores.descripcion ? ' maestro-control--error' : ''}`} rows={4} maxLength={255} placeholder="Descripción del producto" value={form.descripcion} onChange={(e) => cambiar('descripcion', e.target.value)} /><CharacterCounter value={form.descripcion} maxLength={255} />{errores.descripcion && <div className="maestro-field-error">{errores.descripcion}</div>}</div>
           </div>

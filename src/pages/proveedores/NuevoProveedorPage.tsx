@@ -25,11 +25,11 @@ export function NuevoProveedorPage() {
       'Nuevo proveedor | AGRIHUSAC'
   }, [])
 
-  function guardarProveedor(
+  async function guardarProveedor(
     datos: ProveedorFormData,
-  ): void {
+  ): Promise<void> {
     try {
-      crearProveedor(datos)
+      await crearProveedor(datos)
 
       navigate('/proveedores', { replace: true })
     } catch (errorGuardado) {
