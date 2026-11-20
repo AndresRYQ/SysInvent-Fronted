@@ -10,6 +10,54 @@ const CONFIGURED_API_URL = import.meta.env.VITE_API_URL?.trim()
 
 const solicitudesGetEnCurso = new Map<string, Promise<Response>>()
 
+type ApiLoadingListener = (cargando: boolean) => void
+
+const listenersCargaApi = new Set<ApiLoadingListener>()
+const controladoresApiEnCurso = new Set<AbortController>()
+let solicitudesApiEnCurso = 0
+
+function notificarCargaApi() {
+  const cargando = solicitudesApiEnCurso > 0
+
+  listenersCargaApi.forEach((listener) => listener(cargando))
+}
+
+export function suscribirseCargaApi(
+  listener: ApiLoadingListener,
+): () => void {
+  listenersCargaApi.add(listener)
+  listener(solicitudesApiEnCurso > 0)
+
+  return () => listenersCargaApi.delete(listener)
+}
+
+export function cancelarSolicitudesApi() {
+  controladoresApiEnCurso.forEach((controlador) => controlador.abort())
+}
+
+export function haySolicitudesApiEnCurso() {
+  return solicitudesApiEnCurso > 0
+}
+
+function fetchConIndicadorCarga(
+  url: string,
+  init: RequestInit,
+): Promise<Response> {
+  solicitudesApiEnCurso += 1
+  notificarCargaApi()
+  const controlador = new AbortController()
+  controladoresApiEnCurso.add(controlador)
+
+  return fetch(url, {
+    ...init,
+    signal: init.signal ?? controlador.signal,
+  }).finally(() => {
+    controladoresApiEnCurso.delete(controlador)
+    solicitudesApiEnCurso = Math.max(0, solicitudesApiEnCurso - 1)
+    notificarCargaApi()
+  })
+}
+
 export const API_URL = (
   CONFIGURED_API_URL ||
   (import.meta.env.DEV
@@ -24,7 +72,7 @@ export function fetchConDedupe(
   const method = (init.method ?? 'GET').toUpperCase()
 
   if (method !== 'GET' && method !== 'HEAD') {
-    return fetch(url, init)
+    return fetchConIndicadorCarga(url, init)
   }
 
   const solicitudExistente = solicitudesGetEnCurso.get(url)
@@ -33,7 +81,7 @@ export function fetchConDedupe(
     return solicitudExistente.then((response) => response.clone())
   }
 
-  const solicitud = fetch(url, init).finally(() => {
+  const solicitud = fetchConIndicadorCarga(url, init).finally(() => {
     solicitudesGetEnCurso.delete(url)
   })
 

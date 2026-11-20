@@ -203,6 +203,17 @@
   animation: maestro-fade-up 180ms ease;
 }
 
+.maestro-modal-card[data-api-submitting='true'] .maestro-modal-body {
+  opacity: 0.72;
+  pointer-events: none;
+  user-select: none;
+}
+
+.maestro-modal-card[data-api-submitting='true'] .maestro-modal-close,
+.maestro-modal-card[data-api-submitting='true'] .btn-maestro-danger {
+  pointer-events: auto;
+}
+
 .maestro-modal-card--sm {
   width: min(100%, 460px);
   padding: 28px;
