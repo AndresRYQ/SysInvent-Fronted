@@ -116,7 +116,7 @@ export function TablaReporteIngresos({
                   </small>
                 </td>
 
-                <td>
+                <td className="table-document-cell">
                   <span className="d-block">
                     {fila.tipoDocumento}
                   </span>

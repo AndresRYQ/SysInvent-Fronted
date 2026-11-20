@@ -1,151 +1,22 @@
-import {
-  Ban,
-  Boxes,
-  CircleCheckBig,
-  ClipboardList,
-  WalletCards,
-} from 'lucide-react'
+import { Ban, Boxes, CircleCheckBig, ClipboardList, WalletCards } from 'lucide-react'
 
-import type {
-  ResumenReporteIngresos as Resumen,
-} from '../../../types/reporteIngreso'
+import { MetricCard } from '../../common/MetricCard'
+import type { ResumenReporteIngresos as Resumen } from '../../../types/reporteIngreso'
 
-interface ResumenReporteIngresosProps {
-  resumen: Resumen
+interface ResumenReporteIngresosProps { resumen: Resumen }
+
+function formatearMoneda(valor: number): string {
+  return new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN', minimumFractionDigits: 2 }).format(valor)
 }
 
-function formatearMoneda(
-  valor: number,
-): string {
-  return new Intl.NumberFormat(
-    'es-PE',
-    {
-      style: 'currency',
-      currency: 'PEN',
-      minimumFractionDigits: 2,
-    },
-  ).format(valor)
+export function ResumenReporteIngresos({ resumen }: ResumenReporteIngresosProps) {
+  const cards = [
+    { label: 'Total de ingresos', value: resumen.totalIngresos, detail: 'Documentos registrados', tone: 'blue', icon: <ClipboardList size={27} /> },
+    { label: 'Registrados', value: resumen.ingresosRegistrados, detail: 'Ingresos confirmados', tone: 'green', status: 'positive' as const, icon: <CircleCheckBig size={27} /> },
+    { label: 'Anulados', value: resumen.ingresosAnulados, detail: 'Ingresos anulados', tone: 'orange', status: 'alert' as const, icon: <Ban size={27} /> },
+    { label: 'Líneas de productos', value: resumen.lineasProductos, detail: 'Productos registrados', tone: 'violet', icon: <Boxes size={27} /> },
+    { label: 'Total valorizado', value: formatearMoneda(resumen.totalValorizado), detail: 'Valor acumulado', tone: 'teal', status: 'positive' as const, icon: <WalletCards size={27} /> },
+  ]
+
+  return <section className="report-metric-grid">{cards.map((card) => <MetricCard key={card.label} {...card} />)}</section>
 }
-
-export function ResumenReporteIngresos({
-  resumen,
-}: ResumenReporteIngresosProps) {
-  return (
-    <section className="mb-3">
-      <div className="row g-3">
-        <div className="col-12 col-sm-6 col-xl">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body">
-              <div className="d-flex align-items-center gap-3">
-                <div className="text-primary">
-                  <ClipboardList size={26} />
-                </div>
-
-                <div>
-                  <span className="text-secondary small">
-                    Total de ingresos
-                  </span>
-
-                  <strong className="d-block fs-3 mt-1">
-                    {resumen.totalIngresos}
-                  </strong>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-12 col-sm-6 col-xl">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body">
-              <div className="d-flex align-items-center gap-3">
-                <div className="text-success">
-                  <CircleCheckBig size={26} />
-                </div>
-
-                <div>
-                  <span className="text-secondary small">
-                    Registrados
-                  </span>
-
-                  <strong className="d-block fs-3 text-success mt-1">
-                    {resumen.ingresosRegistrados}
-                  </strong>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-12 col-sm-6 col-xl">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body">
-              <div className="d-flex align-items-center gap-3">
-                <div className="text-danger">
-                  <Ban size={26} />
-                </div>
-
-                <div>
-                  <span className="text-secondary small">
-                    Anulados
-                  </span>
-
-                  <strong className="d-block fs-3 text-danger mt-1">
-                    {resumen.ingresosAnulados}
-                  </strong>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-12 col-sm-6 col-xl">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body">
-              <div className="d-flex align-items-center gap-3">
-                <div className="text-warning">
-                  <Boxes size={26} />
-                </div>
-
-                <div>
-                  <span className="text-secondary small">
-                    Líneas de productos
-                  </span>
-
-                  <strong className="d-block fs-3 mt-1">
-                    {resumen.lineasProductos}
-                  </strong>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-12 col-sm-6 col-xl">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body">
-              <div className="d-flex align-items-center gap-3">
-                <div className="text-success">
-                  <WalletCards size={26} />
-                </div>
-
-                <div>
-                  <span className="text-secondary small">
-                    Total valorizado
-                  </span>
-
-                  <strong className="d-block fs-5 text-success mt-1">
-                    {formatearMoneda(
-                      resumen.totalValorizado,
-                    )}
-                  </strong>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-

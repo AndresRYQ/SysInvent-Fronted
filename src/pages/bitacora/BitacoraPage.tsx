@@ -5,7 +5,6 @@ import {
   useState,
 } from 'react'
 import { ShieldCheck } from 'lucide-react'
-
 import { DetalleBitacoraModal } from '../../components/bitacora/DetalleBitacoraModal'
 import {
   FiltrosBitacora,
@@ -198,7 +197,7 @@ export function BitacoraPage() {
 
           </section>
 
-          <div className="alert alert-light border d-flex align-items-center gap-2 mb-3">
+          <div className="d-none">
             <ShieldCheck
               size={20}
               className="text-success"

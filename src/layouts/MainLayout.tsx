@@ -6,8 +6,26 @@ import { Sidebar } from '../components/common/Sidebar'
 import '../styles/MainLayout.css'
 
 const SIN_MENU = ['/dashboard', '/sin-permiso']
+const TITULOS_PANTALLA: Record<string, string> = {
+  '/dashboard': 'Dashboard',
+  '/perfil': 'Perfil',
+  '/bitacora': 'Bitácora',
+  '/reportes/kardex': 'Reporte Kardex',
+  '/reportes/ingresos': 'Reporte de ingresos',
+  '/reportes/vales': 'Reporte de vales',
+  '/reportes/productos-mas-pedidos': 'Productos más pedidos',
+  '/control-almacen': 'Control de almacén',
+  '/ingresos-almacen': 'Ingresos de almacén',
+  '/proveedores': 'Proveedores',
+  '/productos': 'Productos',
+  '/contactos': 'Contactos',
+}
+
 export function MainLayout() {
   const { pathname } = useLocation()
+  const [modoOscuro, setModoOscuro] = useState<boolean>(() =>
+    localStorage.getItem('agrihusac_tema') === 'oscuro',
+  )
   const [menuAbierto, setMenuAbierto] = useState<boolean>(() => {
     if (window.matchMedia('(max-width: 1024px)').matches) {
       return false
@@ -16,6 +34,20 @@ export function MainLayout() {
     const guardado = localStorage.getItem('agrihusac_menu_abierto')
     return guardado === null ? true : guardado === 'true'
   })
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = modoOscuro ? 'dark' : 'light'
+    localStorage.setItem('agrihusac_tema', modoOscuro ? 'oscuro' : 'claro')
+  }, [modoOscuro])
+
+  useEffect(() => {
+    const rutaBase = `/${pathname.split('/')[1] ?? ''}`
+    const titulo = TITULOS_PANTALLA[pathname]
+      ?? TITULOS_PANTALLA[rutaBase]
+      ?? 'Sistema de almacén'
+
+    document.title = `${titulo} | AGRIHUSAC`
+  }, [pathname])
 
   const ocultarMenu = SIN_MENU.includes(pathname)
   const cerrarMenuMovil = () => {
@@ -48,6 +80,8 @@ export function MainLayout() {
         <Header
           menuAbierto={menuAbierto}
           onMenuToggle={() => setMenuAbierto((actual) => !actual)}
+          modoOscuro={modoOscuro}
+          onModoOscuroToggle={() => setModoOscuro((actual) => !actual)}
         />
       </header>
 

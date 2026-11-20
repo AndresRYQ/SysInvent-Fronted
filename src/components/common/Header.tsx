@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Leaf, LogOut, Menu, X } from 'lucide-react'
+import { Leaf, LogOut, Menu, Moon, Sun, X } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
 import { useAuth } from '../../hooks/useAuth'
@@ -18,6 +18,8 @@ type HeaderProps = {
   notifications?: number
   menuAbierto?: boolean
   onMenuToggle?: () => void
+  modoOscuro?: boolean
+  onModoOscuroToggle?: () => void
 }
 
 export function Header({
@@ -26,6 +28,8 @@ export function Header({
   brandMark = <Leaf size={20} />,
   menuAbierto = false,
   onMenuToggle,
+  modoOscuro = false,
+  onModoOscuroToggle,
 }: HeaderProps) {
   const { sesion, logout } = useAuth()
   const { pathname } = useLocation()
@@ -94,13 +98,30 @@ export function Header({
         </button>
         */}
 
-        <button className="user-menu" type="button">
+        {onModoOscuroToggle && (
+          <button
+            className="theme-toggle"
+            type="button"
+            onClick={onModoOscuroToggle}
+            aria-label={modoOscuro ? 'Activar modo claro' : 'Activar modo oscuro'}
+            aria-pressed={modoOscuro}
+            title={modoOscuro ? 'Activar modo claro' : 'Activar modo oscuro'}
+          >
+            {modoOscuro ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+        )}
+
+        <Link
+          className="user-menu"
+          to="/perfil"
+          aria-label="Ir al perfil de usuario"
+        >
           <span className="avatar">{iniciales}</span>
           <span>
             <strong>{nombreCompleto}</strong>
             <small>{rolUsuario}</small>
           </span>
-        </button>
+        </Link>
 
         <button
           className="logout-button"

@@ -127,7 +127,7 @@ export function AuthProvider({
     )
 
   /*
-   * Cierra automaticamente la sesion
+   * Cierra automáticamente la sesión
    * cuando se cumple la hora.
    */
   useEffect(() => {
@@ -172,7 +172,7 @@ export function AuthProvider({
   ])
 
   /*
-   * Cierra la sesion despues de
+   * Cierra la sesión después de
    * 1 hora sin actividad.
    */
   useEffect(() => {
@@ -255,7 +255,7 @@ export function AuthProvider({
 
   /*
    * Sincroniza inicio, cierre y actualizacion
-   * de sesion entre las pestanas.
+   * de sesión entre las pestañas.
    */
   useEffect(() => {
     const sincronizarSesion = (

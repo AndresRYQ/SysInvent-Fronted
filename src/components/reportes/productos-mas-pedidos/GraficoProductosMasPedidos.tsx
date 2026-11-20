@@ -132,7 +132,7 @@ export function GraficoProductosMasPedidos({
                     style={{
                       height: '10px',
                       backgroundColor:
-                        '#e9f2ed',
+                        'var(--report-progress-bg, #e9f2ed)',
                     }}
                   >
                     <div

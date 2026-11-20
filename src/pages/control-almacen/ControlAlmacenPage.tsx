@@ -41,6 +41,7 @@ import { crearEstilosSelect } from '../../styles/reactSelectStyles'
 import { coincidenIds } from '../../utils/identificadores'
 import '../../styles/maestros.css'
 import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
+import { MetricCard } from '../../components/common/MetricCard'
 
 const FILTROS_INICIALES:
   FiltrosControlAlmacen = {
@@ -246,59 +247,45 @@ export function ControlAlmacenPage() {
 
           <div className="row g-3 mb-4">
             <div className="col-12 col-md-3">
-              <div className="card border-0 shadow-sm h-100">
-                <div className="card-body">
-                  <span className="text-secondary small">
-                    Productos controlados
-                  </span>
-
-                  <strong className="d-block fs-3 mt-1">
-                    {control.length}
-                  </strong>
-                </div>
-              </div>
+              <MetricCard
+                label="Productos controlados"
+                value={control.length}
+                detail="Productos registrados"
+                tone="green"
+                icon={<Boxes size={27} />}
+              />
             </div>
 
             <div className="col-12 col-md-3">
-              <div className="card border-0 shadow-sm h-100">
-                <div className="card-body">
-                  <span className="text-secondary small">
-                    Productos con stock
-                  </span>
-
-                  <strong className="d-block fs-3 text-success mt-1">
-                    {productosConStock}
-                  </strong>
-                </div>
-              </div>
+              <MetricCard
+                label="Productos con stock"
+                value={productosConStock}
+                detail="Disponibles en almacén"
+                tone="teal"
+                status="positive"
+                icon={<Boxes size={27} />}
+              />
             </div>
 
             <div className="col-12 col-md-3">
-              <div className="card border-0 shadow-sm h-100">
-                <div className="card-body">
-                  <span className="text-secondary small">
-                    Productos sin stock
-                  </span>
-
-                  <strong className="d-block fs-3 text-danger mt-1">
-                    {productosSinStock}
-                  </strong>
-                </div>
-              </div>
+              <MetricCard
+                label="Productos sin stock"
+                value={productosSinStock}
+                detail="Requieren reposición"
+                tone="orange"
+                status="alert"
+                icon={<Boxes size={27} />}
+              />
             </div>
 
             <div className="col-12 col-md-3">
-              <div className="card border-0 shadow-sm h-100">
-                <div className="card-body">
-                  <span className="text-secondary small">
-                    Unidades movilizadas
-                  </span>
-
-                  <strong className="d-block fs-3 mt-1">
-                    {unidadesMovilizadas}
-                  </strong>
-                </div>
-              </div>
+              <MetricCard
+                label="Unidades movilizadas"
+                value={unidadesMovilizadas}
+                detail="Entradas y salidas"
+                tone="blue"
+                icon={<ArrowDownToLine size={27} />}
+              />
             </div>
           </div>
 

@@ -10,6 +10,7 @@ import {
   type ResumenDashboard,
 } from '../services/dashboardService'
 import { PageLoadingOverlay } from '../components/common/PageLoadingOverlay'
+import { MetricCard } from '../components/common/MetricCard'
 import AnimatedContent from '../components/ui/AnimatedContent'
 import CountUp from '../components/ui/CountUp'
 import SpotlightCard from '../components/ui/SpotlightCard'
@@ -63,6 +64,34 @@ type Module = {
   category: string
   route?: string
   rutasPermiso?: string[]
+}
+
+function formatearFechaMovimiento(fecha?: Date | string): string {
+  if (!fecha) {
+    return 'Sin fecha'
+  }
+
+  const fechaDate = fecha instanceof Date ? fecha : new Date(fecha)
+  if (Number.isNaN(fechaDate.getTime())) {
+    return String(fecha)
+  }
+
+  return new Intl.DateTimeFormat('es-PE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).format(fechaDate)
+}
+
+function formatearFechasEnTexto(texto: string): string {
+  return texto.replace(
+    /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/g,
+    (fecha) => formatearFechaMovimiento(fecha),
+  )
 }
 
 const categories = [
@@ -505,7 +534,7 @@ function DashboardPage() {
       (alerta) => ({
         id: alerta.id,
         title: alerta.titulo,
-        detail: alerta.detalle,
+        detail: formatearFechasEnTexto(alerta.detalle),
         tone: alerta.tono,
       }),
     )
@@ -515,7 +544,7 @@ function DashboardPage() {
       .movimientosRecientes
       .map((movimiento) => ({
         id: movimiento.id,
-        date: movimiento.fecha,
+        date: formatearFechaMovimiento(movimiento.fecha),
         type: movimiento.tipo,
         document:
           movimiento.documento,
@@ -623,62 +652,20 @@ const filteredModules =
           </AnimatedContent>
         </div>
 
-        <AnimatedContent
-          className="system-status"
-          delay={120}
-        >
-          <div className="system-status__header">
-            <span
-              className="system-status__indicator"
-              aria-hidden="true"
-            />
-
-            <div>
-              <small>Estado del sistema</small>
-              <strong>Operación normal</strong>
-            </div>
-          </div>
-
-          <div className="system-status__details">
-            <div>
-              <span>Entorno</span>
-              <strong>Localhost</strong>
-            </div>
-
-            <div>
-              <span>Sesión</span>
-              <strong>Activa</strong>
-            </div>
-
-            <div>
-              <span>Rol</span>
-              <strong>
-                {sesion?.rol ?? 'Sin rol'}
-              </strong>
-            </div>
-          </div>
-        </AnimatedContent>
       </section>
 
       <section className="metrics-grid" aria-label="Indicadores principales">
         {metrics.map((metric, index) => (
           <AnimatedContent delay={index * 80} key={metric.label}>
-            <SpotlightCard className="metric-card" color={`var(--tone-${metric.tone}-soft)`}>
-              <span className={`icon-bubble tone-${metric.tone}`}>
-                <Icon name={metric.icon} />
-              </span>
-              <div>
-                <p>{metric.label}</p>
-                <strong>
-                  <CountUp end={metric.value} />
-                </strong>
-                <small
-                  className={`metric-detail metric-detail--${metric.status}`}
-                >
-                  {metric.detail}
-                </small>
-              </div>
-            </SpotlightCard>
+            <MetricCard
+              label={metric.label}
+              value={<CountUp end={metric.value} />}
+              detail={metric.detail}
+              status={metric.status}
+              tone={metric.tone}
+              icon={<Icon name={metric.icon} />}
+              spotlight
+            />
           </AnimatedContent>
         ))}
       </section>
