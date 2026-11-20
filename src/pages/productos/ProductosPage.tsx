@@ -303,9 +303,9 @@ export function ProductosPage() {
 
     try {
       await eliminarProducto(productoAEliminar.productoId)
-      await cargarProductos()
       setModalDeleteOpen(false)
       setProductoAEliminar(null)
+      void cargarProductos()
 
       mostrarAlerta('success', 'Producto eliminado correctamente.')
     } catch (error) {
@@ -321,7 +321,9 @@ export function ProductosPage() {
 
     try {
       const respuesta = await reactivarProducto(productoAReactivar.productoId)
-      await cargarProductos()
+      setModalReactivarOpen(false)
+      setProductoAReactivar(null)
+      void cargarProductos()
       mostrarAlerta('success', respuesta.message ?? 'Producto reactivado correctamente.')
     } catch (error) {
       mostrarAlerta('error', obtenerMensajeError(error))
@@ -346,9 +348,9 @@ export function ProductosPage() {
       } else {
         await crearProducto(datos)
       }
-      await cargarProductos()
       cerrarFormulario()
       mostrarAlerta('success', editando ? 'Producto actualizado correctamente.' : 'Producto registrado correctamente.')
+      void cargarProductos()
     } catch (error) {
       setErrorFormulario(obtenerMensajeError(error))
     }
