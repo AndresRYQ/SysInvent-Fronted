@@ -558,6 +558,16 @@
   box-shadow: 0 12px 30px rgb(0 0 0 / 24%);
 }
 
+[data-theme='dark'] .maestro-fullscreen-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgb(7 13 24 / 72%) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: none;
+}
+
 [data-theme='dark'] .ingreso-products-card {
   background: #1b2a3d !important;
 }
@@ -771,4 +781,3 @@
 [data-theme='dark'] .ingreso-products-card .table tfoot {
   border-top: 2px solid #40556d;
 }
-
