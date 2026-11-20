@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 
 import { Header } from '../components/common/Header'
 import { Sidebar } from '../components/common/Sidebar'
+import { ModalSubmitGuard } from '../components/common/ModalSubmitGuard'
 import '../styles/MainLayout.css'
 
 const SIN_MENU = ['/dashboard', '/sin-permiso']
@@ -76,6 +77,7 @@ export function MainLayout() {
 
   return (
     <div className="app-layout">
+      <ModalSubmitGuard />
       <header className="app-header">
         <Header
           menuAbierto={menuAbierto}

@@ -19,6 +19,7 @@ import type {
   Rol,
   RolFormData,
 } from '../../types/rol'
+import { useModalSubmit } from '../../hooks/useModalSubmit'
 
 interface FormularioRolProps {
   rol: Rol | null
@@ -47,6 +48,7 @@ export function FormularioRol({
   const [error, setError] = useState('')
   const [tipoAlerta, setTipoAlerta] = useState<'warning' | 'error'>('warning')
   const [errores, setErrores] = useState({ nombre: '', descripcion: '' })
+  const { guardando, ejecutar } = useModalSubmit()
 
   const todosSeleccionados =
     MODULOS_SISTEMA.every((modulo) =>
@@ -95,12 +97,14 @@ export function FormularioRol({
       return
     }
 
-    const mensaje = await onGuardar(datos)
+    await ejecutar(async () => {
+      const mensaje = await onGuardar(datos)
 
-    if (mensaje) {
-      setTipoAlerta('error')
-      setError(mensaje)
-    }
+      if (mensaje) {
+        setTipoAlerta('error')
+        setError(mensaje)
+      }
+    })
   }
 
   return (
@@ -111,6 +115,7 @@ export function FormularioRol({
       <form
         className="maestro-modal-card"
         onSubmit={manejarEnvio}
+        aria-busy={guardando}
         role="dialog"
         aria-modal="true"
         aria-labelledby="rol-form-title"
@@ -165,6 +170,7 @@ export function FormularioRol({
                 className={`form-control${errores.nombre ? ' maestro-control--error' : ''}`}
                 value={datos.nombre}
                 placeholder={Placeholder.Ingresar}
+                disabled={guardando}
                 maxLength={255}
                 onChange={(evento) => {
                   setDatos((actual) => ({
@@ -195,6 +201,7 @@ export function FormularioRol({
                 maxLength={255}
                 value={datos.descripcion}
                 placeholder={Placeholder.Ingresar}
+                disabled={guardando}
                 onChange={(evento) => {
                   setDatos((actual) => ({
                     ...actual,
@@ -225,6 +232,7 @@ export function FormularioRol({
                   <input
                     type="checkbox"
                     checked={todosSeleccionados}
+                    disabled={guardando}
                     onChange={(evento) =>
                       setDatos((actual) => ({
                         ...actual,
@@ -255,6 +263,7 @@ export function FormularioRol({
                         checked={datos.modulos.includes(
                           modulo.id,
                         )}
+                        disabled={guardando}
                         onChange={() =>
                           cambiarModulo(
                             modulo.id,
@@ -285,9 +294,10 @@ export function FormularioRol({
           <button
             type="submit"
             className="btn btn-maestro-primary"
+            disabled={guardando}
           >
             <Save size={17} />
-            Guardar
+            {guardando ? 'Guardando...' : 'Guardar'}
           </button>
         </footer>
       </form>
