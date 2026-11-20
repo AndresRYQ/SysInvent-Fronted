@@ -204,10 +204,21 @@ export function RolesPage() {
         setAlertaAbierta(true)
       }
 
-      setRoles(await obtenerRolesBackend())
       setModalAbierto(false)
       setRolEnEdicion(null)
       setPage(1)
+
+      void obtenerRolesBackend()
+        .then(setRoles)
+        .catch((error: unknown) => {
+          setMensaje({
+            tipo: 'error',
+            texto: error instanceof Error
+              ? error.message
+              : 'No se pudieron actualizar los roles.',
+          })
+          setAlertaAbierta(true)
+        })
 
       return null
     } catch (error) {
@@ -228,7 +239,6 @@ export function RolesPage() {
 
     try {
       await eliminarRolBackend(rolAEliminar.id)
-      setRoles(await obtenerRolesBackend())
       setPage(1)
       setRolAEliminar(null)
       setMensaje({
@@ -236,6 +246,13 @@ export function RolesPage() {
         texto: 'Rol eliminado correctamente.',
       })
       setAlertaAbierta(true)
+      void obtenerRolesBackend().then(setRoles).catch(() => {
+        setMensaje({
+          tipo: 'error',
+          texto: 'No se pudieron actualizar los roles.',
+        })
+        setAlertaAbierta(true)
+      })
     } catch (error) {
       setRolAEliminar(null)
       setMensaje({
