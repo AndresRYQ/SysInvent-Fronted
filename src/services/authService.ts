@@ -125,7 +125,7 @@ export async function login(
       return {
         exitoso: true,
         sesion: crearSesionDesdeToken(response.data),
-        mensaje: response.message || 'Inicio de sesion correcto',
+        mensaje: response.message || 'Inicio de sesión correcto',
         bloqueadoHasta: null,
       }
     }

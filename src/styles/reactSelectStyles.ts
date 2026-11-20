@@ -71,7 +71,25 @@ export function crearEstilosSelect({
     }),
     menu: (base: any) => ({
       ...base,
+      color: 'var(--color-text-primary)',
+      backgroundColor: 'var(--color-select-bg)',
       zIndex: 9999,
+    }),
+    menuList: (base: any) => ({
+      ...base,
+      padding: 4,
+      backgroundColor: 'var(--color-select-bg)',
+    }),
+    dropdownIndicator: (base: any) => ({
+      ...base,
+      color: 'var(--color-text-muted)',
+      '&:hover': {
+        color: 'var(--color-text-primary)',
+      },
+    }),
+    indicatorSeparator: (base: any) => ({
+      ...base,
+      backgroundColor: 'var(--color-border)',
     }),
     menuPortal: (base: any) => ({
       ...base,
@@ -80,14 +98,19 @@ export function crearEstilosSelect({
     option: (base: any, state: any) => ({
       ...base,
       color: state.isSelected
-        ? 'var(--color-white)'
+        ? '#fff'
         : 'var(--color-text-secondary)',
       fontSize: 'var(--form-control-font-size)',
       backgroundColor: state.isSelected
-        ? 'var(--color-green)'
+        ? 'var(--select-option-selected-bg)'
         : state.isFocused
-          ? 'var(--color-green-soft)'
-          : 'var(--color-white)',
+          ? 'var(--select-option-focused-bg)'
+          : 'var(--select-option-bg)',
+      ':active': {
+        backgroundColor: state.isSelected
+          ? 'var(--select-option-selected-bg)'
+          : 'var(--select-option-focused-bg)',
+      },
     }),
   }
 }

@@ -15,6 +15,7 @@ import { Placeholder } from '../../constants/placeholders'
 import { TablePagination } from '../../components/ui/TablePagination'
 import { DatePickerInput } from '../../components/ui/DatePickerInput'
 import { PageLoadingOverlay } from '../../components/common/PageLoadingOverlay'
+import { MetricCard } from '../../components/common/MetricCard'
 import { ValidadorRangoFechas } from '../../utils/ValidadorRangoFechas'
 import { listarControlAlmacen } from '../../services/kardexService'
 import {
@@ -316,6 +317,7 @@ export function ReportesKardexPage() {
             valor:
               movimientosFiltrados.length,
             Icon: ListFilter,
+            tone: 'green',
           },
           {
             label:
@@ -327,6 +329,7 @@ export function ReportesKardexPage() {
                   'Entrada',
               ).length,
             Icon: ArrowDownToLine,
+            tone: 'teal',
           },
           {
             label:
@@ -338,22 +341,19 @@ export function ReportesKardexPage() {
                   'Salida',
               ).length,
             Icon: ArrowUpFromLine,
+            tone: 'blue',
           },
         ].map(
-          ({ label, valor, Icon }) => (
-            <article
-              className="table-card kardex-stat"
+          ({ label, valor, Icon, tone }) => (
+            <MetricCard
               key={label}
-            >
-              <Icon
-                size={22}
-                aria-hidden="true"
-              />
-              <div>
-                <span>{label}</span>
-                <strong>{valor}</strong>
-              </div>
-            </article>
+              label={label}
+              value={valor}
+              detail="Movimientos registrados"
+              tone={tone}
+              status="positive"
+              icon={<Icon size={27} aria-hidden="true" />}
+            />
           ),
         )}
       </section>

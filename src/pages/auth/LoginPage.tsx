@@ -52,6 +52,13 @@ export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
 
+  useEffect(() => {
+    // El login conserva siempre el tema claro para asegurar el contraste de
+    // los campos de usuario y contraseña. El tema guardado se recupera al
+    // montar nuevamente el layout autenticado.
+    document.documentElement.dataset.theme = 'light'
+  }, [])
+
   const [usuario, setUsuario] =
     useState('')
 

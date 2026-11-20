@@ -74,7 +74,7 @@ export function ActividadRecienteFromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         
-        'fecha': json['fecha'] == null ? undefined : (new Date(json['fecha'])),
+        'fecha': json['fecha'] == null ? undefined : new Date(json['fecha']),
         'tipo': json['tipo'] == null ? undefined : json['tipo'],
         'documento': json['documento'] == null ? undefined : json['documento'],
         'producto': json['producto'] == null ? undefined : json['producto'],
@@ -94,7 +94,7 @@ export function ActividadRecienteToJSONTyped(value?: ActividadReciente | null, i
 
     return {
         
-        'fecha': value['fecha'] == null ? value['fecha'] : value['fecha'].toISOString(),
+        'fecha': value['fecha']?.toISOString(),
         'tipo': value['tipo'],
         'documento': value['documento'],
         'producto': value['producto'],

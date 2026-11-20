@@ -20,6 +20,9 @@
   --color-page-start: #eff8f0;
   --color-page-middle: #f6f8f6;
   --color-page-end: #eef2f7;
+  --select-option-bg: #fff;
+  --select-option-focused-bg: #e8f5ea;
+  --select-option-selected-bg: #338f3c;
 
   /* Medidas reutilizables */
   --form-control-height: 36px;
